@@ -1,0 +1,462 @@
+{
+  "appTitle": "E-Team - Department as a Service",
+
+  "commonCancel": "Cancel",
+  "commonApply": "Apply",
+
+  "profileTitle": "My Profile",
+  "profileDarkMode": "Dark Mode",
+  "profileEditProfile": "Edit Profile",
+  "profileLanguage": "Language",
+  "profileTerms": "Terms & Conditions",
+  "profilePrivacy": "Privacy Policy",
+  "profileLogout": "Logout",
+  "profileUserDataNotAvailable": "User data not available",
+  "profileUpdatedSuccessfully": "Profile updated successfully!",
+
+  "logoutDialogTitle": "Logout",
+  "logoutDialogMessage": "Are you sure you want to logout?",
+
+  "languageTitle": "Language",
+  "languageSubtitle": "Choose your preferred language",
+  "languageInfoBanner": "The app language will update instantly",
+  "languageApplyButton": "Apply Language",
+  "languageChangeDialogTitle": "Change Language?",
+  "languageChangeDialogMessage": "The app will switch to {language}.",
+  "@languageChangeDialogMessage": {
+    "placeholders": {
+      "language": {}
+    }
+  },
+  "languageChangedSnack": "Language changed to {language}",
+  "@languageChangedSnack": {
+    "placeholders": {
+      "language": {}
+    }
+  },
+
+  "commonPerHourShort": "/hr",
+  "commonPerMonthShort": "/mo",
+
+  "agentMarketplaceWelcomeBack": "Welcome back",
+  "agentMarketplaceNoNewNotifications": "No new notifications",
+  "agentMarketplaceTitle": "Agent Marketplace",
+  "agentMarketplaceSwipeToExplore": "Swipe to explore {count} AI agents",
+  "@agentMarketplaceSwipeToExplore": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "agentMarketplaceHireAgent": "Hire Agent",
+  "agentMarketplaceNavMarket": "Market",
+  "agentMarketplaceNavAgents": "Agents",
+  "agentMarketplaceNavStats": "Stats",
+  "agentMarketplaceNavSettings": "Settings",
+  "agentMarketplaceStatResponse": "Response",
+  "agentMarketplaceStatAccuracy": "Accuracy",
+  "agentMarketplaceStatLanguages": "Languages",
+  "agentMarketplacePriceFrom": "from {price}",
+  "@agentMarketplacePriceFrom": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+
+  "agentRoleHrSpecialist": "HR SPECIALIST",
+  "agentRoleFinancialExpert": "FINANCIAL EXPERT",
+  "agentRoleAdminAssistant": "ADMIN ASSISTANT",
+  "agentRolePlanningManager": "PLANNING MANAGER",
+  "agentRoleCommunicationPro": "COMMUNICATION PRO",
+  "agentDescAlpha": "Manage employees, track leaves, and onboarding support",
+  "agentDescFinanceWizard": "Expense tracking, invoice management, financial reports",
+  "agentDescAdminPro": "Document management, classification, archiving",
+  "agentDescPlanningBot": "Task management, meeting scheduling, deadlines",
+  "agentDescCommSync": "Email management, notifications, summaries",
+
+  "agentDetailsTitle": "Agent Profile",
+  "agentDetailsShareSnack": "Share {agent}",
+  "@agentDetailsShareSnack": {
+    "placeholders": {
+      "agent": {}
+    }
+  },
+  "agentDetailsHires": "({hires} hires)",
+  "@agentDetailsHires": {
+    "placeholders": {
+      "hires": {}
+    }
+  },
+  "agentDetailsStatResponse": "RESPONSE",
+  "agentDetailsStatAccuracy": "ACCURACY",
+  "agentDetailsStatLanguages": "LANGUAGES",
+  "agentDetailsCoreSkills": "CORE SKILLS",
+  "agentDetailsPerformanceEfficiency": "PERFORMANCE EFFICIENCY",
+  "agentDetailsPerformanceThisWeek": "+12.4% this week",
+  "agentDetailsDeploymentPlans": "DEPLOYMENT PLANS",
+  "agentDetailsPlanFreeTrial": "Free Trial",
+  "agentDetailsPlanHourly": "Hourly",
+  "agentDetailsPlanMonthly": "Monthly",
+  "agentDetailsBadgeStarter": "STARTER",
+  "agentDetailsBadgeBestValue": "BEST VALUE",
+  "agentDetailsHireAgent": "Hire Agent",
+  "agentDetailsHourlyPlan": "Hourly Plan",
+  "agentDetailsMonthlyPlan": "Monthly Plan",
+  "agentDetailsAgentHiredSnack": "{agent} hired with {plan}!",
+  "@agentDetailsAgentHiredSnack": {
+    "placeholders": {
+      "agent": {},
+      "plan": {}
+    }
+  },
+
+  "pricingRequestsPerMonth": "{count} requests/month",
+  "@pricingRequestsPerMonth": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pricingPayAsYouGo": "Pay as you go",
+  "pricingUnlimitedHrTasks": "Unlimited HR tasks",
+  "pricingFullFinancialSuite": "Full financial suite",
+  "pricingCompleteAdminSupport": "Complete admin support",
+  "pricingProjectManagementTools": "Project management tools",
+  "pricingCommunicationAutomation": "Communication automation",
+  "pricingFullFeaturesAccess": "Full features access",
+
+  "agentVersionAlpha": "Version 3.2.1 • HR Certified",
+  "agentVersionFinanceWizard": "Version 4.0.5 • Financial Expert",
+  "agentVersionAdminPro": "Version 2.8.3 • Admin Specialist",
+  "agentVersionPlanningBot": "Version 3.1.0 • Planning Pro",
+  "agentVersionCommSync": "Version 2.9.2 • Communication Master",
+  "agentVersionDefault": "Version 2.4.0 • Enterprise Ready",
+
+  "skillRecruitmentOnboarding": "Recruitment & Onboarding",
+  "skillEmployeeRecords": "Employee Records",
+  "skillPayrollManagement": "Payroll Management",
+  "skillLeaveTracking": "Leave Tracking",
+  "skillPerformanceReviews": "Performance Reviews",
+  "skillInvoiceProcessing": "Invoice Processing",
+  "skillExpenseTracking": "Expense Tracking",
+  "skillFinancialReports": "Financial Reports",
+  "skillBudgetPlanning": "Budget Planning",
+  "skillTaxCompliance": "Tax Compliance",
+  "skillDocumentManagement": "Document Management",
+  "skillFileOrganization": "File Organization",
+  "skillDataEntry": "Data Entry",
+  "skillMeetingScheduling": "Meeting Scheduling",
+  "skillEmailManagement": "Email Management",
+  "skillProjectPlanning": "Project Planning",
+  "skillTaskManagement": "Task Management",
+  "skillResourceAllocation": "Resource Allocation",
+  "skillDeadlineTracking": "Deadline Tracking",
+  "skillTeamCoordination": "Team Coordination",
+  "skillEmailCampaigns": "Email Campaigns",
+  "skillTeamCommunications": "Team Communications",
+  "skillNotifications": "Notifications",
+  "skillAnnouncementDistribution": "Announcement Distribution",
+  "skillChatManagement": "Chat Management",
+  "skillNaturalLanguage": "Natural Language",
+  "skillApiIntegration": "API Integration",
+  "skillMultilingualSupport": "Multi-lingual Support",
+  "skillDataAnalysis": "Data Analysis",
+  "skillAutomation": "Automation",
+
+  "onboardingSkip": "Skip",
+  "onboardingWelcomeTo": "Welcome to",
+  "onboardingWelcomeSubtitle": "Your AI-powered workspace\nfor smarter decisions",
+  "onboardingSlideToStart": "Slide to Start",
+  "onboardingExploreMarketplace": "Explore Marketplace",
+
+  "onboardingChatbotTitle": "E-Team AI",
+  "onboardingChatbotQuestionLabel": "Question {number}",
+  "@onboardingChatbotQuestionLabel": {
+    "placeholders": {
+      "number": {}
+    }
+  },
+  "onboardingChatbotSelectAtLeastOne": "Please select at least one option",
+  "onboardingChatbotContinue": "Continue",
+  "onboardingChatbotDiscoverMarketplace": "Discover Marketplace",
+  "onboardingChatbotPersonalizedRecommendations": "✨ Personalized recommendations:\n\n{recommendations}",
+  "@onboardingChatbotPersonalizedRecommendations": {
+    "placeholders": {
+      "recommendations": {}
+    }
+  },
+
+  "chatbotQRole": "👋 Nice to meet you!\n\nWhat's your role?",
+  "chatbotQTeamSize": "How large is your team?",
+  "chatbotQChallenges": "What are your biggest challenges?",
+  "chatbotQChallengesSubtitle": "Select all that apply",
+  "chatbotQPriority": "What's your #1 priority?",
+
+  "chatbotRoleCeoFounder": "👔 CEO / Founder",
+  "chatbotRoleManager": "📊 Manager",
+  "chatbotRoleDepartmentHead": "💼 Department Head",
+  "chatbotRoleEmployee": "👨‍💻 Employee",
+  "chatbotRoleStudent": "🎓 Student",
+
+  "chatbotTeamSolo": "Solo",
+  "chatbotTeam2To5": "2-5 people",
+  "chatbotTeam6To20": "6-20 people",
+  "chatbotTeam21To50": "21-50 people",
+  "chatbotTeam50Plus": "50+ people",
+
+  "chatbotChallengeTimeManagement": "⏰ Time management",
+  "chatbotChallengeGrowthManagement": "📈 Growth management",
+  "chatbotChallengeCostOptimization": "💰 Cost optimization",
+  "chatbotChallengeTeamCoordination": "🤝 Team coordination",
+  "chatbotChallengeDataAnalysis": "📊 Data analysis",
+  "chatbotChallengeTaskAutomation": "🔄 Task automation",
+
+  "chatbotPriorityProductivity": "🚀 Productivity",
+  "chatbotPriorityInnovation": "💡 Innovation",
+  "chatbotPriorityRevenueGrowth": "📈 Revenue growth",
+  "chatbotPriorityTeamDevelopment": "👥 Team development",
+  "chatbotPriorityTimeSaving": "⚡ Time saving",
+
+  "chatbotRecTaskAutomationAi": "🤖 Task Automation AI",
+  "chatbotRecTeamSyncAssistant": "👥 Team Sync Assistant",
+  "chatbotRecDataAnalyticsPro": "📊 Data Analytics Pro",
+  "chatbotRecSmartAssistant": "🚀 Smart Assistant",
+  "chatbotRecAnalyticsDashboard": "📊 Analytics Dashboard",
+
+  "commonUser": "User",
+  "commonEmailPlaceholder": "email@example.com",
+  "commonUserInitial": "U",
+
+  "authWelcomeBackTitle": "Welcome\nback",
+  "authWelcomeBackSnack": "✅ Welcome back!",
+
+  "authEmailLabel": "Email",
+  "authEmailHint": "name@company.com",
+  "authEmailRequired": "Enter your email",
+  "authEmailInvalid": "Please enter a valid email",
+
+  "authPasswordLabel": "Password",
+  "authPasswordHint": "••••••••",
+  "authPasswordRequired": "Enter your password",
+  "authPasswordMin6Short": "Min 6 characters",
+  "authPasswordMin6": "Password must be at least 6 characters",
+
+  "authRememberMe": "Remember me",
+  "authForgotPassword": "Forgot password?",
+  "authSignIn": "Sign In",
+  "authOr": "or",
+  "authNewHere": "New here? ",
+  "authCreateAccount": "Create account",
+
+  "authGoogleComingSoon": "Google Sign-In coming soon!",
+  "authAppleComingSoon": "Apple Sign-In coming soon!",
+
+  "authLoginNoAccount": "No account found with this email",
+  "authLoginIncorrectPassword": "Incorrect password",
+  "authUnableToConnect": "Unable to connect to server",
+  "authLoginFailedTryAgain": "Login failed. Please try again.",
+
+  "authCreateAccountTitle": "Create Account",
+  "authSignupSubtitle": "Join us to transform your business",
+  "authFullNameLabel": "Full Name",
+  "authFullNameHint": "John Doe",
+  "authNameRequired": "Please enter your name",
+  "authNameMin2": "Name must be at least 2 characters",
+
+  "authConfirmPasswordLabel": "Confirm Password",
+  "authConfirmPasswordRequired": "Please confirm your password",
+  "authPasswordsDoNotMatch": "Passwords do not match",
+
+  "authAcceptTermsError": "Please accept the Terms & Conditions and Privacy Policy",
+  "authAgreeToPrefix": "I agree to the ",
+  "authTermsAndConditions": "Terms & Conditions",
+  "authAnd": " and ",
+  "authPrivacyPolicy": "Privacy Policy",
+
+  "authAccountCreatedCheckEmail": "✅ Account created! Check your email for verification.",
+  "authEmailAlreadyRegistered": "This email is already registered",
+  "authConnectionTimeout": "Connection timeout. Please try again.",
+
+  "authAlreadyHaveAccount": "Already have an account? ",
+
+  "authForgotPasswordTitle": "Forgot\npassword?",
+  "authForgotPasswordSubtitle": "No worries. Enter your email and we'll send you a reset link.",
+  "authSendResetLink": "Send Reset Link",
+  "authBackToLogin": "Back to Login",
+
+  "authCheckYourEmailTitle": "Check your\nemail",
+  "authResetLinkSentTo": "We sent a password reset link to\n{email}",
+  "@authResetLinkSentTo": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "authDidntReceiveResend": "Didn't receive it? Resend",
+
+  "authVerifyYourEmailTitle": "Verify Your Email",
+  "authWeSentCodeTo": "We sent a verification code to",
+  "authYourEmailPlaceholder": "your email",
+  "authVerifyEmailButton": "Verify Email",
+  "authEnterAll6Digits": "Please enter all 6 digits",
+  "authEmailMissing": "Email is missing",
+  "authEmailVerifiedSuccess": "✅ Email verified successfully!",
+  "authInvalidCodeCheckEmail": "Invalid code. Check your email.",
+  "authCodeExpiredRequestNew": "Code expired. Request a new one.",
+  "authEmailAlreadyVerified": "Email already verified",
+  "authNewCodeSent": "✅ New code sent! Check your email.",
+  "authDidntReceiveCode": "Didn't receive the code? ",
+  "authResendInSeconds": "Resend in {seconds}s",
+  "@authResendInSeconds": {
+    "placeholders": {
+      "seconds": {}
+    }
+  },
+  "authResendCode": "Resend Code",
+  "authErrorWithDetails": "❌ Error: {error}",
+  "@authErrorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+
+  "authEditProfileTitle": "Edit Profile",
+  "authNameLabel": "Name",
+  "authEnterYourNameHint": "Enter your name",
+  "authEnterYourEmailHint": "Enter your email",
+  "authChangePassword": "Change Password",
+  "authCurrentPassword": "Current Password",
+  "authEnterCurrentPasswordHint": "Enter current password",
+  "authCurrentPasswordRequired": "Please enter current password",
+  "authNewPassword": "New Password",
+  "authEnterNewPasswordHint": "Enter new password",
+  "authConfirmNewPassword": "Confirm New Password",
+  "authConfirmNewPasswordHint": "Confirm new password",
+  "authUpdateProfileButton": "Update Profile",
+  "authProfileUpdatedSnack": "✅ Profile updated successfully!",
+
+  "helpSupportTitle": "Help & Support",
+  "helpSupportSubtitle": "We're here to help",
+  "helpSupportNeedHelpTitle": "Need Help?",
+  "helpSupportNeedHelpDesc": "Our support team is available 24/7\nto assist you",
+  "helpSupportFaqSectionTitle": "Frequently Asked Questions",
+  "helpSupportContactSectionTitle": "Contact Us",
+
+  "helpSupportFaqHireQuestion": "How do I hire an AI agent?",
+  "helpSupportFaqHireAnswer": "Go to the Agent Marketplace, browse available agents, and tap \"Hire Agent\" on your preferred choice.",
+  "helpSupportFaqPaymentQuestion": "What payment methods do you accept?",
+  "helpSupportFaqPaymentAnswer": "We accept credit cards (Visa, Mastercard), and bank transfers for enterprise plans.",
+  "helpSupportFaqCancelQuestion": "Can I cancel my subscription?",
+  "helpSupportFaqCancelAnswer": "Yes, you can cancel anytime from your profile settings. Your access continues until the end of the billing period.",
+  "helpSupportFaqUpdateProfileQuestion": "How do I update my profile?",
+  "helpSupportFaqUpdateProfileAnswer": "Go to Profile → Edit Profile to update your name, email, or password.",
+  "helpSupportFaqDataSecureQuestion": "Is my data secure?",
+  "helpSupportFaqDataSecureAnswer": "Yes! We use end-to-end encryption, SSL connections, and comply with GDPR standards.",
+
+  "helpSupportEmailSupportTitle": "Email Support",
+  "helpSupportEmailSupportDesc": "We respond within 24 hours",
+  "helpSupportCopiedToClipboard": "{label} copied to clipboard!",
+  "@helpSupportCopiedToClipboard": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "helpSupportComingSoon": "{label} - Coming soon!",
+  "@helpSupportComingSoon": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+
+  "privacyTitle": "Privacy Policy",
+  "privacySubtitle": "Your data is protected",
+  "privacyBadge": "GDPR Compliant • Last updated: Feb 8, 2026",
+  "privacyIntro": "We value your privacy and are committed to protecting your personal data.",
+
+  "privacySectionDataCollectedTitle": "Data Collected",
+  "privacySectionDataCollectedSummary": "What we gather",
+  "privacySectionDataCollectedContent": "We collect: Account info (name, email), usage data, device info, and payment details.",
+
+  "privacySectionDataUsageTitle": "Data Usage",
+  "privacySectionDataUsageSummary": "How we use it",
+  "privacySectionDataUsageContent": "We use data to provide services, personalize experience, process payments, and ensure security.",
+
+  "privacySectionSecurityTitle": "Security",
+  "privacySectionSecuritySummary": "Data protection",
+  "privacySectionSecurityContent": "End-to-end encryption, secure SSL, regular audits, and encrypted storage.",
+
+  "privacySectionRightsTitle": "Your Rights",
+  "privacySectionRightsSummary": "GDPR compliance",
+  "privacySectionRightsContent": "You can access, correct, delete, and export your data at any time.",
+
+  "privacySectionContactDpoTitle": "Contact DPO",
+  "privacySectionContactDpoSummary": "Privacy inquiries",
+  "privacySectionContactDpoContent": "📧 privacy@e-team.com\n📧 dpo@e-team.com",
+
+  "privacyDownloadSnack": "Privacy Policy downloaded",
+  "privacyDownloadButton": "Download Privacy Policy",
+  "privacyUnderstandButton": "I Understand",
+
+  "termsTitle": "Terms & Conditions",
+  "termsSubtitle": "Tap sections to expand",
+  "termsBadge": "Last updated: Feb 8, 2026",
+
+  "termsSectionAcceptanceTitle": "Acceptance",
+  "termsSectionAcceptanceSummary": "By using E-Team, you agree to these terms",
+  "termsSectionAcceptanceContent": "By accessing E-Team, you accept these terms. If you disagree, do not use the service.",
+
+  "termsSectionAiUsageTitle": "AI Usage",
+  "termsSectionAiUsageSummary": "AI tools assist, not replace judgment",
+  "termsSectionAiUsageContent": "AI agents assist with tasks. Results are not guaranteed. You must validate outputs and handle data securely.",
+
+  "termsSectionPaymentTitle": "Payment",
+  "termsSectionPaymentSummary": "Subscription & pay-as-you-go pricing",
+  "termsSectionPaymentContent": "Some features require payment. Subscriptions are billed monthly/yearly. Non-refundable unless required by law.",
+
+  "termsSectionLiabilityTitle": "Liability",
+  "termsSectionLiabilitySummary": "Limited legal responsibility",
+  "termsSectionLiabilityContent": "E-Team is not liable for indirect damages, loss of profits, or data loss.",
+
+  "termsSectionContactTitle": "Contact",
+  "termsSectionContactSummary": "Get in touch",
+  "termsSectionContactContent": "📧 support@e-team.com\n🌐 www.e-team.com",
+
+  "termsAcceptButton": "I Understand & Accept",
+
+  "appInfoTitle": "About E-Team",
+  "appInfoSubtitle": "App Information",
+  "appInfoTagline": "AI-Powered Team Management",
+  "appInfoVersion": "Version {version}",
+  "@appInfoVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+
+  "appInfoAboutSectionTitle": "About",
+  "appInfoAboutDescription": "E-Team is an AI-powered platform that helps businesses manage their teams efficiently. With specialized AI agents for HR, Finance, Admin, Planning, and Communication, we automate repetitive tasks and boost productivity.",
+
+  "appInfoFeaturesTitle": "Key Features",
+  "appInfoFeaturesSubtitle": "What we offer",
+  "appInfoFeatureMarketplace": "🦾 AI Agent Marketplace",
+  "appInfoFeatureHr": "💼 HR Management Automation",
+  "appInfoFeatureFinancial": "💰 Financial Tools & Reports",
+  "appInfoFeatureDocs": "📁 Document Management",
+  "appInfoFeaturePlanning": "📅 Smart Planning & Scheduling",
+  "appInfoFeatureCommunication": "📧 Communication Assistant",
+
+  "appInfoTechTitle": "Technology Stack",
+  "appInfoTechSubtitle": "Built with modern tools",
+  "appInfoTechFlutter": "Flutter - Cross-platform UI",
+  "appInfoTechNode": "Node.js - Backend API",
+  "appInfoTechMongo": "MongoDB - Database",
+  "appInfoTechProvider": "Provider - State Management",
+  "appInfoTechJwt": "JWT - Authentication",
+
+  "appInfoConnectWithUs": "CONNECT WITH US",
+  "appInfoEmailLabel": "Email",
+  "appInfoLegalTerms": "Terms & Conditions",
+  "appInfoLegalPrivacy": "Privacy Policy",
+  "appInfoLegalLicenses": "Licenses",
+  "appInfoComingSoon": "Coming soon!",
+  "appInfoLegalese": "© 2025 E-Team. All rights reserved.",
+  "appInfoCopyright": "© 2025 E-Team. All rights reserved.",
+  "appInfoMadeWith": "Made with ❤️ in Tunisia 🇹🇳"
+}
