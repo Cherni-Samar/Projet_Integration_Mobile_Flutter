@@ -1,5 +1,6 @@
 class ApiConstants {
   static const String baseUrl = 'http://10.0.2.2:3000/api/auth';
+  //static const String baseUrl ='http://192.168.100.15:3000/api/auth'; // ✅ Adresse IP pour le telephone physique
 
   // Auth
   static const String signup = '$baseUrl/signup';
