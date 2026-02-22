@@ -37,11 +37,7 @@ class Benefit {
   final String title;
   final String description;
 
-  Benefit({
-    required this.icon,
-    required this.title,
-    required this.description,
-  });
+  Benefit({required this.icon, required this.title, required this.description});
 }
 
 // Activity Model
@@ -85,11 +81,7 @@ class AgentData {
       id: 'hr',
       title: 'HR SPECIALIST',
       shortTitle: 'HR',
-      description: [
-        'Manage employees',
-        'Track leaves',
-        'Onboarding support',
-      ],
+      description: ['Manage employees', 'Track leaves', 'Onboarding support'],
       timesSaved: '20h/week',
       price: '29€/month',
       color: const Color(0xFF8B5CF6),
@@ -308,7 +300,8 @@ class AgentData {
         icon: '👥',
         color: const Color(0xFF8B5CF6),
         action: 'Processed 3 leave requests',
-        details: '• Approved: Sarah M.\n• Pending: John D.\n• Rejected: Mike R. (insufficient balance)',
+        details:
+            '• Approved: Sarah M.\n• Pending: John D.\n• Rejected: Mike R. (insufficient balance)',
         timestamp: DateTime.now().subtract(const Duration(minutes: 2)),
       ),
       Activity(
@@ -318,7 +311,8 @@ class AgentData {
         icon: '📁',
         color: const Color(0xFF10B981),
         action: 'Archived 12 documents',
-        details: 'Organized files into Q4 2025 folder\nCategories: Invoices (5), Contracts (7)',
+        details:
+            'Organized files into Q4 2025 folder\nCategories: Invoices (5), Contracts (7)',
         timestamp: DateTime.now().subtract(const Duration(minutes: 15)),
       ),
       Activity(
@@ -328,7 +322,8 @@ class AgentData {
         icon: '📅',
         color: const Color(0xFFEC4899),
         action: 'Scheduled 2 meetings',
-        details: '• Team Sync - Tomorrow 10:00 AM\n• Client Review - Friday 2:00 PM',
+        details:
+            '• Team Sync - Tomorrow 10:00 AM\n• Client Review - Friday 2:00 PM',
         timestamp: DateTime.now().subtract(const Duration(hours: 1)),
       ),
       Activity(

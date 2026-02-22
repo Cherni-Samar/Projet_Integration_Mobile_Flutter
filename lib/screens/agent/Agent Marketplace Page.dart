@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import '../../services/auth_service.dart';
 import '../../models/user_model.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/cart_provider.dart';
 import '../../l10n/app_localizations.dart';
-import 'agentDetails page.dart';
+
+import '../../screens/agent/AgentDetails Page.dart';
 import '../auth/user_profile_page.dart';
 
 class AgentMarketplacePage extends StatefulWidget {
@@ -30,56 +32,76 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
   List<Map<String, dynamic>> _buildAgents(AppLocalizations l10n) {
     return [
       {
-        'name': 'Agent Alpha',
+        'name': 'Hera',
         'role': l10n.agentRoleHrSpecialist,
         'description': l10n.agentDescAlpha,
-        'icon': '🦾',
+        'icon': 'assets/images/hera.png',
         'color': const Color(0xFF8B5CF6),
-        'stats': {'response': '< 1.2s', 'accuracy': '99.4%', 'languages': '42+'},
+        'stats': {
+          'response': '< 1.2s',
+          'accuracy': '99.4%',
+          'languages': '42+',
+        },
         'rating': 4.9,
         'hires': '1.2k',
         'price': '29€',
       },
       {
-        'name': 'FinanceWizard',
+        'name': 'Kash',
         'role': l10n.agentRoleFinancialExpert,
         'description': l10n.agentDescFinanceWizard,
-        'icon': '🧠',
+        'icon': 'assets/images/kash.png',
         'color': const Color(0xFFF59E0B),
-        'stats': {'response': '< 0.8s', 'accuracy': '98.9%', 'languages': '35+'},
+        'stats': {
+          'response': '< 0.8s',
+          'accuracy': '98.9%',
+          'languages': '35+',
+        },
         'rating': 4.8,
         'hires': '980',
         'price': '39€',
       },
       {
-        'name': 'AdminPro',
+        'name': 'Dexo',
         'role': l10n.agentRoleAdminAssistant,
         'description': l10n.agentDescAdminPro,
-        'icon': '🤖',
+        'icon': 'assets/images/dexo.png',
         'color': const Color(0xFF10B981),
-        'stats': {'response': '< 1.5s', 'accuracy': '97.8%', 'languages': '28+'},
+        'stats': {
+          'response': '< 1.5s',
+          'accuracy': '97.8%',
+          'languages': '28+',
+        },
         'rating': 5.0,
         'hires': '2.1k',
         'price': '25€',
       },
       {
-        'name': 'PlanningBot',
+        'name': 'Timo',
         'role': l10n.agentRolePlanningManager,
         'description': l10n.agentDescPlanningBot,
-        'icon': '🦿',
+        'icon': 'assets/images/krono.png',
         'color': const Color(0xFFEC4899),
-        'stats': {'response': '< 1.0s', 'accuracy': '96.5%', 'languages': '30+'},
+        'stats': {
+          'response': '< 1.0s',
+          'accuracy': '96.5%',
+          'languages': '30+',
+        },
         'rating': 4.7,
         'hires': '850',
         'price': '19€',
       },
       {
-        'name': 'CommSync',
+        'name': 'Echo',
         'role': l10n.agentRoleCommunicationPro,
         'description': l10n.agentDescCommSync,
-        'icon': '👾',
+        'icon': 'assets/images/voxi.png',
         'color': const Color(0xFFA855F7),
-        'stats': {'response': '< 0.9s', 'accuracy': '98.2%', 'languages': '45+'},
+        'stats': {
+          'response': '< 0.9s',
+          'accuracy': '98.2%',
+          'languages': '45+',
+        },
         'rating': 4.9,
         'hires': '1.5k',
         'price': '19€',
@@ -91,10 +113,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
   void initState() {
     super.initState();
     _loadUserData();
-    _pageController = PageController(
-      initialPage: 2,
-      viewportFraction: 0.8,
-    );
+    _pageController = PageController(initialPage: 2, viewportFraction: 0.8);
     _pageController.addListener(() {
       setState(() {
         _currentPage = _pageController.page ?? 2.0;
@@ -129,6 +148,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         });
       }
     } catch (e) {
+      // ignore: avoid_print
       print('Error loading user: $e');
       setState(() => _isLoading = false);
     }
@@ -139,17 +159,20 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
     final l10n = AppLocalizations.of(context)!;
+
     _agents = _buildAgents(l10n);
-    final currentAgent =
-    _agents[_currentPage.round().clamp(0, _agents.length - 1)];
+
+    final currentIndex = _currentPage.round().clamp(0, _agents.length - 1);
+    final currentAgent = _agents[currentIndex];
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF8F9FA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFF8F9FA),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // ✅ HEADER SIMPLIFIÉ SANS SEARCH BAR
               AnimatedBuilder(
                 animation: _headerAnimationController,
                 builder: (context, child) {
@@ -158,31 +181,31 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                     decoration: BoxDecoration(
                       gradient: isDark
                           ? LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          const Color(0xFF1A1A1A),
-                          const Color(0xFF2D2D2D),
-                          Color.lerp(
-                            const Color(0xFF2D2D2D),
-                            const Color(0xFFCDFF00).withOpacity(0.05),
-                            _headerAnimationController.value,
-                          )!,
-                        ],
-                      )
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                const Color(0xFF1A1A1A),
+                                const Color(0xFF2D2D2D),
+                                Color.lerp(
+                                  const Color(0xFF2D2D2D),
+                                  const Color(0xFFCDFF00).withOpacity(0.05),
+                                  _headerAnimationController.value,
+                                )!,
+                              ],
+                            )
                           : LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white,
-                          const Color(0xFFFAFAFA),
-                          Color.lerp(
-                            const Color(0xFFFAFAFA),
-                            const Color(0xFFCDFF00).withOpacity(0.03),
-                            _headerAnimationController.value,
-                          )!,
-                        ],
-                      ),
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.white,
+                                const Color(0xFFFAFAFA),
+                                Color.lerp(
+                                  const Color(0xFFFAFAFA),
+                                  const Color(0xFFCDFF00).withOpacity(0.03),
+                                  _headerAnimationController.value,
+                                )!,
+                              ],
+                            ),
                       boxShadow: [
                         BoxShadow(
                           color: isDark
@@ -199,48 +222,56 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                     ),
                     child: Row(
                       children: [
-                        // ✅ Avatar + User info (simplifié)
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => UserProfilePage(user: _currentUser),
+                                  builder: (context) =>
+                                      UserProfilePage(user: _currentUser),
                                 ),
-                              ).then((_) {
-                                _loadUserData();
-                              });
+                              ).then((_) => _loadUserData());
                             },
                             child: Row(
                               children: [
-                                // Avatar avec gradient
                                 Container(
                                   width: 52,
                                   height: 52,
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [Color(0xFFA855F7), Color(0xFF8B5CF6)],
+                                      colors: [
+                                        Color(0xFFA855F7),
+                                        Color(0xFF8B5CF6),
+                                      ],
                                     ),
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFFA855F7).withOpacity(0.5),
+                                        color: const Color(
+                                          0xFFA855F7,
+                                        ).withOpacity(0.5),
                                         blurRadius: 20,
                                         offset: const Offset(0, 4),
                                       ),
                                     ],
                                     border: Border.all(
                                       color: isDark
-                                          ? const Color(0xFFCDFF00).withOpacity(0.3)
+                                          ? const Color(
+                                              0xFFCDFF00,
+                                            ).withOpacity(0.3)
                                           : Colors.white,
                                       width: 2.5,
                                     ),
                                   ),
                                   child: Center(
                                     child: Text(
-                                      _currentUser?.name?.substring(0, 1).toUpperCase() ??
-                                          _currentUser?.email.substring(0, 1).toUpperCase() ??
+                                      _currentUser?.name
+                                              ?.substring(0, 1)
+                                              .toUpperCase() ??
+                                          _currentUser?.email
+                                              .substring(0, 1)
+                                              .toUpperCase() ??
                                           'U',
                                       style: const TextStyle(
                                         color: Colors.white,
@@ -250,13 +281,11 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                     ),
                                   ),
                                 ),
-
                                 const SizedBox(width: 16),
-
-                                // ✅ Nom simplifié (une seule ligne, sans emoji)
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
@@ -272,10 +301,14 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                       const SizedBox(height: 4),
                                       Text(
                                         _currentUser?.name ??
-                                            _currentUser?.email.split('@').first ??
+                                            _currentUser?.email
+                                                .split('@')
+                                                .first ??
                                             'User',
                                         style: TextStyle(
-                                          color: isDark ? Colors.white : Colors.black,
+                                          color: isDark
+                                              ? Colors.white
+                                              : Colors.black,
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                           letterSpacing: -0.5,
@@ -293,7 +326,65 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
 
                         const SizedBox(width: 12),
 
-                        // ✅ Notification bell (inchangé)
+                        Consumer<CartProvider>(
+                          builder: (context, cart, child) {
+                            return Stack(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.white.withOpacity(0.08)
+                                        : Colors.black.withOpacity(0.05),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isDark
+                                          ? Colors.white.withOpacity(0.15)
+                                          : Colors.black.withOpacity(0.1),
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: IconButton(
+                                    onPressed: () =>
+                                        Navigator.pushNamed(context, '/cart'),
+                                    padding: EdgeInsets.zero,
+                                    icon: Icon(
+                                      Icons.shopping_cart_outlined,
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.black,
+                                      size: 22,
+                                    ),
+                                  ),
+                                ),
+                                if (cart.itemCount > 0)
+                                  Positioned(
+                                    top: 10,
+                                    right: 10,
+                                    child: Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.red.withOpacity(0.8),
+                                            blurRadius: 8,
+                                            spreadRadius: 2,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            );
+                          },
+                        ),
+
+                        const SizedBox(width: 8),
+
                         Stack(
                           children: [
                             Container(
@@ -317,13 +408,16 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                     SnackBar(
                                       content: Row(
                                         children: [
-                                          const Icon(Icons.notifications_active,
-                                              color: Colors.white),
+                                          const Icon(
+                                            Icons.notifications_active,
+                                            color: Colors.white,
+                                          ),
                                           const SizedBox(width: 12),
                                           Expanded(
-                                              child: Text(
-                                                l10n.agentMarketplaceNoNewNotifications,
-                                              )),
+                                            child: Text(
+                                              l10n.agentMarketplaceNoNewNotifications,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       backgroundColor: isDark
@@ -353,12 +447,17 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                 height: 10,
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
-                                    colors: [Color(0xFFCDFF00), Color(0xFFAADD00)],
+                                    colors: [
+                                      Color(0xFFCDFF00),
+                                      Color(0xFFAADD00),
+                                    ],
                                   ),
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: const Color(0xFFCDFF00).withOpacity(0.8),
+                                      color: const Color(
+                                        0xFFCDFF00,
+                                      ).withOpacity(0.8),
                                       blurRadius: 8,
                                       spreadRadius: 2,
                                     ),
@@ -376,7 +475,6 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
 
               const SizedBox(height: 24),
 
-              // ✅ Title amélioré
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
@@ -437,7 +535,6 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
 
               const SizedBox(height: 24),
 
-              // 3D Carousel amélioré
               SizedBox(
                 height: 400,
                 child: PageView.builder(
@@ -451,22 +548,18 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
 
               const SizedBox(height: 16),
 
-              // Agent Info
               Column(
                 children: [
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     child: _buildAgentInfo(currentAgent, isDark),
                   ),
-
                   const SizedBox(height: 20),
 
-                  // ✅ Action Buttons améliorés
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
-                        // Next button
                         Container(
                           width: 56,
                           height: 56,
@@ -500,27 +593,22 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                             ),
                           ),
                         ),
-
                         const SizedBox(width: 12),
 
-                        // Hire button
                         Expanded(
                           child: Container(
                             height: 56,
                             decoration: BoxDecoration(
                               gradient: isDark
                                   ? const LinearGradient(
-                                colors: [
-                                  Color(0xFFCDFF00),
-                                  Color(0xFFAADD00)
-                                ],
-                              )
+                                      colors: [
+                                        Color(0xFFCDFF00),
+                                        Color(0xFFAADD00),
+                                      ],
+                                    )
                                   : const LinearGradient(
-                                colors: [
-                                  Colors.black,
-                                  Color(0xFF1A1A1A)
-                                ],
-                              ),
+                                      colors: [Colors.black, Color(0xFF1A1A1A)],
+                                    ),
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
@@ -538,23 +626,17 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => AgentDetailsPage(
-                                      title: currentAgent['name'],
-                                      color: currentAgent['color'],
-                                      illustration: currentAgent['icon'],
-                                      description: [
-                                        currentAgent['description']
-                                      ],
-                                      timesSaved: currentAgent['stats']
-                                      ['response'],
-                                      price: currentAgent['price'],
+                                      agents: _agents,
+                                      initialIndex: currentIndex,
                                     ),
                                   ),
                                 );
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
-                                foregroundColor:
-                                isDark ? Colors.black : Colors.white,
+                                foregroundColor: isDark
+                                    ? Colors.black
+                                    : Colors.white,
                                 shadowColor: Colors.transparent,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -567,7 +649,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                   const SizedBox(width: 10),
                                   Text(
                                     l10n.agentMarketplaceHireAgent,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0.5,
@@ -589,7 +671,6 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         ),
       ),
 
-      // Bottom Nav amélioré
       bottomNavigationBar: Container(
         height: 72,
         decoration: BoxDecoration(
@@ -634,15 +715,14 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                   MaterialPageRoute(
                     builder: (context) => UserProfilePage(user: _currentUser),
                   ),
-                ).then((_) {
-                  _loadUserData();
-                });
+                ).then((_) => _loadUserData());
               },
               child: _buildNavItem(
-                  Icons.settings_outlined,
-                  l10n.agentMarketplaceNavSettings,
-                  false,
-                  isDark),
+                Icons.settings_outlined,
+                l10n.agentMarketplaceNavSettings,
+                false,
+                isDark,
+              ),
             ),
           ],
         ),
@@ -652,6 +732,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
 
   Widget _build3DCard(int index, bool isDark) {
     final l10n = AppLocalizations.of(context)!;
+
     return AnimatedBuilder(
       animation: _pageController,
       builder: (context, child) {
@@ -663,6 +744,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
 
         final agent = _agents[index];
         final isCenter = (_currentPage - index).abs() < 0.5;
+        final currentIndex = _currentPage.round().clamp(0, _agents.length - 1);
 
         return Transform(
           transform: Matrix4.identity()
@@ -686,38 +768,30 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                       context,
                       MaterialPageRoute(
                         builder: (context) => AgentDetailsPage(
-                          title: agent['name'],
-                          color: agent['color'],
-                          illustration: agent['icon'],
-                          description: [agent['description']],
-                          timesSaved: agent['stats']['response'],
-                          price: agent['price'],
+                          agents: _agents,
+                          initialIndex: currentIndex,
                         ),
                       ),
                     );
                   }
                 },
                 child: Container(
-                  margin:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 24,
+                  ),
                   decoration: BoxDecoration(
                     gradient: isDark
-                        ? LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        const Color(0xFF1E1E1E),
-                        const Color(0xFF2A2A2A),
-                      ],
-                    )
-                        : LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white,
-                        const Color(0xFFFAFAFA),
-                      ],
-                    ),
+                        ? const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF1E1E1E), Color(0xFF2A2A2A)],
+                          )
+                        : const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Colors.white, Color(0xFFFAFAFA)],
+                          ),
                     borderRadius: BorderRadius.circular(32),
                     border: Border.all(
                       color: isCenter
@@ -727,8 +801,9 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: (agent['color'] as Color)
-                            .withOpacity(isCenter ? 0.35 : 0.15),
+                        color: (agent['color'] as Color).withOpacity(
+                          isCenter ? 0.35 : 0.15,
+                        ),
                         blurRadius: isCenter ? 40 : 20,
                         offset: const Offset(0, 15),
                       ),
@@ -737,7 +812,6 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Agent icon with glow
                       Container(
                         width: 110,
                         height: 110,
@@ -762,9 +836,14 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                           ],
                         ),
                         child: Center(
-                          child: Text(
-                            agent['icon'],
-                            style: const TextStyle(fontSize: 56),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(55),
+                            child: Image.asset(
+                              agent['icon'],
+                              width: 110,
+                              height: 110,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
@@ -787,7 +866,9 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 6),
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
@@ -812,7 +893,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                         ),
                       ),
                       const SizedBox(height: 14),
-                      // Rating
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -836,19 +917,25 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                           ),
                         ],
                       ),
+
                       const SizedBox(height: 14),
-                      // Price badge
+
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           gradient: isDark
                               ? const LinearGradient(
-                            colors: [Color(0xFFCDFF00), Color(0xFFAADD00)],
-                          )
+                                  colors: [
+                                    Color(0xFFCDFF00),
+                                    Color(0xFFAADD00),
+                                  ],
+                                )
                               : const LinearGradient(
-                            colors: [Colors.black, Color(0xFF1A1A1A)],
-                          ),
+                                  colors: [Colors.black, Color(0xFF1A1A1A)],
+                                ),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -898,7 +985,11 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
   }
 
   Widget _buildNavItem(
-      IconData icon, String label, bool isActive, bool isDark) {
+    IconData icon,
+    String label,
+    bool isActive,
+    bool isDark,
+  ) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -907,8 +998,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
           color: isActive
               ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
               : (isDark
-              ? Colors.white.withOpacity(0.4)
-              : Colors.black.withOpacity(0.4)),
+                    ? Colors.white.withOpacity(0.4)
+                    : Colors.black.withOpacity(0.4)),
           size: 26,
         ),
         const SizedBox(height: 6),
@@ -918,8 +1009,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
             color: isActive
                 ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
                 : (isDark
-                ? Colors.white.withOpacity(0.4)
-                : Colors.black.withOpacity(0.4)),
+                      ? Colors.white.withOpacity(0.4)
+                      : Colors.black.withOpacity(0.4)),
             fontSize: 11,
             fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           ),
@@ -930,6 +1021,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
 
   Widget _buildAgentInfo(Map<String, dynamic> agent, bool isDark) {
     final l10n = AppLocalizations.of(context)!;
+
     return Container(
       key: ValueKey(agent['name']),
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -995,10 +1087,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
           height: 50,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                color.withOpacity(0.15),
-                color.withOpacity(0.05),
-              ],
+              colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
             ),
             shape: BoxShape.circle,
             border: Border.all(color: color, width: 2.5),
