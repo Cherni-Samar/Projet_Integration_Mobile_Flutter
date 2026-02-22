@@ -62,7 +62,8 @@ import 'app_localizations_fr.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,7 +71,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -82,17 +84,18 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('fr')
+    Locale('fr'),
   ];
 
   /// No description provided for @appTitle.
@@ -314,61 +317,61 @@ abstract class AppLocalizations {
   /// No description provided for @agentRoleHrSpecialist.
   ///
   /// In en, this message translates to:
-  /// **'HR SPECIALIST'**
+  /// **'Human Resources Agent'**
   String get agentRoleHrSpecialist;
 
   /// No description provided for @agentRoleFinancialExpert.
   ///
   /// In en, this message translates to:
-  /// **'FINANCIAL EXPERT'**
+  /// **'Financial Agent'**
   String get agentRoleFinancialExpert;
 
   /// No description provided for @agentRoleAdminAssistant.
   ///
   /// In en, this message translates to:
-  /// **'ADMIN ASSISTANT'**
+  /// **'Administrative Agent'**
   String get agentRoleAdminAssistant;
 
   /// No description provided for @agentRolePlanningManager.
   ///
   /// In en, this message translates to:
-  /// **'PLANNING MANAGER'**
+  /// **'Planning Agent'**
   String get agentRolePlanningManager;
 
   /// No description provided for @agentRoleCommunicationPro.
   ///
   /// In en, this message translates to:
-  /// **'COMMUNICATION PRO'**
+  /// **'Communication Agent'**
   String get agentRoleCommunicationPro;
 
   /// No description provided for @agentDescAlpha.
   ///
   /// In en, this message translates to:
-  /// **'Manage employees, track leaves, and onboarding support'**
+  /// **'I am Hera, your HR guardian. I manage leave requests, approve or reject based on availability, and keep employee profiles updated automatically. I ensure everyone respects their roles and help new hires onboard smoothly. I also provide managers with clear dashboards of absences, so you always know who\'s present and who’s off.'**
   String get agentDescAlpha;
 
   /// No description provided for @agentDescFinanceWizard.
   ///
   /// In en, this message translates to:
-  /// **'Expense tracking, invoice management, financial reports'**
+  /// **'I am Kash, the money master. I validate expenses, classify them into categories like transport or materials, and generate monthly financial reports automatically. I alert you if budgets are exceeded, so you stay on top of your finances effortlessly.'**
   String get agentDescFinanceWizard;
 
   /// No description provided for @agentDescAdminPro.
   ///
   /// In en, this message translates to:
-  /// **'Document management, classification, archiving'**
+  /// **'I am Dexo, your document wizard. I automatically classify and name files, store them in the correct categories, and manage access rights. Need a contract or invoice? I generate it for you. Want to find a document? I’ll locate it instantly.'**
   String get agentDescAdminPro;
 
   /// No description provided for @agentDescPlanningBot.
   ///
   /// In en, this message translates to:
-  /// **'Task management, meeting scheduling, deadlines'**
+  /// **'I am Timo, your scheduling strategist. I prevent calendar conflicts, prioritize urgent tasks, and send reminders before deadlines. I assign tasks automatically, check availability for meetings, and notify you of upcoming deadlines so nothing slips through the cracks.'**
   String get agentDescPlanningBot;
 
   /// No description provided for @agentDescCommSync.
   ///
   /// In en, this message translates to:
-  /// **'Email management, notifications, summaries'**
+  /// **'I am Echo, your communication assistant. I prioritize important messages, summarize long conversations, and send smart notifications. I filter out spam and keep you focused on what really matters. I can even summarize team discussions so everyone stays aligned.'**
   String get agentDescCommSync;
 
   /// No description provided for @agentDetailsTitle.
@@ -1628,91 +1631,91 @@ abstract class AppLocalizations {
   /// No description provided for @privacySectionDataCollectedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Data Collected'**
+  /// **'Information Collection'**
   String get privacySectionDataCollectedTitle;
 
   /// No description provided for @privacySectionDataCollectedSummary.
   ///
   /// In en, this message translates to:
-  /// **'What we gather'**
+  /// **'Comprehensive data gathering practices'**
   String get privacySectionDataCollectedSummary;
 
   /// No description provided for @privacySectionDataCollectedContent.
   ///
   /// In en, this message translates to:
-  /// **'We collect: Account info (name, email), usage data, device info, and payment details.'**
+  /// **'We collect information to provide better services to all our users. This includes: \n\n1. **Personal Information:** Name, email address, phone number, and profile picture when you create an account.\n2. **Usage Info:** We collect information about how you use our services, such as the types of content you view or engage with, the features you use, the actions you take, and the time, frequency, and duration of your activities.\n3. **Device Information:** We collect device-specific information (such as your hardware model, operating system version, unique device identifiers, and mobile network information).\n4. **Payment Information:** If you purchase our services, we collect billing address and credit card information, which is processed securely by our payment partners.'**
   String get privacySectionDataCollectedContent;
 
   /// No description provided for @privacySectionDataUsageTitle.
   ///
   /// In en, this message translates to:
-  /// **'Data Usage'**
+  /// **'How We Use Data'**
   String get privacySectionDataUsageTitle;
 
   /// No description provided for @privacySectionDataUsageSummary.
   ///
   /// In en, this message translates to:
-  /// **'How we use it'**
+  /// **'Purpose of data processing'**
   String get privacySectionDataUsageSummary;
 
   /// No description provided for @privacySectionDataUsageContent.
   ///
   /// In en, this message translates to:
-  /// **'We use data to provide services, personalize experience, process payments, and ensure security.'**
+  /// **'We use the information we collect from all of our services for the following purposes:\n\n*   **To provide our services:** We use your information to deliver our services, such as processing your terms and authenticating you.\n*   **To maintain & improve our services:** We also use your information to ensure our services are working as intended, such as tracking outages or troubleshooting issues that you report to us.\n*   **To develop new services:** We use the information we collect in existing services to help us develop new ones.\n*   **To provide personalized services:** We use the information we collect to customize our services for you, including providing recommendations and personalized content.\n*   **To measure performance:** We use data for analytics and measurement to understand how our services are used.'**
   String get privacySectionDataUsageContent;
 
   /// No description provided for @privacySectionSecurityTitle.
   ///
   /// In en, this message translates to:
-  /// **'Security'**
+  /// **'Data Security'**
   String get privacySectionSecurityTitle;
 
   /// No description provided for @privacySectionSecuritySummary.
   ///
   /// In en, this message translates to:
-  /// **'Data protection'**
+  /// **'Roboust protection measures'**
   String get privacySectionSecuritySummary;
 
   /// No description provided for @privacySectionSecurityContent.
   ///
   /// In en, this message translates to:
-  /// **'End-to-end encryption, secure SSL, regular audits, and encrypted storage.'**
+  /// **'We work hard to protect you and E-Team from unauthorized access, alteration, disclosure, or destruction of information we hold, including:\n\n*   We use encryption to keep your data private while in transit.\n*   We offer security features like 2 Step Verification to help you protect your account.\n*   We review our information collection, storage, and processing practices, including physical security measures, to prevent unauthorized access to our systems.\n*   We restrict access to personal information to E-Team employees, contractors, and agents who need that information in order to process it. Anyone with this access is subject to strict contractual confidentiality obligations and may be disciplined or terminated if they fail to meet these obligations.'**
   String get privacySectionSecurityContent;
 
   /// No description provided for @privacySectionRightsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your Rights'**
+  /// **'Your Privacy Rights'**
   String get privacySectionRightsTitle;
 
   /// No description provided for @privacySectionRightsSummary.
   ///
   /// In en, this message translates to:
-  /// **'GDPR compliance'**
+  /// **'Control over your information'**
   String get privacySectionRightsSummary;
 
   /// No description provided for @privacySectionRightsContent.
   ///
   /// In en, this message translates to:
-  /// **'You can access, correct, delete, and export your data at any time.'**
+  /// **'You have choices regarding the information we collect and how it\'s used. You can:\n\n*   Access and update your personal information through your account settings.\n*   Delete your account and personal information at any time.\n*   Control what information we collect through your device settings.\n*   Opt-out of promotional communications.\n*   Request a copy of your data in a machine-readable format.\n*   File a complaint with your local data protection authority if you believe your rights have been violated.'**
   String get privacySectionRightsContent;
 
   /// No description provided for @privacySectionContactDpoTitle.
   ///
   /// In en, this message translates to:
-  /// **'Contact DPO'**
+  /// **'Contact Us'**
   String get privacySectionContactDpoTitle;
 
   /// No description provided for @privacySectionContactDpoSummary.
   ///
   /// In en, this message translates to:
-  /// **'Privacy inquiries'**
+  /// **'Get in touch regarding privacy'**
   String get privacySectionContactDpoSummary;
 
   /// No description provided for @privacySectionContactDpoContent.
   ///
   /// In en, this message translates to:
-  /// **'📧 privacy@e-team.com\n📧 dpo@e-team.com'**
+  /// **'If you have any questions about this Privacy Policy, you can contact us at:\n\n📧 **Privacy Officer:** privacy@e-team.com\n📧 **Data Protection Officer:** dpo@e-team.com\n📍 **Address:** 123 Tech Park, Innovation Way, Tunis, Tunisia'**
   String get privacySectionContactDpoContent;
 
   /// No description provided for @privacyDownloadSnack.
@@ -1724,13 +1727,13 @@ abstract class AppLocalizations {
   /// No description provided for @privacyDownloadButton.
   ///
   /// In en, this message translates to:
-  /// **'Download Privacy Policy'**
+  /// **'Download Full Policy (PDF)'**
   String get privacyDownloadButton;
 
   /// No description provided for @privacyUnderstandButton.
   ///
   /// In en, this message translates to:
-  /// **'I Understand'**
+  /// **'I Acknowledge'**
   String get privacyUnderstandButton;
 
   /// No description provided for @termsTitle.
@@ -1742,103 +1745,103 @@ abstract class AppLocalizations {
   /// No description provided for @termsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Tap sections to expand'**
+  /// **'Please read carefully before using E-Team'**
   String get termsSubtitle;
 
   /// No description provided for @termsBadge.
   ///
   /// In en, this message translates to:
-  /// **'Last updated: Feb 8, 2026'**
+  /// **'Last updated: Feb 16, 2026'**
   String get termsBadge;
 
   /// No description provided for @termsSectionAcceptanceTitle.
   ///
   /// In en, this message translates to:
-  /// **'Acceptance'**
+  /// **'1. Acceptance of Terms'**
   String get termsSectionAcceptanceTitle;
 
   /// No description provided for @termsSectionAcceptanceSummary.
   ///
   /// In en, this message translates to:
-  /// **'By using E-Team, you agree to these terms'**
+  /// **'Binding agreement for using E-Team'**
   String get termsSectionAcceptanceSummary;
 
   /// No description provided for @termsSectionAcceptanceContent.
   ///
   /// In en, this message translates to:
-  /// **'By accessing E-Team, you accept these terms. If you disagree, do not use the service.'**
+  /// **'By accessing or using the E-Team mobile application (\'Service\'), you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service. This agreement applies to all visitors, users, and others who access the Service. Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms.'**
   String get termsSectionAcceptanceContent;
 
   /// No description provided for @termsSectionAiUsageTitle.
   ///
   /// In en, this message translates to:
-  /// **'AI Usage'**
+  /// **'2. AI Services & Disclaimer'**
   String get termsSectionAiUsageTitle;
 
   /// No description provided for @termsSectionAiUsageSummary.
   ///
   /// In en, this message translates to:
-  /// **'AI tools assist, not replace judgment'**
+  /// **'Limitations of Artificial Intelligence'**
   String get termsSectionAiUsageSummary;
 
   /// No description provided for @termsSectionAiUsageContent.
   ///
   /// In en, this message translates to:
-  /// **'AI agents assist with tasks. Results are not guaranteed. You must validate outputs and handle data securely.'**
+  /// **'Our Service utilizes Artificial Intelligence (AI) to provide recommendations, generate content, and automate tasks.\n\n*   **No Guarantee:** While we strive for accuracy, AI-generated content may contain errors, inaccuracies, or biases. You should not rely solely on AI for critical decisions (legal, financial, medical, etc.).\n*   **User Responsibility:** You are responsible for reviewing and verifying all AI-generated outputs before using them. E-Team is not liable for any actions taken based on AI suggestions.\n*   **Data Usage for Training:** Anonymized usage data may be used to improve our AI models, consistent with our Privacy Policy.'**
   String get termsSectionAiUsageContent;
 
   /// No description provided for @termsSectionPaymentTitle.
   ///
   /// In en, this message translates to:
-  /// **'Payment'**
+  /// **'3. Subscriptions & Payments'**
   String get termsSectionPaymentTitle;
 
   /// No description provided for @termsSectionPaymentSummary.
   ///
   /// In en, this message translates to:
-  /// **'Subscription & pay-as-you-go pricing'**
+  /// **'Billing, renewals, and cancellations'**
   String get termsSectionPaymentSummary;
 
   /// No description provided for @termsSectionPaymentContent.
   ///
   /// In en, this message translates to:
-  /// **'Some features require payment. Subscriptions are billed monthly/yearly. Non-refundable unless required by law.'**
+  /// **'Some parts of the Service are billed on a subscription basis (\'Subscription(s)\'). You will be billed in advance on a recurring and periodic basis (\'Billing Cycle\'). Billing cycles are set either on a monthly or annual basis, depending on the type of subscription plan you select when purchasing a Subscription.\n\n*   **Automatic Renewal:** Your Subscription will automatically renew at the end of each Billing Cycle unless you cancel it or E-Team cancels it.\n*   **Cancellation:** You may cancel your Subscription renewal either through your online account management page or by contacting parts of the e-team customer support team.\n*   **Refunds:** Except when required by law, paid Subscription fees are non-refundable.'**
   String get termsSectionPaymentContent;
 
   /// No description provided for @termsSectionLiabilityTitle.
   ///
   /// In en, this message translates to:
-  /// **'Liability'**
+  /// **'4. Limitation of Liability'**
   String get termsSectionLiabilityTitle;
 
   /// No description provided for @termsSectionLiabilitySummary.
   ///
   /// In en, this message translates to:
-  /// **'Limited legal responsibility'**
+  /// **'Exclusion of damages to the extent permitted'**
   String get termsSectionLiabilitySummary;
 
   /// No description provided for @termsSectionLiabilityContent.
   ///
   /// In en, this message translates to:
-  /// **'E-Team is not liable for indirect damages, loss of profits, or data loss.'**
+  /// **'In no event shall E-Team, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from:\n\n*   Your access to or use of or inability to access or use the Service;\n*   Any conduct or content of any third party on the Service;\n*   Any content obtained from the Service;\n*   Unauthorized access, use or alteration of your transmissions or content, whether based on warranty, contract, tort (including negligence) or any other legal theory, whether or not we have been informed of the possibility of such damage.'**
   String get termsSectionLiabilityContent;
 
   /// No description provided for @termsSectionContactTitle.
   ///
   /// In en, this message translates to:
-  /// **'Contact'**
+  /// **'5. Contact Information'**
   String get termsSectionContactTitle;
 
   /// No description provided for @termsSectionContactSummary.
   ///
   /// In en, this message translates to:
-  /// **'Get in touch'**
+  /// **'How to reach us for legal inquiries'**
   String get termsSectionContactSummary;
 
   /// No description provided for @termsSectionContactContent.
   ///
   /// In en, this message translates to:
-  /// **'📧 support@e-team.com\n🌐 www.e-team.com'**
+  /// **'If you have any questions about these Terms, please contact us:\n\n📧 **Email:** legal@e-team.com\n🌐 **Website:** www.e-team.com/legal\n📍 **Mailing:** E-Team Legal Dept, 123 Tech Park, Tunis, Tunisia'**
   String get termsSectionContactContent;
 
   /// No description provided for @termsAcceptButton.
@@ -2028,7 +2031,8 @@ abstract class AppLocalizations {
   String get appInfoMadeWith;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -2037,25 +2041,26 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'fr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['en', 'fr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en': return AppLocalizationsEn();
-    case 'fr': return AppLocalizationsFr();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'fr':
+      return AppLocalizationsFr();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

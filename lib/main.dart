@@ -11,8 +11,11 @@ import 'screens/agent/Agent Marketplace Page.dart';
 import 'screens/agent/AgentDetails Page.dart';
 import 'screens/agent/onboarding_chatbot_screen.dart';
 import 'screens/agent/onboarding_welcome_screen.dart';
+import 'screens/cart/cart_page.dart';
 import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
+
+import 'providers/cart_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +28,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: const MyApp(),
     ),
@@ -146,8 +150,8 @@ class MyApp extends StatelessWidget {
           // initialRoute: '/',
 
           // ✅ MODE TEST : Tester directement l'onboarding
-          // home: const OnboardingWelcomeScreen(email: 'test@example.com'),
-          home: const SplashScreen(),
+          home: const OnboardingWelcomeScreen(email: 'test@example.com'),
+
           routes: {
             // NOTE: La route '/' est commentée car on utilise 'home' au lieu de 'initialRoute'
             // '/': (context) => const SplashScreen(),
@@ -178,6 +182,7 @@ class MyApp extends StatelessWidget {
             },
 
             '/agent-marketplace': (context) => const AgentMarketplacePage(),
+            '/cart': (context) => const CartPage(),
           },
 
           onGenerateRoute: (settings) {

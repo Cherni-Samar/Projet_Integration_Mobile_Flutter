@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:provider/provider.dart';
+
+import '../../providers/cart_provider.dart';
 
 class OnboardingChatbotScreen extends StatefulWidget {
   final String email;
 
-  const OnboardingChatbotScreen({Key? key, required this.email}) : super(key: key);
+  const OnboardingChatbotScreen({Key? key, required this.email})
+    : super(key: key);
 
   @override
-  State<OnboardingChatbotScreen> createState() => _OnboardingChatbotScreenState();
+  State<OnboardingChatbotScreen> createState() =>
+      _OnboardingChatbotScreenState();
 }
 
 class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
@@ -25,6 +30,46 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
     'teamSize': [],
     'challenges': [],
     'priority': [],
+  };
+
+  // ✅ Catalog agents (match Marketplace + Cart)
+  // key = agentId interne
+  final Map<String, Map<String, dynamic>> _agentCatalog = {
+    'elya': {
+      'display': 'Elya',
+      'title': 'Elya',
+      'illustration': 'assets/images/nexa.png',
+      'color': Color(0xFF8B5CF6),
+      'monthlyPrice': 29.0,
+    },
+    'kash': {
+      'display': 'Kash',
+      'title': 'Kash',
+      'illustration': 'assets/images/kash.png',
+      'color': Color(0xFFF59E0B),
+      'monthlyPrice': 39.0,
+    },
+    'dox': {
+      'display': 'Dox',
+      'title': 'Dox',
+      'illustration': 'assets/images/dexo.png',
+      'color': Color(0xFF10B981),
+      'monthlyPrice': 25.0,
+    },
+    'timo': {
+      'display': 'Timo',
+      'title': 'Timo',
+      'illustration': 'assets/images/krono.png',
+      'color': Color(0xFFEC4899),
+      'monthlyPrice': 19.0,
+    },
+    'echo': {
+      'display': 'Echo',
+      'title': 'Echo',
+      'illustration': 'assets/images/voxi.png',
+      'color': Color(0xFFA855F7),
+      'monthlyPrice': 19.0,
+    },
   };
 
   final List<BotQuestion> _questions = [
@@ -115,13 +160,15 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
     final question = _questions[_currentQuestion];
     setState(() {
-      _messages.add(ChatMessage(
-        text: question.question,
-        subtitle: question.subtitle,
-        isBot: true,
-        options: question.options,
-        multiSelect: question.multiSelect,
-      ));
+      _messages.add(
+        ChatMessage(
+          text: question.question,
+          subtitle: question.subtitle,
+          isBot: true,
+          options: question.options,
+          multiSelect: question.multiSelect,
+        ),
+      );
       _isTyping = false;
       _selectedOptions.clear();
     });
@@ -152,10 +199,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
     final question = _questions[_currentQuestion];
 
     setState(() {
-      _messages.add(ChatMessage(
-        text: answers.join(', '),
-        isBot: false,
-      ));
+      _messages.add(ChatMessage(text: answers.join(', '), isBot: false));
       _userData[question.id] = answers;
       _currentQuestion++;
       _selectedOptions.clear();
@@ -173,9 +217,11 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please select at least one option'),
-          backgroundColor: Colors.black87,
+          backgroundColor: const Color(0xFFB55AF6), // ✅ violet
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           margin: const EdgeInsets.all(20),
         ),
       );
@@ -188,93 +234,155 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
     setState(() => _isTyping = true);
     await Future.delayed(const Duration(milliseconds: 1000));
 
-    final recommendations = _generateRecommendations();
+    // ✅ now returns structured list + text
+    final rec = _generateRecommendations();
+    final recommendationsText = rec.text;
+    final recommendedKeys = rec.agentKeys;
+
+    // ✅ add recommended agents to cart
+    _addRecommendedAgentsToCart(recommendedKeys);
 
     setState(() {
-      _messages.add(ChatMessage(
-        text: "✨ Based on your needs, I recommend these agents:\n\n$recommendations",
-        isBot: true,
-        showActions: true,
-      ));
+      _messages.add(
+        ChatMessage(
+          text:
+              "✨ Based on your needs, I recommend these agents:\n\n$recommendationsText\n\n✅ Added to your cart automatically.",
+          isBot: true,
+          showActions: true,
+        ),
+      );
       _isTyping = false;
     });
 
     _scrollToBottom();
   }
 
-  String _generateRecommendations() {
-    final challenges = _userData['challenges'] ?? [];
-    final priority = _userData['priority']?.isNotEmpty == true ? _userData['priority']![0] : '';
+  // ✅ Add agents to cart (avoid duplicates via stable id)
+  void _addRecommendedAgentsToCart(List<String> keys) {
+    final cart = Provider.of<CartProvider>(context, listen: false);
 
+    int added = 0;
+
+    for (final key in keys) {
+      final data = _agentCatalog[key];
+      if (data == null) continue;
+
+      final id = 'rec-${data['title']}'; // ✅ stable to avoid duplicates
+      final alreadyInCart = cart.items.any((it) => it.id == id);
+
+      if (alreadyInCart) continue;
+
+      final item = CartItem(
+        id: id,
+        title: data['title'] as String,
+        plan: 'monthly',
+        price: (data['monthlyPrice'] as double),
+        color: data['color'] as Color,
+        illustration: data['illustration'] as String,
+      );
+
+      cart.addToCart(item);
+      added++;
+    }
+  }
+
+  // ✅ Return: text + agent keys
+  _RecommendationResult _generateRecommendations() {
+    final challenges = _userData['challenges'] ?? [];
+    final priority = _userData['priority']?.isNotEmpty == true
+        ? _userData['priority']![0]
+        : '';
+
+    // ✅ definitions used to print
     final List<Map<String, String>> agents = [
       {
+        'key': 'elya',
         'name': '🤝 **Elya** (HR Agent)',
-        'description': 'Manages leave requests, employee onboarding, and team coordination'
+        'description':
+            'Manages leave requests, employee onboarding, and team coordination',
       },
       {
+        'key': 'kash',
         'name': '💰 **Kash** (Financial Agent)',
-        'description': 'Validates expenses, tracks budgets, and generates financial reports'
+        'description':
+            'Validates expenses, tracks budgets, and generates financial reports',
       },
       {
+        'key': 'dox',
         'name': '📋 **Dox** (Administrative Agent)',
-        'description': 'Classifies documents, manages files, and handles access rights'
+        'description':
+            'Classifies documents, manages files, and handles access rights',
       },
       {
+        'key': 'timo',
         'name': '⏰ **Timo** (Planning Agent)',
-        'description': 'Avoids scheduling conflicts, prioritizes tasks, and sends deadline reminders'
+        'description':
+            'Avoids scheduling conflicts, prioritizes tasks, and sends deadline reminders',
       },
       {
+        'key': 'echo',
         'name': '💬 **Echo** (Communication Agent)',
-        'description': 'Summarizes conversations, filters messages, and sends smart notifications'
+        'description':
+            'Summarizes conversations, filters messages, and sends smart notifications',
       },
     ];
 
-    List<String> recommended = [];
+    final List<String> recommendedBlocks = [];
+    final List<String> recommendedKeys = [];
 
-    // Logique de recommandation basée sur les défis
-    if (challenges.contains('⏰ Time management') || challenges.contains('🔄 Task automation')) {
-      recommended.add('${agents[3]['name']}\n   • ${agents[3]['description']}'); // Timo
+    void addAgentByKey(String key) {
+      final a = agents.firstWhere((x) => x['key'] == key, orElse: () => {});
+      if (a.isEmpty) return;
+
+      final block = "${a['name']}\n   • ${a['description']}";
+      if (!recommendedBlocks.contains(block)) {
+        recommendedBlocks.add(block);
+        recommendedKeys.add(key);
+      }
+    }
+
+    // Challenges logic
+    if (challenges.contains('⏰ Time management') ||
+        challenges.contains('🔄 Task automation')) {
+      addAgentByKey('timo');
     }
 
     if (challenges.contains('🤝 Team coordination')) {
-      recommended.add('${agents[0]['name']}\n   • ${agents[0]['description']}'); // Elya
-      recommended.add('${agents[4]['name']}\n   • ${agents[4]['description']}'); // Echo
+      addAgentByKey('elya');
+      addAgentByKey('echo');
     }
 
     if (challenges.contains('💰 Cost optimization')) {
-      recommended.add('${agents[1]['name']}\n   • ${agents[1]['description']}'); // Kash
+      addAgentByKey('kash');
     }
 
     if (challenges.contains('📊 Data analysis')) {
-      recommended.add('${agents[1]['name']}\n   • ${agents[1]['description']}'); // Kash
-      recommended.add('${agents[2]['name']}\n   • ${agents[2]['description']}'); // Dox
+      addAgentByKey('kash');
+      addAgentByKey('dox');
     }
 
-    // Basé sur la priorité
-    if (priority.contains('🚀 Productivity') || priority.contains('⚡ Time saving')) {
-      if (!recommended.contains(agents[3]['name'])) {
-        recommended.add('${agents[3]['name']}\n   • ${agents[3]['description']}'); // Timo
-      }
+    // Priority logic
+    if (priority.contains('🚀 Productivity') ||
+        priority.contains('⚡ Time saving')) {
+      addAgentByKey('timo');
     }
 
     if (priority.contains('👥 Team development')) {
-      if (!recommended.contains(agents[0]['name'])) {
-        recommended.add('${agents[0]['name']}\n   • ${agents[0]['description']}'); // Elya
-      }
+      addAgentByKey('elya');
     }
 
-    // Si aucune recommandation spécifique, proposer les agents les plus populaires
-    if (recommended.isEmpty) {
-      recommended = [
-        '${agents[0]['name']}\n   • ${agents[0]['description']}', // Elya
-        '${agents[1]['name']}\n   • ${agents[1]['description']}', // Kash
-        '${agents[3]['name']}\n   • ${agents[3]['description']}', // Timo
-      ];
+    // fallback
+    if (recommendedBlocks.isEmpty) {
+      addAgentByKey('elya');
+      addAgentByKey('kash');
+      addAgentByKey('timo');
     }
 
-    // Limiter à 3 recommandations et supprimer les doublons
-    final uniqueRecommendations = recommended.toSet().toList();
-    return uniqueRecommendations.take(3).join('\n\n');
+    // limit to 3
+    final blocks = recommendedBlocks.take(3).toList();
+    final keys = recommendedKeys.take(3).toList();
+
+    return _RecommendationResult(text: blocks.join('\n\n'), agentKeys: keys);
   }
 
   void _skipToMarketplace() {
@@ -300,7 +408,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
         : null;
 
     return Scaffold(
-      backgroundColor: Colors.white,  // ✅ Background blanc pur
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -349,13 +457,19 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFCDFF00).withOpacity(0.5 * _glowController.value),
+                          color: const Color(
+                            0xFFCDFF00,
+                          ).withOpacity(0.5 * _glowController.value),
                           blurRadius: 15,
                           spreadRadius: 3,
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.auto_awesome, color: Colors.black, size: 18),
+                    child: const Icon(
+                      Icons.auto_awesome,
+                      color: Colors.black,
+                      size: 18,
+                    ),
                   );
                 },
               ),
@@ -372,21 +486,20 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
           ),
         ),
         centerTitle: true,
-        // ✅ Bouton Skip supprimé
       ),
       body: Stack(
         children: [
-          // Background blanc pur
           Container(color: Colors.white),
-
           Column(
             children: [
               const SizedBox(height: 100),
 
-              // Progress card
               if (_currentQuestion < _questions.length)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -433,7 +546,10 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFCDFF00),
                                 borderRadius: BorderRadius.circular(12),
@@ -455,7 +571,9 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                           child: LinearProgressIndicator(
                             value: (_currentQuestion + 1) / _questions.length,
                             backgroundColor: Colors.black.withOpacity(0.05),
-                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFCDFF00)),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Color(0xFFCDFF00),
+                            ),
                             minHeight: 8,
                           ),
                         ),
@@ -464,7 +582,6 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                   ),
                 ),
 
-              // Messages
               Expanded(
                 child: ListView.builder(
                   controller: _scrollController,
@@ -479,8 +596,9 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                 ),
               ),
 
-              // Confirm button
-              if (currentQuestion != null && currentQuestion.multiSelect && _selectedOptions.isNotEmpty)
+              if (currentQuestion != null &&
+                  currentQuestion.multiSelect &&
+                  _selectedOptions.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -547,7 +665,11 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(Icons.arrow_forward_rounded, color: Color(0xFFCDFF00), size: 20),
+                            const Icon(
+                              Icons.arrow_forward_rounded,
+                              color: Color(0xFFCDFF00),
+                              size: 20,
+                            ),
                           ],
                         ),
                       ),
@@ -572,18 +694,22 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
         return Transform.scale(
           scale: clampedValue,
-          alignment: message.isBot ? Alignment.centerLeft : Alignment.centerRight,
+          alignment: message.isBot
+              ? Alignment.centerLeft
+              : Alignment.centerRight,
           child: Opacity(
             opacity: clampedValue,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 24),
               child: Column(
-                crossAxisAlignment:
-                message.isBot ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                crossAxisAlignment: message.isBot
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.end,
                 children: [
                   Row(
-                    mainAxisAlignment:
-                    message.isBot ? MainAxisAlignment.start : MainAxisAlignment.end,
+                    mainAxisAlignment: message.isBot
+                        ? MainAxisAlignment.start
+                        : MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       if (message.isBot) ...[
@@ -603,11 +729,14 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                               ),
                             ],
                           ),
-                          child: const Icon(Icons.auto_awesome, color: Colors.black, size: 24),
+                          child: const Icon(
+                            Icons.auto_awesome,
+                            color: Colors.black,
+                            size: 24,
+                          ),
                         ),
                         const SizedBox(width: 12),
                       ],
-
                       Flexible(
                         child: Container(
                           constraints: BoxConstraints(
@@ -615,14 +744,16 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                           ),
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: message.isBot
-                                ? Colors.white
-                                : Colors.black,
+                            color: message.isBot ? Colors.white : Colors.black,
                             borderRadius: BorderRadius.only(
                               topLeft: const Radius.circular(24),
                               topRight: const Radius.circular(24),
-                              bottomLeft: Radius.circular(message.isBot ? 4 : 24),
-                              bottomRight: Radius.circular(message.isBot ? 24 : 4),
+                              bottomLeft: Radius.circular(
+                                message.isBot ? 4 : 24,
+                              ),
+                              bottomRight: Radius.circular(
+                                message.isBot ? 24 : 4,
+                              ),
                             ),
                             boxShadow: [
                               BoxShadow(
@@ -640,7 +771,9 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                               Text(
                                 message.text,
                                 style: TextStyle(
-                                  color: message.isBot ? Colors.black87 : Colors.white,
+                                  color: message.isBot
+                                      ? Colors.black87
+                                      : Colors.white,
                                   fontSize: 15,
                                   height: 1.5,
                                   fontWeight: FontWeight.w500,
@@ -649,9 +782,14 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                               if (message.subtitle != null) ...[
                                 const SizedBox(height: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFCDFF00).withOpacity(0.2),
+                                    color: const Color(
+                                      0xFFCDFF00,
+                                    ).withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
@@ -668,7 +806,6 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                           ),
                         ),
                       ),
-
                       if (!message.isBot) ...[
                         const SizedBox(width: 12),
                         Container(
@@ -699,7 +836,6 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                       ],
                     ],
                   ),
-
                   const SizedBox(height: 16),
 
                   if (message.options != null && message.options!.isNotEmpty)
@@ -710,7 +846,11 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                         runSpacing: 10,
                         children: message.options!.map((option) {
                           final isSelected = _selectedOptions.contains(option);
-                          return _buildOptionButton(option, isSelected, message.multiSelect);
+                          return _buildOptionButton(
+                            option,
+                            isSelected,
+                            message.multiSelect,
+                          );
                         }).toList(),
                       ),
                     ),
@@ -737,7 +877,11 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                           ),
                           child: ElevatedButton.icon(
                             onPressed: _skipToMarketplace,
-                            icon: const Icon(Icons.explore, size: 24, color: Color(0xFFCDFF00)),
+                            icon: const Icon(
+                              Icons.explore,
+                              size: 24,
+                              color: Color(0xFFCDFF00),
+                            ),
                             label: const Text(
                               'Discover Marketplace',
                               style: TextStyle(
@@ -786,8 +930,8 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
               decoration: BoxDecoration(
                 gradient: isSelected
                     ? const LinearGradient(
-                  colors: [Colors.black, Color(0xFF2A2A2A)],
-                )
+                        colors: [Colors.black, Color(0xFF2A2A2A)],
+                      )
                     : null,
                 color: isSelected ? null : Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -818,15 +962,23 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                       width: 20,
                       height: 20,
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFFCDFF00) : Colors.transparent,
+                        color: isSelected
+                            ? const Color(0xFFCDFF00)
+                            : Colors.transparent,
                         border: Border.all(
-                          color: isSelected ? const Color(0xFFCDFF00) : Colors.black26,
+                          color: isSelected
+                              ? const Color(0xFFCDFF00)
+                              : Colors.black26,
                           width: 2,
                         ),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: isSelected
-                          ? const Icon(Icons.check, size: 14, color: Colors.black)
+                          ? const Icon(
+                              Icons.check,
+                              size: 14,
+                              color: Colors.black,
+                            )
                           : null,
                     ),
                     const SizedBox(width: 10),
@@ -872,7 +1024,11 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                 ),
               ],
             ),
-            child: const Icon(Icons.auto_awesome, color: Colors.black, size: 24),
+            child: const Icon(
+              Icons.auto_awesome,
+              color: Colors.black,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 12),
           Container(
@@ -903,6 +1059,14 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
       ),
     );
   }
+}
+
+// ✅ small DTO
+class _RecommendationResult {
+  final String text;
+  final List<String> agentKeys;
+
+  _RecommendationResult({required this.text, required this.agentKeys});
 }
 
 class _AnimatedDot extends StatefulWidget {
@@ -939,8 +1103,14 @@ class _AnimatedDotState extends State<_AnimatedDot>
       animation: _controller,
       builder: (context, child) {
         final value = (_controller.value + (widget.delay / 1200)) % 1.0;
-        final scale = (0.6 + (math.sin(value * math.pi * 2) * 0.4)).clamp(0.0, 1.0);
-        final opacity = (0.3 + (math.sin(value * math.pi * 2) * 0.7)).clamp(0.0, 1.0);
+        final scale = (0.6 + (math.sin(value * math.pi * 2) * 0.4)).clamp(
+          0.0,
+          1.0,
+        );
+        final opacity = (0.3 + (math.sin(value * math.pi * 2) * 0.7)).clamp(
+          0.0,
+          1.0,
+        );
 
         return Transform.scale(
           scale: scale,

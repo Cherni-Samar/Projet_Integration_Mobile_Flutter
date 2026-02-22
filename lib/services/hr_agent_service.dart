@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class HrAgentService {
-  // Android emulator  → 10.0.2.2
+  /*// Android emulator  → 10.0.2.2
   // iOS simulator     → localhost
   // Device physique   → ton IP locale ex: 192.168.1.x
   static const String _baseUrl = 'http://10.0.2.2:3000/api/agents';
@@ -15,5 +15,21 @@ class HrAgentService {
       return jsonDecode(response.body);
     }
     throw Exception('Erreur ${response.statusCode}');
+  }*/
+
+  // ← URL du webhook N8N (pas ton BackEnd Node.js !)
+  static const String _n8nUrl = 'http://10.0.2.2:5678/webhook/hera';
+
+  static Future<Map<String, dynamic>> hello({String username = 'user'}) async {
+    final response = await http.post(
+      Uri.parse(_n8nUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'username': username, 'intent': 'hello'}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    throw Exception('Erreur N8N: ${response.statusCode}');
   }
 }
