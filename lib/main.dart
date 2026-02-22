@@ -68,7 +68,10 @@ class MyApp extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Color(0xFFCDFF00), width: 2),
+                borderSide: const BorderSide(
+                  color: Color(0xFFCDFF00),
+                  width: 2,
+                ),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -116,7 +119,10 @@ class MyApp extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Color(0xFFCDFF00), width: 2),
+                borderSide: const BorderSide(
+                  color: Color(0xFFCDFF00),
+                  width: 2,
+                ),
               ),
             ),
             elevatedButtonTheme: ElevatedButtonThemeData(
@@ -132,14 +138,16 @@ class MyApp extends StatelessWidget {
             ),
           ),
 
-          themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          themeMode: themeProvider.isDarkMode
+              ? ThemeMode.dark
+              : ThemeMode.light,
 
           // ✅ MODE PRODUCTION : Démarrer sur splash
           // initialRoute: '/',
 
           // ✅ MODE TEST : Tester directement l'onboarding
-          home: const OnboardingWelcomeScreen(email: 'test@example.com'),
-
+          // home: const OnboardingWelcomeScreen(email: 'test@example.com'),
+          home: const SplashScreen(),
           routes: {
             // NOTE: La route '/' est commentée car on utilise 'home' au lieu de 'initialRoute'
             // '/': (context) => const SplashScreen(),
@@ -151,7 +159,9 @@ class MyApp extends StatelessWidget {
 
             // ✅ Route onboarding welcome
             '/onboarding-welcome': (context) {
-              final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+              final args =
+                  ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>?;
               return OnboardingWelcomeScreen(
                 email: args?['email'] ?? 'user@example.com',
               );
@@ -159,7 +169,9 @@ class MyApp extends StatelessWidget {
 
             // ✅ Route onboarding chatbot
             '/onboarding-chatbot': (context) {
-              final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+              final args =
+                  ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>?;
               return OnboardingChatbotScreen(
                 email: args?['email'] ?? 'user@example.com',
               );

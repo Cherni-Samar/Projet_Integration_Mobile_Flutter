@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../../l10n/app_localizations.dart';
+import '../../services/hr_agent_service.dart';
+import '../agent/hr/hr_dashboard_page.dart';
 
 class AgentDetailsPage extends StatefulWidget {
   final String title;
@@ -105,70 +107,73 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         return {
           'free': {
             'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(50)
+            'description': l10n.pricingRequestsPerMonth(50),
           },
           'hourly': {'price': '€3.50', 'description': l10n.pricingPayAsYouGo},
           'monthly': {
             'price': '€29',
-            'description': l10n.pricingUnlimitedHrTasks
-          }
+            'description': l10n.pricingUnlimitedHrTasks,
+          },
         };
       case 'FinanceWizard':
         return {
           'free': {
             'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(30)
+            'description': l10n.pricingRequestsPerMonth(30),
           },
           'hourly': {'price': '€4.50', 'description': l10n.pricingPayAsYouGo},
           'monthly': {
             'price': '€39',
-            'description': l10n.pricingFullFinancialSuite
-          }
+            'description': l10n.pricingFullFinancialSuite,
+          },
         };
       case 'AdminPro':
         return {
           'free': {
             'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(100)
+            'description': l10n.pricingRequestsPerMonth(100),
           },
           'hourly': {'price': '€2.50', 'description': l10n.pricingPayAsYouGo},
           'monthly': {
             'price': '€25',
-            'description': l10n.pricingCompleteAdminSupport
-          }
+            'description': l10n.pricingCompleteAdminSupport,
+          },
         };
       case 'PlanningBot':
         return {
           'free': {
             'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(75)
+            'description': l10n.pricingRequestsPerMonth(75),
           },
           'hourly': {'price': '€2.00', 'description': l10n.pricingPayAsYouGo},
           'monthly': {
             'price': '€19',
-            'description': l10n.pricingProjectManagementTools
-          }
+            'description': l10n.pricingProjectManagementTools,
+          },
         };
       case 'CommSync':
         return {
           'free': {
             'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(100)
+            'description': l10n.pricingRequestsPerMonth(100),
           },
           'hourly': {'price': '€2.00', 'description': l10n.pricingPayAsYouGo},
           'monthly': {
             'price': '€19',
-            'description': l10n.pricingCommunicationAutomation
-          }
+            'description': l10n.pricingCommunicationAutomation,
+          },
         };
       default:
         return {
           'free': {
             'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(50)
+            'description': l10n.pricingRequestsPerMonth(50),
           },
           'hourly': {'price': '€3.00', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {'price': '€29', 'description': l10n.pricingFullFeaturesAccess}
+          'monthly': {
+            'price': '€29',
+            'description': l10n.pricingFullFeaturesAccess,
+          },
         };
     }
   }
@@ -326,10 +331,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                               end: Alignment.bottomRight,
                             ),
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: widget.color,
-                              width: 3,
-                            ),
+                            border: Border.all(color: widget.color, width: 3),
                             boxShadow: [
                               BoxShadow(
                                 color: widget.color.withOpacity(0.3),
@@ -355,13 +357,12 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             decoration: BoxDecoration(
                               color: const Color(0xFFCDFF00),
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 4,
-                              ),
+                              border: Border.all(color: Colors.white, width: 4),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFCDFF00).withOpacity(0.5),
+                                  color: const Color(
+                                    0xFFCDFF00,
+                                  ).withOpacity(0.5),
                                   blurRadius: 8,
                                 ),
                               ],
@@ -501,7 +502,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                   Wrap(
                     spacing: 12,
                     runSpacing: 12,
-                    children: skills.map((skill) => _buildSkillChip(skill)).toList(),
+                    children: skills
+                        .map((skill) => _buildSkillChip(skill))
+                        .toList(),
                   ),
 
                   const SizedBox(height: 32),
@@ -614,7 +617,8 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                           badge: l10n.agentDetailsBadgeBestValue,
                           badgeColor: const Color(0xFFCDFF00),
                           isSelected: _selectedPlan == 'monthly',
-                          onTap: () => setState(() => _selectedPlan = 'monthly'),
+                          onTap: () =>
+                              setState(() => _selectedPlan = 'monthly'),
                         ),
                       ),
                     ],
@@ -635,36 +639,35 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
           children: [
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  final planText = _selectedPlan == 'free'
-                      ? l10n.agentDetailsPlanFreeTrial
-                      : _selectedPlan == 'hourly'
-                      ? l10n.agentDetailsHourlyPlan
-                      : l10n.agentDetailsMonthlyPlan;
+                onPressed: () async {
+                  if (widget.title == 'Agent Alpha') {
+                    // 🔥 TRIGGER → Hello World
+                    try {
+                      final response = await HrAgentService.hello(
+                        username: 'Samar',
+                      );
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          const Icon(Icons.check_circle, color: Colors.white),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              l10n.agentDetailsAgentHiredSnack(
-                                widget.title,
-                                planText,
-                              ),
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => HrDashboardPage(
+                              heraMessage: response['message'],
                             ),
                           ),
-                        ],
-                      ),
-                      backgroundColor: Colors.green,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('❌ Hera indisponible: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
@@ -687,7 +690,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -710,10 +713,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.black.withOpacity(0.1),
-          width: 1.5,
-        ),
+        border: Border.all(color: Colors.black.withOpacity(0.1), width: 1.5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -755,10 +755,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFA855F7),
-          width: 1.5,
-        ),
+        border: Border.all(color: const Color(0xFFA855F7), width: 1.5),
       ),
       child: Text(
         label,
@@ -794,12 +791,12 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
           ),
           boxShadow: isSelected
               ? [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 15,
-              offset: const Offset(0, 6),
-            ),
-          ]
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 15,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
               : [],
         ),
         child: Column(
@@ -818,7 +815,10 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                 ),
                 if (badge != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: badgeColor ?? const Color(0xFFCDFF00),
                       borderRadius: BorderRadius.circular(6),
@@ -847,7 +847,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                   TextSpan(
                     text: price,
                     style: TextStyle(
-                      color: isSelected ? const Color(0xFFCDFF00) : Colors.black,
+                      color: isSelected
+                          ? const Color(0xFFCDFF00)
+                          : Colors.black,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
