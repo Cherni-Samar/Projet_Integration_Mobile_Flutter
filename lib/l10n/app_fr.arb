@@ -1,0 +1,462 @@
+{
+  "appTitle": "E-Team - Department as a Service",
+
+  "commonCancel": "Annuler",
+  "commonApply": "Appliquer",
+
+  "profileTitle": "Mon profil",
+  "profileDarkMode": "Mode sombre",
+  "profileEditProfile": "Modifier le profil",
+  "profileLanguage": "Langue",
+  "profileTerms": "Conditions d’utilisation",
+  "profilePrivacy": "Politique de confidentialité",
+  "profileLogout": "Déconnexion",
+  "profileUserDataNotAvailable": "Données utilisateur indisponibles",
+  "profileUpdatedSuccessfully": "Profil mis à jour avec succès !",
+
+  "logoutDialogTitle": "Déconnexion",
+  "logoutDialogMessage": "Êtes-vous sûr de vouloir vous déconnecter ?",
+
+  "languageTitle": "Langue",
+  "languageSubtitle": "Choisissez votre langue préférée",
+  "languageInfoBanner": "La langue de l’application se met à jour immédiatement",
+  "languageApplyButton": "Appliquer la langue",
+  "languageChangeDialogTitle": "Changer de langue ?",
+  "languageChangeDialogMessage": "L’application passera en {language}.",
+  "@languageChangeDialogMessage": {
+    "placeholders": {
+      "language": {}
+    }
+  },
+  "languageChangedSnack": "Langue changée en {language}",
+  "@languageChangedSnack": {
+    "placeholders": {
+      "language": {}
+    }
+  },
+
+  "commonPerHourShort": "/h",
+  "commonPerMonthShort": "/mo",
+
+  "agentMarketplaceWelcomeBack": "Bon retour",
+  "agentMarketplaceNoNewNotifications": "Aucune nouvelle notification",
+  "agentMarketplaceTitle": "Marché des agents",
+  "agentMarketplaceSwipeToExplore": "Glissez pour explorer {count} agents IA",
+  "@agentMarketplaceSwipeToExplore": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "agentMarketplaceHireAgent": "Recruter l’agent",
+  "agentMarketplaceNavMarket": "Marché",
+  "agentMarketplaceNavAgents": "Agents",
+  "agentMarketplaceNavStats": "Stats",
+  "agentMarketplaceNavSettings": "Paramètres",
+  "agentMarketplaceStatResponse": "Réponse",
+  "agentMarketplaceStatAccuracy": "Précision",
+  "agentMarketplaceStatLanguages": "Langues",
+  "agentMarketplacePriceFrom": "à partir de {price}",
+  "@agentMarketplacePriceFrom": {
+    "placeholders": {
+      "price": {}
+    }
+  },
+
+  "agentRoleHrSpecialist": "Human Resources Agent",
+  "agentRoleFinancialExpert": "Financial Agent",
+  "agentRoleAdminAssistant": "Administrative Agent",
+  "agentRolePlanningManager": "Planning Agent",
+  "agentRoleCommunicationPro": "Communication Agent",
+  "agentDescAlpha": "I am Hera, your HR guardian. I manage leave requests, approve or reject based on availability, and keep employee profiles updated automatically. I ensure everyone respects their roles and help new hires onboard smoothly. I also provide managers with clear dashboards of absences, so you always know who's present and who’s off.",
+  "agentDescFinanceWizard": "I am Kash, the money master. I validate expenses, classify them into categories like transport or materials, and generate monthly financial reports automatically. I alert you if budgets are exceeded, so you stay on top of your finances effortlessly.",
+  "agentDescAdminPro": "I am Dexo, your document wizard. I automatically classify and name files, store them in the correct categories, and manage access rights. Need a contract or invoice? I generate it for you. Want to find a document? I’ll locate it instantly.",
+  "agentDescPlanningBot": "I am Timo, your scheduling strategist. I prevent calendar conflicts, prioritize urgent tasks, and send reminders before deadlines. I assign tasks automatically, check availability for meetings, and notify you of upcoming deadlines so nothing slips through the cracks.",
+  "agentDescCommSync": "I am Echo, your communication assistant. I prioritize important messages, summarize long conversations, and send smart notifications. I filter out spam and keep you focused on what really matters. I can even summarize team discussions so everyone stays aligned.",
+
+  "agentDetailsTitle": "Profil de l’agent",
+  "agentDetailsShareSnack": "Partager {agent}",
+  "@agentDetailsShareSnack": {
+    "placeholders": {
+      "agent": {}
+    }
+  },
+  "agentDetailsHires": "({hires} recrutements)",
+  "@agentDetailsHires": {
+    "placeholders": {
+      "hires": {}
+    }
+  },
+  "agentDetailsStatResponse": "RÉPONSE",
+  "agentDetailsStatAccuracy": "PRÉCISION",
+  "agentDetailsStatLanguages": "LANGUES",
+  "agentDetailsCoreSkills": "COMPÉTENCES CLÉS",
+  "agentDetailsPerformanceEfficiency": "EFFICACITÉ DES PERFORMANCES",
+  "agentDetailsPerformanceThisWeek": "+12,4% cette semaine",
+  "agentDetailsDeploymentPlans": "FORMULES DE DÉPLOIEMENT",
+  "agentDetailsPlanFreeTrial": "Essai gratuit",
+  "agentDetailsPlanHourly": "Horaire",
+  "agentDetailsPlanMonthly": "Mensuel",
+  "agentDetailsBadgeStarter": "DÉMARRAGE",
+  "agentDetailsBadgeBestValue": "MEILLEUR PRIX",
+  "agentDetailsHireAgent": "Recruter l’agent",
+  "agentDetailsHourlyPlan": "Forfait horaire",
+  "agentDetailsMonthlyPlan": "Forfait mensuel",
+  "agentDetailsAgentHiredSnack": "{agent} recruté avec {plan} !",
+  "@agentDetailsAgentHiredSnack": {
+    "placeholders": {
+      "agent": {},
+      "plan": {}
+    }
+  },
+
+  "pricingRequestsPerMonth": "{count} requêtes/mois",
+  "@pricingRequestsPerMonth": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pricingPayAsYouGo": "Paiement à l’usage",
+  "pricingUnlimitedHrTasks": "Tâches RH illimitées",
+  "pricingFullFinancialSuite": "Suite financière complète",
+  "pricingCompleteAdminSupport": "Support admin complet",
+  "pricingProjectManagementTools": "Outils de gestion de projet",
+  "pricingCommunicationAutomation": "Automatisation de la communication",
+  "pricingFullFeaturesAccess": "Accès à toutes les fonctionnalités",
+
+  "agentVersionAlpha": "Version 3.2.1 • Certifié RH",
+  "agentVersionFinanceWizard": "Version 4.0.5 • Expert financier",
+  "agentVersionAdminPro": "Version 2.8.3 • Spécialiste admin",
+  "agentVersionPlanningBot": "Version 3.1.0 • Pro du planning",
+  "agentVersionCommSync": "Version 2.9.2 • Maître communication",
+  "agentVersionDefault": "Version 2.4.0 • Prêt pour l’entreprise",
+
+  "skillRecruitmentOnboarding": "Recrutement & onboarding",
+  "skillEmployeeRecords": "Dossiers employés",
+  "skillPayrollManagement": "Gestion de la paie",
+  "skillLeaveTracking": "Suivi des congés",
+  "skillPerformanceReviews": "Évaluations de performance",
+  "skillInvoiceProcessing": "Traitement des factures",
+  "skillExpenseTracking": "Suivi des dépenses",
+  "skillFinancialReports": "Rapports financiers",
+  "skillBudgetPlanning": "Planification budgétaire",
+  "skillTaxCompliance": "Conformité fiscale",
+  "skillDocumentManagement": "Gestion des documents",
+  "skillFileOrganization": "Organisation des fichiers",
+  "skillDataEntry": "Saisie de données",
+  "skillMeetingScheduling": "Planification des réunions",
+  "skillEmailManagement": "Gestion des emails",
+  "skillProjectPlanning": "Planification de projet",
+  "skillTaskManagement": "Gestion des tâches",
+  "skillResourceAllocation": "Allocation des ressources",
+  "skillDeadlineTracking": "Suivi des échéances",
+  "skillTeamCoordination": "Coordination d’équipe",
+  "skillEmailCampaigns": "Campagnes email",
+  "skillTeamCommunications": "Communications d’équipe",
+  "skillNotifications": "Notifications",
+  "skillAnnouncementDistribution": "Diffusion d’annonces",
+  "skillChatManagement": "Gestion du chat",
+  "skillNaturalLanguage": "Langage naturel",
+  "skillApiIntegration": "Intégration API",
+  "skillMultilingualSupport": "Support multilingue",
+  "skillDataAnalysis": "Analyse de données",
+  "skillAutomation": "Automatisation",
+
+  "onboardingSkip": "Passer",
+  "onboardingWelcomeTo": "Bienvenue sur",
+  "onboardingWelcomeSubtitle": "Votre espace de travail IA\npour de meilleures décisions",
+  "onboardingSlideToStart": "Glisser pour démarrer",
+  "onboardingExploreMarketplace": "Explorer le marché",
+
+  "onboardingChatbotTitle": "E-Team IA",
+  "onboardingChatbotQuestionLabel": "Question {number}",
+  "@onboardingChatbotQuestionLabel": {
+    "placeholders": {
+      "number": {}
+    }
+  },
+  "onboardingChatbotSelectAtLeastOne": "Veuillez sélectionner au moins une option",
+  "onboardingChatbotContinue": "Continuer",
+  "onboardingChatbotDiscoverMarketplace": "Découvrir le marché",
+  "onboardingChatbotPersonalizedRecommendations": "✨ Recommandations personnalisées :\n\n{recommendations}",
+  "@onboardingChatbotPersonalizedRecommendations": {
+    "placeholders": {
+      "recommendations": {}
+    }
+  },
+
+  "chatbotQRole": "👋 Ravi de vous rencontrer !\n\nQuel est votre rôle ?",
+  "chatbotQTeamSize": "Quelle est la taille de votre équipe ?",
+  "chatbotQChallenges": "Quels sont vos plus grands défis ?",
+  "chatbotQChallengesSubtitle": "Sélectionnez tout ce qui s’applique",
+  "chatbotQPriority": "Quelle est votre priorité n°1 ?",
+
+  "chatbotRoleCeoFounder": "👔 CEO / Fondateur",
+  "chatbotRoleManager": "📊 Manager",
+  "chatbotRoleDepartmentHead": "💼 Chef de département",
+  "chatbotRoleEmployee": "👨‍💻 Employé",
+  "chatbotRoleStudent": "🎓 Étudiant",
+
+  "chatbotTeamSolo": "Solo",
+  "chatbotTeam2To5": "2-5 personnes",
+  "chatbotTeam6To20": "6-20 personnes",
+  "chatbotTeam21To50": "21-50 personnes",
+  "chatbotTeam50Plus": "50+ personnes",
+
+  "chatbotChallengeTimeManagement": "⏰ Gestion du temps",
+  "chatbotChallengeGrowthManagement": "📈 Gestion de la croissance",
+  "chatbotChallengeCostOptimization": "💰 Optimisation des coûts",
+  "chatbotChallengeTeamCoordination": "🤝 Coordination d’équipe",
+  "chatbotChallengeDataAnalysis": "📊 Analyse de données",
+  "chatbotChallengeTaskAutomation": "🔄 Automatisation des tâches",
+
+  "chatbotPriorityProductivity": "🚀 Productivité",
+  "chatbotPriorityInnovation": "💡 Innovation",
+  "chatbotPriorityRevenueGrowth": "📈 Croissance du chiffre d’affaires",
+  "chatbotPriorityTeamDevelopment": "👥 Développement d’équipe",
+  "chatbotPriorityTimeSaving": "⚡ Gain de temps",
+
+  "chatbotRecTaskAutomationAi": "🤖 IA d’automatisation des tâches",
+  "chatbotRecTeamSyncAssistant": "👥 Assistant de synchro d’équipe",
+  "chatbotRecDataAnalyticsPro": "📊 Pro de l’analyse de données",
+  "chatbotRecSmartAssistant": "🚀 Assistant intelligent",
+  "chatbotRecAnalyticsDashboard": "📊 Tableau de bord analytics",
+
+  "commonUser": "Utilisateur",
+  "commonEmailPlaceholder": "email@exemple.com",
+  "commonUserInitial": "U",
+
+  "authWelcomeBackTitle": "Bon retour",
+  "authWelcomeBackSnack": "✅ Bon retour !",
+
+  "authEmailLabel": "Email",
+  "authEmailHint": "nom@entreprise.com",
+  "authEmailRequired": "Entrez votre email",
+  "authEmailInvalid": "Veuillez entrer un email valide",
+
+  "authPasswordLabel": "Mot de passe",
+  "authPasswordHint": "••••••••",
+  "authPasswordRequired": "Entrez votre mot de passe",
+  "authPasswordMin6Short": "Min 6 caractères",
+  "authPasswordMin6": "Le mot de passe doit contenir au moins 6 caractères",
+
+  "authRememberMe": "Se souvenir de moi",
+  "authForgotPassword": "Mot de passe oublié ?",
+  "authSignIn": "Se connecter",
+  "authOr": "ou",
+  "authNewHere": "Nouveau ici ? ",
+  "authCreateAccount": "Créer un compte",
+
+  "authGoogleComingSoon": "Connexion Google bientôt disponible !",
+  "authAppleComingSoon": "Connexion Apple bientôt disponible !",
+
+  "authLoginNoAccount": "Aucun compte trouvé avec cet email",
+  "authLoginIncorrectPassword": "Mot de passe incorrect",
+  "authUnableToConnect": "Impossible de se connecter au serveur",
+  "authLoginFailedTryAgain": "Échec de la connexion. Veuillez réessayer.",
+
+  "authCreateAccountTitle": "Créer un compte",
+  "authSignupSubtitle": "Rejoignez-nous pour transformer votre entreprise",
+  "authFullNameLabel": "Nom complet",
+  "authFullNameHint": "Jean Dupont",
+  "authNameRequired": "Veuillez entrer votre nom",
+  "authNameMin2": "Le nom doit contenir au moins 2 caractères",
+
+  "authConfirmPasswordLabel": "Confirmer le mot de passe",
+  "authConfirmPasswordRequired": "Veuillez confirmer votre mot de passe",
+  "authPasswordsDoNotMatch": "Les mots de passe ne correspondent pas",
+
+  "authAcceptTermsError": "Veuillez accepter les Conditions d’utilisation et la Politique de confidentialité",
+  "authAgreeToPrefix": "J’accepte les ",
+  "authTermsAndConditions": "Conditions d’utilisation",
+  "authAnd": " et la ",
+  "authPrivacyPolicy": "Politique de confidentialité",
+
+  "authAccountCreatedCheckEmail": "✅ Compte créé ! Vérifiez votre email pour confirmer.",
+  "authEmailAlreadyRegistered": "Cet email est déjà enregistré",
+  "authConnectionTimeout": "Délai de connexion dépassé. Veuillez réessayer.",
+
+  "authAlreadyHaveAccount": "Vous avez déjà un compte ? ",
+
+  "authForgotPasswordTitle": "Mot de passe\noublé ?",
+  "authForgotPasswordSubtitle": "Pas d’inquiétude. Entrez votre email et nous vous enverrons un lien de réinitialisation.",
+  "authSendResetLink": "Envoyer le lien",
+  "authBackToLogin": "Retour à la connexion",
+
+  "authCheckYourEmailTitle": "Vérifiez\nvotre email",
+  "authResetLinkSentTo": "Nous avons envoyé un lien de réinitialisation à\n{email}",
+  "@authResetLinkSentTo": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "authDidntReceiveResend": "Vous ne l’avez pas reçu ? Renvoyer",
+
+  "authVerifyYourEmailTitle": "Vérifiez votre email",
+  "authWeSentCodeTo": "Nous avons envoyé un code de vérification à",
+  "authYourEmailPlaceholder": "votre email",
+  "authVerifyEmailButton": "Vérifier",
+  "authEnterAll6Digits": "Veuillez saisir les 6 chiffres",
+  "authEmailMissing": "Email manquant",
+  "authEmailVerifiedSuccess": "✅ Email vérifié avec succès !",
+  "authInvalidCodeCheckEmail": "Code invalide. Vérifiez votre email.",
+  "authCodeExpiredRequestNew": "Code expiré. Demandez-en un nouveau.",
+  "authEmailAlreadyVerified": "Email déjà vérifié",
+  "authNewCodeSent": "✅ Nouveau code envoyé ! Vérifiez votre email.",
+  "authDidntReceiveCode": "Vous n’avez pas reçu le code ? ",
+  "authResendInSeconds": "Renvoyer dans {seconds}s",
+  "@authResendInSeconds": {
+    "placeholders": {
+      "seconds": {}
+    }
+  },
+  "authResendCode": "Renvoyer le code",
+  "authErrorWithDetails": "❌ Erreur : {error}",
+  "@authErrorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+
+  "authEditProfileTitle": "Modifier le profil",
+  "authNameLabel": "Nom",
+  "authEnterYourNameHint": "Entrez votre nom",
+  "authEnterYourEmailHint": "Entrez votre email",
+  "authChangePassword": "Changer le mot de passe",
+  "authCurrentPassword": "Mot de passe actuel",
+  "authEnterCurrentPasswordHint": "Entrez le mot de passe actuel",
+  "authCurrentPasswordRequired": "Veuillez saisir le mot de passe actuel",
+  "authNewPassword": "Nouveau mot de passe",
+  "authEnterNewPasswordHint": "Entrez le nouveau mot de passe",
+  "authConfirmNewPassword": "Confirmer le nouveau mot de passe",
+  "authConfirmNewPasswordHint": "Confirmez le nouveau mot de passe",
+  "authUpdateProfileButton": "Mettre à jour",
+  "authProfileUpdatedSnack": "✅ Profil mis à jour avec succès !",
+
+  "helpSupportTitle": "Aide & Support",
+  "helpSupportSubtitle": "Nous sommes là pour vous aider",
+  "helpSupportNeedHelpTitle": "Besoin d’aide ?",
+  "helpSupportNeedHelpDesc": "Notre équipe support est disponible 24/7\npour vous assister",
+  "helpSupportFaqSectionTitle": "Questions fréquentes",
+  "helpSupportContactSectionTitle": "Nous contacter",
+
+  "helpSupportFaqHireQuestion": "Comment recruter un agent IA ?",
+  "helpSupportFaqHireAnswer": "Allez sur le Marché des agents, parcourez les agents disponibles puis appuyez sur \"Recruter l’agent\".",
+  "helpSupportFaqPaymentQuestion": "Quels moyens de paiement acceptez-vous ?",
+  "helpSupportFaqPaymentAnswer": "Nous acceptons les cartes bancaires (Visa, Mastercard) et les virements pour les offres entreprise.",
+  "helpSupportFaqCancelQuestion": "Puis-je annuler mon abonnement ?",
+  "helpSupportFaqCancelAnswer": "Oui, vous pouvez annuler à tout moment depuis les paramètres du profil. Votre accès continue jusqu’à la fin de la période de facturation.",
+  "helpSupportFaqUpdateProfileQuestion": "Comment mettre à jour mon profil ?",
+  "helpSupportFaqUpdateProfileAnswer": "Allez dans Profil → Modifier le profil pour mettre à jour votre nom, votre email ou votre mot de passe.",
+  "helpSupportFaqDataSecureQuestion": "Mes données sont-elles sécurisées ?",
+  "helpSupportFaqDataSecureAnswer": "Oui ! Nous utilisons le chiffrement de bout en bout, des connexions SSL et respectons le RGPD.",
+
+  "helpSupportEmailSupportTitle": "Support email",
+  "helpSupportEmailSupportDesc": "Réponse sous 24 heures",
+  "helpSupportCopiedToClipboard": "{label} copié dans le presse-papiers !",
+  "@helpSupportCopiedToClipboard": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "helpSupportComingSoon": "{label} - Bientôt disponible !",
+  "@helpSupportComingSoon": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+
+  "privacyTitle": "Politique de confidentialité",
+  "privacySubtitle": "Vos données sont protégées",
+  "privacyBadge": "Conforme RGPD • Dernière mise à jour : 8 fév. 2026",
+  "privacyIntro": "Nous respectons votre vie privée et nous nous engageons à protéger vos données personnelles.",
+
+  "privacySectionDataCollectedTitle": "Collecte d'informations",
+  "privacySectionDataCollectedSummary": "Pratiques complètes de collecte de données",
+  "privacySectionDataCollectedContent": "Nous collectons des informations pour fournir de meilleurs services à tous nos utilisateurs. Cela inclut :\n\n1. **Informations personnelles :** Nom, adresse e-mail, numéro de téléphone et photo de profil lors de la création d'un compte.\n2. **Infos d'utilisation :** Nous collectons des informations sur la façon dont vous utilisez nos services, comme les types de contenu que vous consultez, les fonctionnalités que vous utilisez, les actions que vous effectuez, ainsi que l'heure, la fréquence et la durée de vos activités.\n3. **Informations sur l'appareil :** Nous collectons des informations spécifiques à l'appareil (modèle de matériel, version du système d'exploitation, identifiants uniques).\n4. **Informations de paiement :** Si vous achetez nos services, nous collectons l'adresse de facturation et les informations de carte de crédit, traitées de manière sécurisée par nos partenaires.",
+
+  "privacySectionDataUsageTitle": "Utilisation des données",
+  "privacySectionDataUsageSummary": "Finalité du traitement",
+  "privacySectionDataUsageContent": "Nous utilisons les informations que nous collectons pour les finalités suivantes :\n\n*   **Fournir nos services :** Traiter vos demandes et vous authentifier.\n*   **Maintenir et améliorer nos services :** Assurer le bon fonctionnement de nos services, suivre les pannes et résoudre les problèmes.\n*   **Développer de nouveaux services :** Utiliser les informations existantes pour nous aider à créer de nouvelles fonctionnalités.\n*   **Services personnalisés :** Personnaliser votre expérience, y compris les recommandations et le contenu.\n*   **Mesurer les performances :** Analyser et mesurer l'utilisation de nos services.",
+
+  "privacySectionSecurityTitle": "Sécurité des données",
+  "privacySectionSecuritySummary": "Mesures de protection robustes",
+  "privacySectionSecurityContent": "Nous nous efforçons de vous protéger, ainsi que E-Team, contre les accès non autorisés, l'altération, la divulgation ou la destruction d'informations :\n\n*   Chiffrement des données en transit.\n*   Vérification en 2 étapes pour protéger votre compte.\n*   Révision régulière de nos pratiques de collecte et de stockage.\n*   Accès restreint aux employés et sous-traitants qui ont besoin de ces informations pour les traiter, soumis à de strictes obligations de confidentialité.",
+
+  "privacySectionRightsTitle": "Vos droits",
+  "privacySectionRightsSummary": "Contrôle sur vos informations",
+  "privacySectionRightsContent": "Vous avez le choix concernant les informations que nous collectons :\n\n*   Accéder et mettre à jour vos informations personnelles via les paramètres.\n*   Supprimer votre compte et vos données à tout moment.\n*   Contrôler la collecte via les paramètres de votre appareil.\n*   Vous désinscrire des communications promotionnelles.\n*   Demander une copie de vos données.\n*   Déposer une plainte auprès de votre autorité locale de protection des données.",
+
+  "privacySectionContactDpoTitle": "Nous contacter",
+  "privacySectionContactDpoSummary": "Pour toute question de confidentialité",
+  "privacySectionContactDpoContent": "Pour toute question sur cette politique, contactez-nous à :\n\n📧 **Responsable confidentialité :** privacy@e-team.com\n📧 **DPO :** dpo@e-team.com\n📍 **Adresse :** 123 Tech Park, Innovation Way, Tunis, Tunisie",
+
+  "privacyDownloadSnack": "Politique téléchargée",
+  "privacyDownloadButton": "Télécharger la politique (PDF)",
+  "privacyUnderstandButton": "J'ai pris connaissance",
+
+  "termsTitle": "Conditions d'utilisation",
+  "termsSubtitle": "À lire attentivement avant utilisation",
+  "termsBadge": "Dernière mise à jour : 16 fév. 2026",
+
+  "termsSectionAcceptanceTitle": "1. Acceptation des conditions",
+  "termsSectionAcceptanceSummary": "Accord contraignant pour l'utilisation",
+  "termsSectionAcceptanceContent": "En accédant ou en utilisant l'application mobile E-Team ('Service'), vous acceptez d'être lié par ces conditions. Si vous n'êtes pas d'accord avec une partie des conditions, vous ne pouvez pas accéder au Service. Votre accès et votre utilisation du Service sont conditionnés par votre acceptation et votre respect de ces conditions.",
+
+  "termsSectionAiUsageTitle": "2. Services IA & Avertissement",
+  "termsSectionAiUsageSummary": "Limites de l'Intelligence Artificielle",
+  "termsSectionAiUsageContent": "Notre service utilise l'Intelligence Artificielle (IA) pour fournir des recommandations et automatiser des tâches.\n\n*   **Pas de garantie :** Bien que nous visons la précision, le contenu généré par l'IA peut contenir des erreurs. Ne vous fiez pas uniquement à l'IA pour des décisions critiques.\n*   **Responsabilité de l'utilisateur :** Vous êtes responsable de la vérification des résultats générés par l'IA. E-Team n'est pas responsable des actions prises sur la base des suggestions de l'IA.\n*   **Utilisation des données :** Les données d'utilisation anonymisées peuvent être utilisées pour améliorer nos modèles.",
+
+  "termsSectionPaymentTitle": "3. Abonnements & Paiements",
+  "termsSectionPaymentSummary": "Facturation et résiliation",
+  "termsSectionPaymentContent": "Certaines parties du Service sont facturées sur la base d'un abonnement. Vous serez facturé à l'avance sur une base récurrente (mensuelle ou annuelle).\n\n*   **Renouvellement automatique :** Votre abonnement sera renouvelé automatiquement à la fin de chaque cycle.\n*   **Annulation :** Vous pouvez annuler le renouvellement de votre abonnement via la page de gestion de compte.\n*   **Remboursements :** Sauf obligation légale, les frais d'abonnement payés ne sont pas remboursables.",
+
+  "termsSectionLiabilityTitle": "4. Limitation de responsabilité",
+  "termsSectionLiabilitySummary": "Exclusion des dommages",
+  "termsSectionLiabilityContent": "En aucun cas E-Team, ni ses directeurs, employés ou partenaires, ne pourront être tenus responsables de tout dommage indirect, accessoire, spécial ou consécutif, y compris, sans limitation, la perte de profits, de données, d'utilisation ou d'autres pertes intangibles résultant de votre utilisation du Service.",
+
+  "termsSectionContactTitle": "5. Informations de contact",
+  "termsSectionContactSummary": "Nous joindre pour des questions légales",
+  "termsSectionContactContent": "Pour toute question sur ces Conditions, veuillez nous contacter :\n\n📧 **Email :** legal@e-team.com\n🌐 **Site web :** www.e-team.com/legal\n📍 **Adresse :** Service Juridique E-Team, 123 Tech Park, Tunis, Tunisie",
+
+  "termsAcceptButton": "J’ai compris & j’accepte",
+
+  "appInfoTitle": "À propos d’E-Team",
+  "appInfoSubtitle": "Informations de l’application",
+  "appInfoTagline": "Gestion d’équipe propulsée par l’IA",
+  "appInfoVersion": "Version {version}",
+  "@appInfoVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+
+  "appInfoAboutSectionTitle": "À propos",
+  "appInfoAboutDescription": "E-Team est une plateforme propulsée par l’IA qui aide les entreprises à gérer leurs équipes efficacement. Avec des agents IA spécialisés en RH, Finance, Admin, Planning et Communication, nous automatisons les tâches répétitives et augmentons la productivité.",
+
+  "appInfoFeaturesTitle": "Fonctionnalités clés",
+  "appInfoFeaturesSubtitle": "Ce que nous offrons",
+  "appInfoFeatureMarketplace": "🦾 Marché des agents IA",
+  "appInfoFeatureHr": "💼 Automatisation de la gestion RH",
+  "appInfoFeatureFinancial": "💰 Outils & rapports financiers",
+  "appInfoFeatureDocs": "📁 Gestion des documents",
+  "appInfoFeaturePlanning": "📅 Planification & agenda intelligents",
+  "appInfoFeatureCommunication": "📧 Assistant de communication",
+
+  "appInfoTechTitle": "Stack technique",
+  "appInfoTechSubtitle": "Construit avec des outils modernes",
+  "appInfoTechFlutter": "Flutter - UI multiplateforme",
+  "appInfoTechNode": "Node.js - API backend",
+  "appInfoTechMongo": "MongoDB - Base de données",
+  "appInfoTechProvider": "Provider - Gestion d’état",
+  "appInfoTechJwt": "JWT - Authentification",
+
+  "appInfoConnectWithUs": "RESTEZ CONNECTÉS",
+  "appInfoEmailLabel": "Email",
+  "appInfoLegalTerms": "Conditions d’utilisation",
+  "appInfoLegalPrivacy": "Politique de confidentialité",
+  "appInfoLegalLicenses": "Licences",
+  "appInfoComingSoon": "Bientôt disponible !",
+  "appInfoLegalese": "© 2025 E-Team. Tous droits réservés.",
+  "appInfoCopyright": "© 2025 E-Team. Tous droits réservés.",
+  "appInfoMadeWith": "Fait avec ❤️ en Tunisie 🇹🇳"
+}
