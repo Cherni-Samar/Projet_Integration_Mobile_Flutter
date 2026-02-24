@@ -8,6 +8,7 @@ import '../../providers/cart_provider.dart';
 import '../../l10n/app_localizations.dart';
 
 import '../../screens/agent/AgentDetails Page.dart';
+import '../../screens/agent/my_agents_page.dart';
 import '../auth/user_profile_page.dart';
 
 class AgentMarketplacePage extends StatefulWidget {
@@ -44,7 +45,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         },
         'rating': 4.9,
         'hires': '1.2k',
-        'price': '29€',
+        'price': '10 ⚡/task',
       },
       {
         'name': 'Kash',
@@ -59,7 +60,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         },
         'rating': 4.8,
         'hires': '980',
-        'price': '39€',
+        'price': '15 ⚡/task',
       },
       {
         'name': 'Dexo',
@@ -74,7 +75,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         },
         'rating': 5.0,
         'hires': '2.1k',
-        'price': '25€',
+        'price': '8 ⚡/task',
       },
       {
         'name': 'Timo',
@@ -89,7 +90,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         },
         'rating': 4.7,
         'hires': '850',
-        'price': '19€',
+        'price': '20 ⚡/task',
       },
       {
         'name': 'Echo',
@@ -104,7 +105,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         },
         'rating': 4.9,
         'hires': '1.5k',
-        'price': '19€',
+        'price': '5 ⚡/task',
       },
     ];
   }
@@ -696,11 +697,21 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
               true,
               isDark,
             ),
-            _buildNavItem(
-              Icons.people_outline,
-              l10n.agentMarketplaceNavAgents,
-              false,
-              isDark,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyAgentsPage(),
+                  ),
+                );
+              },
+              child: _buildNavItem(
+                Icons.people_outline,
+                l10n.agentMarketplaceNavAgents,
+                false,
+                isDark,
+              ),
             ),
             _buildNavItem(
               Icons.bar_chart_rounded,

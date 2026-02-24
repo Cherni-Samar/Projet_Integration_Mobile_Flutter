@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/splash_screen.dart';
@@ -12,6 +13,7 @@ import 'screens/agent/AgentDetails Page.dart';
 import 'screens/agent/onboarding_chatbot_screen.dart';
 import 'screens/agent/onboarding_welcome_screen.dart';
 import 'screens/cart/cart_page.dart';
+import 'providers/owned_agents_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
 
@@ -19,6 +21,11 @@ import 'providers/cart_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 💳 Initialize Stripe — replace with your publishable key from
+  // https://dashboard.stripe.com/test/apikeys
+  Stripe.publishableKey = 'pk_test_51RIdV7QLtPq7s5k7xiLNgDPFR81G2fA4H8JxNWEK9Adrlm29M0FfWbBytw6astsugguURilr6OYtxzis36aTPhKc00b5eVc6Cm';
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -29,6 +36,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => OwnedAgentsProvider()),
       ],
       child: const MyApp(),
     ),
