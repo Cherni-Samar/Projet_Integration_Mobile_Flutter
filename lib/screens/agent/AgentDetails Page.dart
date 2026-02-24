@@ -1022,7 +1022,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
               ),
               const SizedBox(width: 10),
               Text(
-                name == 'Hera' ? 'Hire Hera' : 'Add to Cart',
+                name == 'Hera' ? 'try et view dashboard' : 'Add to Cart',
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,

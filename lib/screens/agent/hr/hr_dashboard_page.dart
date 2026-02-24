@@ -762,7 +762,10 @@ class _HrDashboardPageState extends State<HrDashboardPage>
             children: [
               _chip('${pending.length} En attente', const Color(0xFFFB7185)),
               _chip('${inProg.length} En cours', const Color(0xFFFBBF24)),
-              _chip('${done.length} Terminées', const Color(0xFFCDFF00)),
+              _chip(
+                '${done.length} Terminées',
+                const Color.fromARGB(255, 7, 186, 51),
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -847,7 +850,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
         sl = 'En cours';
         break;
       default:
-        sc = const Color(0xFFCDFF00);
+        sc = const Color.fromARGB(255, 7, 186, 51);
         sl = 'Terminé';
     }
 
