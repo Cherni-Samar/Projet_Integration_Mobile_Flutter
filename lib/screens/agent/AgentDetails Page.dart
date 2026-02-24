@@ -45,7 +45,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
   late AnimationController _animationController;
   late final PageController _pageController;
   late int _currentIndex;
-  String _selectedPlan = 'free';
+
 
   bool get _isSwipeMode => widget.agents != null && widget.agents!.isNotEmpty;
 
@@ -198,85 +198,113 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
   }
 
   // ---------------------------
-  // Pricing
+  // Energy Costs
   // ---------------------------
-  Map<String, dynamic> _getPricingForAgent(
-    AppLocalizations l10n,
-    String agentName,
-  ) {
+  List<Map<String, dynamic>> _getEnergyCostsForAgent(String agentName) {
     switch (agentName) {
       case 'Hera':
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(50),
-          },
-          'hourly': {'price': '€3.50', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€29',
-            'description': l10n.pricingUnlimitedHrTasks,
-          },
-        };
+        return [
+          {'task': 'Approve leave', 'cost': 10},
+          {'task': 'Employee onboarding', 'cost': 15},
+          {'task': 'Team coordination', 'cost': 12},
+        ];
       case 'Kash':
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(30),
-          },
-          'hourly': {'price': '€4.50', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€39',
-            'description': l10n.pricingFullFinancialSuite,
-          },
-        };
+        return [
+          {'task': 'Add expense', 'cost': 15},
+          {'task': 'Generate report', 'cost': 20},
+          {'task': 'Track budget', 'cost': 12},
+        ];
       case 'Dexo':
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(100),
-          },
-          'hourly': {'price': '€2.50', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€25',
-            'description': l10n.pricingCompleteAdminSupport,
-          },
-        };
+        return [
+          {'task': 'Upload document', 'cost': 8},
+          {'task': 'Classify files', 'cost': 10},
+          {'task': 'Manage access', 'cost': 12},
+        ];
       case 'Timo':
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(75),
-          },
-          'hourly': {'price': '€2.00', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€19',
-            'description': l10n.pricingProjectManagementTools,
-          },
-        };
+        return [
+          {'task': 'Plan meeting', 'cost': 20},
+          {'task': 'Prioritize tasks', 'cost': 15},
+          {'task': 'Deadline reminder', 'cost': 8},
+        ];
       case 'Echo':
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(100),
-          },
-          'hourly': {'price': '€2.00', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€19',
-            'description': l10n.pricingCommunicationAutomation,
-          },
-        };
+        return [
+          {'task': 'Summarize email', 'cost': 5},
+          {'task': 'Filter messages', 'cost': 8},
+          {'task': 'Smart notification', 'cost': 6},
+        ];
       default:
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(50),
-          },
-          'hourly': {'price': '€3.00', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€29',
-            'description': l10n.pricingFullFeaturesAccess,
-          },
-        };
+        return [
+          {'task': 'Basic task', 'cost': 10},
+        ];
+    }
+  }
+
+  List<Map<String, dynamic>> _getMultiAgentScenarios(String agentName) {
+    switch (agentName) {
+      case 'Hera':
+        return [
+          {'scenario': 'Leave + schedule update', 'agents': 'Hera + Timo', 'cost': 25},
+        ];
+      case 'Kash':
+        return [
+          {'scenario': 'Invoice + storage + analysis', 'agents': 'Kash + Dexo', 'cost': 30},
+        ];
+      case 'Dexo':
+        return [
+          {'scenario': 'Invoice + storage + analysis', 'agents': 'Kash + Dexo', 'cost': 30},
+        ];
+      case 'Timo':
+        return [
+          {'scenario': 'Leave + schedule update', 'agents': 'Hera + Timo', 'cost': 25},
+          {'scenario': 'Meeting + summary + tasks', 'agents': 'Timo + Echo', 'cost': 35},
+        ];
+      case 'Echo':
+        return [
+          {'scenario': 'Meeting + summary + tasks', 'agents': 'Timo + Echo', 'cost': 35},
+        ];
+      default:
+        return [];
+    }
+  }
+
+  List<Map<String, dynamic>> _getEnergyPacksForAgent(String agentName) {
+    switch (agentName) {
+      case 'Hera':
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 10.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 45.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 100.0, 'color': 0xFFF59E0B},
+        ];
+      case 'Kash':
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 15.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 55.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 120.0, 'color': 0xFFF59E0B},
+        ];
+      case 'Dexo':
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 8.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 35.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 80.0, 'color': 0xFFF59E0B},
+        ];
+      case 'Timo':
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 12.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 50.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 110.0, 'color': 0xFFF59E0B},
+        ];
+      case 'Echo':
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 5.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 25.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 60.0, 'color': 0xFFF59E0B},
+        ];
+      default:
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 10.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 45.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 100.0, 'color': 0xFFF59E0B},
+        ];
     }
   }
 
@@ -340,7 +368,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       onPageChanged: (i) {
         setState(() {
           _currentIndex = i;
-          _selectedPlan = 'free';
         });
       },
       itemBuilder: (context, index) {
@@ -372,7 +399,8 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     final name = _agentName(agent);
     final color = _agentColor(agent);
     final icon = _agentIcon(agent);
-    final pricing = _getPricingForAgent(l10n, name);
+    final energyCosts = _getEnergyCostsForAgent(name);
+    final multiScenarios = _getMultiAgentScenarios(name);
     final rating = _getRatingForAgent(name);
     final skills = _getSkillsForAgent(l10n, name);
 
@@ -798,9 +826,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
 
                           const SizedBox(height: 32),
 
-                          // Plans
+                          // ── Energy Cost per Task ──
                           Text(
-                            l10n.agentDetailsDeploymentPlans,
+                            'ENERGY COST PER TASK',
                             style: TextStyle(
                               color: isDark ? Colors.white : Colors.black,
                               fontSize: 12,
@@ -809,53 +837,155 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             ),
                           ),
                           const SizedBox(height: 16),
-
-                          _buildPlanCard(
-                            title: l10n.agentDetailsPlanFreeTrial,
-                            price: pricing['free']['price'],
-                            period: '',
-                            description: pricing['free']['description'],
-                            badge: l10n.agentDetailsBadgeStarter,
-                            badgeColor: const Color(0xFF6B7280),
-                            isSelected: _selectedPlan == 'free',
-                            onTap: () => setState(() => _selectedPlan = 'free'),
-                            isDark: isDark,
+                          Container(
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.1)
+                                    : Colors.black.withValues(alpha: 0.1),
+                              ),
+                            ),
+                            child: Column(
+                              children: energyCosts.asMap().entries.map((entry) {
+                                final i = entry.key;
+                                final task = entry.value;
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    border: i < energyCosts.length - 1
+                                        ? Border(bottom: BorderSide(
+                                            color: isDark
+                                                ? Colors.white.withValues(alpha: 0.06)
+                                                : Colors.black.withValues(alpha: 0.06),
+                                          ))
+                                        : null,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        task['task'] as String,
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? Colors.white.withValues(alpha: 0.8)
+                                              : Colors.black87,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: color.withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.bolt, color: color, size: 16),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              '${task['cost']}',
+                                              style: TextStyle(
+                                                color: color,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
                           ),
 
-                          const SizedBox(height: 12),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildPlanCard(
-                                  title: l10n.agentDetailsPlanHourly,
-                                  price: pricing['hourly']['price'],
-                                  period: l10n.commonPerHourShort,
-                                  description: pricing['hourly']['description'],
-                                  isSelected: _selectedPlan == 'hourly',
-                                  onTap: () =>
-                                      setState(() => _selectedPlan = 'hourly'),
-                                  isDark: isDark,
+                          // ── Multi-Agent Scenarios ──
+                          if (multiScenarios.isNotEmpty) ...[
+                            const SizedBox(height: 32),
+                            Text(
+                              'MULTI-AGENT SCENARIOS',
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ...multiScenarios.map((s) => Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    color.withValues(alpha: 0.08),
+                                    color.withValues(alpha: 0.02),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: color.withValues(alpha: 0.2),
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: _buildPlanCard(
-                                  title: l10n.agentDetailsPlanMonthly,
-                                  price: pricing['monthly']['price'],
-                                  period: l10n.commonPerMonthShort,
-                                  description:
-                                      pricing['monthly']['description'],
-                                  badge: l10n.agentDetailsBadgeBestValue,
-                                  badgeColor: const Color(0xFFCDFF00),
-                                  isSelected: _selectedPlan == 'monthly',
-                                  onTap: () =>
-                                      setState(() => _selectedPlan = 'monthly'),
-                                  isDark: isDark,
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    s['scenario'] as String,
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white : Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        s['agents'] as String,
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? Colors.white.withValues(alpha: 0.6)
+                                              : Colors.black54,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(Icons.bolt, color: Color(0xFFF59E0B), size: 16),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              '${s['cost']}',
+                                              style: const TextStyle(
+                                                color: Color(0xFFF59E0B),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            )),
+                          ],
 
                           const SizedBox(height: 120),
                         ],
@@ -883,14 +1013,13 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         name: name,
         color: color,
         icon: icon,
-        pricing: pricing,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
   // ---------------------------
-  // FAB — Hera → N8N, autres → Cart
+  // FAB — Buy Energy
   // ---------------------------
   Widget _buildFab({
     required BuildContext context,
@@ -898,111 +1027,13 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     required String name,
     required Color color,
     required String icon,
-    required Map<String, dynamic> pricing,
   }) {
-    // ✅ On récupère le CartProvider ici, hors du Consumer, pour éviter le
-    //    ProviderNotFoundException quand le widget est dans un PageView.
-    final cart = Provider.of<CartProvider>(context, listen: false);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () async {
-            if (name == 'Hera') {
-              // ── Hera flow → N8N ──────────────────────────────────────
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF8B5CF6)),
-                ),
-              );
-              try {
-                final response = await HrAgentService.hello(
-                  username: 'Samar', // ← remplace par _currentUser.name
-                );
-                if (context.mounted) {
-                  Navigator.pop(context); // ferme loading
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => HrDashboardPage(
-                        heraMessage: response['message'],
-                        username: response['user'] ?? 'Samar',
-                      ),
-                    ),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  Navigator.pop(context); // ferme loading
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('❌ Hera indisponible: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              }
-            } else {
-              // ── Add to Cart pour les autres agents ───────────────────
-              final planKey = _selectedPlan;
-              final planDetails = pricing[planKey];
-
-              final item = CartItem(
-                id: '$name-${DateTime.now().millisecondsSinceEpoch}',
-                title: name,
-                plan: planKey,
-                price:
-                    double.tryParse(
-                      planDetails['price'].toString().replaceAll('€', ''),
-                    ) ??
-                    0.0,
-                color: color,
-                illustration: icon,
-              );
-
-              cart.addToCart(item);
-
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Row(
-                      children: [
-                        const Icon(
-                          Icons.shopping_cart_checkout,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(child: Text('$name added to cart!')),
-                      ],
-                    ),
-                    backgroundColor: isDark
-                        ? const Color(0xFF1E1E1E)
-                        : Colors.black,
-                    behavior: SnackBarBehavior.floating,
-                    duration: const Duration(seconds: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: isDark
-                          ? BorderSide(
-                              color: Colors.white.withValues(alpha: 0.1),
-                              width: 1,
-                            )
-                          : BorderSide.none,
-                    ),
-                    action: SnackBarAction(
-                      label: 'VIEW CART',
-                      textColor: const Color(0xFFCDFF00),
-                      onPressed: () => Navigator.pushNamed(context, '/cart'),
-                    ),
-                  ),
-                );
-              }
-            }
-          },
+          onPressed: () => _showEnergyPackSheet(context, isDark, name, color, icon),
           style: ElevatedButton.styleFrom(
             backgroundColor: isDark ? const Color(0xFFCDFF00) : Colors.black,
             foregroundColor: isDark ? Colors.black : Colors.white,
@@ -1013,17 +1044,14 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
             elevation: 8,
             shadowColor: Colors.black.withValues(alpha: 0.3),
           ),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                name == 'Hera' ? Icons.rocket_launch : Icons.add_shopping_cart,
-                size: 22,
-              ),
-              const SizedBox(width: 10),
+              Icon(Icons.bolt, size: 22),
+              SizedBox(width: 10),
               Text(
-                name == 'Hera' ? 'Hire Hera' : 'Add to Cart',
-                style: const TextStyle(
+                'Buy Energy',
+                style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
                 ),
@@ -1033,6 +1061,196 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         ),
       ),
     );
+  }
+
+  void _showEnergyPackSheet(
+    BuildContext ctx,
+    bool isDark,
+    String agentName,
+    Color agentColor,
+    String agentIcon,
+  ) {
+    final cart = Provider.of<CartProvider>(ctx, listen: false);
+    final packs = _getEnergyPacksForAgent(agentName);
+    showModalBottomSheet(
+      context: ctx,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (sheetCtx) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.black12,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Energy for $agentName',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Choose a pack to power $agentName ⚡',
+                style: TextStyle(
+                  color: isDark ? Colors.white54 : Colors.black54,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 24),
+              ...packs.map((pack) {
+                final packColor = Color(pack['color'] as int);
+                final title = pack['title'] as String;
+                final energy = pack['energy'] as int;
+                final price = pack['price'] as double;
+                final isBest = title == 'Pro';
+                return GestureDetector(
+                  onTap: () {
+                    final item = CartItem(
+                      id: 'agent-$agentName',
+                      agentName: agentName,
+                      agentIllustration: agentIcon,
+                      agentColor: agentColor,
+                      packTitle: title,
+                      energy: energy,
+                      price: price,
+                    );
+                    final added = cart.addToCart(item);
+                    Navigator.pop(sheetCtx);
+                    if (added) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(Icons.bolt, color: agentColor, size: 20),
+                              const SizedBox(width: 10),
+                              Text('$agentName ($title) added to cart!'),
+                            ],
+                          ),
+                          backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.black,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          action: SnackBarAction(
+                            label: 'VIEW CART',
+                            textColor: const Color(0xFFCDFF00),
+                            onPressed: () => Navigator.pushNamed(ctx, '/cart'),
+                          ),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                          content: Text('$agentName is already in your cart!'),
+                          backgroundColor: Colors.orange.shade700,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF252525) : const Color(0xFFF9F9F9),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isBest ? packColor : (isDark ? Colors.white12 : Colors.black12),
+                        width: isBest ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: packColor.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Icon(Icons.bolt, color: packColor, size: 26),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    title,
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white : Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (isBest) ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: packColor,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: const Text(
+                                        'BEST VALUE',
+                                        style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${_fmtEnergy(energy)} ⚡',
+                                style: TextStyle(
+                                  color: packColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          '\$${price.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  static String _fmtEnergy(int n) {
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(n % 1000 == 0 ? 0 : 1)}k';
+    return n.toString();
   }
 
   // ---------------------------
@@ -1112,127 +1330,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     );
   }
 
-  Widget _buildPlanCard({
-    required String title,
-    required String price,
-    required String period,
-    required String description,
-    String? badge,
-    Color? badgeColor,
-    required bool isSelected,
-    required VoidCallback onTap,
-    required bool isDark,
-  }) {
-    final selectedBgColor = isDark ? const Color(0xFFCDFF00) : Colors.black;
-    final unselectedBgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final selectedBorderColor = isDark ? const Color(0xFFCDFF00) : Colors.black;
-    final unselectedBorderColor = isDark
-        ? Colors.white.withValues(alpha: 0.1)
-        : Colors.black.withValues(alpha: 0.2);
-    final selectedTextColor = isDark ? Colors.black : const Color(0xFFCDFF00);
-    final unselectedTextColor = isDark ? Colors.white : Colors.black;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? selectedBgColor : unselectedBgColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? selectedBorderColor : unselectedBorderColor,
-            width: 2,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: selectedBgColor.withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 6),
-                  ),
-                ]
-              : [],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: isSelected ? selectedTextColor : unselectedTextColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (badge != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: badgeColor ?? const Color(0xFFCDFF00),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      badge,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                if (isSelected && badge == null)
-                  Icon(Icons.check_circle, color: selectedTextColor, size: 20),
-              ],
-            ),
-            const SizedBox(height: 12),
-            RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: price,
-                    style: TextStyle(
-                      color: isSelected
-                          ? selectedTextColor
-                          : unselectedTextColor,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (period.isNotEmpty)
-                    TextSpan(
-                      text: period,
-                      style: TextStyle(
-                        color: isSelected
-                            ? selectedTextColor.withValues(alpha: 0.7)
-                            : unselectedTextColor.withValues(alpha: 0.5),
-                        fontSize: 14,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: TextStyle(
-                color: isSelected
-                    ? selectedTextColor.withValues(alpha: 0.8)
-                    : unselectedTextColor.withValues(alpha: 0.6),
-                fontSize: 12,
-                height: 1.4,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 // ---------------------------
