@@ -33,42 +33,41 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
   };
 
   // ✅ Catalog agents (match Marketplace + Cart)
-  // key = agentId interne
   final Map<String, Map<String, dynamic>> _agentCatalog = {
-    'elya': {
-      'display': 'Elya',
-      'title': 'Elya',
-      'illustration': 'assets/images/nexa.png',
+    'hera': {
+      'display': 'Hera',
+      'title': 'Hera',
+      'illustration': 'assets/images/hera.png',
       'color': Color(0xFF8B5CF6),
-      'monthlyPrice': 29.0,
+      'energyCost': 10,
     },
     'kash': {
       'display': 'Kash',
       'title': 'Kash',
       'illustration': 'assets/images/kash.png',
       'color': Color(0xFFF59E0B),
-      'monthlyPrice': 39.0,
+      'energyCost': 15,
     },
     'dox': {
       'display': 'Dox',
       'title': 'Dox',
       'illustration': 'assets/images/dexo.png',
       'color': Color(0xFF10B981),
-      'monthlyPrice': 25.0,
+      'energyCost': 8,
     },
     'timo': {
       'display': 'Timo',
       'title': 'Timo',
       'illustration': 'assets/images/krono.png',
       'color': Color(0xFFEC4899),
-      'monthlyPrice': 19.0,
+      'energyCost': 20,
     },
     'echo': {
       'display': 'Echo',
       'title': 'Echo',
       'illustration': 'assets/images/voxi.png',
       'color': Color(0xFFA855F7),
-      'monthlyPrice': 19.0,
+      'energyCost': 5,
     },
   };
 
@@ -246,7 +245,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
       _messages.add(
         ChatMessage(
           text:
-              "✨ Based on your needs, I recommend these agents:\n\n$recommendationsText\n\n✅ Added to your cart automatically.",
+              "✨ Based on your needs, I recommend these agents:\n\n$recommendationsText\n\n⚡ I've added them to your cart with a Starter Energy Pack (1,000 ⚡ each)!",
           isBot: true,
           showActions: true,
         ),
@@ -257,32 +256,26 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
     _scrollToBottom();
   }
 
-  // ✅ Add agents to cart (avoid duplicates via stable id)
+  // ✅ Add recommended agents to cart with Starter pack
   void _addRecommendedAgentsToCart(List<String> keys) {
     final cart = Provider.of<CartProvider>(context, listen: false);
-
-    int added = 0;
 
     for (final key in keys) {
       final data = _agentCatalog[key];
       if (data == null) continue;
 
-      final id = 'rec-${data['title']}'; // ✅ stable to avoid duplicates
-      final alreadyInCart = cart.items.any((it) => it.id == id);
-
-      if (alreadyInCart) continue;
-
+      final agentName = data['title'] as String;
       final item = CartItem(
-        id: id,
-        title: data['title'] as String,
-        plan: 'monthly',
-        price: (data['monthlyPrice'] as double),
-        color: data['color'] as Color,
-        illustration: data['illustration'] as String,
+        id: 'agent-$agentName',
+        agentName: agentName,
+        agentIllustration: data['illustration'] as String,
+        agentColor: data['color'] as Color,
+        packTitle: 'Starter',
+        energy: 1000,
+        price: 10.0,
       );
 
-      cart.addToCart(item);
-      added++;
+      cart.addToCart(item); // silently skips if already in cart
     }
   }
 
@@ -296,8 +289,8 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
     // ✅ definitions used to print
     final List<Map<String, String>> agents = [
       {
-        'key': 'elya',
-        'name': '🤝 **Elya** (HR Agent)',
+        'key': 'hera',
+        'name': '🤝 **Hera** (HR Agent)',
         'description':
             'Manages leave requests, employee onboarding, and team coordination',
       },
@@ -348,7 +341,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
     }
 
     if (challenges.contains('🤝 Team coordination')) {
-      addAgentByKey('elya');
+      addAgentByKey('hera');
       addAgentByKey('echo');
     }
 
@@ -368,12 +361,12 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
     }
 
     if (priority.contains('👥 Team development')) {
-      addAgentByKey('elya');
+      addAgentByKey('hera');
     }
 
     // fallback
     if (recommendedBlocks.isEmpty) {
-      addAgentByKey('elya');
+      addAgentByKey('hera');
       addAgentByKey('kash');
       addAgentByKey('timo');
     }
