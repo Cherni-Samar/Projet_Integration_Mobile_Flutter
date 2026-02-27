@@ -972,15 +972,6 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                 letterSpacing: 0.5,
                               ),
                             ),
-                            Text(
-                              l10n.commonPerMonthShort,
-                              style: TextStyle(
-                                color: isDark
-                                    ? Colors.black.withOpacity(0.7)
-                                    : const Color(0xFFCDFF00).withOpacity(0.7),
-                                fontSize: 11,
-                              ),
-                            ),
                           ],
                         ),
                       ),
