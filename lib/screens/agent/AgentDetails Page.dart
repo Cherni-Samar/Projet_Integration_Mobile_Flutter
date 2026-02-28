@@ -4,6 +4,8 @@ import '../../l10n/app_localizations.dart';
 
 import '../../providers/cart_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../services/hr_agent_service.dart';
+import '../../screens/agent/hr/hr_dashboard_page.dart';
 
 class AgentDetailsPage extends StatefulWidget {
   // ✅ Legacy single agent (optionnel)
@@ -19,7 +21,7 @@ class AgentDetailsPage extends StatefulWidget {
   final int initialIndex;
 
   const AgentDetailsPage({
-    Key? key,
+    super.key,
 
     // legacy
     this.title,
@@ -32,35 +34,29 @@ class AgentDetailsPage extends StatefulWidget {
     // swipe
     this.agents,
     this.initialIndex = 0,
-  }) : super(key: key);
+  });
 
   @override
   State<AgentDetailsPage> createState() => _AgentDetailsPageState();
 }
 
-
 class _AgentDetailsPageState extends State<AgentDetailsPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-
   late final PageController _pageController;
   late int _currentIndex;
 
-  String _selectedPlan = 'free';
 
   bool get _isSwipeMode => widget.agents != null && widget.agents!.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
-
     _currentIndex = widget.initialIndex.clamp(
       0,
       _isSwipeMode ? widget.agents!.length - 1 : 0,
     );
-
     _pageController = PageController(initialPage: _currentIndex);
-
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
@@ -74,40 +70,34 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     super.dispose();
   }
 
-  // ✅ page value helper (for animation)
   double _pageValue() {
     if (!_pageController.hasClients) return _currentIndex.toDouble();
     return _pageController.page ?? _currentIndex.toDouble();
   }
 
-  // ✅ Dots indicator (top)
   Widget _buildSwipeDots({required bool isDark}) {
     if (!_isSwipeMode) return const SizedBox.shrink();
-
     final count = widget.agents!.length;
-
     return AnimatedBuilder(
       animation: _pageController,
       builder: (context, _) {
         final page = _pageValue();
-
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: List.generate(count, (i) {
             final dist = (page - i).abs().clamp(0.0, 1.0);
-            final t = (1.0 - dist); // 1 = actif, 0 = loin
-
-            final width = 6.0 + (10.0 - 6.0) * t; // 6 → 10
-            final height = 6.0;
-            final opacity = 0.35 + (1.0 - 0.35) * t; // 0.35 → 1
-
+            final t = 1.0 - dist;
+            final width = 6.0 + (10.0 - 6.0) * t;
+            const height = 6.0;
+            final opacity = 0.35 + (1.0 - 0.35) * t;
             return Container(
               margin: const EdgeInsets.symmetric(horizontal: 4),
               width: width,
               height: height,
               decoration: BoxDecoration(
-                color:
-                (isDark ? Colors.white : Colors.black).withOpacity(opacity),
+                color: (isDark ? Colors.white : Colors.black).withValues(
+                  alpha: opacity,
+                ),
                 borderRadius: BorderRadius.circular(999),
               ),
             );
@@ -122,7 +112,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
   // ---------------------------
   Map<String, dynamic> _agentAt(int index) {
     if (_isSwipeMode) return widget.agents![index];
-
     return {
       'name': widget.title ?? '',
       'color': widget.color ?? Colors.black,
@@ -152,7 +141,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     return widget.description ?? <String>[];
   }
 
-  // ✅ Skills selon l'agent
+  // ---------------------------
+  // Skills
+  // ---------------------------
   List<String> _getSkillsForAgent(AppLocalizations l10n, String agentName) {
     switch (agentName) {
       case 'Hera':
@@ -206,82 +197,114 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     }
   }
 
-  // ✅ Pricing avec Free
-  Map<String, dynamic> _getPricingForAgent(
-      AppLocalizations l10n, String agentName) {
+  // ---------------------------
+  // Energy Costs
+  // ---------------------------
+  List<Map<String, dynamic>> _getEnergyCostsForAgent(String agentName) {
     switch (agentName) {
       case 'Hera':
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(50)
-          },
-          'hourly': {'price': '€3.50', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€29',
-            'description': l10n.pricingUnlimitedHrTasks
-          },
-        };
+        return [
+          {'task': 'Approve leave', 'cost': 10},
+          {'task': 'Employee onboarding', 'cost': 15},
+          {'task': 'Team coordination', 'cost': 12},
+        ];
       case 'Kash':
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(30)
-          },
-          'hourly': {'price': '€4.50', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€39',
-            'description': l10n.pricingFullFinancialSuite
-          },
-        };
+        return [
+          {'task': 'Add expense', 'cost': 15},
+          {'task': 'Generate report', 'cost': 20},
+          {'task': 'Track budget', 'cost': 12},
+        ];
       case 'Dexo':
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(100)
-          },
-          'hourly': {'price': '€2.50', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€25',
-            'description': l10n.pricingCompleteAdminSupport
-          },
-        };
+        return [
+          {'task': 'Upload document', 'cost': 8},
+          {'task': 'Classify files', 'cost': 10},
+          {'task': 'Manage access', 'cost': 12},
+        ];
       case 'Timo':
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(75)
-          },
-          'hourly': {'price': '€2.00', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€19',
-            'description': l10n.pricingProjectManagementTools
-          },
-        };
+        return [
+          {'task': 'Plan meeting', 'cost': 20},
+          {'task': 'Prioritize tasks', 'cost': 15},
+          {'task': 'Deadline reminder', 'cost': 8},
+        ];
       case 'Echo':
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(100)
-          },
-          'hourly': {'price': '€2.00', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€19',
-            'description': l10n.pricingCommunicationAutomation
-          },
-        };
+        return [
+          {'task': 'Summarize email', 'cost': 5},
+          {'task': 'Filter messages', 'cost': 8},
+          {'task': 'Smart notification', 'cost': 6},
+        ];
       default:
-        return {
-          'free': {
-            'price': '€0',
-            'description': l10n.pricingRequestsPerMonth(50)
-          },
-          'hourly': {'price': '€3.00', 'description': l10n.pricingPayAsYouGo},
-          'monthly': {
-            'price': '€29',
-            'description': l10n.pricingFullFeaturesAccess
-          },
-        };
+        return [
+          {'task': 'Basic task', 'cost': 10},
+        ];
+    }
+  }
+
+  List<Map<String, dynamic>> _getMultiAgentScenarios(String agentName) {
+    switch (agentName) {
+      case 'Hera':
+        return [
+          {'scenario': 'Leave + schedule update', 'agents': 'Hera + Timo', 'cost': 25},
+        ];
+      case 'Kash':
+        return [
+          {'scenario': 'Invoice + storage + analysis', 'agents': 'Kash + Dexo', 'cost': 30},
+        ];
+      case 'Dexo':
+        return [
+          {'scenario': 'Invoice + storage + analysis', 'agents': 'Kash + Dexo', 'cost': 30},
+        ];
+      case 'Timo':
+        return [
+          {'scenario': 'Leave + schedule update', 'agents': 'Hera + Timo', 'cost': 25},
+          {'scenario': 'Meeting + summary + tasks', 'agents': 'Timo + Echo', 'cost': 35},
+        ];
+      case 'Echo':
+        return [
+          {'scenario': 'Meeting + summary + tasks', 'agents': 'Timo + Echo', 'cost': 35},
+        ];
+      default:
+        return [];
+    }
+  }
+
+  List<Map<String, dynamic>> _getEnergyPacksForAgent(String agentName) {
+    switch (agentName) {
+      case 'Hera':
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 10.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 45.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 100.0, 'color': 0xFFF59E0B},
+        ];
+      case 'Kash':
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 15.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 55.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 120.0, 'color': 0xFFF59E0B},
+        ];
+      case 'Dexo':
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 8.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 35.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 80.0, 'color': 0xFFF59E0B},
+        ];
+      case 'Timo':
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 12.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 50.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 110.0, 'color': 0xFFF59E0B},
+        ];
+      case 'Echo':
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 5.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 25.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 60.0, 'color': 0xFFF59E0B},
+        ];
+      default:
+        return [
+          {'title': 'Starter', 'energy': 1000, 'price': 10.0, 'color': 0xFF10B981},
+          {'title': 'Pro', 'energy': 6000, 'price': 45.0, 'color': 0xFF8B5CF6},
+          {'title': 'Business', 'energy': 15000, 'price': 100.0, 'color': 0xFFF59E0B},
+        ];
     }
   }
 
@@ -319,13 +342,15 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     }
   }
 
+  // ---------------------------
+  // Build
+  // ---------------------------
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
 
-    // ✅ Legacy
     if (!_isSwipeMode) {
       return _buildAgentDetailsScaffold(
         context: context,
@@ -336,7 +361,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       );
     }
 
-    // ✅ OPTION B: Parallax (avatar) + micro fade/slide on content
     return PageView.builder(
       controller: _pageController,
       itemCount: widget.agents!.length,
@@ -344,7 +368,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       onPageChanged: (i) {
         setState(() {
           _currentIndex = i;
-          _selectedPlan = 'free';
         });
       },
       itemBuilder: (context, index) {
@@ -352,7 +375,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
           animation: _pageController,
           builder: (context, _) {
             final page = _pageValue();
-            final diff = (index - page);
+            final diff = index - page;
             return _buildAgentDetailsScaffold(
               context: context,
               l10n: l10n,
@@ -366,7 +389,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     );
   }
 
-  // swipeDiff: 0.0 = centre, -1/+1 = voisin
   Widget _buildAgentDetailsScaffold({
     required BuildContext context,
     required AppLocalizations l10n,
@@ -377,30 +399,27 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     final name = _agentName(agent);
     final color = _agentColor(agent);
     final icon = _agentIcon(agent);
-
-    final pricing = _getPricingForAgent(l10n, name);
+    final energyCosts = _getEnergyCostsForAgent(name);
+    final multiScenarios = _getMultiAgentScenarios(name);
     final rating = _getRatingForAgent(name);
     final skills = _getSkillsForAgent(l10n, name);
 
     final abs = swipeDiff.abs().clamp(0.0, 1.0);
-
-    // ✅ Option B animation values
     final avatarDx = -swipeDiff * 28.0;
     final contentDy = 16.0 * abs;
     final contentOpacity = (1.0 - 0.25 * abs).clamp(0.75, 1.0);
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0A0A0A) : Colors.white,
-
-      // ✅ Stack to overlay dots
       body: Stack(
         children: [
           CustomScrollView(
             slivers: [
-              // AppBar
+              // ── AppBar ──────────────────────────────────────────────────
               SliverAppBar(
-                backgroundColor:
-                isDark ? const Color(0xFF0A0A0A) : Colors.white,
+                backgroundColor: isDark
+                    ? const Color(0xFF0A0A0A)
+                    : Colors.white,
                 pinned: true,
                 elevation: 0,
                 leading: IconButton(
@@ -410,7 +429,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                     height: 40,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? Colors.white.withOpacity(0.1)
+                          ? Colors.white.withValues(alpha: 0.1)
                           : const Color(0xFFF5F5F5),
                       shape: BoxShape.circle,
                     ),
@@ -430,6 +449,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                   ),
                 ),
                 actions: [
+                  // Cart icon with badge
                   Consumer<CartProvider>(
                     builder: (context, cart, child) {
                       return Stack(
@@ -442,7 +462,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                               height: 40,
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? Colors.white.withOpacity(0.1)
+                                    ? Colors.white.withValues(alpha: 0.1)
                                     : const Color(0xFFF5F5F5),
                                 shape: BoxShape.circle,
                               ),
@@ -482,6 +502,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                       );
                     },
                   ),
+                  // Share icon
                   IconButton(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -501,9 +522,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             borderRadius: BorderRadius.circular(12),
                             side: isDark
                                 ? BorderSide(
-                              color: Colors.white.withOpacity(0.1),
-                              width: 1,
-                            )
+                                    color: Colors.white.withValues(alpha: 0.1),
+                                    width: 1,
+                                  )
                                 : BorderSide.none,
                           ),
                         ),
@@ -514,7 +535,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                       height: 40,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withOpacity(0.1)
+                            ? Colors.white.withValues(alpha: 0.1)
                             : const Color(0xFFF5F5F5),
                         shape: BoxShape.circle,
                       ),
@@ -529,7 +550,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                 ],
               ),
 
-              // Content
+              // ── Content ─────────────────────────────────────────────────
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
@@ -540,7 +561,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Avatar with PARALLAX
+                          // Avatar with parallax
                           Center(
                             child: Transform.translate(
                               offset: Offset(avatarDx, 0),
@@ -565,8 +586,8 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          color.withOpacity(0.2),
-                                          color.withOpacity(0.1),
+                                          color.withValues(alpha: 0.2),
+                                          color.withValues(alpha: 0.1),
                                         ],
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
@@ -578,7 +599,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: color.withOpacity(0.3),
+                                          color: color.withValues(alpha: 0.3),
                                           blurRadius: 20,
                                           offset: const Offset(0, 10),
                                         ),
@@ -609,8 +630,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: const Color(0xFFCDFF00)
-                                                .withOpacity(0.5),
+                                            color: const Color(
+                                              0xFFCDFF00,
+                                            ).withValues(alpha: 0.5),
                                             blurRadius: 8,
                                           ),
                                         ],
@@ -624,6 +646,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
 
                           const SizedBox(height: 24),
 
+                          // Name
                           Center(
                             child: Text(
                               name,
@@ -638,13 +661,14 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
 
                           const SizedBox(height: 8),
 
+                          // Version
                           Center(
                             child: Text(
                               _getVersionForAgent(l10n, name),
                               style: TextStyle(
                                 color: isDark
-                                    ? Colors.white.withOpacity(0.5)
-                                    : Colors.black.withOpacity(0.5),
+                                    ? Colors.white.withValues(alpha: 0.5)
+                                    : Colors.black.withValues(alpha: 0.5),
                                 fontSize: 14,
                               ),
                             ),
@@ -652,6 +676,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
 
                           const SizedBox(height: 16),
 
+                          // Stars
                           Center(
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -673,8 +698,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                   } else {
                                     return Icon(
                                       Icons.star_border,
-                                      color: const Color(0xFFFBBF24)
-                                          .withOpacity(0.3),
+                                      color: const Color(
+                                        0xFFFBBF24,
+                                      ).withValues(alpha: 0.3),
                                       size: 20,
                                     );
                                   }
@@ -692,8 +718,8 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                   l10n.agentDetailsHires(rating['hires']),
                                   style: TextStyle(
                                     color: isDark
-                                        ? Colors.white.withOpacity(0.5)
-                                        : Colors.black.withOpacity(0.5),
+                                        ? Colors.white.withValues(alpha: 0.5)
+                                        : Colors.black.withValues(alpha: 0.5),
                                     fontSize: 14,
                                   ),
                                 ),
@@ -708,10 +734,10 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             margin: const EdgeInsets.symmetric(horizontal: 10),
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.05),
+                              color: color.withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: color.withOpacity(0.2),
+                                color: color.withValues(alpha: 0.2),
                                 width: 1.5,
                               ),
                             ),
@@ -727,8 +753,8 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                   _agentDescriptionLines(agent).join('\n\n'),
                                   style: TextStyle(
                                     color: isDark
-                                        ? Colors.white.withOpacity(0.8)
-                                        : Colors.black.withOpacity(0.8),
+                                        ? Colors.white.withValues(alpha: 0.8)
+                                        : Colors.black.withValues(alpha: 0.8),
                                     fontSize: 16,
                                     height: 1.6,
                                     fontStyle: FontStyle.italic,
@@ -790,7 +816,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             ),
                           ),
                           const SizedBox(height: 16),
-
                           Wrap(
                             spacing: 12,
                             runSpacing: 12,
@@ -801,9 +826,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
 
                           const SizedBox(height: 32),
 
-                          // Plans
+                          // ── Energy Cost per Task ──
                           Text(
-                            l10n.agentDetailsDeploymentPlans,
+                            'ENERGY COST PER TASK',
                             style: TextStyle(
                               color: isDark ? Colors.white : Colors.black,
                               fontSize: 12,
@@ -811,54 +836,156 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                               letterSpacing: 1.5,
                             ),
                           ),
-
                           const SizedBox(height: 16),
-
-                          _buildPlanCard(
-                            title: l10n.agentDetailsPlanFreeTrial,
-                            price: pricing['free']['price'],
-                            period: '',
-                            description: pricing['free']['description'],
-                            badge: l10n.agentDetailsBadgeStarter,
-                            badgeColor: const Color(0xFF6B7280),
-                            isSelected: _selectedPlan == 'free',
-                            onTap: () => setState(() => _selectedPlan = 'free'),
-                            isDark: isDark,
+                          Container(
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.1)
+                                    : Colors.black.withValues(alpha: 0.1),
+                              ),
+                            ),
+                            child: Column(
+                              children: energyCosts.asMap().entries.map((entry) {
+                                final i = entry.key;
+                                final task = entry.value;
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    border: i < energyCosts.length - 1
+                                        ? Border(bottom: BorderSide(
+                                            color: isDark
+                                                ? Colors.white.withValues(alpha: 0.06)
+                                                : Colors.black.withValues(alpha: 0.06),
+                                          ))
+                                        : null,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        task['task'] as String,
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? Colors.white.withValues(alpha: 0.8)
+                                              : Colors.black87,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: color.withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.bolt, color: color, size: 16),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              '${task['cost']}',
+                                              style: TextStyle(
+                                                color: color,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
                           ),
 
-                          const SizedBox(height: 12),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildPlanCard(
-                                  title: l10n.agentDetailsPlanHourly,
-                                  price: pricing['hourly']['price'],
-                                  period: l10n.commonPerHourShort,
-                                  description: pricing['hourly']['description'],
-                                  isSelected: _selectedPlan == 'hourly',
-                                  onTap: () =>
-                                      setState(() => _selectedPlan = 'hourly'),
-                                  isDark: isDark,
+                          // ── Multi-Agent Scenarios ──
+                          if (multiScenarios.isNotEmpty) ...[
+                            const SizedBox(height: 32),
+                            Text(
+                              'MULTI-AGENT SCENARIOS',
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ...multiScenarios.map((s) => Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    color.withValues(alpha: 0.08),
+                                    color.withValues(alpha: 0.02),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: color.withValues(alpha: 0.2),
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: _buildPlanCard(
-                                  title: l10n.agentDetailsPlanMonthly,
-                                  price: pricing['monthly']['price'],
-                                  period: l10n.commonPerMonthShort,
-                                  description: pricing['monthly']['description'],
-                                  badge: l10n.agentDetailsBadgeBestValue,
-                                  badgeColor: const Color(0xFFCDFF00),
-                                  isSelected: _selectedPlan == 'monthly',
-                                  onTap: () =>
-                                      setState(() => _selectedPlan = 'monthly'),
-                                  isDark: isDark,
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    s['scenario'] as String,
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white : Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        s['agents'] as String,
+                                        style: TextStyle(
+                                          color: isDark
+                                              ? Colors.white.withValues(alpha: 0.6)
+                                              : Colors.black54,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(Icons.bolt, color: Color(0xFFF59E0B), size: 16),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              '${s['cost']}',
+                                              style: const TextStyle(
+                                                color: Color(0xFFF59E0B),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            )),
+                          ],
 
                           const SizedBox(height: 120),
                         ],
@@ -870,7 +997,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
             ],
           ),
 
-          // ✅ Dots overlay (under AppBar)
+          // Dots overlay
           Positioned(
             top: MediaQuery.of(context).padding.top + kToolbarHeight + 10,
             left: 0,
@@ -880,116 +1007,250 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         ],
       ),
 
-      floatingActionButton: _buildAddToCartFab(
+      floatingActionButton: _buildFab(
         context: context,
         isDark: isDark,
         name: name,
         color: color,
         icon: icon,
-        pricing: pricing,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
-  Widget _buildAddToCartFab({
+  // ---------------------------
+  // FAB — Buy Energy
+  // ---------------------------
+  Widget _buildFab({
     required BuildContext context,
     required bool isDark,
     required String name,
     required Color color,
     required String icon,
-    required Map<String, dynamic> pricing,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: Consumer<CartProvider>(
-              builder: (context, cart, child) {
-                return ElevatedButton(
-                  onPressed: () {
-                    final planKey = _selectedPlan;
-                    final planDetails = pricing[planKey];
-
-                    final item = CartItem(
-                      id: '$name-${DateTime.now().millisecondsSinceEpoch}',
-                      title: name,
-                      plan: planKey,
-                      price: double.tryParse(
-                        planDetails['price'].toString().replaceAll('€', ''),
-                      ) ??
-                          0.0,
-                      color: color,
-                      illustration: icon,
-                    );
-
-                    cart.addToCart(item);
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: [
-                            const Icon(Icons.shopping_cart_checkout,
-                                color: Colors.white),
-                            const SizedBox(width: 12),
-                            Expanded(child: Text('$name added to cart!')),
-                          ],
-                        ),
-                        backgroundColor:
-                        isDark ? const Color(0xFF1E1E1E) : Colors.black,
-                        behavior: SnackBarBehavior.floating,
-                        duration: const Duration(seconds: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: isDark
-                              ? BorderSide(
-                            color: Colors.white.withOpacity(0.1),
-                            width: 1,
-                          )
-                              : BorderSide.none,
-                        ),
-                        action: SnackBarAction(
-                          label: 'VIEW CART',
-                          textColor: const Color(0xFFCDFF00),
-                          onPressed: () =>
-                              Navigator.pushNamed(context, '/cart'),
-                        ),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                    isDark ? const Color(0xFFCDFF00) : Colors.black,
-                    foregroundColor: isDark ? Colors.black : Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 8,
-                    shadowColor: Colors.black.withOpacity(0.3),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.add_shopping_cart, size: 22),
-                      SizedBox(width: 10),
-                      Text(
-                        'Add to Cart',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    ],
-                  ),
-                );
-              },
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: () => _showEnergyPackSheet(context, isDark, name, color, icon),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isDark ? const Color(0xFFCDFF00) : Colors.black,
+            foregroundColor: isDark ? Colors.black : Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
+            elevation: 8,
+            shadowColor: Colors.black.withValues(alpha: 0.3),
           ),
-        ],
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.bolt, size: 22),
+              SizedBox(width: 10),
+              Text(
+                'Buy Energy',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
+  }
+
+  void _showEnergyPackSheet(
+    BuildContext ctx,
+    bool isDark,
+    String agentName,
+    Color agentColor,
+    String agentIcon,
+  ) {
+    final cart = Provider.of<CartProvider>(ctx, listen: false);
+    final packs = _getEnergyPacksForAgent(agentName);
+    showModalBottomSheet(
+      context: ctx,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (sheetCtx) {
+        return Container(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.black12,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Energy for $agentName',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Choose a pack to power $agentName ⚡',
+                style: TextStyle(
+                  color: isDark ? Colors.white54 : Colors.black54,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 24),
+              ...packs.map((pack) {
+                final packColor = Color(pack['color'] as int);
+                final title = pack['title'] as String;
+                final energy = pack['energy'] as int;
+                final price = pack['price'] as double;
+                final isBest = title == 'Pro';
+                return GestureDetector(
+                  onTap: () {
+                    final item = CartItem(
+                      id: 'agent-$agentName',
+                      agentName: agentName,
+                      agentIllustration: agentIcon,
+                      agentColor: agentColor,
+                      packTitle: title,
+                      energy: energy,
+                      price: price,
+                    );
+                    final added = cart.addToCart(item);
+                    Navigator.pop(sheetCtx);
+                    if (added) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(Icons.bolt, color: agentColor, size: 20),
+                              const SizedBox(width: 10),
+                              Text('$agentName ($title) added to cart!'),
+                            ],
+                          ),
+                          backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.black,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          action: SnackBarAction(
+                            label: 'VIEW CART',
+                            textColor: const Color(0xFFCDFF00),
+                            onPressed: () => Navigator.pushNamed(ctx, '/cart'),
+                          ),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                          content: Text('$agentName is already in your cart!'),
+                          backgroundColor: Colors.orange.shade700,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF252525) : const Color(0xFFF9F9F9),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isBest ? packColor : (isDark ? Colors.white12 : Colors.black12),
+                        width: isBest ? 2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: packColor.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Icon(Icons.bolt, color: packColor, size: 26),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    title,
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white : Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  if (isBest) ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: packColor,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: const Text(
+                                        'BEST VALUE',
+                                        style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${_fmtEnergy(energy)} ⚡',
+                                style: TextStyle(
+                                  color: packColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          '\$${price.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  static String _fmtEnergy(int n) {
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(n % 1000 == 0 ? 0 : 1)}k';
+    return n.toString();
   }
 
   // ---------------------------
@@ -1009,13 +1270,13 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.black.withOpacity(0.1),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.1),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -1029,8 +1290,8 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
             label,
             style: TextStyle(
               color: isDark
-                  ? Colors.white.withOpacity(0.5)
-                  : Colors.black.withOpacity(0.5),
+                  ? Colors.white.withValues(alpha: 0.5)
+                  : Colors.black.withValues(alpha: 0.5),
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
@@ -1056,10 +1317,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFA855F7),
-          width: 1.5,
-        ),
+        border: Border.all(color: const Color(0xFFA855F7), width: 1.5),
       ),
       child: Text(
         label,
@@ -1072,131 +1330,12 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     );
   }
 
-  Widget _buildPlanCard({
-    required String title,
-    required String price,
-    required String period,
-    required String description,
-    String? badge,
-    Color? badgeColor,
-    required bool isSelected,
-    required VoidCallback onTap,
-    required bool isDark,
-  }) {
-    final selectedBgColor = isDark ? const Color(0xFFCDFF00) : Colors.black;
-    final unselectedBgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final selectedBorderColor =
-    isDark ? const Color(0xFFCDFF00) : Colors.black;
-    final unselectedBorderColor =
-    isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.2);
-    final selectedTextColor = isDark ? Colors.black : const Color(0xFFCDFF00);
-    final unselectedTextColor = isDark ? Colors.white : Colors.black;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? selectedBgColor : unselectedBgColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? selectedBorderColor : unselectedBorderColor,
-            width: 2,
-          ),
-          boxShadow: isSelected
-              ? [
-            BoxShadow(
-              color: selectedBgColor.withOpacity(0.3),
-              blurRadius: 15,
-              offset: const Offset(0, 6),
-            ),
-          ]
-              : [],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: isSelected ? selectedTextColor : unselectedTextColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (badge != null)
-                  Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: badgeColor ?? const Color(0xFFCDFF00),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      badge,
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                if (isSelected && badge == null)
-                  Icon(
-                    Icons.check_circle,
-                    color: selectedTextColor,
-                    size: 20,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: price,
-                    style: TextStyle(
-                      color:
-                      isSelected ? selectedTextColor : unselectedTextColor,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (period.isNotEmpty)
-                    TextSpan(
-                      text: period,
-                      style: TextStyle(
-                        color: isSelected
-                            ? selectedTextColor.withOpacity(0.7)
-                            : unselectedTextColor.withOpacity(0.5),
-                        fontSize: 14,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: TextStyle(
-                color: isSelected
-                    ? selectedTextColor.withOpacity(0.8)
-                    : unselectedTextColor.withOpacity(0.6),
-                fontSize: 12,
-                height: 1.4,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
-// Custom painter for pulsating ring
+// ---------------------------
+// Custom painter — pulsating ring
+// ---------------------------
 class _PulsatingRingPainter extends CustomPainter {
   final double progress;
   final Color color;
@@ -1207,12 +1346,10 @@ class _PulsatingRingPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-
     final paint = Paint()
-      ..color = color.withOpacity(0.3 - progress * 0.3)
+      ..color = color.withValues(alpha: 0.3 - progress * 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
-
     canvas.drawCircle(center, radius * (0.8 + progress * 0.2), paint);
   }
 

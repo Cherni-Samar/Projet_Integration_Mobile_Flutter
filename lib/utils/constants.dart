@@ -1,5 +1,9 @@
 class ApiConstants {
-  static const String baseUrl = 'http://10.0.2.2:3000/api/auth';
+  // Change the IP here to switch between emulator and physical device
+  static const String _host = '10.0.2.2:3000';
+  // static const String _host = '192.168.100.15:3000'; // ✅ Adresse IP pour le telephone physique
+
+  static const String baseUrl = 'http://$_host/api/auth';
 
   // Auth
   static const String signup = '$baseUrl/signup';
@@ -16,4 +20,8 @@ class ApiConstants {
   static const String forgotPassword = '$baseUrl/forgot-password';
   static const String verifyResetCode = '$baseUrl/verify-reset-code';
   static const String resetPassword = '$baseUrl/reset-password';
+
+  // Payment (Stripe)
+  static const String paymentBaseUrl = 'http://$_host/api/payment';
+  static const String createPaymentIntent = '$paymentBaseUrl/create-payment-intent';
 }

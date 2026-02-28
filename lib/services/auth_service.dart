@@ -84,7 +84,9 @@ class AuthService {
     print('   - Existe: ${token != null}');
     print('   - Longueur: ${token?.length ?? 0}');
     print('   - Début: ${token != null ? token.substring(0, 30) : "NULL"}');
-    print('   - Fin: ${token != null && token.length > 30 ? token.substring(token.length - 30) : "N/A"}');
+    print(
+      '   - Fin: ${token != null && token.length > 30 ? token.substring(token.length - 30) : "N/A"}',
+    );
     print('   - COMPLET: $token'); // ✅ Afficher le token complet
 
     if (token == null) {
