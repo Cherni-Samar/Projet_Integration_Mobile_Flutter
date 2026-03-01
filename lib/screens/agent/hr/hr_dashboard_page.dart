@@ -1,78 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'dart:math' as math;
-import '../../../providers/theme_provider.dart';
+import 'package:intl/intl.dart';
 import '../../../services/hr_agent_service.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class HrDashboardPage extends StatefulWidget {
-  final String heraMessage;
-  final String username;
-
-  const HrDashboardPage({
-    Key? key,
-    required this.heraMessage,
-    required this.username,
-  }) : super(key: key);
+  const HrDashboardPage({super.key});
 
   @override
   State<HrDashboardPage> createState() => _HrDashboardPageState();
 }
 
 class _HrDashboardPageState extends State<HrDashboardPage>
-    with TickerProviderStateMixin {
-  AnimationController? _pulseController;
-  AnimationController? _fadeController;
-  Animation<double>? _fadeAnimation;
+    with SingleTickerProviderStateMixin {
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // VARIABLES
+  // ══════════════════════════════════════════════════════════════════════════
 
   int _selectedTab = 0;
 
-  final List<Map<String, dynamic>> _tasks = [
-    {
-      'icon': '🏖️',
-      'title': 'Congé — Ali B.',
-      'sub': 'En attente',
-      'status': 'pending',
-      'time': 'Il y a 2h',
-    },
-    {
-      'icon': '👤',
-      'title': 'Onboarding — Sana M.',
-      'sub': 'Étape 3/5',
-      'status': 'in_progress',
-      'time': "Auj.",
-    },
-    {
-      'icon': '📄',
-      'title': 'Contrat — Karim T.',
-      'sub': 'Généré',
-      'status': 'done',
-      'time': 'Hier',
-    },
-    {
-      'icon': '⚠️',
-      'title': 'Absence — Youssef K.',
-      'sub': 'Action requise',
-      'status': 'pending',
-      'time': 'Il y a 1j',
-    },
-    {
-      'icon': '📊',
-      'title': 'Rapport RH',
-      'sub': 'Prêt',
-      'status': 'done',
-      'time': '14 fév',
-    },
-  ];
+  // Données admin
+  Map<String, dynamic>? _stats;
+  List<Map<String, dynamic>> _recentActions = [];
+  List<Map<String, dynamic>> _employees = [];
+  List<Map<String, dynamic>> _allLeaves = [];
 
-  final List<Map<String, dynamic>> _activity = [
-    {'label': 'L', 'value': 0.4},
-    {'label': 'M', 'value': 0.75},
-    {'label': 'M', 'value': 0.55},
-    {'label': 'J', 'value': 0.9},
-    {'label': 'V', 'value': 0.65},
-    {'label': 'S', 'value': 0.2},
-    {'label': 'D', 'value': 0.1},
-  ];
+  bool _loadingStats = true;
+  bool _loadingActions = true;
+  bool _loadingEmployees = true;
+
+  // Calendrier
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+
+  late AnimationController _pulseController;
+
+  // ════════════════════════��═════════════════════════════════════════════════
+  // LIFECYCLE
+  // ══════════════════════════════════════════════════════════════════════════
 
   @override
   void initState() {
@@ -83,197 +49,247 @@ class _HrDashboardPageState extends State<HrDashboardPage>
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _fadeController!, curve: Curves.easeOut));
-
-    _fadeController!.forward();
+    _loadAdminData();
   }
 
   @override
   void dispose() {
-    _pulseController?.dispose();
-    _fadeController?.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
-  // ── Theme helpers ─────────────────────────────────────────────────────────
-  Color _bg(bool d) => d ? const Color(0xFF0A0A0A) : const Color(0xFFF8F9FA);
-  Color _surface(bool d) => d ? const Color(0xFF1A1A1A) : Colors.white;
-  Color _text(bool d) => d ? Colors.white : Colors.black;
-  Color _sub(bool d) =>
-      d ? Colors.white.withOpacity(0.45) : Colors.black.withOpacity(0.45);
-  Color _border(bool d) =>
-      d ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.08);
+  // ══════════════════════════════════════════════════════════════════════════
+  // MÉTHODES API
+  // ══════════════════════════════════════════════════════════════════════════
+
+  Future<void> _loadAdminData() async {
+    _loadStats();
+    _loadRecentActions();
+    _loadEmployees();
+  }
+
+  Future<void> _loadStats() async {
+    setState(() => _loadingStats = true);
+
+    try {
+      final result = await HrAgentService.getAdminStats();
+
+      if (result['success'] == true) {
+        setState(() {
+          _stats = result['stats'];
+          _loadingStats = false;
+        });
+      } else {
+        setState(() => _loadingStats = false);
+      }
+    } catch (e) {
+      setState(() => _loadingStats = false);
+    }
+  }
+
+  Future<void> _loadRecentActions() async {
+    setState(() => _loadingActions = true);
+
+    try {
+      final result = await HrAgentService.getRecentActions(limit: 3);
+
+      if (result['success'] == true) {
+        setState(() {
+          _recentActions = List<Map<String, dynamic>>.from(result['recent_actions'] ?? []);
+          _loadingActions = false;
+        });
+      } else {
+        setState(() => _loadingActions = false);
+      }
+    } catch (e) {
+      print('❌ Erreur chargement actions: $e');
+      setState(() => _loadingActions = false);
+    }
+  }
+
+  Future<void> _loadEmployees() async {
+    setState(() => _loadingEmployees = true);
+
+    try {
+      final result = await HrAgentService.getAllEmployees();
+
+      if (result['success'] == true) {
+        setState(() {
+          _employees = List<Map<String, dynamic>>.from(result['employees'] ?? []);
+          _loadingEmployees = false;
+        });
+
+        _loadAllLeaves();
+      } else {
+        setState(() => _loadingEmployees = false);
+      }
+    } catch (e) {
+      setState(() => _loadingEmployees = false);
+    }
+  }
+  Future<void> _loadAllLeaves() async {
+    try {
+      print('📅 Chargement des congés de tous les employés...');
+
+      final allLeaves = <Map<String, dynamic>>[];
+
+      for (var emp in _employees) {
+        print('  → Chargement des congés de ${emp['name']}...');
+
+        final result = await HrAgentService.getLeaves(employeeId: emp['_id']);
+
+        if (result['success'] == true) {
+          final leaves = List<Map<String, dynamic>>.from(result['leaves'] ?? []);
+
+          print('    ✅ ${leaves.length} congé(s) trouvé(s)');
+
+          for (var leave in leaves) {
+            // Ajoute le nom de l'employé à chaque congé
+            leave['employee_name'] = emp['name'];
+            leave['employee_role'] = emp['role'];
+            allLeaves.add(leave);
+          }
+        } else {
+          print('    ❌ Erreur: ${result['error']}');
+        }
+      }
+
+      print('📊 Total: ${allLeaves.length} congé(s) chargé(s) pour ${_employees.length} employé(s)');
+
+      setState(() {
+        _allLeaves = allLeaves;
+      });
+    } catch (e) {
+      print('💥 Erreur _loadAllLeaves: $e');
+    }
+  }
+
+  List<Map<String, dynamic>> _getLeavesForDay(DateTime day) {
+    return _allLeaves.where((leave) {
+      if (leave['status'] != 'approved') return false;
+
+      final startDate = DateTime.parse(leave['start_date']);
+      final endDate = DateTime.parse(leave['end_date']);
+
+      return day.isAfter(startDate.subtract(const Duration(days: 1))) &&
+          day.isBefore(endDate.add(const Duration(days: 1)));
+    }).toList();
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // BUILD
+  // ══════════════════════════════════════════════════════════════════════════
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    if (_fadeAnimation == null) {
-      return _buildBody(isDark);
-    }
-
-    return AnimatedBuilder(
-      animation: _fadeAnimation!,
-      builder: (context, child) =>
-          Opacity(opacity: _fadeAnimation!.value, child: child),
-      child: _buildBody(isDark),
+    return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF8FAFC),
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(isDark),
+            _buildTabs(isDark),
+            Expanded(
+              child: IndexedStack(
+                index: _selectedTab,
+                children: [
+                  _buildOverview(isDark),
+                  _buildCalendar(isDark),
+                  _buildEnergy(isDark),
+                  _buildEmployees(isDark),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
+  // ══════════════════════════════════════════════════════════════════════════
+  // HEADER
+  // ══════════════════════════════════════════════════════════════════════════
 
-  Widget _buildBody(bool isDark) {
-    return Scaffold(
-      backgroundColor: _bg(isDark),
-      body: Column(
-        children: [
-          _buildHeader(isDark),
-          _buildTabBar(isDark),
-          Expanded(
-            child: IndexedStack(
-              index: _selectedTab,
-              children: [
-                _buildOverview(isDark),
-                _buildTasks(isDark),
-                _buildLeaves(
-                  isDark,
-                  _bg(isDark),
-                  _surface(isDark),
-                  _text(isDark),
-                  _sub(isDark),
-                  _border(isDark),
-                ),
-                _buildUsage(isDark),
-              ],
-            ),
+  Widget _buildHeader(bool isDark) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: const Color(0xFFA855F7).withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-    );
-  }
-
-  // ── HEADER ────────────────────────────────────────────────────────────────
-  Widget _buildHeader(bool isDark) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 10,
-        left: 16,
-        right: 16,
-        bottom: 12,
-      ),
-      decoration: BoxDecoration(
-        color: _surface(isDark),
-        border: Border(bottom: BorderSide(color: _border(isDark))),
-      ),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.white.withOpacity(0.07)
-                    : Colors.black.withOpacity(0.06),
-                borderRadius: BorderRadius.circular(10),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withOpacity(0.1)
+                  : Colors.black.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(
+                Icons.arrow_back_rounded,
+                color: isDark ? Colors.white : Colors.black,
+                size: 22,
               ),
-              child: Icon(Icons.arrow_back, color: _text(isDark), size: 18),
             ),
           ),
           const SizedBox(width: 12),
-
-          AnimatedBuilder(
-            animation: _pulseController ?? kAlwaysCompleteAnimation,
-            builder: (_, __) {
-              final pulse = _pulseController?.value ?? 0.0;
-              return Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF8B5CF6), Color(0xFF6366F1)],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(
-                        0xFF8B5CF6,
-                      ).withOpacity(0.25 + pulse * 0.25),
-                      blurRadius: 12 + pulse * 8,
-                    ),
-                  ],
-                ),
-                child: const Center(
-                  child: Text('👥', style: TextStyle(fontSize: 18)),
-                ),
-              );
-            },
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: const Color(0xFFCCFF00).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: const Color(0xFFCCFF00),
+                width: 2,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: Image.asset(
+                'assets/images/hera.png',
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-          const SizedBox(width: 10),
-
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hera',
+                  'Hera Dashboard',
                   style: TextStyle(
-                    color: _text(isDark),
-                    fontSize: 15,
+                    color: isDark ? Colors.white : Colors.black,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                Row(
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFCDFF00),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'HR Agent • Actif',
-                      style: TextStyle(color: _sub(isDark), fontSize: 11),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.white.withOpacity(0.07)
-                  : Colors.black.withOpacity(0.06),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Icon(Icons.notifications_none, color: _text(isDark), size: 18),
-                Positioned(
-                  top: 6,
-                  right: 6,
-                  child: Container(
-                    width: 6,
-                    height: 6,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFCDFF00),
-                      shape: BoxShape.circle,
-                    ),
+                const SizedBox(height: 4),
+                Text(
+                  'HR Management Agent',
+                  style: TextStyle(
+                    color: isDark ? Colors.white60 : Colors.black54,
+                    fontSize: 13,
                   ),
                 ),
               ],
@@ -284,1599 +300,1363 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     );
   }
 
-  // ── TAB BAR ───────────────────────────────────────────────────────────────
-  Widget _buildTabBar(bool isDark) {
-    final tabs = ["Vue d'ensemble", 'Tâches', 'Usage', 'congés'];
+  // ══════════════════════════════════════════════════════════════════════════
+  // TABS
+  // ══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildTabs(bool isDark) {
     return Container(
-      color: _surface(isDark),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
       child: Row(
-        children: List.generate(tabs.length, (i) {
-          final active = _selectedTab == i;
-          return GestureDetector(
-            onTap: () => setState(() => _selectedTab = i),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-              decoration: BoxDecoration(
-                color: active
-                    ? const Color(0xFF8B5CF6)
-                    : (isDark
-                          ? Colors.white.withOpacity(0.07)
-                          : Colors.black.withOpacity(0.06)),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                tabs[i],
-                style: TextStyle(
-                  color: active ? Colors.white : _sub(isDark),
-                  fontSize: 12,
-                  fontWeight: active ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-            ),
-          );
-        }),
+        children: [
+          _tab(Icons.dashboard_rounded, 0, isDark),
+          _tab(Icons.calendar_month_rounded, 1, isDark),
+          _tab(Icons.bolt_rounded, 2, isDark),
+          _tab(Icons.people_rounded, 3, isDark),
+        ],
       ),
     );
   }
 
-  // ── CONGÉS TAB ──────────────────────────────────────────────────────────────
-  Widget _buildLeaves(
-    bool isDark,
-    Color bg,
-    Color surface,
-    Color textColor,
-    Color subColor,
-    Color borderColor,
-  ) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Banner ──
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF8B5CF6), Color(0xFF6366F1)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '🌴 Nouvelle demande',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Soumettez votre congé en quelques secondes',
-                        style: TextStyle(color: Colors.white70, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () => _showLeaveForm(isDark),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF8B5CF6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Demander',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
+  Widget _tab(IconData icon, int index, bool isDark) {
+    final isSelected = _selectedTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedTab = index),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? const Color(0xFFCCFF00).withOpacity(0.15)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
           ),
+          child: Icon(
+            icon,
+            color: isSelected
+                ? Colors.black
+                : (isDark ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5)),
+            size: 22,
+          ),
+        ),
+      ),
+    );
+  }
 
-          const SizedBox(height: 20),
-          _label('HISTORIQUE', subColor),
-          const SizedBox(height: 12),
+  // ══════════════════════════════════════════════════════════════════════════
+  // OVERVIEW TAB
+  // ══════════════════════════════════════════════════════════════════════════
 
-          // ── Historique statique (à rendre dynamique plus tard) ──
-          ...[
-            {
-              'type': '🌴 Congé Annuel',
-              'dates': '10→19 Mar 2025',
-              'days': '10j',
-              'status': 'approved',
-            },
-            {
-              'type': '🤒 Congé Maladie',
-              'dates': '05→07 Jan 2025',
-              'days': '3j',
-              'status': 'approved',
-            },
-            {
-              'type': '⚡ Congé Urgent',
-              'dates': '20 Fév 2025',
-              'days': '1j',
-              'status': 'pending',
-            },
-          ].map((leave) {
-            final isApproved = leave['status'] == 'approved';
-            final statusColor = isApproved
-                ? const Color(0xFF34D399)
-                : const Color(0xFFFBBF24);
-            return Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.all(14),
+  Widget _buildOverview(bool isDark) {
+    return RefreshIndicator(
+      onRefresh: _loadAdminData,
+      color: const Color(0xFFCCFF00),
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Stats en haut
+          if (_loadingStats)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(40),
+                child: CircularProgressIndicator(color: Color(0xFFCCFF00)),
+              ),
+            )
+          else if (_stats != null)
+            _buildStats(isDark),
+
+          const SizedBox(height: 24),
+
+          // Historique uniquement
+          _buildHistorySection(isDark),
+        ],
+      ),
+    );
+  }
+  Widget _buildStats(bool isDark) {
+    return Row(
+      children: [
+        _statCard(Icons.people, 'Employés', '${_stats!['total_employees']}', isDark),
+        const SizedBox(width: 12),
+        _statCard(Icons.beach_access, 'En congé', '${_stats!['on_leave_today']}', isDark),
+      ],
+    );
+  }
+  Widget _statCard(IconData icon, String label, String value, bool isDark) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: surface,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: statusColor.withOpacity(0.3)),
+                color: const Color(0xFFCCFF00).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: Colors.black, size: 22),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              value,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isDark ? Colors.white60 : Colors.black54,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // HISTORY SECTION - DYNAMIQUE
+  // ══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildHistorySection(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Historique',
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextButton(
+              onPressed: () {},
+              child: Text(
+                'Voir tout',
+                style: TextStyle(
+                  color: const Color(0xFFA855F7),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        if (_loadingActions)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: CircularProgressIndicator(color: Color(0xFFCCFF00)),
+            ),
+          )
+        else if (_recentActions.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                'Aucun historique pour le moment',
+                style: TextStyle(
+                  color: isDark ? Colors.white60 : Colors.black54,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          )
+        else
+          ..._recentActions.map((action) {
+            IconData icon;
+            Color color;
+            String statusText;
+
+            switch (action['status']) {
+              case 'approved':
+                icon = Icons.check_circle;
+                color = const Color(0xFFCCFF00);
+                statusText = 'approuvé';
+                if (action['approved_by']?.toString().contains('auto') == true) {
+                  statusText += ' automatiquement';
+                }
+                break;
+              case 'refused':
+                icon = Icons.cancel;
+                color = const Color(0xFFEF4444);
+                statusText = 'refusé';
+                break;
+              default:
+                icon = Icons.info;
+                color = const Color(0xFFA855F7);
+                statusText = 'traité';
+            }
+
+            final employeeName = action['employee_name'] ?? 'Employé';
+            final typeLabel = action['type'] == 'urgent' ? 'urgent' :
+            action['type'] == 'sick' ? 'maladie' : '';
+
+            final text = typeLabel.isNotEmpty
+                ? 'Congé $typeLabel de $employeeName $statusText'
+                : 'Congé de $employeeName $statusText';
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: color.withOpacity(0.2),
+                  width: 1,
+                ),
               ),
               child: Row(
                 children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: color,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      text,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    color: (isDark ? Colors.white : Colors.black).withOpacity(0.3),
+                    size: 20,
+                  ),
+                ],
+              ),
+            );
+          }),
+      ],
+    );
+  }
+  // ══════════════════════════════════════════════════════════════════════════
+  // CALENDAR TAB
+  // ══════════════════════════════════════════════════════════════════════════
+  Widget _buildCalendar(bool isDark) {
+    final leavesOnSelectedDay = _selectedDay != null ? _getLeavesForDay(_selectedDay!) : <Map<String, dynamic>>[];
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TableCalendar(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: _focusedDay,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            calendarFormat: _calendarFormat,
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+            },
+            onFormatChanged: (format) {
+              setState(() {
+                _calendarFormat = format;
+              });
+            },
+            onPageChanged: (focusedDay) {
+              _focusedDay = focusedDay;
+            },
+            eventLoader: _getLeavesForDay,
+
+            // ═══════════════════════════════════════════════════════════════
+            // STYLING PERSONNALISÉ
+            // ═══════════════════════════════════════════════════════════════
+
+            calendarBuilders: CalendarBuilders(
+              // ✅ Colore les jours avec des congés
+              defaultBuilder: (context, day, focusedDay) {
+                final leavesForDay = _getLeavesForDay(day);
+
+                if (leavesForDay.isNotEmpty) {
+                  // Détermine la couleur selon le type de congé
+                  Color backgroundColor;
+
+                  // Si plusieurs types, priorise : urgent > sick > annual
+                  if (leavesForDay.any((l) => l['type'] == 'urgent')) {
+                    backgroundColor = const Color(0xFFEF4444); // Rouge pour urgent
+                  } else if (leavesForDay.any((l) => l['type'] == 'sick')) {
+                    backgroundColor = const Color(0xFFF59E0B); // Orange pour maladie
+                  } else {
+                    backgroundColor = const Color(0xFFCCFF00); // Vert pour congé normal
+                  }
+
+                  return Container(
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: backgroundColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: backgroundColor,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return null; // Utilise le style par défaut
+              },
+
+              // ✅ Style des weekends avec congés
+              outsideBuilder: (context, day, focusedDay) {
+                final leavesForDay = _getLeavesForDay(day);
+
+                if (leavesForDay.isNotEmpty) {
+                  Color backgroundColor;
+
+                  if (leavesForDay.any((l) => l['type'] == 'urgent')) {
+                    backgroundColor = const Color(0xFFEF4444);
+                  } else if (leavesForDay.any((l) => l['type'] == 'sick')) {
+                    backgroundColor = const Color(0xFFF59E0B);
+                  } else {
+                    backgroundColor = const Color(0xFFCCFF00);
+                  }
+
+                  return Container(
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: backgroundColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: backgroundColor.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          color: (isDark ? Colors.white : Colors.black).withOpacity(0.3),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return null;
+              },
+
+              // ✅ Petits points pour indiquer nombre de congés
+              markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  return Positioned(
+                    bottom: 2,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: events.take(3).map((event) {
+                        final leave = event as Map<String, dynamic>;
+                        Color dotColor;
+
+                        switch (leave['type']) {
+                          case 'urgent':
+                            dotColor = const Color(0xFFEF4444);
+                            break;
+                          case 'sick':
+                            dotColor = const Color(0xFFF59E0B);
+                            break;
+                          default:
+                            dotColor = const Color(0xFFCCFF00);
+                        }
+
+                        return Container(
+                          width: 5,
+                          height: 5,
+                          margin: const EdgeInsets.symmetric(horizontal: 1),
+                          decoration: BoxDecoration(
+                            color: dotColor,
+                            shape: BoxShape.circle,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                }
+                return null;
+              },
+            ),
+
+            calendarStyle: CalendarStyle(
+              // Aujourd'hui
+              todayDecoration: BoxDecoration(
+                color: Colors.transparent,
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFFA855F7), width: 2),
+              ),
+              // Jour sélectionné
+              selectedDecoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFA855F7), Color(0xFF8B5CF6)],
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFA855F7).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              todayTextStyle: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+              selectedTextStyle: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              defaultTextStyle: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 14,
+              ),
+              weekendTextStyle: TextStyle(
+                color: isDark ? Colors.white70 : Colors.black54,
+                fontSize: 14,
+              ),
+              outsideTextStyle: TextStyle(
+                color: isDark ? Colors.white30 : Colors.black26,
+              ),
+            ),
+
+            headerStyle: HeaderStyle(
+              formatButtonVisible: true,
+              titleCentered: true,
+              formatButtonShowsNext: false,
+              formatButtonDecoration: BoxDecoration(
+                color: const Color(0xFFCCFF00).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFCCFF00)),
+              ),
+              formatButtonTextStyle: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+              titleTextStyle: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+              leftChevronIcon: Icon(
+                Icons.chevron_left_rounded,
+                color: isDark ? Colors.white : Colors.black,
+                size: 28,
+              ),
+              rightChevronIcon: Icon(
+                Icons.chevron_right_rounded,
+                color: isDark ? Colors.white : Colors.black,
+                size: 28,
+              ),
+            ),
+
+            daysOfWeekStyle: DaysOfWeekStyle(
+              weekdayStyle: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+              weekendStyle: TextStyle(
+                color: isDark ? Colors.white60 : Colors.black54,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Légende des couleurs
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Légende',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _buildLegendItem('Congé annuel', const Color(0xFFCCFF00)),
+                  const SizedBox(width: 16),
+                  _buildLegendItem('Maladie', const Color(0xFFF59E0B)),
+                  const SizedBox(width: 16),
+                  _buildLegendItem('Urgent', const Color(0xFFEF4444)),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        Text(
+          _selectedDay != null
+              ? 'Congés le ${DateFormat('d MMMM yyyy', 'fr_FR').format(_selectedDay!)}'
+              : 'Sélectionnez une date',
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        if (leavesOnSelectedDay.isEmpty)
+          _buildEmpty(Icons.event_available, 'Aucun congé', 'Pas d\'absence ce jour-là', isDark)
+        else
+          ...leavesOnSelectedDay.map((leave) => _buildLeaveDetailCard(leave, isDark)),
+      ],
+    );
+  }
+
+// Fonction helper pour la légende
+  Widget _buildLegendItem(String label, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: color, width: 1.5),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLeaveDetailCard(Map<String, dynamic> leave, bool isDark) {
+    final type = leave['type'] as String;
+    final employeeName = leave['employee_name'] as String? ?? 'Unknown';
+    final reason = leave['reason'] as String? ?? '';
+    final days = leave['days'] as int;
+    final startDate = DateTime.parse(leave['start_date']);
+    final endDate = DateTime.parse(leave['end_date']);
+
+    IconData icon;
+    switch (type) {
+      case 'annual':
+        icon = Icons.beach_access;
+        break;
+      case 'sick':
+        icon = Icons.medical_services;
+        break;
+      case 'urgent':
+        icon = Icons.warning_amber_rounded;
+        break;
+      default:
+        icon = Icons.description;
+    }
+
+    final dateFormat = DateFormat('d MMM yyyy', 'fr_FR');
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFCCFF00).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFCCFF00),
+                    width: 1.5,
+                  ),
+                ),
+                child: Icon(icon, color: Colors.black, size: 24),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      employeeName,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$days jour${days > 1 ? "s" : ""}',
+                      style: TextStyle(
+                        color: isDark ? Colors.white60 : Colors.black54,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: (isDark ? Colors.white : Colors.black).withOpacity(0.05),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today, size: 14, color: isDark ? Colors.white60 : Colors.black54),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${dateFormat.format(startDate)} → ${dateFormat.format(endDate)}',
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black87,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                if (reason.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.chat_bubble_outline, size: 14, color: isDark ? Colors.white60 : Colors.black54),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          reason,
+                          style: TextStyle(
+                            color: isDark ? Colors.white70 : Colors.black87,
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ENERGY TAB
+  // ══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildEnergy(bool isDark) {
+    // Calcule l'énergie utilisée depuis les stats
+    int usedEnergy = 45;
+
+    if (_stats != null) {
+      final monthlyLeaves = _stats!['monthly_leave_days'] ?? 0;
+      usedEnergy = (monthlyLeaves * 10 / 30).round().clamp(0, 100);
+    }
+
+    final remainingEnergy = 100 - usedEnergy;
+
+    final tasks = [
+      {
+        'icon': Icons.event_note,
+        'title': 'Demande de congé',
+        'cost': 10,
+        'color': const Color(0xFFA855F7),
+      },
+      {
+        'icon': Icons.flash_on,
+        'title': 'Congé urgent',
+        'cost': 15,
+        'color': const Color(0xFFEC4899),
+      },
+      {
+        'icon': Icons.person_add_alt_1,
+        'title': 'Onboarding employé',
+        'cost': 25,
+        'color': const Color(0xFF8B5CF6),
+      },
+      {
+        'icon': Icons.trending_up,
+        'title': 'Promotion',
+        'cost': 20,
+        'color': const Color(0xFF06B6D4),
+      },
+      {
+        'icon': Icons.workspace_premium,
+        'title': 'Évaluation performance',
+        'cost': 18,
+        'color': const Color(0xFFF59E0B),
+      },
+      {
+        'icon': Icons.exit_to_app,
+        'title': 'Offboarding',
+        'cost': 30,
+        'color': const Color(0xFFEF4444),
+      },
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFFA855F7).withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFA855F7).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.battery_charging_full,
+                      color: Color(0xFFA855F7),
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          leave['type']!,
+                          'Budget Énergie Hera',
                           style: TextStyle(
-                            color: textColor,
+                            color: isDark ? Colors.white : Colors.black,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          leave['dates']!,
-                          style: TextStyle(color: subColor, fontSize: 12),
-                        ),
-                        Text(
-                          leave['days']!,
+                          'Réinitialisé chaque jour',
                           style: TextStyle(
-                            color: const Color(0xFF8B5CF6),
-                            fontSize: 12,
+                            color: isDark ? Colors.white60 : Colors.black54,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+
+              Stack(
+                children: [
+                  Container(
+                    height: 12,
+                    decoration: BoxDecoration(
+                      color: (isDark ? Colors.white : Colors.black).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  FractionallySizedBox(
+                    widthFactor: remainingEnergy / 100,
+                    child: Container(
+                      height: 12,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: remainingEnergy > 30
+                              ? [const Color(0xFFA855F7), const Color(0xFF8B5CF6)]
+                              : [const Color(0xFFEF4444), const Color(0xFFDC2626)],
+                        ),
+                        borderRadius: BorderRadius.circular(6),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (remainingEnergy > 30
+                                ? const Color(0xFFA855F7)
+                                : const Color(0xFFEF4444)).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$remainingEnergy / 100',
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black,
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Unités disponibles',
+                        style: TextStyle(
+                          color: isDark ? Colors.white60 : Colors.black54,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: (isDark ? Colors.white : Colors.black).withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.bolt,
+                          color: remainingEnergy > 30
+                              ? const Color(0xFFA855F7)
+                              : const Color(0xFFEF4444),
+                          size: 20,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '$usedEnergy utilisés',
+                          style: TextStyle(
+                            color: isDark ? Colors.white70 : Colors.black87,
+                            fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: statusColor),
-                    ),
-                    child: Text(
-                      isApproved ? '✅ Approuvé' : '⏳ En attente',
-                      style: TextStyle(
-                        color: statusColor,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
                 ],
               ),
-            );
-          }),
-        ],
-      ),
-    );
-  }
-
-  // ── Formulaire Congé ─────────────────────────────────────────────────────────
-  void _showLeaveForm(bool isDark) {
-    String _type = 'annual';
-    DateTime? _startDate;
-    DateTime? _endDate;
-    final _reasonController = TextEditingController();
-    bool _loading = false;
-    String? _message;
-    bool _success = false;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModalState) => Container(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 30,
+            ],
           ),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.white24 : Colors.black12,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+        ),
+
+        const SizedBox(height: 24),
+
+        Row(
+          children: [
+            Text(
+              'Tâches disponibles',
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 16),
-              Text(
-                '🌴 Demande de Congé',
-                style: TextStyle(
-                  color: isDark ? Colors.white : Colors.black,
-                  fontSize: 18,
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFA855F7).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                '${tasks.length}',
+                style: const TextStyle(
+                  color: Color(0xFFA855F7),
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 16),
-
-              // Type
-              DropdownButtonFormField<String>(
-                value: _type,
-                dropdownColor: isDark ? const Color(0xFF252525) : Colors.white,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  labelText: 'Type de congé',
-                  labelStyle: TextStyle(
-                    color: isDark ? Colors.white54 : Colors.black54,
-                  ),
-                  filled: true,
-                  fillColor: isDark
-                      ? const Color(0xFF252525)
-                      : const Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                items: const [
-                  DropdownMenuItem(
-                    value: 'annual',
-                    child: Text('🌴 Congé Annuel'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'sick',
-                    child: Text('🤒 Congé Maladie'),
-                  ),
-                  DropdownMenuItem(
-                    value: 'urgent',
-                    child: Text('⚡ Congé Urgent'),
-                  ),
-                ],
-                onChanged: (v) => setModalState(() => _type = v!),
-              ),
-              const SizedBox(height: 12),
-
-              // Dates
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        final d = await showDatePicker(
-                          context: ctx,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime.now().add(
-                            const Duration(days: 365),
-                          ),
-                        );
-                        if (d != null) setModalState(() => _startDate = d);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF252525)
-                              : const Color(0xFFF5F5F5),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.calendar_today,
-                              size: 16,
-                              color: Color(0xFF8B5CF6),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              _startDate != null
-                                  ? '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'
-                                  : 'Début',
-                              style: TextStyle(
-                                color: _startDate != null
-                                    ? (isDark ? Colors.white : Colors.black)
-                                    : Colors.grey,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        final d = await showDatePicker(
-                          context: ctx,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime.now().add(
-                            const Duration(days: 365),
-                          ),
-                        );
-                        if (d != null) setModalState(() => _endDate = d);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF252525)
-                              : const Color(0xFFF5F5F5),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.calendar_today,
-                              size: 16,
-                              color: Color(0xFF8B5CF6),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              _endDate != null
-                                  ? '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}'
-                                  : 'Fin',
-                              style: TextStyle(
-                                color: _endDate != null
-                                    ? (isDark ? Colors.white : Colors.black)
-                                    : Colors.grey,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // Motif
-              TextField(
-                controller: _reasonController,
-                maxLines: 2,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  hintText: 'Motif...',
-                  hintStyle: TextStyle(
-                    color: isDark ? Colors.white38 : Colors.black38,
-                  ),
-                  filled: true,
-                  fillColor: isDark
-                      ? const Color(0xFF252525)
-                      : const Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Message
-              if (_message != null)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  margin: const EdgeInsets.only(bottom: 12),
-                  decoration: BoxDecoration(
-                    color: _success
-                        ? const Color(0xFF34D399).withOpacity(0.1)
-                        : const Color(0xFFFB7185).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: _success
-                          ? const Color(0xFF34D399)
-                          : const Color(0xFFFB7185),
-                    ),
-                  ),
-                  child: Text(
-                    _message!,
-                    style: TextStyle(
-                      color: _success
-                          ? const Color(0xFF34D399)
-                          : const Color(0xFFFB7185),
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-
-              // Bouton
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _loading
-                      ? null
-                      : () async {
-                          if (_startDate == null || _endDate == null) {
-                            setModalState(
-                              () => _message = '⚠️ Sélectionne les dates !',
-                            );
-                            return;
-                          }
-                          setModalState(() => _loading = true);
-                          try {
-                            final days =
-                                _endDate!.difference(_startDate!).inDays + 1;
-                            final result = await HrAgentService.requestLeave(
-                              employeeId: '69a36380631008d197d4ac02',
-                              employeeEmail: 'eya.mosbahi@esprit.tn',
-                              type: _type,
-                              startDate: _startDate!.toIso8601String().split(
-                                'T',
-                              )[0],
-                              endDate: _endDate!.toIso8601String().split(
-                                'T',
-                              )[0],
-                              days: days,
-                              reason: _reasonController.text.isEmpty
-                                  ? 'Congé'
-                                  : _reasonController.text,
-                            );
-                            setModalState(() {
-                              _success = result['success'] == true;
-                              _message = result['message'] ?? result['error'];
-                              _loading = false;
-                            });
-                            if (_success) {
-                              Future.delayed(const Duration(seconds: 2), () {
-                                Navigator.pop(ctx);
-                              });
-                            }
-                          } catch (e) {
-                            setModalState(() {
-                              _message = '❌ Erreur: $e';
-                              _loading = false;
-                            });
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8B5CF6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: _loading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text(
-                          '✅ Soumettre',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── OVERVIEW ──────────────────────────────────────────────────────────────
-  Widget _buildOverview(bool isDark) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _heraMessage(isDark),
-          const SizedBox(height: 20),
-
-          _label('RÉSUMÉ', _sub(isDark)),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 115,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                _kpiCard(
-                  '✅',
-                  '24',
-                  'Tâches',
-                  '+6 sem.',
-                  const Color(0xFFCDFF00),
-                  isDark,
-                ),
-                _kpiCard(
-                  '⏳',
-                  '3',
-                  'En cours',
-                  '2 urgentes',
-                  const Color(0xFFFBBF24),
-                  isDark,
-                ),
-                _kpiCard(
-                  '👥',
-                  '47',
-                  'Employés',
-                  '2 nouveaux',
-                  const Color(0xFF8B5CF6),
-                  isDark,
-                ),
-                _kpiCard(
-                  '📈',
-                  '96%',
-                  'Résolution',
-                  '↑ +4%',
-                  const Color(0xFF34D399),
-                  isDark,
-                ),
-              ],
             ),
-          ),
-
-          const SizedBox(height: 20),
-          _label('ACTIVITÉ — 7 JOURS', _sub(isDark)),
-          const SizedBox(height: 10),
-          _activityChart(isDark),
-
-          const SizedBox(height: 20),
-          _label('TÂCHES RÉCENTES', _sub(isDark)),
-          const SizedBox(height: 10),
-          ..._tasks
-              .take(3)
-              .map(
-                (t) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: _taskRow(t, isDark),
-                ),
-              ),
-
-          const SizedBox(height: 20),
-          _label('UTILISATION CE MOIS', _sub(isDark)),
-          const SizedBox(height: 10),
-          _usageRow(isDark),
-
-          const SizedBox(height: 30),
-        ],
-      ),
-    );
-  }
-
-  Widget _heraMessage(bool isDark) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF8B5CF6).withOpacity(isDark ? 0.15 : 0.08),
-            const Color(0xFF6366F1).withOpacity(isDark ? 0.06 : 0.02),
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF8B5CF6).withOpacity(isDark ? 0.4 : 0.2),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 32,
-            height: 32,
+
+        const SizedBox(height: 16),
+
+        ...tasks.map((task) {
+          final cost = task['cost'] as int;
+          final afterUse = remainingEnergy - cost;
+          final canAfford = afterUse >= 0;
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: const Color(0xFF8B5CF6).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8),
+              color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: canAfford
+                    ? (task['color'] as Color).withOpacity(0.3)
+                    : Colors.red.withOpacity(0.3),
+                width: 1,
+              ),
             ),
-            child: const Center(
-              child: Text('🤖', style: TextStyle(fontSize: 15)),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Hera · Maintenant',
-                  style: TextStyle(
-                    color: Color(0xFF8B5CF6),
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.heraMessage,
-                  style: TextStyle(
-                    color: _text(isDark),
-                    fontSize: 13,
-                    height: 1.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _kpiCard(
-    String icon,
-    String value,
-    String label,
-    String sub,
-    Color color,
-    bool isDark,
-  ) {
-    return Container(
-      width: 115,
-      height: 115,
-      margin: const EdgeInsets.only(right: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: _surface(isDark),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.25)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(icon, style: const TextStyle(fontSize: 16)),
-              Container(
-                width: 6,
-                height: 6,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              ),
-            ],
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              height: 1.0,
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: _text(isDark),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
-                ),
-              ),
-              Text(
-                sub,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: _sub(isDark), fontSize: 9, height: 1.2),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _activityChart(bool isDark) {
-    return Container(
-      height: 90,
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-      decoration: BoxDecoration(
-        color: _surface(isDark),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _border(isDark)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: _activity.map((day) {
-          final isToday = day['label'] == 'J';
-          final val = day['value'] as double;
-          return Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Flexible(
-                  child: FractionallySizedBox(
-                    heightFactor: val,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: isToday
-                              ? [
-                                  const Color(0xFF8B5CF6),
-                                  const Color(0xFFCDFF00),
-                                ]
-                              : [
-                                  const Color(
-                                    0xFF8B5CF6,
-                                  ).withOpacity(isDark ? 0.5 : 0.3),
-                                  const Color(
-                                    0xFF8B5CF6,
-                                  ).withOpacity(isDark ? 0.15 : 0.08),
-                                ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                        borderRadius: BorderRadius.circular(4),
+                        color: (task['color'] as Color).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        task['icon'] as IconData,
+                        color: task['color'] as Color,
+                        size: 24,
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            task['title'] as String,
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.bolt,
+                                size: 14,
+                                color: task['color'] as Color,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Coût : $cost unités',
+                                style: TextStyle(
+                                  color: task['color'] as Color,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (!canAfford)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.block, color: Colors.red, size: 14),
+                            SizedBox(width: 4),
+                            Text(
+                              'Indisponible',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  day['label'] as String,
-                  style: TextStyle(
-                    color: isToday ? _text(isDark) : _sub(isDark),
-                    fontSize: 9,
-                    fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+
+                const SizedBox(height: 14),
+
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: (isDark ? Colors.white : Colors.black).withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: isDark ? Colors.white60 : Colors.black54,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Après exécution : ',
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black87,
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        canAfford ? '$afterUse unités restantes' : 'Budget insuffisant',
+                        style: TextStyle(
+                          color: canAfford
+                              ? (task['color'] as Color)
+                              : Colors.red,
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           );
-        }).toList(),
-      ),
+        }),
+
+        const SizedBox(height: 16),
+
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFA855F7).withOpacity(0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFA855F7).withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.lightbulb_outline, color: Color(0xFFA855F7), size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Le budget se réinitialise automatiquement chaque jour à minuit',
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.black87,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _usageRow(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: _surface(isDark),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _border(isDark)),
-      ),
-      child: Row(
+  // ══════════════════════════════════════════════════════════════════════════
+  // EMPLOYEES TAB
+  // ══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildEmployees(bool isDark) {
+    return RefreshIndicator(
+      onRefresh: _loadAdminData,
+      color: const Color(0xFFCCFF00),
+      child: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          SizedBox(
-            width: 70,
-            height: 70,
-            child: CustomPaint(
-              painter: _RingPainter(
-                progress: 0.72,
-                color: const Color(0xFF8B5CF6),
-                bgColor: isDark
-                    ? Colors.white.withOpacity(0.07)
-                    : Colors.black.withOpacity(0.07),
-              ),
-              child: Center(
-                child: Text(
-                  '72%',
-                  style: TextStyle(
-                    color: _text(isDark),
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Mon équipe',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black,
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '36 / 50 requêtes',
-                  style: TextStyle(
-                    color: _text(isDark),
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  '14 restantes ce mois',
-                  style: TextStyle(color: _sub(isDark), fontSize: 11),
-                ),
-                const SizedBox(height: 8),
+              if (_employees.isNotEmpty)
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(8),
+                    color: const Color(0xFFCCFF00).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: const Color(0xFF8B5CF6).withOpacity(0.3),
+                      color: const Color(0xFFCCFF00),
+                      width: 1,
                     ),
                   ),
-                  child: const Text(
-                    '⚡ Passer à Monthly',
-                    style: TextStyle(
-                      color: Color(0xFF8B5CF6),
-                      fontSize: 11,
+                  child: Text(
+                    '${_employees.length}',
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── TASKS TAB ─────────────────────────────────────────────────────────────
-  Widget _buildTasks(bool isDark) {
-    final pending = _tasks.where((t) => t['status'] == 'pending').toList();
-    final inProg = _tasks.where((t) => t['status'] == 'in_progress').toList();
-    final done = _tasks.where((t) => t['status'] == 'done').toList();
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ✅ Boutons de test réels
-          _label('TESTER HERA', _sub(isDark)),
-          const SizedBox(height: 12),
-
-          _testButton(
-            icon: '🏖️',
-            label: 'Demander un congé (5 jours)',
-            color: const Color(0xFF8B5CF6),
-            isDark: isDark,
-            onTap: () => _testLeaveRequest(isDark),
-          ),
-          const SizedBox(height: 10),
-          _testButton(
-            icon: '⚡',
-            label: 'Congé urgent',
-            color: const Color(0xFFFBBF24),
-            isDark: isDark,
-            onTap: () => _testUrgentLeave(isDark),
-          ),
-          const SizedBox(height: 10),
-          _testButton(
-            icon: '👤',
-            label: 'Onboarding nouvel employé',
-            color: const Color(0xFF34D399),
-            isDark: isDark,
-            onTap: () => _testOnboarding(isDark),
-          ),
-          const SizedBox(height: 10),
-          _testButton(
-            icon: '🚪',
-            label: 'Offboarding employé',
-            color: const Color(0xFFFB7185),
-            isDark: isDark,
-            onTap: () => _testOffboarding(isDark),
-          ),
-
-          const SizedBox(height: 24),
-          _label('TÂCHES EN COURS', _sub(isDark)),
-          const SizedBox(height: 12),
-
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _chip('${pending.length} En attente', const Color(0xFFFB7185)),
-              _chip('${inProg.length} En cours', const Color(0xFFFBBF24)),
-              _chip('${done.length} Terminées', const Color(0xFF34D399)),
             ],
           ),
           const SizedBox(height: 16),
 
-          if (pending.isNotEmpty) ...[
-            _label('⚠️  EN ATTENTE', _sub(isDark)),
-            const SizedBox(height: 8),
-            ...pending.map(
-              (t) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _taskRow(t, isDark),
+          if (_loadingEmployees)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(40),
+                child: CircularProgressIndicator(color: Color(0xFFCCFF00)),
               ),
-            ),
-            const SizedBox(height: 16),
-          ],
-          if (inProg.isNotEmpty) ...[
-            _label('⏳  EN COURS', _sub(isDark)),
-            const SizedBox(height: 8),
-            ...inProg.map(
-              (t) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _taskRow(t, isDark),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-          if (done.isNotEmpty) ...[
-            _label('✅  TERMINÉES', _sub(isDark)),
-            const SizedBox(height: 8),
-            ...done.map(
-              (t) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _taskRow(t, isDark),
-              ),
-            ),
-          ],
-          const SizedBox(height: 30),
+            )
+          else if (_employees.isEmpty)
+            _buildEmpty(Icons.people_outline, 'Aucun employé', 'Commencez par ajouter des employés', isDark)
+          else
+            ..._employees.map((emp) => _buildEmployeeCard(emp, isDark)),
         ],
       ),
     );
   }
 
-  Widget _testButton({
-    required String icon,
-    required String label,
-    required Color color,
-    required bool isDark,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: color.withOpacity(isDark ? 0.1 : 0.06),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: color.withOpacity(0.3)),
-        ),
-        child: Row(
-          children: [
-            Text(icon, style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: _text(isDark),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Icon(Icons.arrow_forward_ios, color: color, size: 14),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _taskRow(Map<String, dynamic> task, bool isDark) {
-    final status = task['status'] as String;
-    Color sc;
-    String sl;
-    switch (status) {
-      case 'pending':
-        sc = const Color(0xFFFB7185);
-        sl = 'En attente';
-        break;
-      case 'in_progress':
-        sc = const Color(0xFFFBBF24);
-        sl = 'En cours';
-        break;
-      default:
-        sc = const Color(0xFF34D399);
-        sl = 'Terminé';
-    }
+  Widget _buildEmployeeCard(Map<String, dynamic> employee, bool isDark) {
+    final name = employee['name'] as String;
+    final role = employee['role'] as String;
+    final department = employee['department'] as String;
+    final balances = employee['balances'] as Map<String, dynamic>;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _surface(isDark),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _border(isDark)),
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Text(task['icon'] as String, style: const TextStyle(fontSize: 20)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  task['title'] as String,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: _text(isDark),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  task['sub'] as String,
-                  style: TextStyle(color: _sub(isDark), fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
-                  color: sc.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  sl,
-                  style: TextStyle(
-                    color: sc,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                  color: const Color(0xFFCCFF00).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFFCCFF00),
+                    width: 2,
                   ),
                 ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                task['time'] as String,
-                style: TextStyle(color: _sub(isDark), fontSize: 10),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── USAGE TAB ─────────────────────────────────────────────────────────────
-  Widget _buildUsage(bool isDark) {
-    final metrics = [
-      {
-        'label': 'Requêtes',
-        'val': 36,
-        'max': 50,
-        'color': const Color(0xFF8B5CF6),
-      },
-      {
-        'label': 'Tâches auto',
-        'val': 24,
-        'max': 30,
-        'color': const Color(0xFFCDFF00),
-      },
-      {
-        'label': 'Temps (h)',
-        'val': 18,
-        'max': 40,
-        'color': const Color(0xFF34D399),
-      },
-      {
-        'label': 'Erreurs',
-        'val': 3,
-        'max': 10,
-        'color': const Color(0xFFFB7185),
-      },
-    ];
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Plan card
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFF8B5CF6).withOpacity(isDark ? 0.15 : 0.08),
-                  const Color(0xFF6366F1).withOpacity(isDark ? 0.04 : 0.01),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: const Color(0xFF8B5CF6).withOpacity(isDark ? 0.3 : 0.15),
-              ),
-            ),
-            child: Row(
-              children: [
-                const Text('🆓', style: TextStyle(fontSize: 24)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Plan Gratuit',
-                        style: TextStyle(
-                          color: _text(isDark),
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        '50 requêtes/mois • Renouvelle le 1 mars',
-                        style: TextStyle(color: _sub(isDark), fontSize: 11),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    'Upgrade',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
+                child: Center(
+                  child: Text(
+                    name.substring(0, 1).toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-          _label('MÉTRIQUES', _sub(isDark)),
-          const SizedBox(height: 12),
-
-          ...metrics.map((m) {
-            final color = m['color'] as Color;
-            final val = m['val'] as int;
-            final max = m['max'] as int;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        m['label'] as String,
-                        style: TextStyle(
-                          color: _text(isDark),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        '$val / $max',
-                        style: TextStyle(
-                          color: color,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: LinearProgressIndicator(
-                      value: val / max,
-                      minHeight: 7,
-                      backgroundColor: isDark
-                          ? Colors.white.withOpacity(0.07)
-                          : Colors.black.withOpacity(0.07),
-                      valueColor: AlwaysStoppedAnimation<Color>(color),
-                    ),
-                  ),
-                ],
               ),
-            );
-          }),
-
-          const SizedBox(height: 20),
-          _label('HISTORIQUE', _sub(isDark)),
-          const SizedBox(height: 10),
-
-          ...[
-            {'month': 'Février 2025', 'tasks': 24, 'req': 36},
-            {'month': 'Janvier 2025', 'tasks': 19, 'req': 41},
-            {'month': 'Décembre 2024', 'tasks': 31, 'req': 48},
-          ].map(
-            (h) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: _surface(isDark),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _border(isDark)),
-                ),
-                child: Row(
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        h['month'] as String,
-                        style: TextStyle(
-                          color: _text(isDark),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    Text(
+                      name,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
-                    _chip2('${h['tasks']} tâches', const Color(0xFFCDFF00)),
-                    const SizedBox(width: 6),
-                    _chip2('${h['req']} req', const Color(0xFF8B5CF6)),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$role • $department',
+                      style: TextStyle(
+                        color: isDark ? Colors.white60 : Colors.black54,
+                        fontSize: 13,
+                      ),
+                    ),
                   ],
-                ),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 30),
-        ],
-      ),
-    );
-  }
-
-  // ── TEST METHODS ──────────────────────────────────────────────────────────
-  Future<void> _testLeaveRequest(bool isDark) async {
-    _showLoading(isDark, 'Envoi demande de congé...');
-    try {
-      final result = await HrAgentService.requestLeave(
-        employeeId: '69a36380631008d197d4ac02',
-        employeeEmail: 'eya.mosbahi@esprit.tn',
-        type: 'annual',
-        startDate: '2025-03-10',
-        endDate: '2025-03-14',
-        days: 5,
-        reason: 'Vacances famille',
-      );
-      if (!mounted) return;
-      Navigator.pop(context);
-      _showResult(isDark, result);
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.pop(context);
-      _showError(e.toString());
-    }
-  }
-
-  Future<void> _testUrgentLeave(bool isDark) async {
-    _showLoading(isDark, 'Envoi congé urgent...');
-    try {
-      final result = await HrAgentService.urgentLeave(
-        employeeId: 'samar@eteam.com',
-        reason: 'Urgence médicale famille',
-      );
-      if (!mounted) return;
-      Navigator.pop(context);
-      _showResult(isDark, result);
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.pop(context);
-      _showError(e.toString());
-    }
-  }
-
-  Future<void> _testOnboarding(bool isDark) async {
-    _showLoading(isDark, 'Démarrage onboarding...');
-    try {
-      final result = await HrAgentService.onboarding(
-        name: 'Sana Meziane',
-        email: 'sana@eteam.com',
-        role: 'Designer',
-        department: 'Creative',
-        contractType: 'CDI',
-        managerEmail: 'manager@eteam.com',
-      );
-      if (!mounted) return;
-      Navigator.pop(context);
-      _showResult(isDark, result);
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.pop(context);
-      _showError(e.toString());
-    }
-  }
-
-  Future<void> _testOffboarding(bool isDark) async {
-    _showLoading(isDark, 'Démarrage offboarding...');
-    try {
-      final result = await HrAgentService.offboarding(
-        employeeId: 'samar@eteam.com',
-        reason: 'resignation',
-        lastDay: '2025-03-31',
-      );
-      if (!mounted) return;
-      Navigator.pop(context);
-      _showResult(isDark, result);
-    } catch (e) {
-      if (!mounted) return;
-      Navigator.pop(context);
-      _showError(e.toString());
-    }
-  }
-
-  // ── UI HELPERS ────────────────────────────────────────────────────────────
-  void _showLoading(bool isDark, String message) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => Center(
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(color: Color(0xFF8B5CF6)),
-              const SizedBox(height: 16),
-              Text(
-                message,
-                style: TextStyle(
-                  color: _text(isDark),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  void _showResult(bool isDark, Map<String, dynamic> result) {
-    final success = result['success'] == true;
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Text(success ? '✅' : '❌', style: const TextStyle(fontSize: 22)),
-            const SizedBox(width: 8),
-            Text(
-              success ? 'Succès' : 'Refusé',
-              style: TextStyle(
-                color: _text(isDark),
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color:
-                    (success
-                            ? const Color(0xFF34D399)
-                            : const Color(0xFFFB7185))
-                        .withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                result['message'] ?? 'Aucun message',
-                style: TextStyle(
-                  color: _text(isDark),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            if (result['balance_left'] != null)
-              _resultRow(
-                '💰 Solde restant',
-                '${result['balance_left']} jours',
-                isDark,
-              ),
-            if (result['leave_id'] != null)
-              _resultRow('🆔 ID congé', result['leave_id'].toString(), isDark),
-            if (result['employee_id'] != null)
-              _resultRow(
-                '👤 Employé ID',
-                result['employee_id'].toString(),
-                isDark,
-              ),
-            if (result['status'] != null)
-              _resultRow('📊 Statut', result['status'].toString(), isDark),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'OK',
-              style: TextStyle(
-                color: Color(0xFF8B5CF6),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              _badge(Icons.beach_access, '${balances['annual']['remaining']}/${balances['annual']['total']}', isDark),
+              const SizedBox(width: 8),
+              _badge(Icons.medical_services, '${balances['sick']['remaining']}/${balances['sick']['total']}', isDark),
+              const SizedBox(width: 8),
+              _badge(Icons.warning_amber_rounded, '${balances['urgent']['remaining']}/${balances['urgent']['total']}', isDark),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _resultRow(String label, String value, bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _badge(IconData icon, String text, bool isDark) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: (isDark ? Colors.white : Colors.black).withOpacity(0.05),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 14, color: Colors.black),
+            const SizedBox(width: 6),
+            Text(
+              text,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmpty(IconData icon, String title, String subtitle, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
         children: [
-          Text(label, style: TextStyle(color: _sub(isDark), fontSize: 11)),
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: const Color(0xFFCCFF00).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(icon, color: Colors.black, size: 32),
+          ),
+          const SizedBox(height: 16),
           Text(
-            value,
+            title,
             style: TextStyle(
-              color: _text(isDark),
-              fontSize: 11,
+              color: isDark ? Colors.white : Colors.black,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 8),
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: isDark ? Colors.white60 : Colors.black54,
+              fontSize: 14,
+            ),
+          ),
         ],
       ),
     );
   }
-
-  void _showError(String error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.wifi_off, color: Colors.white),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                error.contains('indisponible')
-                    ? '❌ Express :3000 indisponible\nLance: npm run dev'
-                    : '❌ $error',
-                style: const TextStyle(fontSize: 12),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.red.shade700,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 5),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-  }
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
-  Widget _label(String t, Color subColor) => Text(
-    t,
-    style: TextStyle(
-      color: subColor,
-      fontSize: 11,
-      fontWeight: FontWeight.bold,
-      letterSpacing: 1.2,
-    ),
-  );
-
-  Widget _chip(String label, Color color) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    decoration: BoxDecoration(
-      color: color.withOpacity(0.12),
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: color.withOpacity(0.3)),
-    ),
-    child: Text(
-      label,
-      style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
-    ),
-  );
-
-  Widget _chip2(String label, Color color) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-    decoration: BoxDecoration(
-      color: color.withOpacity(0.12),
-      borderRadius: BorderRadius.circular(6),
-    ),
-    child: Text(
-      label,
-      style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
-    ),
-  );
-}
-
-// ── Ring Painter ──────────────────────────────────────────────────────────────
-class _RingPainter extends CustomPainter {
-  final double progress;
-  final Color color;
-  final Color bgColor;
-
-  _RingPainter({
-    required this.progress,
-    required this.color,
-    required this.bgColor,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 7;
-    const sw = 7.0;
-
-    canvas.drawCircle(
-      center,
-      radius,
-      Paint()
-        ..color = bgColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = sw
-        ..strokeCap = StrokeCap.round,
-    );
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -math.pi / 2,
-      2 * math.pi * progress,
-      false,
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = sw
-        ..strokeCap = StrokeCap.round,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
