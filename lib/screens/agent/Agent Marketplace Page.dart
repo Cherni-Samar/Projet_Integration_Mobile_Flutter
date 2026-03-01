@@ -182,31 +182,31 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                     decoration: BoxDecoration(
                       gradient: isDark
                           ? LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                const Color(0xFF1A1A1A),
-                                const Color(0xFF2D2D2D),
-                                Color.lerp(
-                                  const Color(0xFF2D2D2D),
-                                  const Color(0xFFCDFF00).withOpacity(0.05),
-                                  _headerAnimationController.value,
-                                )!,
-                              ],
-                            )
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFF1A1A1A),
+                          const Color(0xFF2D2D2D),
+                          Color.lerp(
+                            const Color(0xFF2D2D2D),
+                            const Color(0xFFCDFF00).withOpacity(0.05),
+                            _headerAnimationController.value,
+                          )!,
+                        ],
+                      )
                           : LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.white,
-                                const Color(0xFFFAFAFA),
-                                Color.lerp(
-                                  const Color(0xFFFAFAFA),
-                                  const Color(0xFFCDFF00).withOpacity(0.03),
-                                  _headerAnimationController.value,
-                                )!,
-                              ],
-                            ),
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white,
+                          const Color(0xFFFAFAFA),
+                          Color.lerp(
+                            const Color(0xFFFAFAFA),
+                            const Color(0xFFCDFF00).withOpacity(0.03),
+                            _headerAnimationController.value,
+                          )!,
+                        ],
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: isDark
@@ -259,8 +259,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                     border: Border.all(
                                       color: isDark
                                           ? const Color(
-                                              0xFFCDFF00,
-                                            ).withOpacity(0.3)
+                                        0xFFCDFF00,
+                                      ).withOpacity(0.3)
                                           : Colors.white,
                                       width: 2.5,
                                     ),
@@ -268,8 +268,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                   child: Center(
                                     child: Text(
                                       _currentUser?.name
-                                              ?.substring(0, 1)
-                                              .toUpperCase() ??
+                                          ?.substring(0, 1)
+                                          .toUpperCase() ??
                                           _currentUser?.email
                                               .substring(0, 1)
                                               .toUpperCase() ??
@@ -286,7 +286,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
@@ -602,14 +602,14 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                             decoration: BoxDecoration(
                               gradient: isDark
                                   ? const LinearGradient(
-                                      colors: [
-                                        Color(0xFFCDFF00),
-                                        Color(0xFFAADD00),
-                                      ],
-                                    )
+                                colors: [
+                                  Color(0xFFCDFF00),
+                                  Color(0xFFAADD00),
+                                ],
+                              )
                                   : const LinearGradient(
-                                      colors: [Colors.black, Color(0xFF1A1A1A)],
-                                    ),
+                                colors: [Colors.black, Color(0xFF1A1A1A)],
+                              ),
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
@@ -794,15 +794,15 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                   decoration: BoxDecoration(
                     gradient: isDark
                         ? const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF1E1E1E), Color(0xFF2A2A2A)],
-                          )
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF1E1E1E), Color(0xFF2A2A2A)],
+                    )
                         : const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Colors.white, Color(0xFFFAFAFA)],
-                          ),
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Colors.white, Color(0xFFFAFAFA)],
+                    ),
                     borderRadius: BorderRadius.circular(32),
                     border: Border.all(
                       color: isCenter
@@ -939,14 +939,14 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                         decoration: BoxDecoration(
                           gradient: isDark
                               ? const LinearGradient(
-                                  colors: [
-                                    Color(0xFFCDFF00),
-                                    Color(0xFFAADD00),
-                                  ],
-                                )
+                            colors: [
+                              Color(0xFFCDFF00),
+                              Color(0xFFAADD00),
+                            ],
+                          )
                               : const LinearGradient(
-                                  colors: [Colors.black, Color(0xFF1A1A1A)],
-                                ),
+                            colors: [Colors.black, Color(0xFF1A1A1A)],
+                          ),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -987,11 +987,11 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
   }
 
   Widget _buildNavItem(
-    IconData icon,
-    String label,
-    bool isActive,
-    bool isDark,
-  ) {
+      IconData icon,
+      String label,
+      bool isActive,
+      bool isDark,
+      ) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -1000,8 +1000,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
           color: isActive
               ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
               : (isDark
-                    ? Colors.white.withOpacity(0.4)
-                    : Colors.black.withOpacity(0.4)),
+              ? Colors.white.withOpacity(0.4)
+              : Colors.black.withOpacity(0.4)),
           size: 26,
         ),
         const SizedBox(height: 6),
@@ -1011,8 +1011,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
             color: isActive
                 ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
                 : (isDark
-                      ? Colors.white.withOpacity(0.4)
-                      : Colors.black.withOpacity(0.4)),
+                ? Colors.white.withOpacity(0.4)
+                : Colors.black.withOpacity(0.4)),
             fontSize: 11,
             fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           ),

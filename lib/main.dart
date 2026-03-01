@@ -172,8 +172,8 @@ class MyApp extends StatelessWidget {
             // ✅ Route onboarding welcome
             '/onboarding-welcome': (context) {
               final args =
-                  ModalRoute.of(context)?.settings.arguments
-                      as Map<String, dynamic>?;
+              ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>?;
               return OnboardingWelcomeScreen(
                 email: args?['email'] ?? 'user@example.com',
               );
@@ -182,8 +182,8 @@ class MyApp extends StatelessWidget {
             // ✅ Route onboarding chatbot
             '/onboarding-chatbot': (context) {
               final args =
-                  ModalRoute.of(context)?.settings.arguments
-                      as Map<String, dynamic>?;
+              ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>?;
               return OnboardingChatbotScreen(
                 email: args?['email'] ?? 'user@example.com',
               );

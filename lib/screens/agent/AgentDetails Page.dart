@@ -522,9 +522,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             borderRadius: BorderRadius.circular(12),
                             side: isDark
                                 ? BorderSide(
-                                    color: Colors.white.withValues(alpha: 0.1),
-                                    width: 1,
-                                  )
+                              color: Colors.white.withValues(alpha: 0.1),
+                              width: 1,
+                            )
                                 : BorderSide.none,
                           ),
                         ),
@@ -856,10 +856,10 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                   decoration: BoxDecoration(
                                     border: i < energyCosts.length - 1
                                         ? Border(bottom: BorderSide(
-                                            color: isDark
-                                                ? Colors.white.withValues(alpha: 0.06)
-                                                : Colors.black.withValues(alpha: 0.06),
-                                          ))
+                                      color: isDark
+                                          ? Colors.white.withValues(alpha: 0.06)
+                                          : Colors.black.withValues(alpha: 0.06),
+                                    ))
                                         : null,
                                   ),
                                   child: Row(
@@ -1064,12 +1064,12 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
   }
 
   void _showEnergyPackSheet(
-    BuildContext ctx,
-    bool isDark,
-    String agentName,
-    Color agentColor,
-    String agentIcon,
-  ) {
+      BuildContext ctx,
+      bool isDark,
+      String agentName,
+      Color agentColor,
+      String agentIcon,
+      ) {
     final cart = Provider.of<CartProvider>(ctx, listen: false);
     final packs = _getEnergyPacksForAgent(agentName);
     showModalBottomSheet(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/owned_agents_provider.dart';
 import '../../providers/theme_provider.dart';
+import 'agent_chat_page.dart';
 
 class MyAgentsPage extends StatelessWidget {
   const MyAgentsPage({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class MyAgentsPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor:
-          isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+      isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
       appBar: AppBar(
         title: Text(
           'My Agents',
@@ -26,8 +27,8 @@ class MyAgentsPage extends StatelessWidget {
         backgroundColor: isDark ? const Color(0xFF0A0A0A) : Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: isDark ? Colors.white : Colors.black),
+          icon:
+          Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -68,13 +69,9 @@ class MyAgentsPage extends StatelessWidget {
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  isDark ? const Color(0xFFCDFF00) : Colors.black,
+              backgroundColor: isDark ? const Color(0xFFCDFF00) : Colors.black,
               foregroundColor: isDark ? Colors.black : Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -86,17 +83,13 @@ class MyAgentsPage extends StatelessWidget {
     );
   }
 
-  void _showRenameDialog(
-      BuildContext context, OwnedAgent agent, bool isDark) {
+  void _showRenameDialog(BuildContext context, OwnedAgent agent, bool isDark) {
     final controller = TextEditingController(text: agent.displayName);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor:
-            isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
@@ -111,11 +104,8 @@ class MyAgentsPage extends StatelessWidget {
                 child: Image.asset(
                   agent.agentIllustration,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Icon(
-                    Icons.smart_toy,
-                    color: agent.agentColor,
-                    size: 20,
-                  ),
+                  errorBuilder: (_, __, ___) =>
+                      Icon(Icons.smart_toy, color: agent.agentColor, size: 20),
                 ),
               ),
             ),
@@ -132,27 +122,21 @@ class MyAgentsPage extends StatelessWidget {
         content: TextField(
           controller: controller,
           autofocus: true,
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black,
-          ),
+          style: TextStyle(color: isDark ? Colors.white : Colors.black),
           decoration: InputDecoration(
             hintText: agent.agentName,
             hintStyle: TextStyle(
               color: isDark ? Colors.grey[600] : Colors.grey[400],
             ),
             filled: true,
-            fillColor:
-                isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF5F5F5),
+            fillColor: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF5F5F5),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(
-                color: agent.agentColor,
-                width: 1.5,
-              ),
+              borderSide: BorderSide(color: agent.agentColor, width: 1.5),
             ),
             prefixIcon: Icon(Icons.edit, color: agent.agentColor, size: 20),
           ),
@@ -169,31 +153,24 @@ class MyAgentsPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              final owned = Provider.of<OwnedAgentsProvider>(
-                context,
-                listen: false,
-              );
+              final owned = Provider.of<OwnedAgentsProvider>(context, listen: false);
               owned.renameAgent(agent.agentName, controller.text);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                      'Renamed to "${controller.text.trim().isEmpty ? agent.agentName : controller.text.trim()}"'),
-                  backgroundColor:
-                      isDark ? const Color(0xFF1E1E1E) : Colors.black,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    'Renamed to "${controller.text.trim().isEmpty ? agent.agentName : controller.text.trim()}"',
                   ),
+                  backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.black,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: agent.agentColor,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             child: const Text('Save'),
           ),
@@ -220,9 +197,7 @@ class MyAgentsPage extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isDark
-                  ? Colors.white.withOpacity(0.08)
-                  : Colors.black.withOpacity(0.06),
+              color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
             ),
             boxShadow: [
               BoxShadow(
@@ -241,8 +216,7 @@ class MyAgentsPage extends StatelessWidget {
                   color: const Color(0xFFF59E0B).withOpacity(0.15),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(Icons.bolt,
-                    color: Color(0xFFF59E0B), size: 26),
+                child: const Icon(Icons.bolt, color: Color(0xFFF59E0B), size: 26),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -272,6 +246,7 @@ class MyAgentsPage extends StatelessWidget {
             ],
           ),
         ),
+
         // ── Agent cards ──
         Expanded(
           child: ListView.builder(
@@ -279,31 +254,38 @@ class MyAgentsPage extends StatelessWidget {
             itemCount: owned.count,
             itemBuilder: (context, index) {
               final agent = owned.agents[index];
-              return GestureDetector(
-                onTap: () => _showRenameDialog(context, agent, isDark),
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color:
-                        isDark ? const Color(0xFF1E1E1E) : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: agent.agentColor.withOpacity(0.25),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: agent.agentColor
-                            .withOpacity(isDark ? 0.1 : 0.06),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: agent.agentColor.withOpacity(0.25),
+                    width: 1.5,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: agent.agentColor.withOpacity(isDark ? 0.1 : 0.06),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AgentChatPage(agent: agent),
+                      ),
+                    );
+                  },
                   child: Row(
                     children: [
-                      // Agent Avatar
+                      // Avatar
                       Container(
                         width: 60,
                         height: 60,
@@ -316,16 +298,14 @@ class MyAgentsPage extends StatelessWidget {
                           child: Image.asset(
                             agent.agentIllustration,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Icon(
-                              Icons.smart_toy,
-                              color: agent.agentColor,
-                              size: 30,
-                            ),
+                            errorBuilder: (_, __, ___) =>
+                                Icon(Icons.smart_toy, color: agent.agentColor, size: 30),
                           ),
                         ),
                       ),
                       const SizedBox(width: 16),
-                      // Agent info
+
+                      // Info
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,57 +314,55 @@ class MyAgentsPage extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         agent.displayName,
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 17,
-                                          color: isDark
-                                              ? Colors.white
-                                              : Colors.black,
+                                          color: isDark ? Colors.white : Colors.black,
                                         ),
                                       ),
-                                      if (agent.displayName !=
-                                          agent.agentName)
+                                      if (agent.displayName != agent.agentName)
                                         Text(
                                           agent.agentName,
                                           style: TextStyle(
-                                            color: isDark
-                                                ? Colors.grey[500]
-                                                : Colors.grey[400],
+                                            color: isDark ? Colors.grey[500] : Colors.grey[400],
                                             fontSize: 12,
                                           ),
                                         ),
                                     ],
                                   ),
                                 ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.edit_outlined,
-                                  size: 16,
-                                  color: isDark
-                                      ? Colors.grey[600]
-                                      : Colors.grey[400],
+                                PopupMenuButton<String>(
+                                  icon: Icon(
+                                    Icons.more_horiz,
+                                    color: isDark ? Colors.grey[400] : Colors.grey[600],
+                                  ),
+                                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                                  onSelected: (v) {
+                                    if (v == "rename") {
+                                      _showRenameDialog(context, agent, isDark);
+                                    }
+                                  },
+                                  itemBuilder: (_) => [
+                                    const PopupMenuItem(
+                                      value: "rename",
+                                      child: Text("Rename"),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                // Pack badge
                                 Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 3,
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: agent.agentColor
-                                        .withOpacity(0.12),
-                                    borderRadius:
-                                        BorderRadius.circular(6),
+                                    color: agent.agentColor.withOpacity(0.12),
+                                    borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
                                     agent.packTitle,
@@ -396,16 +374,12 @@ class MyAgentsPage extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                // Energy
-                                Icon(Icons.bolt,
-                                    color: agent.agentColor, size: 14),
+                                Icon(Icons.bolt, color: agent.agentColor, size: 14),
                                 const SizedBox(width: 2),
                                 Text(
-                                  '${_fmtEnergy(agent.energy)}',
+                                  _fmtEnergy(agent.energy),
                                   style: TextStyle(
-                                    color: isDark
-                                        ? Colors.grey[400]
-                                        : Colors.grey[600],
+                                    color: isDark ? Colors.grey[400] : Colors.grey[600],
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -415,15 +389,12 @@ class MyAgentsPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      // Status chip
+
+                      // Status
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color:
-                              const Color(0xFF10B981).withOpacity(0.12),
+                          color: const Color(0xFF10B981).withOpacity(0.12),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(
@@ -446,7 +417,7 @@ class MyAgentsPage extends StatelessWidget {
     );
   }
 
-  String _fmtEnergy(int n) {
+  static String _fmtEnergy(int n) {
     if (n >= 1000) {
       return '${(n / 1000).toStringAsFixed(n % 1000 == 0 ? 0 : 1)}k';
     }
