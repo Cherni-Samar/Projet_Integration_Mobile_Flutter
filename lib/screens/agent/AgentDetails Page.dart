@@ -46,7 +46,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
   late final PageController _pageController;
   late int _currentIndex;
 
-
   bool get _isSwipeMode => widget.agents != null && widget.agents!.isNotEmpty;
 
   @override
@@ -243,24 +242,48 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     switch (agentName) {
       case 'Hera':
         return [
-          {'scenario': 'Leave + schedule update', 'agents': 'Hera + Timo', 'cost': 25},
+          {
+            'scenario': 'Leave + schedule update',
+            'agents': 'Hera + Timo',
+            'cost': 25,
+          },
         ];
       case 'Kash':
         return [
-          {'scenario': 'Invoice + storage + analysis', 'agents': 'Kash + Dexo', 'cost': 30},
+          {
+            'scenario': 'Invoice + storage + analysis',
+            'agents': 'Kash + Dexo',
+            'cost': 30,
+          },
         ];
       case 'Dexo':
         return [
-          {'scenario': 'Invoice + storage + analysis', 'agents': 'Kash + Dexo', 'cost': 30},
+          {
+            'scenario': 'Invoice + storage + analysis',
+            'agents': 'Kash + Dexo',
+            'cost': 30,
+          },
         ];
       case 'Timo':
         return [
-          {'scenario': 'Leave + schedule update', 'agents': 'Hera + Timo', 'cost': 25},
-          {'scenario': 'Meeting + summary + tasks', 'agents': 'Timo + Echo', 'cost': 35},
+          {
+            'scenario': 'Leave + schedule update',
+            'agents': 'Hera + Timo',
+            'cost': 25,
+          },
+          {
+            'scenario': 'Meeting + summary + tasks',
+            'agents': 'Timo + Echo',
+            'cost': 35,
+          },
         ];
       case 'Echo':
         return [
-          {'scenario': 'Meeting + summary + tasks', 'agents': 'Timo + Echo', 'cost': 35},
+          {
+            'scenario': 'Meeting + summary + tasks',
+            'agents': 'Timo + Echo',
+            'cost': 35,
+          },
         ];
       default:
         return [];
@@ -271,39 +294,99 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     switch (agentName) {
       case 'Hera':
         return [
-          {'title': 'Starter', 'energy': 1000, 'price': 10.0, 'color': 0xFF10B981},
+          {
+            'title': 'Starter',
+            'energy': 1000,
+            'price': 10.0,
+            'color': 0xFF10B981,
+          },
           {'title': 'Pro', 'energy': 6000, 'price': 45.0, 'color': 0xFF8B5CF6},
-          {'title': 'Business', 'energy': 15000, 'price': 100.0, 'color': 0xFFF59E0B},
+          {
+            'title': 'Business',
+            'energy': 15000,
+            'price': 100.0,
+            'color': 0xFFF59E0B,
+          },
         ];
       case 'Kash':
         return [
-          {'title': 'Starter', 'energy': 1000, 'price': 15.0, 'color': 0xFF10B981},
+          {
+            'title': 'Starter',
+            'energy': 1000,
+            'price': 15.0,
+            'color': 0xFF10B981,
+          },
           {'title': 'Pro', 'energy': 6000, 'price': 55.0, 'color': 0xFF8B5CF6},
-          {'title': 'Business', 'energy': 15000, 'price': 120.0, 'color': 0xFFF59E0B},
+          {
+            'title': 'Business',
+            'energy': 15000,
+            'price': 120.0,
+            'color': 0xFFF59E0B,
+          },
         ];
       case 'Dexo':
         return [
-          {'title': 'Starter', 'energy': 1000, 'price': 8.0, 'color': 0xFF10B981},
+          {
+            'title': 'Starter',
+            'energy': 1000,
+            'price': 8.0,
+            'color': 0xFF10B981,
+          },
           {'title': 'Pro', 'energy': 6000, 'price': 35.0, 'color': 0xFF8B5CF6},
-          {'title': 'Business', 'energy': 15000, 'price': 80.0, 'color': 0xFFF59E0B},
+          {
+            'title': 'Business',
+            'energy': 15000,
+            'price': 80.0,
+            'color': 0xFFF59E0B,
+          },
         ];
       case 'Timo':
         return [
-          {'title': 'Starter', 'energy': 1000, 'price': 12.0, 'color': 0xFF10B981},
+          {
+            'title': 'Starter',
+            'energy': 1000,
+            'price': 12.0,
+            'color': 0xFF10B981,
+          },
           {'title': 'Pro', 'energy': 6000, 'price': 50.0, 'color': 0xFF8B5CF6},
-          {'title': 'Business', 'energy': 15000, 'price': 110.0, 'color': 0xFFF59E0B},
+          {
+            'title': 'Business',
+            'energy': 15000,
+            'price': 110.0,
+            'color': 0xFFF59E0B,
+          },
         ];
       case 'Echo':
         return [
-          {'title': 'Starter', 'energy': 1000, 'price': 5.0, 'color': 0xFF10B981},
+          {
+            'title': 'Starter',
+            'energy': 1000,
+            'price': 5.0,
+            'color': 0xFF10B981,
+          },
           {'title': 'Pro', 'energy': 6000, 'price': 25.0, 'color': 0xFF8B5CF6},
-          {'title': 'Business', 'energy': 15000, 'price': 60.0, 'color': 0xFFF59E0B},
+          {
+            'title': 'Business',
+            'energy': 15000,
+            'price': 60.0,
+            'color': 0xFFF59E0B,
+          },
         ];
       default:
         return [
-          {'title': 'Starter', 'energy': 1000, 'price': 10.0, 'color': 0xFF10B981},
+          {
+            'title': 'Starter',
+            'energy': 1000,
+            'price': 10.0,
+            'color': 0xFF10B981,
+          },
           {'title': 'Pro', 'energy': 6000, 'price': 45.0, 'color': 0xFF8B5CF6},
-          {'title': 'Business', 'energy': 15000, 'price': 100.0, 'color': 0xFFF59E0B},
+          {
+            'title': 'Business',
+            'energy': 15000,
+            'price': 100.0,
+            'color': 0xFFF59E0B,
+          },
         ];
     }
   }
@@ -365,11 +448,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       controller: _pageController,
       itemCount: widget.agents!.length,
       physics: const BouncingScrollPhysics(),
-      onPageChanged: (i) {
-        setState(() {
-          _currentIndex = i;
-        });
-      },
+      onPageChanged: (i) => setState(() => _currentIndex = i),
       itemBuilder: (context, index) {
         return AnimatedBuilder(
           animation: _pageController,
@@ -449,7 +528,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                   ),
                 ),
                 actions: [
-                  // Cart icon with badge
                   Consumer<CartProvider>(
                     builder: (context, cart, child) {
                       return Stack(
@@ -502,7 +580,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                       );
                     },
                   ),
-                  // Share icon
                   IconButton(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -561,7 +638,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Avatar with parallax
+                          // Avatar
                           Center(
                             child: Transform.translate(
                               offset: Offset(avatarDx, 0),
@@ -826,7 +903,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
 
                           const SizedBox(height: 32),
 
-                          // ── Energy Cost per Task ──
+                          // Energy Cost per Task
                           Text(
                             'ENERGY COST PER TASK',
                             style: TextStyle(
@@ -839,7 +916,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                           const SizedBox(height: 16),
                           Container(
                             decoration: BoxDecoration(
-                              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                              color: isDark
+                                  ? const Color(0xFF1E1E1E)
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: isDark
@@ -848,43 +927,66 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                               ),
                             ),
                             child: Column(
-                              children: energyCosts.asMap().entries.map((entry) {
+                              children: energyCosts.asMap().entries.map((
+                                entry,
+                              ) {
                                 final i = entry.key;
                                 final task = entry.value;
                                 return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 14,
+                                  ),
                                   decoration: BoxDecoration(
                                     border: i < energyCosts.length - 1
-                                        ? Border(bottom: BorderSide(
-                                            color: isDark
-                                                ? Colors.white.withValues(alpha: 0.06)
-                                                : Colors.black.withValues(alpha: 0.06),
-                                          ))
+                                        ? Border(
+                                            bottom: BorderSide(
+                                              color: isDark
+                                                  ? Colors.white.withValues(
+                                                      alpha: 0.06,
+                                                    )
+                                                  : Colors.black.withValues(
+                                                      alpha: 0.06,
+                                                    ),
+                                            ),
+                                          )
                                         : null,
                                   ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         task['task'] as String,
                                         style: TextStyle(
                                           color: isDark
-                                              ? Colors.white.withValues(alpha: 0.8)
+                                              ? Colors.white.withValues(
+                                                  alpha: 0.8,
+                                                )
                                               : Colors.black87,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: color.withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(Icons.bolt, color: color, size: 16),
+                                            Icon(
+                                              Icons.bolt,
+                                              color: color,
+                                              size: 16,
+                                            ),
                                             const SizedBox(width: 2),
                                             Text(
                                               '${task['cost']}',
@@ -904,7 +1006,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             ),
                           ),
 
-                          // ── Multi-Agent Scenarios ──
+                          // Multi-Agent Scenarios
                           if (multiScenarios.isNotEmpty) ...[
                             const SizedBox(height: 32),
                             Text(
@@ -917,74 +1019,92 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                               ),
                             ),
                             const SizedBox(height: 16),
-                            ...multiScenarios.map((s) => Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    color.withValues(alpha: 0.08),
-                                    color.withValues(alpha: 0.02),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: color.withValues(alpha: 0.2),
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    s['scenario'] as String,
-                                    style: TextStyle(
-                                      color: isDark ? Colors.white : Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        s['agents'] as String,
-                                        style: TextStyle(
-                                          color: isDark
-                                              ? Colors.white.withValues(alpha: 0.6)
-                                              : Colors.black54,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Icon(Icons.bolt, color: Color(0xFFF59E0B), size: 16),
-                                            const SizedBox(width: 2),
-                                            Text(
-                                              '${s['cost']}',
-                                              style: const TextStyle(
-                                                color: Color(0xFFF59E0B),
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                            ...multiScenarios.map(
+                              (s) => Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      color.withValues(alpha: 0.08),
+                                      color.withValues(alpha: 0.02),
                                     ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
                                   ),
-                                ],
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: color.withValues(alpha: 0.2),
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      s['scenario'] as String,
+                                      style: TextStyle(
+                                        color: isDark
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          s['agents'] as String,
+                                          style: TextStyle(
+                                            color: isDark
+                                                ? Colors.white.withValues(
+                                                    alpha: 0.6,
+                                                  )
+                                                : Colors.black54,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(
+                                              0xFFF59E0B,
+                                            ).withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(
+                                                Icons.bolt,
+                                                color: Color(0xFFF59E0B),
+                                                size: 16,
+                                              ),
+                                              const SizedBox(width: 2),
+                                              Text(
+                                                '${s['cost']}',
+                                                style: const TextStyle(
+                                                  color: Color(0xFFF59E0B),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            )),
+                            ),
                           ],
 
                           const SizedBox(height: 120),
@@ -1006,7 +1126,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
           ),
         ],
       ),
-
       floatingActionButton: _buildFab(
         context: context,
         isDark: isDark,
@@ -1019,7 +1138,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
   }
 
   // ---------------------------
-  // FAB — Buy Energy
+  // ✅ FAB — Hire ou Buy Energy
   // ---------------------------
   Widget _buildFab({
     required BuildContext context,
@@ -1033,7 +1152,8 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () => _showEnergyPackSheet(context, isDark, name, color, icon),
+          // ✅ CHANGEMENT — appelle _handleHireAgent
+          onPressed: () => _handleHireAgent(context, isDark, name, color, icon),
           style: ElevatedButton.styleFrom(
             backgroundColor: isDark ? const Color(0xFFCDFF00) : Colors.black,
             foregroundColor: isDark ? Colors.black : Colors.white,
@@ -1044,14 +1164,15 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
             elevation: 8,
             shadowColor: Colors.black.withValues(alpha: 0.3),
           ),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.bolt, size: 22),
-              SizedBox(width: 10),
+              // ✅ CHANGEMENT — icône + texte selon l'agent
+              Icon(name == 'Hera' ? Icons.rocket_launch : Icons.bolt, size: 22),
+              const SizedBox(width: 10),
               Text(
-                'Buy Energy',
-                style: TextStyle(
+                name == 'Hera' ? 'Hire Hera' : 'Buy Energy',
+                style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
                 ),
@@ -1063,6 +1184,108 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     );
   }
 
+  // ---------------------------
+  // ✅ NOUVELLE méthode — Handle Hire Agent
+  // ---------------------------
+  Future<void> _handleHireAgent(
+    BuildContext context,
+    bool isDark,
+    String name,
+    Color color,
+    String icon,
+  ) async {
+    if (name == 'Hera') {
+      // 1. Loading dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => Center(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(color: Color(0xFF8B5CF6)),
+                const SizedBox(height: 16),
+                Text(
+                  'Connexion à Hera...',
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      try {
+        // 2. Appelle N8N
+        final response = await HrAgentService.hello(username: 'Samar');
+
+        if (!context.mounted) return;
+
+        // 3. Ferme loading
+        Navigator.pop(context);
+
+        // 4. ✅ Navigate vers HrDashboardPage
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => HrDashboardPage(
+              heraMessage:
+                  response['message'] ??
+                  'Hello! Je suis Hera, votre agent RH 👋',
+              username: response['user'] ?? 'Samar',
+            ),
+          ),
+        );
+      } catch (e) {
+        if (!context.mounted) return;
+
+        // Ferme loading
+        Navigator.pop(context);
+
+        // Affiche erreur
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.wifi_off, color: Colors.white),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Hera indisponible. Lance N8N sur le port 5678.',
+                    style: TextStyle(fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+      return;
+    }
+
+    // ✅ Autres agents → Energy pack sheet (inchangé)
+    _showEnergyPackSheet(context, isDark, name, color, icon);
+  }
+
+  // ---------------------------
+  // Energy Pack Sheet (inchangé)
+  // ---------------------------
   void _showEnergyPackSheet(
     BuildContext ctx,
     bool isDark,
@@ -1086,7 +1309,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Handle
               Container(
                 width: 40,
                 height: 4,
@@ -1142,9 +1364,13 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                               Text('$agentName ($title) added to cart!'),
                             ],
                           ),
-                          backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.black,
+                          backgroundColor: isDark
+                              ? const Color(0xFF1E1E1E)
+                              : Colors.black,
                           behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           action: SnackBarAction(
                             label: 'VIEW CART',
                             textColor: const Color(0xFFCDFF00),
@@ -1158,7 +1384,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                           content: Text('$agentName is already in your cart!'),
                           backgroundColor: Colors.orange.shade700,
                           behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       );
                     }
@@ -1167,10 +1395,14 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF252525) : const Color(0xFFF9F9F9),
+                      color: isDark
+                          ? const Color(0xFF252525)
+                          : const Color(0xFFF9F9F9),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isBest ? packColor : (isDark ? Colors.white12 : Colors.black12),
+                        color: isBest
+                            ? packColor
+                            : (isDark ? Colors.white12 : Colors.black12),
                         width: isBest ? 2 : 1,
                       ),
                     ),
@@ -1195,7 +1427,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                   Text(
                                     title,
                                     style: TextStyle(
-                                      color: isDark ? Colors.white : Colors.black,
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.black,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -1203,14 +1437,21 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                   if (isBest) ...[
                                     const SizedBox(width: 8),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: packColor,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: const Text(
                                         'BEST VALUE',
-                                        style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -1249,7 +1490,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
   }
 
   static String _fmtEnergy(int n) {
-    if (n >= 1000) return '${(n / 1000).toStringAsFixed(n % 1000 == 0 ? 0 : 1)}k';
+    if (n >= 1000) {
+      return '${(n / 1000).toStringAsFixed(n % 1000 == 0 ? 0 : 1)}k';
+    }
     return n.toString();
   }
 
@@ -1329,8 +1572,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       ),
     );
   }
-
-
 }
 
 // ---------------------------
