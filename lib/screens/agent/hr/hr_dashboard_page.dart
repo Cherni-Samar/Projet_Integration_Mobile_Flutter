@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 import '../../../services/hr_agent_service.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -18,6 +19,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
   // ══════════════════════════════════════════════════════════════════════════
 
   int _selectedTab = 0;
+  int _employeeSubTab = 0; // 0 = Mon équipe, 1 = Nouveaux arrivants
 
   // Données admin
   Map<String, dynamic>? _stats;
@@ -35,8 +37,9 @@ class _HrDashboardPageState extends State<HrDashboardPage>
   CalendarFormat _calendarFormat = CalendarFormat.month;
 
   late AnimationController _pulseController;
+  Timer? _refreshTimer;
 
-  // ════════════════════════��═════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════════════════
   // LIFECYCLE
   // ══════════════════════════════════════════════════════════════════════════
 
@@ -50,11 +53,18 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     )..repeat(reverse: true);
 
     _loadAdminData();
+
+    // Auto-refresh toutes les 30 secondes
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      print('🔄 Auto-refresh Dashboard (30s)');
+      _loadAdminData();
+    });
   }
 
   @override
   void dispose() {
     _pulseController.dispose();
+    _refreshTimer?.cancel();
     super.dispose();
   }
 
@@ -127,6 +137,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
       setState(() => _loadingEmployees = false);
     }
   }
+
   Future<void> _loadAllLeaves() async {
     try {
       print('📅 Chargement des congés de tous les employés...');
@@ -144,7 +155,6 @@ class _HrDashboardPageState extends State<HrDashboardPage>
           print('    ✅ ${leaves.length} congé(s) trouvé(s)');
 
           for (var leave in leaves) {
-            // Ajoute le nom de l'employé à chaque congé
             leave['employee_name'] = emp['name'];
             leave['employee_role'] = emp['role'];
             allLeaves.add(leave);
@@ -207,6 +217,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
       ),
     );
   }
+
   // ══════════════════════════════════════════════════════════════════════════
   // HEADER
   // ══════════════════════════════════════════════════════════════════════════
@@ -295,6 +306,38 @@ class _HrDashboardPageState extends State<HrDashboardPage>
               ],
             ),
           ),
+
+          // Bouton refresh
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withOpacity(0.1)
+                  : Colors.black.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              onPressed: () {
+                print('🔄 Refresh manuel Dashboard');
+                _loadAdminData();
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('🔄 Actualisation...'),
+                    duration: Duration(seconds: 1),
+                    backgroundColor: Color(0xFF000000),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+              icon: Icon(
+                Icons.refresh_rounded,
+                color: isDark ? Colors.white : Colors.black,
+                size: 22,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -359,7 +402,6 @@ class _HrDashboardPageState extends State<HrDashboardPage>
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Stats en haut
           if (_loadingStats)
             const Center(
               child: Padding(
@@ -372,12 +414,12 @@ class _HrDashboardPageState extends State<HrDashboardPage>
 
           const SizedBox(height: 24),
 
-          // Historique uniquement
           _buildHistorySection(isDark),
         ],
       ),
     );
   }
+
   Widget _buildStats(bool isDark) {
     return Row(
       children: [
@@ -387,6 +429,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
       ],
     );
   }
+
   Widget _statCard(IconData icon, String label, String value, bool isDark) {
     return Expanded(
       child: Container(
@@ -431,7 +474,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
   }
 
   // ══════════════════════════════════════════════════════════════════════════
-  // HISTORY SECTION - DYNAMIQUE
+  // HISTORY SECTION
   // ══════════════════════════════════════════════════════════════════════════
 
   Widget _buildHistorySection(bool isDark) {
@@ -451,10 +494,10 @@ class _HrDashboardPageState extends State<HrDashboardPage>
             ),
             TextButton(
               onPressed: () {},
-              child: Text(
+              child: const Text(
                 'Voir tout',
                 style: TextStyle(
-                  color: const Color(0xFFA855F7),
+                  color: Color(0xFFA855F7),
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -496,35 +539,57 @@ class _HrDashboardPageState extends State<HrDashboardPage>
           ..._recentActions.map((action) {
             IconData icon;
             Color color;
-            String statusText;
+            String text;
 
-            switch (action['status']) {
-              case 'approved':
+            // Gestion des types d'actions
+            switch (action['action_type']) {
+              case 'onboarding_started':
+                icon = Icons.person_add;
+                color = const Color(0xFFCCFF00);
+                text = 'Nouvel employé : ${action['details']?['name'] ?? 'Unknown'} (${action['details']?['role'] ?? ''})';
+                break;
+
+              case 'employee_activated':
+                icon = Icons.check_circle;
+                color = const Color(0xFF10B981);
+                text = '${action['details']?['name'] ?? 'Employé'} est maintenant actif';
+                break;
+
+              case 'leave_approved':
                 icon = Icons.check_circle;
                 color = const Color(0xFFCCFF00);
-                statusText = 'approuvé';
-                if (action['approved_by']?.toString().contains('auto') == true) {
-                  statusText += ' automatiquement';
-                }
+                final employeeName = action['employee_name'] ?? 'Employé';
+                text = 'Congé de $employeeName approuvé automatiquement';
                 break;
-              case 'refused':
+
+              case 'leave_refused':
                 icon = Icons.cancel;
                 color = const Color(0xFFEF4444);
-                statusText = 'refusé';
+                final employeeName = action['employee_name'] ?? 'Employé';
+                text = 'Congé de $employeeName refusé';
                 break;
+
               default:
-                icon = Icons.info;
-                color = const Color(0xFFA855F7);
-                statusText = 'traité';
+              // Fallback pour les anciens types
+                switch (action['status']) {
+                  case 'approved':
+                    icon = Icons.check_circle;
+                    color = const Color(0xFFCCFF00);
+                    final employeeName = action['employee_name'] ?? 'Employé';
+                    text = 'Congé de $employeeName approuvé';
+                    break;
+                  case 'refused':
+                    icon = Icons.cancel;
+                    color = const Color(0xFFEF4444);
+                    final employeeName = action['employee_name'] ?? 'Employé';
+                    text = 'Congé de $employeeName refusé';
+                    break;
+                  default:
+                    icon = Icons.info;
+                    color = const Color(0xFFA855F7);
+                    text = 'Action Hera';
+                }
             }
-
-            final employeeName = action['employee_name'] ?? 'Employé';
-            final typeLabel = action['type'] == 'urgent' ? 'urgent' :
-            action['type'] == 'sick' ? 'maladie' : '';
-
-            final text = typeLabel.isNotEmpty
-                ? 'Congé $typeLabel de $employeeName $statusText'
-                : 'Congé de $employeeName $statusText';
 
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
@@ -575,9 +640,11 @@ class _HrDashboardPageState extends State<HrDashboardPage>
       ],
     );
   }
+
   // ══════════════════════════════════════════════════════════════════════════
   // CALENDAR TAB
   // ══════════════════════════════════════════════════════════════════════════
+
   Widget _buildCalendar(bool isDark) {
     final leavesOnSelectedDay = _selectedDay != null ? _getLeavesForDay(_selectedDay!) : <Map<String, dynamic>>[];
 
@@ -618,26 +685,19 @@ class _HrDashboardPageState extends State<HrDashboardPage>
             },
             eventLoader: _getLeavesForDay,
 
-            // ═══════════════════════════════════════════════════════════════
-            // STYLING PERSONNALISÉ
-            // ═══════════════════════════════════════════════════════════════
-
             calendarBuilders: CalendarBuilders(
-              // ✅ Colore les jours avec des congés
               defaultBuilder: (context, day, focusedDay) {
                 final leavesForDay = _getLeavesForDay(day);
 
                 if (leavesForDay.isNotEmpty) {
-                  // Détermine la couleur selon le type de congé
                   Color backgroundColor;
 
-                  // Si plusieurs types, priorise : urgent > sick > annual
                   if (leavesForDay.any((l) => l['type'] == 'urgent')) {
-                    backgroundColor = const Color(0xFFEF4444); // Rouge pour urgent
+                    backgroundColor = const Color(0xFFEF4444);
                   } else if (leavesForDay.any((l) => l['type'] == 'sick')) {
-                    backgroundColor = const Color(0xFFF59E0B); // Orange pour maladie
+                    backgroundColor = const Color(0xFFF59E0B);
                   } else {
-                    backgroundColor = const Color(0xFFCCFF00); // Vert pour congé normal
+                    backgroundColor = const Color(0xFFCCFF00);
                   }
 
                   return Container(
@@ -661,10 +721,9 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                     ),
                   );
                 }
-                return null; // Utilise le style par défaut
+                return null;
               },
 
-              // ✅ Style des weekends avec congés
               outsideBuilder: (context, day, focusedDay) {
                 final leavesForDay = _getLeavesForDay(day);
 
@@ -703,7 +762,6 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                 return null;
               },
 
-              // ✅ Petits points pour indiquer nombre de congés
               markerBuilder: (context, date, events) {
                 if (events.isNotEmpty) {
                   return Positioned(
@@ -743,13 +801,11 @@ class _HrDashboardPageState extends State<HrDashboardPage>
             ),
 
             calendarStyle: CalendarStyle(
-              // Aujourd'hui
               todayDecoration: BoxDecoration(
                 color: Colors.transparent,
                 shape: BoxShape.circle,
                 border: Border.all(color: const Color(0xFFA855F7), width: 2),
               ),
-              // Jour sélectionné
               selectedDecoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [Color(0xFFA855F7), Color(0xFF8B5CF6)],
@@ -831,7 +887,6 @@ class _HrDashboardPageState extends State<HrDashboardPage>
 
         const SizedBox(height: 24),
 
-        // Légende des couleurs
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -889,7 +944,6 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     );
   }
 
-// Fonction helper pour la légende
   Widget _buildLegendItem(String label, Color color) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -1048,7 +1102,6 @@ class _HrDashboardPageState extends State<HrDashboardPage>
   // ══════════════════════════════════════════════════════════════════════════
 
   Widget _buildEnergy(bool isDark) {
-    // Calcule l'énergie utilisée depuis les stats
     int usedEnergy = 45;
 
     if (_stats != null) {
@@ -1452,68 +1505,227 @@ class _HrDashboardPageState extends State<HrDashboardPage>
   }
 
   // ══════════════════════════════════════════════════════════════════════════
-  // EMPLOYEES TAB
+  // EMPLOYEES TAB - SÉPARÉ EN 2 SECTIONS
   // ══════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════
+// EMPLOYEES TAB - AVEC SUB-TABS
+// ══════════════════════════════════════════════════════════════════════════
+
 
   Widget _buildEmployees(bool isDark) {
-    return RefreshIndicator(
-      onRefresh: _loadAdminData,
-      color: const Color(0xFFCCFF00),
-      child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // Sépare les employés actifs et en onboarding
+    final activeEmployees = _employees
+        .where((e) => e['status'] == 'active')
+        .toList();
+
+    final onboardingEmployees = _employees
+        .where((e) => e['status'] == 'onboarding')
+        .toList();
+
+    return Column(
+      children: [
+        // ═══════════════════════════════════════════════════════════════════
+        // SUB-TABS
+        // ═══════════════════════════════════════════════════════════════════
+        Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
             children: [
-              Text(
-                'Mon équipe',
-                style: TextStyle(
-                  color: isDark ? Colors.white : Colors.black,
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _employeeSubTab = 0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: _employeeSubTab == 0
+                          ? (isDark ? Colors.white : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: _employeeSubTab == 0
+                          ? [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                          : [],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Mon équipe',
+                          style: TextStyle(
+                            color: _employeeSubTab == 0
+                                ? Colors.black
+                                : (isDark ? Colors.white60 : Colors.black54),
+                            fontSize: 14,
+                            fontWeight: _employeeSubTab == 0
+                                ? FontWeight.bold
+                                : FontWeight.w500,
+                          ),
+                        ),
+                        if (activeEmployees.isNotEmpty) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _employeeSubTab == 0
+                                  ? const Color(0xFFCCFF00)
+                                  : (isDark ? Colors.white24 : Colors.black12),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${activeEmployees.length}',
+                              style: const TextStyle(
+                                color: Colors.black, // ✅ TOUJOURS NOIR
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
               ),
-              if (_employees.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFCCFF00).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: const Color(0xFFCCFF00),
-                      width: 1,
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _employeeSubTab = 1),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: _employeeSubTab == 1
+                          ? (isDark ? Colors.white : Colors.white)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: _employeeSubTab == 1
+                          ? [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ]
+                          : [],
                     ),
-                  ),
-                  child: Text(
-                    '${_employees.length}',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Nouveaux',
+                          style: TextStyle(
+                            color: _employeeSubTab == 1
+                                ? Colors.black
+                                : (isDark ? Colors.white60 : Colors.black54),
+                            fontSize: 14,
+                            fontWeight: _employeeSubTab == 1
+                                ? FontWeight.bold
+                                : FontWeight.w500,
+                          ),
+                        ),
+                        if (onboardingEmployees.isNotEmpty) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _employeeSubTab == 1
+                                  ? const Color(0xFFCCFF00)
+                                  : (isDark ? Colors.white24 : Colors.black12),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${onboardingEmployees.length}',
+                              style: const TextStyle(
+                                color: Colors.black, // ✅ TOUJOURS NOIR
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
+        ),
 
-          if (_loadingEmployees)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(40),
-                child: CircularProgressIndicator(color: Color(0xFFCCFF00)),
-              ),
+        // ═══════════════════════════════════════════════════════════════════
+        // CONTENU SELON LE TAB
+        // ═══════════════════════════════════════════════════════════════════
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: _loadAdminData,
+            color: const Color(0xFFCCFF00),
+            child: _loadingEmployees
+                ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFFCCFF00)),
             )
-          else if (_employees.isEmpty)
-            _buildEmpty(Icons.people_outline, 'Aucun employé', 'Commencez par ajouter des employés', isDark)
-          else
-            ..._employees.map((emp) => _buildEmployeeCard(emp, isDark)),
-        ],
-      ),
+                : _employeeSubTab == 0
+                ? _buildActiveEmployeesList(activeEmployees, isDark)
+                : _buildOnboardingEmployeesList(onboardingEmployees, isDark),
+          ),
+        ),
+      ],
+    );
+  }
+// ══════════════════════════════════════════════════════════════════════════
+// LISTE EMPLOYÉS ACTIFS
+// ══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildActiveEmployeesList(List<Map<String, dynamic>> employees, bool isDark) {
+    if (employees.isEmpty) {
+      return _buildEmpty(
+        Icons.people_outline,
+        'Aucun employé actif',
+        'Tous vos employés sont en cours d\'intégration',
+        isDark,
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: employees.map((emp) => _buildActiveEmployeeCard(emp, isDark)).toList(),
     );
   }
 
-  Widget _buildEmployeeCard(Map<String, dynamic> employee, bool isDark) {
+// ══════════════════════════════════════════════════════════════════════════
+// LISTE NOUVEAUX ARRIVANTS
+// ══════════════════════════════════════════════════════════════════════════
+
+  Widget _buildOnboardingEmployeesList(List<Map<String, dynamic>> employees, bool isDark) {
+    if (employees.isEmpty) {
+      return _buildEmpty(
+        Icons.celebration,
+        'Aucun nouvel arrivant',
+        'Tous vos employés sont déjà actifs',
+        isDark,
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: employees.map((emp) => _buildOnboardingEmployeeCard(emp, isDark)).toList(),
+    );
+  }
+  // Card employé actif
+  Widget _buildActiveEmployeeCard(Map<String, dynamic> employee, bool isDark) {
     final name = employee['name'] as String;
     final role = employee['role'] as String;
     final department = employee['department'] as String;
@@ -1525,6 +1737,10 @@ class _HrDashboardPageState extends State<HrDashboardPage>
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFF10B981).withOpacity(0.3),
+          width: 1.5,
+        ),
       ),
       child: Column(
         children: [
@@ -1534,7 +1750,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFCCFF00).withOpacity(0.1),
+                  color: const Color(0xFFCCFF00).withOpacity(0.2), // ✅ Fond jaune
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: const Color(0xFFCCFF00),
@@ -1545,7 +1761,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                   child: Text(
                     name.substring(0, 1).toUpperCase(),
                     style: const TextStyle(
-                      color: Colors.black,
+                      color: Colors.black, // ✅ LETTRE TOUJOURS NOIRE
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
@@ -1587,6 +1803,223 @@ class _HrDashboardPageState extends State<HrDashboardPage>
               const SizedBox(width: 8),
               _badge(Icons.warning_amber_rounded, '${balances['urgent']['remaining']}/${balances['urgent']['total']}', isDark),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+  // Card employé en onboarding
+  Widget _buildOnboardingEmployeeCard(Map<String, dynamic> employee, bool isDark) {
+    final name = employee['name'] as String;
+    final role = employee['role'] as String;
+    final department = employee['department'] as String;
+
+    final startDateStr = employee['start_date'] as String?;
+
+    DateTime? startDate;
+    String dateText = 'Date non définie';
+    String countdownText = '';
+
+    if (startDateStr != null && startDateStr.isNotEmpty) {
+      try {
+        startDate = DateTime.parse(startDateStr);
+        dateText = DateFormat('d MMMM yyyy', 'fr_FR').format(startDate);
+
+        final today = DateTime.now();
+        final daysUntilStart = startDate.difference(DateTime(today.year, today.month, today.day)).inDays;
+
+        if (daysUntilStart == 0) {
+          countdownText = 'Arrive aujourd\'hui !';
+        } else if (daysUntilStart == 1) {
+          countdownText = 'Arrive demain';
+        } else if (daysUntilStart > 0) {
+          countdownText = 'Arrive dans $daysUntilStart jours';
+        } else {
+          countdownText = 'Date de début passée';
+        }
+      } catch (e) {
+        print('❌ Erreur parsing date: $e');
+      }
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFCCFF00),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFCCFF00).withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFCCFF00).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFFCCFF00),
+                    width: 2,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    name.substring(0, 1).toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            name,
+                            style: TextStyle(
+                              color: isDark ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFCCFF00).withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: const Color(0xFFCCFF00),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Text(
+                            ' Nouveau',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$role • $department',
+                      style: TextStyle(
+                        color: isDark ? Colors.white60 : Colors.black54,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Informations de date
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFCCFF00).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFFCCFF00).withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.calendar_today,
+                      color: Colors.black,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Date de début',
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black87,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      dateText,
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (countdownText.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.schedule,
+                              size: 14,
+                              color: Colors.black,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              countdownText,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
