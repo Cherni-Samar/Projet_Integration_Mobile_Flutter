@@ -2,11 +2,43 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class HrAgentService {
-  // ✅ Pointe vers EXPRESS (pas N8N)
-  static const String _base = 'http://10.0.2.2:3000/api/hera';
+  // ══════════════════════════════════════════════════════════════════════════
+  // Configuration
+  // ══════════════════════════════════════════════════════════════════════════
 
-  static Future<Map<String, dynamic>> hello({String username = 'user'}) =>
-      _post('hello', {'username': username});
+  static const String baseUrl = 'http://10.0.2.2:3000/api/hera';
+  // ══════════════════════════════════════════════════════════════════════════
+  // Hello
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> hello({required String username}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/hello'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'username': username}),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to connect',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Leave Request
+  // ══════════════════════════════════════════════════════════════════════════
 
   static Future<Map<String, dynamic>> requestLeave({
     required String employeeId,
@@ -14,85 +46,300 @@ class HrAgentService {
     required String type,
     required String startDate,
     required String endDate,
-    required int days,
-    required String reason,
+    String? reason,
   }) async {
-    final response = await http.post(
-      Uri.parse('$_base/leave-request'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'employee_id': employeeId,
-        'employee_email': employeeEmail,
-        'type': type,
-        'start_date': startDate,
-        'end_date': endDate,
-        'days': days,
-        'reason': reason,
-      }),
-    );
-    return jsonDecode(response.body);
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/leave-request'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'employee_id': employeeId,
+          'employee_email': employeeEmail,
+          'type': type,
+          'start_date': startDate,
+          'end_date': endDate,
+          'reason': reason ?? '',
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to request leave',
+          'status_code': response.statusCode,
+          'body': response.body,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
   }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Urgent Leave
+  // ══════════════════════════════════════════════════════════════════════════
 
   static Future<Map<String, dynamic>> urgentLeave({
     required String employeeId,
-    required String reason,
-  }) => _post('leave-urgent', {'employee_id': employeeId, 'reason': reason});
+    required String employeeEmail,
+    String? reason,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/leave-urgent'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'employee_id': employeeId,
+          'employee_email': employeeEmail,
+          'reason': reason ?? 'Urgence',
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to request urgent leave',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Get Leaves
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> getLeaves({required String employeeId}) async {
+    try {
+      print('📡 GET $baseUrl/leaves/$employeeId');
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/leaves/$employeeId'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      print('📥 Status: ${response.statusCode}');
+      print('📥 Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to load leaves',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      print('❌ Erreur getLeaves: $e');
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Onboarding
+  // ══════════════════════════════════════════════════════════════════════════
 
   static Future<Map<String, dynamic>> onboarding({
     required String name,
     required String email,
     required String role,
-    required String department,
-    required String contractType,
-    required String managerEmail,
-  }) => _post('onboarding', {
-    'name': name,
-    'email': email,
-    'role': role,
-    'department': department,
-    'contract_type': contractType,
-    'manager_email': managerEmail,
-  });
-
-  static Future<Map<String, dynamic>> promote({
-    required String employeeId,
-    required String newRole,
-    required double newSalary,
-  }) => _post('promote', {
-    'employee_id': employeeId,
-    'new_role': newRole,
-    'new_salary': newSalary,
-  });
-
-  static Future<Map<String, dynamic>> offboarding({
-    required String employeeId,
-    required String reason,
-    required String lastDay,
-  }) => _post('offboarding', {
-    'employee_id': employeeId,
-    'reason': reason,
-    'last_day': lastDay,
-  });
-
-  static Future<Map<String, dynamic>> _post(
-    String path,
-    Map<String, dynamic> body,
-  ) async {
+    String? department,
+    String? contractType,
+    String? managerEmail,
+  }) async {
     try {
-      final response = await http
-          .post(
-            Uri.parse('$_base/$path'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(body),
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await http.post(
+        Uri.parse('$baseUrl/onboarding'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'name': name,
+          'email': email,
+          'role': role,
+          'department': department ?? '',
+          'contract_type': contractType ?? 'CDI',
+          'manager_email': managerEmail ?? '',
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to onboard employee',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ADMIN - Get Stats
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> getAdminStats() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/stats'),
+        headers: {'Content-Type': 'application/json'},
+      );
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to load stats',
+          'status_code': response.statusCode,
+        };
       }
-      throw Exception('Erreur ${response.statusCode}');
     } catch (e) {
-      throw Exception('Serveur indisponible: $e');
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ADMIN - Get Pending Leaves
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> getPendingLeaves() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/pending-leaves'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to load pending leaves',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ADMIN - Get All Employees
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> getAllEmployees() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/employees'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to load employees',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ADMIN - Approve or Reject Leave
+  // ════════════════════════════════════════════════════════════════���═════════
+
+  static Future<Map<String, dynamic>> approveOrRejectLeave({
+    required String leaveId,
+    required String action,
+    String? adminName,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/admin/approve-reject'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'leave_id': leaveId,
+          'action': action,
+          'admin_name': adminName ?? 'Admin',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to process leave',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // ADMIN - Get Recent Actions
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> getRecentActions({int limit = 5}) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/recent-actions?limit=$limit'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to load recent actions',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
     }
   }
 }

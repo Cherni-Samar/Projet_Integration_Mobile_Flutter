@@ -1238,12 +1238,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => HrDashboardPage(
-              heraMessage:
-                  response['message'] ??
-                  'Hello! Je suis Hera, votre agent RH 👋',
-              username: response['user'] ?? 'Samar',
-            ),
+            builder: (_) => const HrDashboardPage(),
           ),
         );
       } catch (e) {
