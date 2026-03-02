@@ -6,14 +6,16 @@ import '../utils/constants.dart';
 
 class StripeService {
   static final AuthService _authService = AuthService();
+  static String? _lastPaymentIntentId;
+
+  static String? get lastPaymentIntentId => _lastPaymentIntentId;
 
   /// Creates a PaymentIntent on the backend and presents the Stripe PaymentSheet.
-  /// [amount] is the total price in EUR (e.g. 29.99).
+  /// [packId] is a server-defined identifier (e.g. energy_eco, energy_boost, basic_plan).
   /// Returns true on success, false on cancel.
   /// Throws on error.
   static Future<bool> makePayment({
-    required double amount,
-    String currency = 'eur',
+    required String packId,
   }) async {
     // 1. Get the auth token
     final token = await _authService.getToken();
@@ -21,13 +23,10 @@ class StripeService {
       throw Exception('You must be logged in to make a payment');
     }
 
-    // 2. Create PaymentIntent on our backend (amount in cents)
-    final amountInCents = (amount * 100).round();
     final response = await ApiService.post(
       endpoint: ApiConstants.createPaymentIntent,
       body: {
-        'amount': amountInCents,
-        'currency': currency,
+        'packId': packId,
       },
       token: token,
     );
@@ -37,6 +36,12 @@ class StripeService {
     }
 
     final clientSecret = response['clientSecret'] as String;
+    final paymentIntentId = response['paymentIntentId'];
+    if (paymentIntentId == null) {
+      throw Exception('Missing paymentIntentId from backend response');
+    }
+
+    _lastPaymentIntentId = paymentIntentId.toString();
 
     // 3. Initialize the PaymentSheet
     await Stripe.instance.initPaymentSheet(
@@ -50,9 +55,11 @@ class StripeService {
     // 4. Present the PaymentSheet
     try {
       await Stripe.instance.presentPaymentSheet();
+
       return true; // Payment succeeded
     } on StripeException catch (e) {
       if (e.error.code == FailureCode.Canceled) {
+        _lastPaymentIntentId = null;
         return false; // User cancelled
       }
       rethrow;

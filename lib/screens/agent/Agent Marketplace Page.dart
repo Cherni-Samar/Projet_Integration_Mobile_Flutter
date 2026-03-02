@@ -9,7 +9,10 @@ import '../../l10n/app_localizations.dart';
 
 import '../../screens/agent/AgentDetails Page.dart';
 import '../../screens/agent/my_agents_page.dart';
+import '../../screens/pricing_page.dart';
 import '../auth/user_profile_page.dart';
+import '../../services/api_service.dart';
+import '../../utils/constants.dart';
 
 class AgentMarketplacePage extends StatefulWidget {
   const AgentMarketplacePage({Key? key}) : super(key: key);
@@ -23,6 +26,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
   final _authService = AuthService();
   User? _currentUser;
   bool _isLoading = true;
+  bool _isHiring = false;
 
   late PageController _pageController;
   double _currentPage = 2.0;
@@ -148,10 +152,72 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
           _isLoading = false;
         });
       }
+
+      // Refresh from API to keep subscription/agents in sync
+      final fresh = await _authService.getMe();
+      if (fresh != null && mounted) {
+        setState(() => _currentUser = fresh);
+      }
     } catch (e) {
       // ignore: avoid_print
       print('Error loading user: $e');
       setState(() => _isLoading = false);
+    }
+  }
+
+  String _agentIdFromName(String name) {
+    return name.trim().toLowerCase();
+  }
+
+  Future<void> _hireAgent(String agentId) async {
+    if (_isHiring) return;
+
+    final user = _currentUser;
+    if (user == null) return;
+
+    setState(() => _isHiring = true);
+    try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('You must be logged in');
+      }
+
+      final resp = await ApiService.post(
+        endpoint: ApiConstants.hireAgent,
+        body: {'agentId': agentId},
+        token: token,
+      );
+
+      if (resp['success'] == true) {
+        final nextActive = (resp['activeAgents'] is List)
+            ? (resp['activeAgents'] as List).map((e) => e.toString()).toList()
+            : user.activeAgents;
+
+        final nextMax = (resp['maxAgentsAllowed'] is num)
+            ? (resp['maxAgentsAllowed'] as num).toInt()
+            : user.maxAgentsAllowed;
+
+        final updated = user.copyWith(
+          activeAgents: nextActive,
+          maxAgentsAllowed: nextMax,
+        );
+
+        // Persist by saving via AuthService private helper isn't accessible;
+        // so we just keep it in memory and rely on /me refresh.
+        if (mounted) {
+          setState(() => _currentUser = updated);
+        }
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isHiring = false);
     }
   }
 
@@ -165,6 +231,14 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
 
     final currentIndex = _currentPage.round().clamp(0, _agents.length - 1);
     final currentAgent = _agents[currentIndex];
+
+    final currentAgentId = _agentIdFromName(currentAgent['name'] as String);
+    final user = _currentUser;
+    final activeAgents = user?.activeAgents ?? const <String>[];
+    final maxAgentsAllowed = user?.maxAgentsAllowed ?? 1;
+    final isActive = activeAgents.contains(currentAgentId);
+    final hasSlots = activeAgents.length < maxAgentsAllowed;
+    final buttonFg = isDark ? Colors.black : Colors.white;
 
     return Scaffold(
       backgroundColor: isDark
@@ -622,22 +696,30 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                               ],
                             ),
                             child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AgentDetailsPage(
-                                      agents: _agents,
-                                      initialIndex: currentIndex,
-                                    ),
-                                  ),
-                                );
-                              },
+                                  onPressed: (user == null || _isHiring)
+                                      ? null
+                                      : isActive
+                                          ? null
+                                          : hasSlots
+                                              ? () => _hireAgent(currentAgentId)
+                                              : () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const PricingPage(),
+                                                    ),
+                                                  ).then((result) {
+                                                    if (result == true) {
+                                                      _loadUserData();
+                                                    }
+                                                  });
+                                                },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
-                                foregroundColor: isDark
-                                    ? Colors.black
-                                    : Colors.white,
+                                foregroundColor: buttonFg,
+                                disabledForegroundColor: buttonFg,
+                                disabledBackgroundColor: Colors.transparent,
                                 shadowColor: Colors.transparent,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
@@ -646,16 +728,40 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.rocket_launch, size: 22),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    l10n.agentMarketplaceHireAgent,
-                                    style: const TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
+                                      if (_isHiring)
+                                        SizedBox(
+                                          height: 18,
+                                          width: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.2,
+                                            color: buttonFg,
+                                          ),
+                                        )
+                                      else ...[
+                                        Icon(
+                                          isActive
+                                              ? Icons.verified
+                                              : hasSlots
+                                                  ? Icons.person_add_alt_1
+                                                  : Icons.workspace_premium,
+                                          size: 22,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          isActive
+                                              ? 'Actif'
+                                              : hasSlots
+                                                  ? 'Hire'
+                                                  : 'Plan plein - Améliorer mon offre',
+                                          style: TextStyle(
+                                            color: buttonFg,
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.5,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
                                 ],
                               ),
                             ),

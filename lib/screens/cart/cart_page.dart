@@ -4,6 +4,11 @@ import '../../providers/cart_provider.dart';
 import '../../providers/owned_agents_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../services/stripe_service.dart';
+import '../../services/api_service.dart';
+import '../../services/auth_service.dart';
+import '../../utils/constants.dart';
+import '../../models/user_model.dart';
+import '../../l10n/app_localizations.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({Key? key}) : super(key: key);
@@ -14,9 +19,28 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   bool _isProcessing = false;
+  final _authService = AuthService();
+
+  String _packIdFromTotalPrice(double totalPrice) {
+    final cents = (totalPrice * 100).round();
+    switch (cents) {
+      case 1000:
+        return 'energy_eco';
+      case 3500:
+        return 'energy_boost';
+      case 5900:
+        return 'basic_plan';
+      case 9900:
+        return 'premium_plan';
+      default:
+        throw Exception(totalPrice.toString());
+    }
+  }
 
   Future<void> _handleCheckout(CartProvider cart) async {
     if (_isProcessing) return;
+
+    final l10n = AppLocalizations.of(context)!;
 
     if (cart.totalPrice == 0) {
       _showSuccessDialog(cart);
@@ -26,18 +50,47 @@ class _CartPageState extends State<CartPage> {
     setState(() => _isProcessing = true);
 
     try {
+      late final String packId;
+      try {
+        packId = _packIdFromTotalPrice(cart.totalPrice);
+      } catch (_) {
+        throw Exception(l10n.cartUnknownPackForTotal(cart.totalPrice));
+      }
+
       final success = await StripeService.makePayment(
-        amount: cart.totalPrice,
+        packId: packId,
       );
 
       if (!mounted) return;
 
       if (success) {
+        final paymentIntentId = StripeService.lastPaymentIntentId;
+        if (paymentIntentId == null) {
+          throw Exception(l10n.paymentMissingIntentId);
+        }
+
+        final token = await _authService.getToken();
+        if (token == null) {
+          throw Exception(l10n.authMustBeLoggedIn);
+        }
+
+        final confirm = await ApiService.post(
+          endpoint: ApiConstants.confirmPayment,
+          body: {'paymentIntentId': paymentIntentId},
+          token: token,
+        );
+
+        // Best-effort local cache update (if backend returns user)
+        final rawUser = confirm['data']?['user'] ?? confirm['user'];
+        if (rawUser is Map<String, dynamic>) {
+          await _authService.saveUser(User.fromJson(rawUser));
+        }
+
         _showSuccessDialog(cart);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Payment cancelled'),
+          SnackBar(
+            content: Text(l10n.paymentCancelledSnack),
             backgroundColor: Colors.orange,
           ),
         );
@@ -47,7 +100,10 @@ class _CartPageState extends State<CartPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              'Payment failed: ${e.toString().replaceAll('Exception: ', '')}'),
+            l10n.paymentFailedSnack(
+              e.toString().replaceAll('Exception: ', ''),
+            ),
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -150,55 +206,59 @@ class _CartPageState extends State<CartPage> {
             ),
         ],
       ),
-      body: cart.itemCount == 0
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.bolt_outlined,
-                    size: 80,
-                    color: isDark ? Colors.grey[700] : Colors.grey[300],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No agents yet',
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Visit an agent to buy an energy pack',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          isDark ? const Color(0xFFCDFF00) : Colors.black,
-                      foregroundColor: isDark ? Colors.black : Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 12,
+      body: Stack(
+        children: [
+          cart.itemCount == 0
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.bolt_outlined,
+                        size: 80,
+                        color: isDark ? Colors.grey[700] : Colors.grey[300],
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No agents yet',
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    child: const Text('Go to Marketplace'),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Visit an agent to buy an energy pack',
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isDark
+                              ? const Color(0xFFCDFF00)
+                              : Colors.black,
+                          foregroundColor:
+                              isDark ? Colors.black : Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Go to Marketplace'),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )
-          : Column(
-              children: [
+                )
+              : Column(
+                  children: [
                 Expanded(
                   child: ListView.builder(
                     padding: const EdgeInsets.all(16),
@@ -483,7 +543,22 @@ class _CartPageState extends State<CartPage> {
                   ),
                 ),
               ],
+                ),
+          if (_isProcessing)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: ColoredBox(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFFCDFF00),
+                    ),
+                  ),
+                ),
+              ),
             ),
+        ],
+      ),
     );
   }
 
