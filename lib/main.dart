@@ -16,6 +16,7 @@ import 'screens/cart/cart_page.dart';
 import 'providers/owned_agents_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/user_provider.dart';
 
 import 'providers/cart_provider.dart';
 
@@ -36,7 +37,15 @@ void main() {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => OwnedAgentsProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProxyProvider<UserProvider, OwnedAgentsProvider>(
+          create: (_) => OwnedAgentsProvider(),
+          update: (_, userProvider, owned) {
+            owned ??= OwnedAgentsProvider();
+            owned.syncFromActiveAgents(userProvider.activeAgents);
+            return owned;
+          },
+        ),
       ],
       child: const MyApp(),
     ),

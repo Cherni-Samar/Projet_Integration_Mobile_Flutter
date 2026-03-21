@@ -4,6 +4,7 @@ import '../../l10n/app_localizations.dart';
 
 import '../../providers/cart_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../services/hr_agent_service.dart';
 import '../../screens/agent/hr/hr_dashboard_page.dart';
 
@@ -478,6 +479,10 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     final name = _agentName(agent);
     final color = _agentColor(agent);
     final icon = _agentIcon(agent);
+
+    final userProvider = context.watch<UserProvider>();
+    final agentId = name.trim().toLowerCase();
+    final isActive = userProvider.isAgentActive(agentId);
     final energyCosts = _getEnergyCostsForAgent(name);
     final multiScenarios = _getMultiAgentScenarios(name);
     final rating = _getRatingForAgent(name);
@@ -1132,6 +1137,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         name: name,
         color: color,
         icon: icon,
+        isActive: isActive,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -1146,14 +1152,28 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     required String name,
     required Color color,
     required String icon,
+    required bool isActive,
   }) {
+    final isHera = name.trim().toLowerCase() == 'hera';
+    final canOpenDashboard = isHera && isActive;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          // ✅ CHANGEMENT — appelle _handleHireAgent
-          onPressed: () => _handleHireAgent(context, isDark, name, color, icon),
+          onPressed: () {
+            if (canOpenDashboard) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const HrDashboardPage(),
+                ),
+              );
+              return;
+            }
+            _handleHireAgent(context, isDark, name, color, icon);
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: isDark ? const Color(0xFFCDFF00) : Colors.black,
             foregroundColor: isDark ? Colors.black : Colors.white,
@@ -1168,10 +1188,17 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // ✅ CHANGEMENT — icône + texte selon l'agent
-              Icon(name == 'Hera' ? Icons.rocket_launch : Icons.bolt, size: 22),
+              Icon(
+                canOpenDashboard
+                    ? Icons.dashboard_outlined
+                    : (isHera ? Icons.rocket_launch : Icons.bolt),
+                size: 22,
+              ),
               const SizedBox(width: 10),
               Text(
-                name == 'Hera' ? 'Hire Hera' : 'Buy Energy',
+                canOpenDashboard
+                    ? 'Ouvrir le Dashboard'
+                    : (isHera ? 'Hire Hera' : 'Buy Energy'),
                 style: const TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,

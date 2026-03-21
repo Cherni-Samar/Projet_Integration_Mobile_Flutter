@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/owned_agents_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../services/stripe_service.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
@@ -83,7 +84,16 @@ class _CartPageState extends State<CartPage> {
         // Best-effort local cache update (if backend returns user)
         final rawUser = confirm['data']?['user'] ?? confirm['user'];
         if (rawUser is Map<String, dynamic>) {
-          await _authService.saveUser(User.fromJson(rawUser));
+          final parsed = User.fromJson(rawUser);
+          await _authService.saveUser(parsed);
+          if (mounted) {
+            await context.read<UserProvider>().setUser(parsed);
+          }
+        } else {
+          // Fallback: refresh global user state from API
+          if (mounted) {
+            await context.read<UserProvider>().refreshFromApi();
+          }
         }
 
         _showSuccessDialog(cart);

@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/owned_agents_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/user_provider.dart';
 import 'agent_chat_page.dart';
+import 'hr/hr_dashboard_page.dart';
 
 class MyAgentsPage extends StatelessWidget {
   const MyAgentsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final activeAgents = userProvider.user?.activeAgents ?? const <String>[];
+
+    // OwnedAgentsProvider est désormais synchronisé sur activeAgents via ProxyProvider.
     final owned = Provider.of<OwnedAgentsProvider>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
@@ -32,11 +38,13 @@ class MyAgentsPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: owned.count == 0
+        body: activeAgents.isEmpty
           ? _buildEmptyState(isDark, context)
           : _buildAgentsList(owned, isDark, context),
     );
   }
+
+      String _agentId(String name) => name.trim().toLowerCase();
 
   Widget _buildEmptyState(bool isDark, BuildContext context) {
     return Center(
@@ -276,6 +284,17 @@ class MyAgentsPage extends StatelessWidget {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(20),
                   onTap: () {
+                    final id = _agentId(agent.agentName);
+                    if (id == 'hera') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HrDashboardPage(),
+                        ),
+                      );
+                      return;
+                    }
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(

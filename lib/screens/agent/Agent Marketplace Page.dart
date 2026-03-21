@@ -5,6 +5,7 @@ import '../../services/auth_service.dart';
 import '../../models/user_model.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../l10n/app_localizations.dart';
 
 import '../../screens/agent/AgentDetails Page.dart';
@@ -153,10 +154,16 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         });
       }
 
+      final resolved = _currentUser;
+      if (resolved != null && mounted) {
+        await context.read<UserProvider>().setUser(resolved);
+      }
+
       // Refresh from API to keep subscription/agents in sync
       final fresh = await _authService.getMe();
       if (fresh != null && mounted) {
         setState(() => _currentUser = fresh);
+        await context.read<UserProvider>().setUser(fresh);
       }
     } catch (e) {
       // ignore: avoid_print
@@ -206,6 +213,10 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         // so we just keep it in memory and rely on /me refresh.
         if (mounted) {
           setState(() => _currentUser = updated);
+        }
+
+        if (mounted) {
+          await context.read<UserProvider>().setUser(updated);
         }
       }
     } catch (e) {

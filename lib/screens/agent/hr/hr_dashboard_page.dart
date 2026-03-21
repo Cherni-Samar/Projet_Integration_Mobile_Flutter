@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../services/hr_agent_service.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+import '../../../providers/user_provider.dart';
 
 class HrDashboardPage extends StatefulWidget {
   const HrDashboardPage({super.key});
@@ -18,6 +23,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
   // ══════════════════════════════════════════════════════════════════════════
 
   int _selectedTab = 0;
+  int _employeesSubTab = 0; // 0: active, 1: onboarding
 
   // Données admin
   Map<String, dynamic>? _stats;
@@ -36,6 +42,9 @@ class _HrDashboardPageState extends State<HrDashboardPage>
 
   late AnimationController _pulseController;
 
+  Timer? _autoRefreshTimer;
+  bool _autoRefreshInProgress = false;
+
   // ════════════════════════��═════════════════════════════════════════════════
   // LIFECYCLE
   // ══════════════════════════════════════════════════════════════════════════
@@ -50,10 +59,23 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     )..repeat(reverse: true);
 
     _loadAdminData();
+
+    _autoRefreshTimer = Timer.periodic(const Duration(seconds: 30), (_) async {
+      if (!mounted) return;
+      if (_autoRefreshInProgress) return;
+
+      _autoRefreshInProgress = true;
+      try {
+        await _loadAdminData(refreshLeaves: false);
+      } finally {
+        _autoRefreshInProgress = false;
+      }
+    });
   }
 
   @override
   void dispose() {
+    _autoRefreshTimer?.cancel();
     _pulseController.dispose();
     super.dispose();
   }
@@ -62,10 +84,12 @@ class _HrDashboardPageState extends State<HrDashboardPage>
   // MÉTHODES API
   // ══════════════════════════════════════════════════════════════════════════
 
-  Future<void> _loadAdminData() async {
-    _loadStats();
-    _loadRecentActions();
-    _loadEmployees();
+  Future<void> _loadAdminData({bool refreshLeaves = true}) async {
+    await Future.wait([
+      _loadStats(),
+      _loadRecentActions(),
+      _loadEmployees(refreshLeaves: refreshLeaves),
+    ]);
   }
 
   Future<void> _loadStats() async {
@@ -107,7 +131,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     }
   }
 
-  Future<void> _loadEmployees() async {
+  Future<void> _loadEmployees({required bool refreshLeaves}) async {
     setState(() => _loadingEmployees = true);
 
     try {
@@ -119,7 +143,9 @@ class _HrDashboardPageState extends State<HrDashboardPage>
           _loadingEmployees = false;
         });
 
-        _loadAllLeaves();
+        if (refreshLeaves) {
+          _loadAllLeaves();
+        }
       } else {
         setState(() => _loadingEmployees = false);
       }
@@ -295,6 +321,25 @@ class _HrDashboardPageState extends State<HrDashboardPage>
               ],
             ),
           ),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withOpacity(0.1)
+                  : Colors.black.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: IconButton(
+              onPressed: () => _loadAdminData(),
+              icon: Icon(
+                Icons.refresh_rounded,
+                color: isDark ? Colors.white : Colors.black,
+                size: 22,
+              ),
+              tooltip: 'Rafraîchir',
+            ),
+          ),
         ],
       ),
     );
@@ -354,7 +399,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
 
   Widget _buildOverview(bool isDark) {
     return RefreshIndicator(
-      onRefresh: _loadAdminData,
+      onRefresh: () => _loadAdminData(),
       color: const Color(0xFFCCFF00),
       child: ListView(
         padding: const EdgeInsets.all(16),
@@ -496,35 +541,64 @@ class _HrDashboardPageState extends State<HrDashboardPage>
           ..._recentActions.map((action) {
             IconData icon;
             Color color;
-            String statusText;
 
-            switch (action['status']) {
-              case 'approved':
-                icon = Icons.check_circle;
-                color = const Color(0xFFCCFF00);
-                statusText = 'approuvé';
-                if (action['approved_by']?.toString().contains('auto') == true) {
-                  statusText += ' automatiquement';
-                }
-                break;
-              case 'refused':
-                icon = Icons.cancel;
-                color = const Color(0xFFEF4444);
-                statusText = 'refusé';
-                break;
-              default:
-                icon = Icons.info;
-                color = const Color(0xFFA855F7);
-                statusText = 'traité';
+            final employeeName = (action['employee_name'] ?? 'Employé').toString();
+            final actionType = action['action_type']?.toString();
+
+            String text;
+
+            if (actionType == 'employee_onboarding_started') {
+              icon = Icons.person_add_alt_1;
+              color = const Color(0xFFA855F7);
+              text = 'Onboarding démarré • $employeeName';
+            } else if (actionType == 'employee_activated') {
+              icon = Icons.verified_rounded;
+              color = const Color(0xFFCCFF00);
+              text = 'Employé activé • $employeeName';
+            } else if (actionType == 'leave_approved') {
+              icon = Icons.check_circle;
+              color = const Color(0xFFCCFF00);
+              text = 'Congé approuvé • $employeeName';
+            } else if (actionType == 'leave_refused') {
+              icon = Icons.cancel;
+              color = const Color(0xFFEF4444);
+              text = 'Congé refusé • $employeeName';
+            } else if (actionType == 'leave_requested' || actionType == 'leave_request_created') {
+              icon = Icons.event_note;
+              color = const Color(0xFFA855F7);
+              text = 'Demande de congé • $employeeName';
+            } else {
+              String statusText;
+              switch (action['status']) {
+                case 'approved':
+                  icon = Icons.check_circle;
+                  color = const Color(0xFFCCFF00);
+                  statusText = 'approuvé';
+                  if (action['approved_by']?.toString().contains('auto') == true) {
+                    statusText += ' automatiquement';
+                  }
+                  break;
+                case 'refused':
+                  icon = Icons.cancel;
+                  color = const Color(0xFFEF4444);
+                  statusText = 'refusé';
+                  break;
+                default:
+                  icon = Icons.info;
+                  color = const Color(0xFFA855F7);
+                  statusText = 'traité';
+              }
+
+              final typeLabel = action['type'] == 'urgent'
+                  ? 'urgent'
+                  : action['type'] == 'sick'
+                      ? 'maladie'
+                      : '';
+
+              text = typeLabel.isNotEmpty
+                  ? 'Congé $typeLabel de $employeeName $statusText'
+                  : 'Congé de $employeeName $statusText';
             }
-
-            final employeeName = action['employee_name'] ?? 'Employé';
-            final typeLabel = action['type'] == 'urgent' ? 'urgent' :
-            action['type'] == 'sick' ? 'maladie' : '';
-
-            final text = typeLabel.isNotEmpty
-                ? 'Congé $typeLabel de $employeeName $statusText'
-                : 'Congé de $employeeName $statusText';
 
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
@@ -1048,15 +1122,23 @@ class _HrDashboardPageState extends State<HrDashboardPage>
   // ══════════════════════════════════════════════════════════════════════════
 
   Widget _buildEnergy(bool isDark) {
-    // Calcule l'énergie utilisée depuis les stats
-    int usedEnergy = 45;
+    final userProvider = context.watch<UserProvider>();
 
-    if (_stats != null) {
-      final monthlyLeaves = _stats!['monthly_leave_days'] ?? 0;
-      usedEnergy = (monthlyLeaves * 10 / 30).round().clamp(0, 100);
+    int remainingEnergy;
+    int usedEnergy;
+
+    if (userProvider.user != null) {
+      remainingEnergy = userProvider.energyBalance.clamp(0, 100);
+      usedEnergy = (100 - remainingEnergy).clamp(0, 100);
+    } else {
+      // Fallback: estimation basée sur les stats
+      usedEnergy = 45;
+      if (_stats != null) {
+        final monthlyLeaves = _stats!['monthly_leave_days'] ?? 0;
+        usedEnergy = (monthlyLeaves * 10 / 30).round().clamp(0, 100);
+      }
+      remainingEnergy = 100 - usedEnergy;
     }
-
-    final remainingEnergy = 100 - usedEnergy;
 
     final tasks = [
       {
@@ -1456,8 +1538,18 @@ class _HrDashboardPageState extends State<HrDashboardPage>
   // ══════════════════════════════════════════════════════════════════════════
 
   Widget _buildEmployees(bool isDark) {
+    final activeEmployees = _employees
+        .where((e) => (e['status'] ?? 'active').toString() == 'active')
+        .toList();
+    final onboardingEmployees = _employees
+        .where((e) => (e['status'] ?? 'active').toString() == 'onboarding')
+        .toList();
+
+    final isActiveView = _employeesSubTab == 0;
+    final shownEmployees = isActiveView ? activeEmployees : onboardingEmployees;
+
     return RefreshIndicator(
-      onRefresh: _loadAdminData,
+      onRefresh: () => _loadAdminData(),
       color: const Color(0xFFCCFF00),
       child: ListView(
         padding: const EdgeInsets.all(16),
@@ -1466,14 +1558,14 @@ class _HrDashboardPageState extends State<HrDashboardPage>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Mon équipe',
+                isActiveView ? 'Mon équipe' : 'Nouveaux arrivants',
                 style: TextStyle(
                   color: isDark ? Colors.white : Colors.black,
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              if (_employees.isNotEmpty)
+              if (shownEmployees.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
@@ -1485,7 +1577,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                     ),
                   ),
                   child: Text(
-                    '${_employees.length}',
+                    '${shownEmployees.length}',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 13,
@@ -1497,6 +1589,73 @@ class _HrDashboardPageState extends State<HrDashboardPage>
           ),
           const SizedBox(height: 16),
 
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _employeesSubTab = 0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _employeesSubTab == 0
+                            ? const Color(0xFFCCFF00).withOpacity(0.15)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        'Mon Équipe',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: _employeesSubTab == 0
+                              ? Colors.black
+                              : (isDark
+                                  ? Colors.white.withOpacity(0.6)
+                                  : Colors.black.withOpacity(0.6)),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => _employeesSubTab = 1),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _employeesSubTab == 1
+                            ? const Color(0xFFCCFF00).withOpacity(0.15)
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        'Nouveaux Arrivants',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: _employeesSubTab == 1
+                              ? Colors.black
+                              : (isDark
+                                  ? Colors.white.withOpacity(0.6)
+                                  : Colors.black.withOpacity(0.6)),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
           if (_loadingEmployees)
             const Center(
               child: Padding(
@@ -1504,20 +1663,32 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                 child: CircularProgressIndicator(color: Color(0xFFCCFF00)),
               ),
             )
-          else if (_employees.isEmpty)
-            _buildEmpty(Icons.people_outline, 'Aucun employé', 'Commencez par ajouter des employés', isDark)
+          else if (shownEmployees.isEmpty)
+            _buildEmpty(
+              Icons.people_outline,
+              isActiveView ? 'Aucun employé actif' : 'Aucun onboarding',
+              isActiveView
+                  ? 'Commencez par ajouter des employés'
+                  : 'Les nouveaux employés apparaîtront ici',
+              isDark,
+            )
           else
-            ..._employees.map((emp) => _buildEmployeeCard(emp, isDark)),
+            ...shownEmployees.map((emp) => _buildEmployeeCard(emp, isDark)),
         ],
       ),
     );
   }
 
   Widget _buildEmployeeCard(Map<String, dynamic> employee, bool isDark) {
-    final name = employee['name'] as String;
-    final role = employee['role'] as String;
-    final department = employee['department'] as String;
-    final balances = employee['balances'] as Map<String, dynamic>;
+    final name = (employee['name'] ?? '').toString();
+    final role = (employee['role'] ?? '').toString();
+    final department = (employee['department'] ?? '').toString();
+    final balances = (employee['balances'] as Map<String, dynamic>?) ??
+        {
+          'annual': {'remaining': 0, 'total': 0},
+          'sick': {'remaining': 0, 'total': 0},
+          'urgent': {'remaining': 0, 'total': 0},
+        };
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -1543,7 +1714,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                 ),
                 child: Center(
                   child: Text(
-                    name.substring(0, 1).toUpperCase(),
+                    (name.isNotEmpty ? name.substring(0, 1) : '?').toUpperCase(),
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 22,
