@@ -64,9 +64,16 @@ class AuthService {
     );
 
     if (response['success'] == true) {
-      return User.fromJson(response['data']['user']);
+      final user = User.fromJson(response['data']['user']);
+      await _saveUser(user);
+      return user;
     }
     return null;
+  }
+
+  // ✅ Public helper to persist an updated user locally
+  Future<void> saveUser(User user) async {
+    await _saveUser(user);
   }
 
   // ✅ UPDATE USER PROFILE

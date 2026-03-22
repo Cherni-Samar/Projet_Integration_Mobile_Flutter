@@ -24,4 +24,9 @@ class ApiConstants {
   // Payment (Stripe)
   static const String paymentBaseUrl = 'http://$_host/api/payment';
   static const String createPaymentIntent = '$paymentBaseUrl/create-payment-intent';
+  static const String confirmPayment = '$paymentBaseUrl/confirm-payment';
+
+  // Agents
+  static const String agentsBaseUrl = 'http://$_host/api/agents';
+  static const String hireAgent = '$agentsBaseUrl/hire';
 }

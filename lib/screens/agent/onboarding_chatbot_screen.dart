@@ -270,7 +270,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
         agentName: agentName,
         agentIllustration: data['illustration'] as String,
         agentColor: data['color'] as Color,
-        packTitle: 'Starter',
+        packTitle: 'Pack Éco',
         energy: 1000,
         price: 10.0,
       );

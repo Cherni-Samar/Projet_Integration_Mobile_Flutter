@@ -123,6 +123,52 @@
   "pricingCommunicationAutomation": "Automatisation de la communication",
   "pricingFullFeaturesAccess": "Accès à toutes les fonctionnalités",
 
+  "pricingOffersTitle": "Offres & Tarifs",
+  "pricingSectionSubscriptions": "Abonnements",
+  "pricingSectionEnergyTopups": "Recharges d'énergie",
+  "pricingOfferFreeTrial": "Free Trial",
+  "pricingOfferBasicPlan": "Basic Plan",
+  "pricingOfferPremiumPlan": "Premium Plan",
+  "pricingOfferEcoPack": "Pack Éco",
+  "pricingOfferBoostPack": "Pack Boost",
+  "pricingCreditsCount": "{count} crédits",
+  "@pricingCreditsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pricingAgentsCount": "{count, plural, one{{count} agent} other{{count} agents}}",
+  "@pricingAgentsCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "pricingFreeTrialAlreadyAvailableSnack": "Free Trial est déjà disponible.",
+
+  "paymentCancelledSnack": "Paiement annulé",
+  "paymentMissingIntentId": "paymentIntentId manquant après le paiement",
+  "paymentConfirmedTitle": "Paiement confirmé",
+  "paymentConfirmedSubtitle": "Bienvenue dans l'E-Team {planName} !",
+  "@paymentConfirmedSubtitle": {
+    "placeholders": {
+      "planName": {}
+    }
+  },
+  "paymentFailedSnack": "Paiement échoué : {error}",
+  "@paymentFailedSnack": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+
+  "authMustBeLoggedIn": "Vous devez être connecté",
+  "cartUnknownPackForTotal": "Pack inconnu pour un total de {total} (attendu 10, 35, 59 ou 99 EUR)",
+  "@cartUnknownPackForTotal": {
+    "placeholders": {
+      "total": {}
+    }
+  },
+
   "agentVersionAlpha": "Version 3.2.1 • Certifié RH",
   "agentVersionFinanceWizard": "Version 4.0.5 • Expert financier",
   "agentVersionAdminPro": "Version 2.8.3 • Spécialiste admin",

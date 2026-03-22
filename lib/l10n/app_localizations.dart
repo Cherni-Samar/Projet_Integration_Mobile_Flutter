@@ -62,8 +62,7 @@ import 'app_localizations_fr.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -71,8 +70,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -84,18 +82,17 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
-        delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-      ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
-    Locale('fr'),
+    Locale('fr')
   ];
 
   /// No description provided for @appTitle.
@@ -535,6 +532,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Full features access'**
   String get pricingFullFeaturesAccess;
+
+  /// No description provided for @pricingOffersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Offers & Pricing'**
+  String get pricingOffersTitle;
+
+  /// No description provided for @pricingSectionSubscriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions'**
+  String get pricingSectionSubscriptions;
+
+  /// No description provided for @pricingSectionEnergyTopups.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy top-ups'**
+  String get pricingSectionEnergyTopups;
+
+  /// No description provided for @pricingOfferFreeTrial.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Trial'**
+  String get pricingOfferFreeTrial;
+
+  /// No description provided for @pricingOfferBasicPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic Plan'**
+  String get pricingOfferBasicPlan;
+
+  /// No description provided for @pricingOfferPremiumPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Plan'**
+  String get pricingOfferPremiumPlan;
+
+  /// No description provided for @pricingOfferEcoPack.
+  ///
+  /// In en, this message translates to:
+  /// **'Eco Pack'**
+  String get pricingOfferEcoPack;
+
+  /// No description provided for @pricingOfferBoostPack.
+  ///
+  /// In en, this message translates to:
+  /// **'Boost Pack'**
+  String get pricingOfferBoostPack;
+
+  /// No description provided for @pricingCreditsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} credits'**
+  String pricingCreditsCount(Object count);
+
+  /// No description provided for @pricingAgentsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} agent} other{{count} agents}}'**
+  String pricingAgentsCount(num count);
+
+  /// No description provided for @pricingFreeTrialAlreadyAvailableSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Trial is already available.'**
+  String get pricingFreeTrialAlreadyAvailableSnack;
+
+  /// No description provided for @paymentCancelledSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancelled'**
+  String get paymentCancelledSnack;
+
+  /// No description provided for @paymentMissingIntentId.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing paymentIntentId after payment'**
+  String get paymentMissingIntentId;
+
+  /// No description provided for @paymentConfirmedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment confirmed'**
+  String get paymentConfirmedTitle;
+
+  /// No description provided for @paymentConfirmedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to the E-Team {planName}!'**
+  String paymentConfirmedSubtitle(Object planName);
+
+  /// No description provided for @paymentFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment failed: {error}'**
+  String paymentFailedSnack(Object error);
+
+  /// No description provided for @authMustBeLoggedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'You must be logged in'**
+  String get authMustBeLoggedIn;
+
+  /// No description provided for @cartUnknownPackForTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown pack for total: {total} (expected 10, 35, 59, or 99 EUR)'**
+  String cartUnknownPackForTotal(Object total);
 
   /// No description provided for @agentVersionAlpha.
   ///
@@ -2031,8 +2136,7 @@ abstract class AppLocalizations {
   String get appInfoMadeWith;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -2041,26 +2145,25 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'fr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'fr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en':
-      return AppLocalizationsEn();
-    case 'fr':
-      return AppLocalizationsFr();
+    case 'en': return AppLocalizationsEn();
+    case 'fr': return AppLocalizationsFr();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.',
+    'that was used.'
   );
 }
