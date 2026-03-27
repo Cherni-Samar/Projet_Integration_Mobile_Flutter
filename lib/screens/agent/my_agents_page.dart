@@ -3,11 +3,14 @@ import 'package:provider/provider.dart';
 import '../../providers/owned_agents_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/user_provider.dart';
+import '../../services/stripe_service.dart';
 import 'agent_chat_page.dart';
 import 'hr/hr_dashboard_page.dart';
 
 class MyAgentsPage extends StatelessWidget {
   const MyAgentsPage({Key? key}) : super(key: key);
+
+  static const Color _volt = Color(0xFFCDFF00);
 
   @override
   Widget build(BuildContext context) {
@@ -189,9 +192,12 @@ class MyAgentsPage extends StatelessWidget {
 
   Widget _buildAgentsList(
       OwnedAgentsProvider owned, bool isDark, BuildContext context) {
+    final energyBalance = context.watch<UserProvider>().energyBalance;
+    final activeCount = context.watch<OwnedAgentsProvider>().count;
+
     return Column(
       children: [
-        // ── Summary header ──
+        // ── Energy wallet header ──
         Container(
           margin: const EdgeInsets.all(16),
           padding: const EdgeInsets.all(20),
@@ -218,13 +224,17 @@ class MyAgentsPage extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
                   color: const Color(0xFFF59E0B).withOpacity(0.15),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(Icons.bolt, color: Color(0xFFF59E0B), size: 26),
+                child: const Icon(
+                  Icons.bolt,
+                  color: Color(0xFFF59E0B),
+                  size: 34,
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -232,26 +242,70 @@ class MyAgentsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${owned.count} Active Agent${owned.count == 1 ? '' : 's'}',
+                      "Portefeuille d'Énergie",
                       style: TextStyle(
                         color: isDark ? Colors.white : Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '${_fmtEnergy(owned.totalEnergy)} ⚡ total energy',
-                      style: const TextStyle(
-                        color: Color(0xFFF59E0B),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          _fmtEnergy(energyBalance),
+                          style: TextStyle(
+                            color: isDark ? Colors.white : Colors.black,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w800,
+                            height: 1.0,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 3),
+                          child: Text(
+                            '⚡',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFFF59E0B),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
+              const SizedBox(width: 12),
+              TextButton(
+                onPressed: () => _showEnergyTopupSheet(context),
+                style: TextButton.styleFrom(
+                  foregroundColor: isDark ? _volt : Colors.black,
+                  textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                child: const Text('Acheter plus'),
+              ),
             ],
+          ),
+        ),
+
+        // ── Section title ──
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              '$activeCount Agents Actifs',
+              style: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black,
+              ),
+            ),
           ),
         ),
 
@@ -441,5 +495,202 @@ class MyAgentsPage extends StatelessWidget {
       return '${(n / 1000).toStringAsFixed(n % 1000 == 0 ? 0 : 1)}k';
     }
     return n.toString();
+  }
+
+  Future<void> _showEnergyTopupSheet(BuildContext context) async {
+    final userProvider = context.read<UserProvider>();
+    final currentBalance = userProvider.energyBalance;
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (sheetCtx) {
+        return Container(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            16,
+            24,
+            24 + MediaQuery.of(sheetCtx).viewInsets.bottom,
+          ),
+          decoration: const BoxDecoration(
+            color: Color(0xFF1A1A1A),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'Recharger votre Énergie',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Solde actuel : ${_fmtEnergy(currentBalance)} ⚡',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 18),
+              _TopupOptionTile(
+                leading: const Text('⚡', style: TextStyle(fontSize: 18)),
+                title: 'Pack Éco (100 crédits)',
+                priceLabel: r'$10',
+                accent: _volt,
+                onTap: () => _handleTopup(
+                  rootContext: context,
+                  sheetContext: sheetCtx,
+                  packId: 'energy_eco',
+                ),
+              ),
+              const SizedBox(height: 12),
+              _TopupOptionTile(
+                leading: const Text('⚡⚡', style: TextStyle(fontSize: 18)),
+                title: 'Pack Boost (500 crédits)',
+                priceLabel: r'$35',
+                accent: _volt,
+                onTap: () => _handleTopup(
+                  rootContext: context,
+                  sheetContext: sheetCtx,
+                  packId: 'energy_boost',
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _handleTopup({
+    required BuildContext rootContext,
+    required BuildContext sheetContext,
+    required String packId,
+  }) async {
+    // 1) Close bottom sheet first
+    Navigator.pop(sheetContext);
+
+    try {
+      final success = await StripeService.makePayment(packId: packId);
+      if (!rootContext.mounted) return;
+
+      if (success) {
+        await rootContext.read<UserProvider>().refreshUser();
+        if (!rootContext.mounted) return;
+
+        ScaffoldMessenger.of(rootContext).showSnackBar(
+          const SnackBar(
+            content: Text('Énergie créditée !'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!rootContext.mounted) return;
+      ScaffoldMessenger.of(rootContext).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+}
+
+class _TopupOptionTile extends StatelessWidget {
+  final Widget leading;
+  final String title;
+  final String priceLabel;
+  final Color accent;
+  final VoidCallback onTap;
+
+  const _TopupOptionTile({
+    required this.leading,
+    required this.title,
+    required this.priceLabel,
+    required this.accent,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.08),
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center,
+                child: DefaultTextStyle(
+                  style: TextStyle(color: accent, fontWeight: FontWeight.w800),
+                  child: leading,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: accent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  priceLabel,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

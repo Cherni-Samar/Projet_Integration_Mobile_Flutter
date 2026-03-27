@@ -58,6 +58,12 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  /// Public alias used by UI flows to force a fresh /me fetch
+  /// after backend-side updates (e.g. Stripe confirm-payment).
+  Future<void> refreshUser() async {
+    await refreshFromApi();
+  }
+
   Future<void> setUser(User? user) async {
     _user = user;
     notifyListeners();
