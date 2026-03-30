@@ -4,6 +4,7 @@ class User {
   final String email;
   final bool isEmailVerified;
   final String subscriptionPlan;
+  final String? subscriptionStatus;
   final int maxAgentsAllowed;
   final List<String> activeAgents;
   final int energyBalance;
@@ -16,6 +17,7 @@ class User {
     required this.email,
     required this.isEmailVerified,
     this.subscriptionPlan = 'free',
+    this.subscriptionStatus,
     this.maxAgentsAllowed = 1,
     this.activeAgents = const [],
     this.energyBalance = 0,
@@ -32,6 +34,7 @@ class User {
       email: json['email'],
       isEmailVerified: json['isEmailVerified'] ?? false,
       subscriptionPlan: (json['subscriptionPlan'] ?? 'free').toString(),
+        subscriptionStatus: json['subscriptionStatus']?.toString(),
       maxAgentsAllowed: (json['maxAgentsAllowed'] is num)
           ? (json['maxAgentsAllowed'] as num).toInt()
           : 1,
@@ -48,6 +51,7 @@ class User {
 
   User copyWith({
     String? subscriptionPlan,
+    String? subscriptionStatus,
     int? maxAgentsAllowed,
     List<String>? activeAgents,
     int? energyBalance,
@@ -58,6 +62,7 @@ class User {
       email: email,
       isEmailVerified: isEmailVerified,
       subscriptionPlan: subscriptionPlan ?? this.subscriptionPlan,
+      subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
       maxAgentsAllowed: maxAgentsAllowed ?? this.maxAgentsAllowed,
       activeAgents: activeAgents ?? this.activeAgents,
       energyBalance: energyBalance ?? this.energyBalance,
@@ -73,6 +78,7 @@ class User {
       'email': email,
       'isEmailVerified': isEmailVerified,
       'subscriptionPlan': subscriptionPlan,
+      'subscriptionStatus': subscriptionStatus,
       'maxAgentsAllowed': maxAgentsAllowed,
       'activeAgents': activeAgents,
       'energyBalance': energyBalance,

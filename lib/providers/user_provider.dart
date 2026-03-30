@@ -16,6 +16,20 @@ class UserProvider extends ChangeNotifier {
   User? get user => _user;
   bool get isLoading => _loading;
 
+  String get subscriptionPlanLabel {
+    final raw = (_user?.subscriptionPlan ?? '').trim().toLowerCase();
+    switch (raw) {
+      case 'free':
+        return 'Free Trial';
+      case 'basic':
+        return 'Basic Plan';
+      case 'premium':
+        return 'Premium Plan';
+      default:
+        return 'Plan Inconnu';
+    }
+  }
+
   List<String> get activeAgents => _user?.activeAgents ?? const <String>[];
 
   bool isAgentActive(String agentIdOrName) {
@@ -56,6 +70,12 @@ class UserProvider extends ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
+  }
+
+  /// Public alias used by UI flows to force a fresh /me fetch
+  /// after backend-side updates (e.g. Stripe confirm-payment).
+  Future<void> refreshUser() async {
+    await refreshFromApi();
   }
 
   Future<void> setUser(User? user) async {

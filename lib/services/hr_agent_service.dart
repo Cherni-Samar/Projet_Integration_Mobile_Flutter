@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'api_config.dart';
 
 class HrAgentService {
   // ══════════════════════════════════════════════════════════════════════════
   // Configuration
   // ══════════════════════════════════════════════════════════════════════════
 
-  static const String baseUrl = 'http://10.0.2.2:3000/api/hera';
+  static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
   // ══════════════════════════════════════════════════════════════════════════
   // Hello
   // ══════════════════════════════════════════════════════════════════════════
@@ -36,6 +37,43 @@ class HrAgentService {
     }
   }
 
+  // ══════════════════════════════════════════════════════════════════════════
+  // Envoyer un email à Echo
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> sendEmailToEcho({
+    required String subject,
+    required String content,
+    String? from,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/send-email'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'subject': subject,
+          'content': content,
+          'from': from ?? 'hera@e-team.com',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to send email to Echo',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
+  }
+  
   // ══════════════════════════════════════════════════════════════════════════
   // Leave Request
   // ══════════════════════════════════════════════════════════════════════════
@@ -313,6 +351,25 @@ class HrAgentService {
         'error': e.toString()
       };
     }
+  }
+
+  static Future<Map<String, dynamic>> deleteAction(String actionId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/admin/action/$actionId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    return json.decode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> getAllActions({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/admin/all-actions?page=$page&limit=$limit'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    return json.decode(response.body);
   }
 
   // ══════════════════════════════════════════════════════════════════════════
