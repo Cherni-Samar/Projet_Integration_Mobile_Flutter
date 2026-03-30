@@ -16,6 +16,20 @@ class UserProvider extends ChangeNotifier {
   User? get user => _user;
   bool get isLoading => _loading;
 
+  String get subscriptionPlanLabel {
+    final raw = (_user?.subscriptionPlan ?? '').trim().toLowerCase();
+    switch (raw) {
+      case 'free':
+        return 'Free Trial';
+      case 'basic':
+        return 'Basic Plan';
+      case 'premium':
+        return 'Premium Plan';
+      default:
+        return 'Plan Inconnu';
+    }
+  }
+
   List<String> get activeAgents => _user?.activeAgents ?? const <String>[];
 
   bool isAgentActive(String agentIdOrName) {

@@ -49,6 +49,7 @@ class ApiService {
       return _handleResponse(response);
     } catch (e) {
       print('❌ POST Error: $e');
+      if (e is Exception) throw e;
       throw Exception('Erreur de connexion: $e');
     }
   }
@@ -72,6 +73,7 @@ class ApiService {
       return _handleResponse(response);
     } catch (e) {
       print('❌ GET Error: $e');
+      if (e is Exception) throw e;
       throw Exception('Erreur de connexion: $e');
     }
   }
@@ -116,6 +118,7 @@ class ApiService {
       return _handleResponse(response);
     } catch (e) {
       print('❌ PATCH Error: $e');
+      if (e is Exception) throw e;
       throw Exception('$e');
     }
   }
@@ -139,18 +142,58 @@ class ApiService {
       return _handleResponse(response);
     } catch (e) {
       print('❌ DELETE Error: $e');
+      if (e is Exception) throw e;
       throw Exception('Erreur de connexion: $e');
     }
   }
 
   // Gérer la réponse
   static Map<String, dynamic> _handleResponse(http.Response response) {
-    final data = jsonDecode(response.body);
+    final status = response.statusCode;
+    final body = response.body;
+    final contentType = response.headers['content-type'] ?? '';
 
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      return data;
-    } else {
-      throw Exception(data['message'] ?? 'Une erreur est survenue');
+    dynamic parsed;
+    final trimmed = body.trimLeft();
+    final looksLikeJson = trimmed.startsWith('{') || trimmed.startsWith('[');
+    final isJsonContentType = contentType.toLowerCase().contains('application/json');
+
+    if (body.isNotEmpty && (isJsonContentType || looksLikeJson)) {
+      try {
+        parsed = jsonDecode(body);
+      } catch (_) {
+        parsed = null;
+      }
     }
+
+    if (status >= 200 && status < 300) {
+      if (parsed == null) {
+        if (body.isEmpty) return <String, dynamic>{};
+        return <String, dynamic>{'raw': body};
+      }
+      if (parsed is Map<String, dynamic>) return parsed;
+      return <String, dynamic>{'data': parsed};
+    }
+
+    String message;
+    if (parsed is Map && parsed['message'] is String) {
+      message = parsed['message'] as String;
+    } else if (parsed is Map && parsed['error'] is String) {
+      message = parsed['error'] as String;
+    } else {
+      // HTML errors (ex: Express default 404) or plain text
+      final normalized = body.replaceAll(RegExp(r'\s+'), ' ').trim();
+      final preMatch = RegExp(r'<pre>(.*?)</pre>', caseSensitive: false)
+          .firstMatch(body)
+          ?.group(1)
+          ?.trim();
+      message = (preMatch != null && preMatch.isNotEmpty)
+          ? preMatch
+          : (normalized.isEmpty
+              ? 'Une erreur est survenue'
+              : (normalized.length > 200 ? normalized.substring(0, 200) + '…' : normalized));
+    }
+
+    throw Exception('HTTP $status: $message');
   }
 }
