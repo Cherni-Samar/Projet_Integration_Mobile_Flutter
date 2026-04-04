@@ -35,6 +35,26 @@ class HrAgentService {
         'error': e.toString()
       };
     }
+  }static Future<Map<String, dynamic>> getHistory({required String employeeId}) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/history/$employeeId'), // Vérifie que c'est bien ta route back
+      headers: {"Content-Type": "application/json"},
+    );
+    return jsonDecode(response.body);
+  }
+  static Future<Map<String, dynamic>> generateHeraDoc({
+    required String employeeId,
+    required String docType
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/generate-doc'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "employee_id": employeeId,
+        "doc_type": docType,
+      }),
+    );
+    return jsonDecode(response.body);
   }
 
   // ══════════════════════════════════════════════════════════════════════════

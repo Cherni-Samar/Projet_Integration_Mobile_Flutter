@@ -2,18 +2,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:vapi/vapi.dart';
 
-enum HeraVoiceStatus {
-  idle,
-  connecting,
-  listening,
-  speaking,
-  ended,
-  error,
-}
+enum HeraVoiceStatus { idle, connecting, listening, speaking, ended, error }
 
 class VapiService extends ChangeNotifier {
-  static const String publicKey = '39a7bfbe-4e8f-4e51-b7d8-ff1b96e57df0';
-  static const String assistantId = '575504d6-a203-40e8-b75d-e47f15c68091';
+  static const String publicKey = '6c5ea938-c1c0-4a59-826e-143cbaa8de53';
+  static const String assistantId = '7c6ac6cf-c5b1-45a8-9b7b-9655735e78f4';
 
   late final VapiClient _client;
   VapiCall? _call;
@@ -161,10 +154,7 @@ class VapiService extends ChangeNotifier {
 
       await _call!.send({
         'type': 'add-message',
-        'message': {
-          'role': 'user',
-          'content': text.trim(),
-        },
+        'message': {'role': 'user', 'content': text.trim()},
       });
     } catch (e) {
       _status = HeraVoiceStatus.error;

@@ -1,8 +1,9 @@
+import 'dart:convert';
+import 'package:characters/characters.dart';
 import 'api_service.dart';
-import 'api_config.dart';
 
 class EchoService {
-  static String get _baseUrl => ApiConfig.baseUrl;
+  static const String _baseUrl = 'http://10.0.2.2:3000';
 
   static Future<EchoResponse> sendTextMessage({
     required String message,
@@ -12,10 +13,7 @@ class EchoService {
     try {
       final response = await ApiService.post(
         endpoint: '$_baseUrl/api/echo/echo',
-        body: {
-          'message': message,
-          'sender': sender,
-        },
+        body: {'message': message, 'sender': sender},
         token: token,
       );
       return EchoResponse.fromJson(response);
@@ -78,6 +76,16 @@ class EchoService {
     }
   }
 
+  /// Réponses API considérées comme succès (selon implémentation backend).
+  static bool replySucceeded(Map<String, dynamic> response) {
+    final s = response['success'];
+    if (s == true || s == 1 || s == 'true') return true;
+    if (response['ok'] == true || response['saved'] == true) return true;
+    if (response['status'] == 'ok' || response['status'] == 'success')
+      return true;
+    return false;
+  }
+
   static Future<Map<String, dynamic>> replyToEmail({
     required String emailId,
     required String replyContent,
@@ -92,6 +100,31 @@ class EchoService {
       return response;
     } catch (e) {
       return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  static Future<ResponseSuggestionsResponse> getResponseSuggestions({
+    required String message,
+    required String sender,
+    Map<String, dynamic>? context,
+    Map<String, dynamic>? analysis,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/api/echo/response-suggestions',
+        body: {
+          'message': message,
+          'sender': sender,
+          'context': context ?? {},
+          'analysis': analysis,
+        },
+        token: token,
+      );
+      return ResponseSuggestionsResponse.fromJson(response);
+    } catch (e) {
+      print('❌ EchoService - getResponseSuggestions error: $e');
+      return ResponseSuggestionsResponse.error(e.toString());
     }
   }
 
@@ -154,18 +187,178 @@ class EchoService {
     final consonants = 'bcdfghjklmnpqrstvwxzBCDFGHJKLMNPQRSTVWXZ';
     int vowelCount = 0;
     int consonantCount = 0;
-    for (final rune in message.runes) {
-      final char = String.fromCharCode(rune);
-      if (vowels.contains(char)) {
+    for (var char in message.characters) {
+      if (vowels.contains(char))
         vowelCount++;
-      } else if (consonants.contains(char)) {
+      else if (consonants.contains(char))
         consonantCount++;
-      }
     }
     if (consonantCount > 0 && vowelCount / consonantCount < 0.2) {
       return false;
     }
     return true;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 📄 DOCUMENT MANAGEMENT METHODS
+  // ═══════════════════════════════════════════════════════════════
+
+  static Future<DocumentClassificationResponse> classifyDocument({
+    required String content,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/api/echo/classify-document',
+        body: {'content': content},
+        token: token,
+      );
+      return DocumentClassificationResponse.fromJson(response);
+    } catch (e) {
+      print('❌ EchoService - classifyDocument error: $e');
+      return DocumentClassificationResponse.error(e.toString());
+    }
+  }
+
+  static Future<Map<String, dynamic>> saveClassifiedDocument({
+    required String content,
+    required Map<String, dynamic> classification,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/api/echo/save-document',
+        body: {'content': content, 'classification': classification},
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - saveClassifiedDocument error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  static Future<DocumentListResponse> getDocumentsByCategory({
+    required String category,
+    String? confidentialityLevel,
+    String? token,
+  }) async {
+    try {
+      String endpoint = '$_baseUrl/api/echo/documents/$category';
+      if (confidentialityLevel != null) {
+        endpoint += '?confidentialityLevel=$confidentialityLevel';
+      }
+
+      final response = await ApiService.get(endpoint: endpoint, token: token);
+      return DocumentListResponse.fromJson(response);
+    } catch (e) {
+      print('❌ EchoService - getDocumentsByCategory error: $e');
+      return DocumentListResponse.error(e.toString());
+    }
+  }
+
+  static Future<DocumentContentResponse> getDocumentContent({
+    required String documentId,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.get(
+        endpoint: '$_baseUrl/api/echo/document-content/$documentId',
+        token: token,
+      );
+      return DocumentContentResponse.fromJson(response);
+    } catch (e) {
+      print('❌ EchoService - getDocumentContent error: $e');
+      return DocumentContentResponse.error(e.toString());
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 📋 TASK MANAGEMENT METHODS
+  // ═══════════════════════════════════════════════════════════════
+
+  static Future<TaskExtractionResponse> extractAndSaveTasks({
+    required String message,
+    required String sender,
+    String? emailId,
+    String? subject,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/api/echo/extract-save-tasks',
+        body: {
+          'message': message,
+          'sender': sender,
+          'emailId': emailId,
+          'subject': subject,
+        },
+        token: token,
+      );
+      return TaskExtractionResponse.fromJson(response);
+    } catch (e) {
+      print('❌ EchoService - extractAndSaveTasks error: $e');
+      return TaskExtractionResponse.error(e.toString());
+    }
+  }
+
+  static Future<TaskListResponse> getTasks({
+    String? status,
+    String? category,
+    String? token,
+  }) async {
+    try {
+      Map<String, String> queryParams = {};
+      if (status != null) queryParams['status'] = status;
+      if (category != null) queryParams['category'] = category;
+
+      String endpoint = '$_baseUrl/api/echo/tasks';
+      if (queryParams.isNotEmpty) {
+        endpoint +=
+            '?' +
+            queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+      }
+
+      final response = await ApiService.get(endpoint: endpoint, token: token);
+      return TaskListResponse.fromJson(response);
+    } catch (e) {
+      print('❌ EchoService - getTasks error: $e');
+      return TaskListResponse.error(e.toString());
+    }
+  }
+
+  static Future<Map<String, dynamic>> updateTaskStatus({
+    required String taskId,
+    required String status,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.patch(
+        endpoint: '$_baseUrl/api/echo/tasks/$taskId/status',
+        body: {'status': status},
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - updateTaskStatus error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> deleteTask({
+    required String taskId,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.delete(
+        endpoint: '$_baseUrl/api/echo/tasks/$taskId',
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - deleteTask error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
   }
 }
 
@@ -219,16 +412,13 @@ class EchoResponse {
   String get formattedText {
     String text = '';
     if (summary != null) text += '📝 Resume\n$summary\n\n';
-    if (transcribedText != null) {
+    if (transcribedText != null)
       text += '🎤 Message transcrit\n$transcribedText\n\n';
-    }
     text += '⚠️ Urgent : ${isUrgent ? 'OUI' : 'NON'}\n';
     text += '⭐ Priorite : ${_getPriorityIcon()}\n\n';
     if (actions.isNotEmpty) {
       text += '✅ Actions a faire\n';
-      for (var action in actions) {
-        text += '   • $action\n';
-      }
+      for (var action in actions) text += '   • $action\n';
     }
     if (category != null) text += '\n📂 Categorie : $category';
     if (error != null) text += '❌ Erreur : $error';
@@ -357,7 +547,8 @@ class PendingItem {
       emailId: json['emailId'] ?? '',
       subject: json['subject'] ?? '',
       sender: json['sender'] ?? '',
-      scheduledAt: DateTime.tryParse(json['scheduledAt'] ?? '') ?? DateTime.now(),
+      scheduledAt:
+          DateTime.tryParse(json['scheduledAt'] ?? '') ?? DateTime.now(),
       remainingMinutes: (json['remainingMinutes'] ?? 0).toDouble(),
       willSendIn: json['willSendIn'] ?? '',
     );
@@ -498,12 +689,78 @@ class StatsResponse {
     this.error,
   });
 
+  static int _readInt(dynamic v) {
+    if (v == null) return 0;
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v.toString()) ?? 0;
+  }
+
+  static int _pickInt(Map<String, dynamic>? m, List<String> keys) {
+    if (m == null) return 0;
+    for (final k in keys) {
+      if (m.containsKey(k) && m[k] != null) return _readInt(m[k]);
+    }
+    return 0;
+  }
+
+  /// Accepte plusieurs formes JSON (stats imbriquées, clés à la racine, snake_case).
   factory StatsResponse.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic>? asMap(dynamic x) =>
+        x is Map<String, dynamic> ? x : null;
+
+    final stats = asMap(json['stats']);
+    final data = asMap(json['data']);
+    const totalKeys = [
+      'totalProcessed',
+      'total_processed',
+      'messagesProcessed',
+      'messages_processed',
+      'processed',
+      'handled',
+    ];
+    const spamKeys = ['spamBlocked', 'spam_blocked', 'spam', 'blockedSpam'];
+
+    double readUptime(Map<String, dynamic>? m) {
+      if (m == null) return 0;
+      for (final k in ['uptime', 'uptimeSeconds', 'uptime_seconds']) {
+        final v = m[k];
+        if (v == null) continue;
+        if (v is num) return v.toDouble();
+        return double.tryParse(v.toString()) ?? 0;
+      }
+      return 0;
+    }
+
+    int total = _pickInt(stats, totalKeys);
+    int spam = _pickInt(stats, spamKeys);
+    double up = readUptime(stats);
+
+    if (total == 0) total = _pickInt(json, totalKeys);
+    if (spam == 0) spam = _pickInt(json, spamKeys);
+    if (up == 0) up = readUptime(json);
+
+    if (data != null) {
+      if (total == 0) total = _pickInt(data, totalKeys);
+      if (spam == 0) spam = _pickInt(data, spamKeys);
+      if (up == 0) up = readUptime(data);
+    }
+
+    final explicitFailure = json['success'] == false;
+    final ok =
+        !explicitFailure &&
+        (json['success'] == true ||
+            stats != null ||
+            data != null ||
+            json.keys.any(
+              (k) => totalKeys.contains(k) || spamKeys.contains(k),
+            ));
+
     return StatsResponse(
-      success: json['success'] ?? false,
-      totalProcessed: json['stats']?['totalProcessed'] ?? 0,
-      spamBlocked: json['stats']?['spamBlocked'] ?? 0,
-      uptime: (json['stats']?['uptime'] ?? 0).toDouble(),
+      success: ok,
+      totalProcessed: total,
+      spamBlocked: spam,
+      uptime: up,
       error: null,
     );
   }
@@ -591,5 +848,502 @@ class HistoryItem {
       timestamp: json['timestamp'] ?? '',
       isSpam: json['isSpam'] ?? false,
     );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📄 DOCUMENT MANAGEMENT RESPONSE CLASSES
+// ═══════════════════════════════════════════════════════════════
+
+class DocumentClassificationResponse {
+  final bool success;
+  final DocumentClassification? classification;
+  final String? error;
+
+  DocumentClassificationResponse({
+    required this.success,
+    this.classification,
+    this.error,
+  });
+
+  factory DocumentClassificationResponse.fromJson(Map<String, dynamic> json) {
+    return DocumentClassificationResponse(
+      success: json['success'] ?? false,
+      classification: json['classification'] != null
+          ? DocumentClassification.fromJson(json['classification'])
+          : null,
+      error: json['error'],
+    );
+  }
+
+  factory DocumentClassificationResponse.error(String message) {
+    return DocumentClassificationResponse(success: false, error: message);
+  }
+}
+
+class DocumentClassification {
+  final String category;
+  final String confidentialityLevel;
+  final String summary;
+  final List<String> keyTopics;
+  final String documentType;
+  final String urgency;
+  final double confidence;
+
+  DocumentClassification({
+    required this.category,
+    required this.confidentialityLevel,
+    required this.summary,
+    required this.keyTopics,
+    required this.documentType,
+    required this.urgency,
+    required this.confidence,
+  });
+
+  factory DocumentClassification.fromJson(Map<String, dynamic> json) {
+    return DocumentClassification(
+      category: json['category'] ?? '',
+      confidentialityLevel: json['confidentialityLevel'] ?? '',
+      summary: json['summary'] ?? '',
+      keyTopics: List<String>.from(json['keyTopics'] ?? []),
+      documentType: json['documentType'] ?? '',
+      urgency: json['urgency'] ?? '',
+      confidence: (json['confidence'] ?? 0).toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'category': category,
+      'confidentialityLevel': confidentialityLevel,
+      'summary': summary,
+      'keyTopics': keyTopics,
+      'documentType': documentType,
+      'urgency': urgency,
+      'confidence': confidence,
+    };
+  }
+}
+
+class DocumentListResponse {
+  final bool success;
+  final List<DocumentItem> documents;
+  final String? error;
+
+  DocumentListResponse({
+    required this.success,
+    required this.documents,
+    this.error,
+  });
+
+  factory DocumentListResponse.fromJson(Map<String, dynamic> json) {
+    final documentList = <DocumentItem>[];
+    if (json['documents'] != null) {
+      for (var item in json['documents']) {
+        documentList.add(DocumentItem.fromJson(item));
+      }
+    }
+    return DocumentListResponse(
+      success: json['success'] ?? false,
+      documents: documentList,
+      error: json['error'],
+    );
+  }
+
+  factory DocumentListResponse.error(String message) {
+    return DocumentListResponse(success: false, documents: [], error: message);
+  }
+}
+
+class DocumentItem {
+  final String id;
+  final String name;
+  final String category;
+  final String confidentialityLevel;
+  final String summary;
+  final List<String> keyTopics;
+  final String documentType;
+  final String urgency;
+  final DateTime createdAt;
+  final int size;
+
+  DocumentItem({
+    required this.id,
+    required this.name,
+    required this.category,
+    required this.confidentialityLevel,
+    required this.summary,
+    required this.keyTopics,
+    required this.documentType,
+    required this.urgency,
+    required this.createdAt,
+    required this.size,
+  });
+
+  factory DocumentItem.fromJson(Map<String, dynamic> json) {
+    return DocumentItem(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      category: json['category'] ?? '',
+      confidentialityLevel: json['confidentialityLevel'] ?? '',
+      summary: json['summary'] ?? '',
+      keyTopics: List<String>.from(json['keyTopics'] ?? []),
+      documentType: json['documentType'] ?? '',
+      urgency: json['urgency'] ?? '',
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      size: json['size'] ?? 0,
+    );
+  }
+}
+
+class DocumentContentResponse {
+  final bool success;
+  final DocumentContent? document;
+  final String? error;
+
+  DocumentContentResponse({required this.success, this.document, this.error});
+
+  factory DocumentContentResponse.fromJson(Map<String, dynamic> json) {
+    return DocumentContentResponse(
+      success: json['success'] ?? false,
+      document: json['document'] != null
+          ? DocumentContent.fromJson(json['document'])
+          : null,
+      error: json['error'],
+    );
+  }
+
+  factory DocumentContentResponse.error(String message) {
+    return DocumentContentResponse(success: false, error: message);
+  }
+}
+
+class DocumentContent {
+  final String id;
+  final String name;
+  final String content;
+  final String category;
+  final String confidentialityLevel;
+  final String summary;
+  final List<String> keyTopics;
+  final String documentType;
+  final String urgency;
+  final DateTime createdAt;
+  final int size;
+  final Map<String, dynamic>? metadata;
+
+  DocumentContent({
+    required this.id,
+    required this.name,
+    required this.content,
+    required this.category,
+    required this.confidentialityLevel,
+    required this.summary,
+    required this.keyTopics,
+    required this.documentType,
+    required this.urgency,
+    required this.createdAt,
+    required this.size,
+    this.metadata,
+  });
+
+  factory DocumentContent.fromJson(Map<String, dynamic> json) {
+    return DocumentContent(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      content: json['content'] ?? '',
+      category: json['category'] ?? '',
+      confidentialityLevel: json['confidentialityLevel'] ?? '',
+      summary: json['summary'] ?? '',
+      keyTopics: List<String>.from(json['keyTopics'] ?? []),
+      documentType: json['documentType'] ?? '',
+      urgency: json['urgency'] ?? '',
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      size: json['size'] ?? 0,
+      metadata: json['metadata'],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 💡 RESPONSE SUGGESTIONS CLASSES
+// ═══════════════════════════════════════════════════════════════
+
+class ResponseSuggestionsResponse {
+  final bool success;
+  final List<ResponseSuggestion> suggestions;
+  final String? error;
+
+  ResponseSuggestionsResponse({
+    required this.success,
+    required this.suggestions,
+    this.error,
+  });
+
+  factory ResponseSuggestionsResponse.fromJson(Map<String, dynamic> json) {
+    return ResponseSuggestionsResponse(
+      success: json['success'] ?? false,
+      suggestions: json['suggestions'] != null
+          ? (json['suggestions'] as List)
+                .map((item) => ResponseSuggestion.fromJson(item))
+                .toList()
+          : [],
+      error: json['error'],
+    );
+  }
+
+  factory ResponseSuggestionsResponse.error(String message) {
+    return ResponseSuggestionsResponse(
+      success: false,
+      suggestions: [],
+      error: message,
+    );
+  }
+}
+
+class ResponseSuggestion {
+  final String type;
+  final String title;
+  final String content;
+
+  /// Catégorie métier (ex: congés, recrutement) si fournie par l’API.
+  final String? category;
+
+  ResponseSuggestion({
+    required this.type,
+    required this.title,
+    required this.content,
+    this.category,
+  });
+
+  factory ResponseSuggestion.fromJson(Map<String, dynamic> json) {
+    return ResponseSuggestion(
+      type: json['type'] ?? '',
+      title: json['title'] ?? '',
+      content: json['content'] ?? '',
+      category:
+          json['category'] as String? ?? json['messageCategory'] as String?,
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📋 TASK MANAGEMENT CLASSES
+// ═══════════════════════════════════════════════════════════════
+
+class TaskExtractionResponse {
+  final bool success;
+  final String message;
+  final List<TaskItem> tasks;
+  final int totalExtracted;
+  final double? confidence;
+  final String? error;
+
+  TaskExtractionResponse({
+    required this.success,
+    required this.message,
+    required this.tasks,
+    required this.totalExtracted,
+    this.confidence,
+    this.error,
+  });
+
+  factory TaskExtractionResponse.fromJson(Map<String, dynamic> json) {
+    return TaskExtractionResponse(
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      tasks: json['tasks'] != null
+          ? (json['tasks'] as List)
+                .map((item) => TaskItem.fromJson(item))
+                .toList()
+          : [],
+      totalExtracted: json['totalExtracted'] ?? 0,
+      confidence: json['confidence']?.toDouble(),
+      error: json['error'],
+    );
+  }
+
+  factory TaskExtractionResponse.error(String message) {
+    return TaskExtractionResponse(
+      success: false,
+      message: '',
+      tasks: [],
+      totalExtracted: 0,
+      error: message,
+    );
+  }
+}
+
+class TaskListResponse {
+  final bool success;
+  final List<TaskItem> tasks;
+  final Map<String, List<TaskItem>> groupedTasks;
+  final List<TaskItem> overdueTasks;
+  final int totalTasks;
+  final TaskStats stats;
+  final String? error;
+
+  TaskListResponse({
+    required this.success,
+    required this.tasks,
+    required this.groupedTasks,
+    required this.overdueTasks,
+    required this.totalTasks,
+    required this.stats,
+    this.error,
+  });
+
+  factory TaskListResponse.fromJson(Map<String, dynamic> json) {
+    Map<String, List<TaskItem>> grouped = {};
+    if (json['groupedTasks'] != null) {
+      (json['groupedTasks'] as Map<String, dynamic>).forEach((key, value) {
+        grouped[key] = (value as List)
+            .map((item) => TaskItem.fromJson(item))
+            .toList();
+      });
+    }
+
+    return TaskListResponse(
+      success: json['success'] ?? false,
+      tasks: json['tasks'] != null
+          ? (json['tasks'] as List)
+                .map((item) => TaskItem.fromJson(item))
+                .toList()
+          : [],
+      groupedTasks: grouped,
+      overdueTasks: json['overdueTasks'] != null
+          ? (json['overdueTasks'] as List)
+                .map((item) => TaskItem.fromJson(item))
+                .toList()
+          : [],
+      totalTasks: json['totalTasks'] ?? 0,
+      stats: TaskStats.fromJson(json['stats'] ?? {}),
+      error: json['error'],
+    );
+  }
+
+  factory TaskListResponse.error(String message) {
+    return TaskListResponse(
+      success: false,
+      tasks: [],
+      groupedTasks: {},
+      overdueTasks: [],
+      totalTasks: 0,
+      stats: TaskStats.empty(),
+      error: message,
+    );
+  }
+}
+
+class TaskItem {
+  final String id;
+  final String title;
+  final String description;
+  final String? assignee;
+  final DateTime? deadline;
+  final String category;
+  final String priority;
+  final String status;
+  final double confidence;
+  final TaskExtractedFrom? extractedFrom;
+  final String? notes;
+  final DateTime createdAt;
+  final DateTime? completedAt;
+
+  TaskItem({
+    required this.id,
+    required this.title,
+    required this.description,
+    this.assignee,
+    this.deadline,
+    required this.category,
+    required this.priority,
+    required this.status,
+    required this.confidence,
+    this.extractedFrom,
+    this.notes,
+    required this.createdAt,
+    this.completedAt,
+  });
+
+  factory TaskItem.fromJson(Map<String, dynamic> json) {
+    return TaskItem(
+      id: json['_id'] ?? json['id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      assignee: json['assignee'],
+      deadline: json['deadline'] != null
+          ? DateTime.tryParse(json['deadline'])
+          : null,
+      category: json['category'] ?? 'other',
+      priority: json['priority'] ?? 'medium',
+      status: json['status'] ?? 'todo',
+      confidence: (json['confidence'] ?? 0.5).toDouble(),
+      extractedFrom: json['extractedFrom'] != null
+          ? TaskExtractedFrom.fromJson(json['extractedFrom'])
+          : null,
+      notes: json['notes'],
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      completedAt: json['completedAt'] != null
+          ? DateTime.tryParse(json['completedAt'])
+          : null,
+    );
+  }
+
+  bool get isOverdue {
+    return deadline != null &&
+        deadline!.isBefore(DateTime.now()) &&
+        status != 'completed';
+  }
+}
+
+class TaskExtractedFrom {
+  final String? emailId;
+  final String? sender;
+  final String? subject;
+  final DateTime extractedAt;
+
+  TaskExtractedFrom({
+    this.emailId,
+    this.sender,
+    this.subject,
+    required this.extractedAt,
+  });
+
+  factory TaskExtractedFrom.fromJson(Map<String, dynamic> json) {
+    return TaskExtractedFrom(
+      emailId: json['emailId'],
+      sender: json['sender'],
+      subject: json['subject'],
+      extractedAt:
+          DateTime.tryParse(json['extractedAt'] ?? '') ?? DateTime.now(),
+    );
+  }
+}
+
+class TaskStats {
+  final int todo;
+  final int inProgress;
+  final int completed;
+  final int overdue;
+
+  TaskStats({
+    required this.todo,
+    required this.inProgress,
+    required this.completed,
+    required this.overdue,
+  });
+
+  factory TaskStats.fromJson(Map<String, dynamic> json) {
+    return TaskStats(
+      todo: json['todo'] ?? 0,
+      inProgress: json['in_progress'] ?? 0,
+      completed: json['completed'] ?? 0,
+      overdue: json['overdue'] ?? 0,
+    );
+  }
+
+  factory TaskStats.empty() {
+    return TaskStats(todo: 0, inProgress: 0, completed: 0, overdue: 0);
   }
 }
