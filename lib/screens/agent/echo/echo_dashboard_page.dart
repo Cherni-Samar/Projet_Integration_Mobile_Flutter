@@ -414,7 +414,6 @@ class _EchoDashboardPageState extends State<EchoDashboardPage>
   Widget _buildProfileHeader(bool isDark) {
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -433,95 +432,137 @@ class _EchoDashboardPageState extends State<EchoDashboardPage>
           ),
         ],
       ),
-      child: Row(
+      child: Stack(
         children: [
-          // Echo Avatar
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: Image.asset(
-                'assets/images/voxi.png',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.purple.shade300, Colors.purple.shade600],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Icon(
-                      Icons.psychology,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-          
-          // Echo Info
-          Expanded(
-            child: Column(
+          Padding(
+            padding: const EdgeInsets.fromLTRB(56, 10, 20, 20),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Echo Dashboard',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
+                // Echo Avatar
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.asset(
+                      'assets/images/voxi.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.purple.shade300, Colors.purple.shade600],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(
+                            Icons.psychology,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Message Analysis Agent',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
+                const SizedBox(width: 16),
+
+                // Echo Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Echo Dashboard',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Message Analysis Agent',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.circle, color: Colors.greenAccent, size: 8),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Active',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Row(
+
+                // Action Buttons
+                Column(
                   children: [
+                    // Send to Hera Button
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.circle, color: Colors.greenAccent, size: 8),
-                          SizedBox(width: 4),
-                          Text(
-                            'Active',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AgentCommunicationScreen(
+                                token: widget.token,
+                                fromAgent: 'echo',
+                              ),
                             ),
-                          ),
-                        ],
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.send,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                        tooltip: 'Envoyer à Hera',
                       ),
                     ),
                   ],
@@ -529,39 +570,30 @@ class _EchoDashboardPageState extends State<EchoDashboardPage>
               ],
             ),
           ),
-          
-          // Action Buttons
-          Column(
-            children: [
-              // Send to Hera Button
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
+          Positioned(
+            top: 10,
+            left: 10,
+            child: SafeArea(
+              top: false,
+              bottom: false,
+              left: false,
+              right: false,
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: Colors.black26,
                 child: IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AgentCommunicationScreen(
-                          token: widget.token,
-                          fromAgent: 'echo',
-                        ),
-                      ),
-                    );
-                  },
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                   icon: const Icon(
-                    Icons.send,
+                    Icons.arrow_back_ios_new,
                     color: Colors.white,
-                    size: 22,
+                    size: 18,
                   ),
-                  tooltip: 'Envoyer à Hera',
+                  onPressed: () => Navigator.of(context).pop(),
+                  tooltip: 'Retour',
                 ),
               ),
-            ],
+            ),
           ),
         ],
       ),

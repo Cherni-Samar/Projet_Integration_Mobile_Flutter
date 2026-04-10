@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' as math;
 import '../../l10n/app_localizations.dart';
 
@@ -16,6 +17,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
   late AnimationController _pulseController;
   double _slidePosition = 0.0;
   bool _isSliding = false;
+  bool _isNavigating = false;
 
   @override
   void initState() {
@@ -32,16 +34,26 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
     super.dispose();
   }
 
-  void _startChatbot() {
-    Navigator.pushReplacementNamed(
-      context,
-      '/onboarding-chatbot',
-      arguments: {'email': widget.email},
-    );
+  Future<void> _startChatbot() async {
+    if (_isNavigating) return;
+    _isNavigating = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasSeenOnboarding', true);
+
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
-  void _skipToMarketplace() {
-    Navigator.pushReplacementNamed(context, '/agent-marketplace');
+  Future<void> _skipToMarketplace() async {
+    if (_isNavigating) return;
+    _isNavigating = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasSeenOnboarding', true);
+
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override
