@@ -7,6 +7,7 @@ import '../../services/stripe_service.dart';
 import 'agent_chat_page.dart';
 import 'hr/hr_dashboard_page.dart';
 import 'echo/echo_dashboard_page.dart';
+import 'finance/kash_dashboard_screen.dart';
 //import 'dexo_agent_page.dart';
 
 class MyAgentsPage extends StatelessWidget {
@@ -399,7 +400,18 @@ class MyAgentsPage extends StatelessWidget {
                       return;
                     }*/
 
-                    // ✅ Pour les autres agents (Timo, Kash, etc.)
+                    // ✅ Pour Kash
+                    if (id == 'kash') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const KashDashboardScreen(),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Pour les autres agents (Timo, etc.)
                     Navigator.push(
                       context,
                       MaterialPageRoute(
