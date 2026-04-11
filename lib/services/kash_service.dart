@@ -189,6 +189,8 @@ class KashService {
         'currency': data['currency'] ?? 'TND',
         'dueDate': data['dueDate'].toString(),
         'notes': data['notes'] ?? '',
+        'category': data['category'] ?? 'Other',
+        'vendor': data['vendor'] ?? '',
       };
 
       final response = await ApiService.post(
