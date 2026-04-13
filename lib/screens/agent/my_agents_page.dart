@@ -8,7 +8,8 @@ import 'agent_chat_page.dart';
 import 'hr/hr_dashboard_page.dart';
 import 'echo/echo_dashboard_page.dart';
 import 'finance/kash_dashboard_screen.dart';
-//import 'dexo_agent_page.dart';
+import 'timo/timo_dashboard_page.dart';
+import 'dexo/dexo_agent_page.dart';
 
 class MyAgentsPage extends StatelessWidget {
   const MyAgentsPage({Key? key}) : super(key: key);
@@ -390,15 +391,15 @@ class MyAgentsPage extends StatelessWidget {
                     }
 
                     // ✅ Pour Dexo
-                    /* if (id == 'dexo') {
+                    if (id == 'dexo') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const DexoAgentPage(),
+                          builder: (_) => const DexoDashboardPage(),
                         ),
                       );
                       return;
-                    }*/
+                    }
 
                     // ✅ Pour Kash
                     if (id == 'kash') {
@@ -406,6 +407,17 @@ class MyAgentsPage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const KashDashboardScreen(),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Pour Timo
+                    if (id == 'timo') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const TimoDashboardPage(),
                         ),
                       );
                       return;

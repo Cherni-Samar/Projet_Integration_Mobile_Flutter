@@ -8,6 +8,8 @@ import '../../providers/user_provider.dart';
 import '../../services/hr_agent_service.dart';
 import '../../screens/agent/hr/hr_dashboard_page.dart';
 import '../../screens/agent/finance/kash_dashboard_screen.dart';
+import '../../screens/agent/timo/timo_dashboard_page.dart';
+import '../../screens/agent/dexo/dexo_agent_page.dart';
 
 class AgentDetailsPage extends StatefulWidget {
   // ✅ Legacy single agent (optionnel)
@@ -1158,7 +1160,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     final agentId = name.trim().toLowerCase();
     final isHera = agentId == 'hera';
     final isKash = agentId == 'kash';
-    final canOpenDashboard = (isHera || isKash) && isActive;
+    final isTimo = agentId == 'timo';
+    final isDexo = agentId == 'dexo';
+    final canOpenDashboard = (isHera || isKash || isTimo || isDexo) && isActive;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1179,6 +1183,20 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                   context,
                   MaterialPageRoute(
                     builder: (_) => const KashDashboardScreen(),
+                  ),
+                );
+              } else if (isTimo) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const TimoDashboardPage(),
+                  ),
+                );
+              } else if (isDexo) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const DexoDashboardPage(),
                   ),
                 );
               }

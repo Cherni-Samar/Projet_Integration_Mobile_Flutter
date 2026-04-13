@@ -58,6 +58,12 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       ]);
 
       _calculateMetrics();
+      
+      // Update energy balance on refresh
+      if (mounted) {
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        await userProvider.refreshUser();
+      }
     } catch (e) {
       setState(() {
         _errorMessage = 'Error loading dashboard: $e';
@@ -146,6 +152,25 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     });
   }
 
+  /// Get combined list of categories: budget projects first, then standard categories
+  /// Removes duplicates automatically
+  List<String> _getCombinedCategories() {
+    final categories = <String>{};
+    
+    // Add budget project names first
+    for (var budget in _budgets) {
+      final project = budget['project'] as String?;
+      if (project != null && project.isNotEmpty) {
+        categories.add(project);
+      }
+    }
+    
+    // Add standard categories
+    categories.addAll(['SaaS', 'Marketing', 'Travel', 'Office', 'Salaries', 'Other']);
+    
+    return categories.toList();
+  }
+
   Future<void> _markReminderPaid(String reminderId) async {
     try {
       final updatedReminder =
@@ -181,6 +206,10 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
             backgroundColor: Colors.green,
           ),
         );
+        _loadDashboardData();
+        // Update energy balance after reminder is paid
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        await userProvider.refreshUser();
       }
     } catch (e) {
       if (mounted) {
@@ -265,7 +294,10 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                       );
                       if (mounted) {
                         Navigator.pop(context);
-                        _loadBudgets();
+                        _loadDashboardData();
+                        // Update energy balance after budget is added
+                        final userProvider = Provider.of<UserProvider>(context, listen: false);
+                        await userProvider.refreshUser();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('✅ Budget added'),
@@ -433,7 +465,10 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                         });
                         if (mounted) {
                           Navigator.pop(context);
-                          _loadReminders();
+                          _loadDashboardData();
+                          // Update energy balance after reminder is created
+                          final userProvider = Provider.of<UserProvider>(context, listen: false);
+                          await userProvider.refreshUser();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('✅ Reminder created'),
@@ -468,7 +503,8 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     final amountController = TextEditingController();
     final descriptionController = TextEditingController();
     String selectedCurrency = 'TND';
-    String selectedCategory = 'Other';
+    final combinedCategories = _getCombinedCategories();
+    String selectedCategory = combinedCategories.isNotEmpty ? combinedCategories.first : 'Other';
     DateTime selectedDate = DateTime.now();
 
     showModalBottomSheet(
@@ -536,16 +572,15 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
               DropdownButtonFormField<String>(
                 value: selectedCategory,
                 decoration: InputDecoration(
-                  labelText: 'Category',
+                  labelText: 'Category / Budget Project',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                items: ['SaaS', 'Marketing', 'Travel', 'Office', 'Salaries', 'Other']
-                    .map((cat) {
+                items: combinedCategories.map((category) {
                   return DropdownMenuItem(
-                    value: cat,
-                    child: Text(cat),
+                    value: category,
+                    child: Text(category),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -626,7 +661,10 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                         });
                         if (mounted) {
                           Navigator.pop(context);
-                          _loadExpenses();
+                          _loadDashboardData();
+                          // Update energy balance after expense is added
+                          final userProvider = Provider.of<UserProvider>(context, listen: false);
+                          await userProvider.refreshUser();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('✅ Expense added'),
@@ -663,19 +701,22 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      body: Column(
-        children: [
-          // Professional Header
-          _buildProfileHeader(energyBalance, isDark),
-          
-          // Tab Navigation
-          _buildTabNavigation(isDark),
-          
-          // Content
-          Expanded(
-            child: _buildTabContent(isDark),
-          ),
-        ],
+      body: RefreshIndicator(
+        onRefresh: _loadDashboardData,
+        child: Column(
+          children: [
+            // Professional Header
+            _buildProfileHeader(energyBalance, isDark),
+            
+            // Tab Navigation
+            _buildTabNavigation(isDark),
+            
+            // Content
+            Expanded(
+              child: _buildTabContent(isDark),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -890,6 +931,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
 
   Widget _buildOverviewTab(bool isDark) {
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -973,6 +1015,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
 
   Widget _buildExpensesTab(bool isDark) {
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1007,6 +1050,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
 
   Widget _buildBudgetsTab(bool isDark) {
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1041,6 +1085,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
 
   Widget _buildRemindersTab(bool isDark) {
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
