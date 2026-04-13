@@ -4,7 +4,10 @@ import '../../../services/hr_agent_service.dart';
 
 class HeraHistoryPage extends StatefulWidget {
   final bool isDark;
-  const HeraHistoryPage({super.key, required this.isDark});
+  final List<Map<String, dynamic>>? actions; // ✅ AJOUTE CETTE LIGNE
+
+  // ✅ MODIFIE LE CONSTRUCTEUR ICI
+  const HeraHistoryPage({super.key, required this.isDark, this.actions});
 
   @override
   State<HeraHistoryPage> createState() => _HeraHistoryPageState();
@@ -20,9 +23,14 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
   @override
   void initState() {
     super.initState();
-    _loadActions();
+    // ✅ MODIFICATION ICI
+    if (widget.actions != null && widget.actions!.isNotEmpty) {
+      _actions = List<Map<String, dynamic>>.from(widget.actions!);
+      _loading = false;
+    } else {
+      _loadActions();
+    }
   }
-
   /// Extrait l'ID MongoDB qu'il soit String ou Map {"$oid": "xxx"}
   String? _extractId(dynamic id) {
     if (id == null) return null;

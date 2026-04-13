@@ -1,3 +1,4 @@
+// screens/agent/echo/echo_analysis_card.dart
 import 'package:flutter/material.dart';
 import '../../../services/echo_service.dart';
 
@@ -22,6 +23,7 @@ class EchoAnalysisCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // En-tête avec priorité
           Row(
             children: [
               _buildPriorityBadge(),
@@ -30,6 +32,8 @@ class EchoAnalysisCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
+
+          // Résumé
           if (analysis.summary != null) ...[
             const Text(
               '📝 Résumé',
@@ -42,6 +46,8 @@ class EchoAnalysisCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
           ],
+
+          // Message transcrit (pour vocal)
           if (analysis.transcribedText != null) ...[
             const Text(
               '🎤 Message transcrit',
@@ -56,36 +62,37 @@ class EchoAnalysisCard extends StatelessWidget {
               ),
               child: Text(
                 analysis.transcribedText!,
-                style:
-                    const TextStyle(fontSize: 13, fontStyle: FontStyle.italic),
+                style: const TextStyle(fontSize: 13, fontStyle: FontStyle.italic),
               ),
             ),
             const SizedBox(height: 12),
           ],
+
+          // Actions à faire
           if (analysis.actions.isNotEmpty) ...[
             const Text(
               '✅ Actions à faire',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             ),
             const SizedBox(height: 8),
-            ...analysis.actions.map(
-              (action) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('• ', style: TextStyle(fontSize: 14)),
-                    Expanded(
-                      child: Text(
-                        action,
-                        style: const TextStyle(fontSize: 13),
-                      ),
+            ...analysis.actions.map((action) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('• ', style: TextStyle(fontSize: 14)),
+                  Expanded(
+                    child: Text(
+                      action,
+                      style: const TextStyle(fontSize: 13),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
+            )),
           ],
+
+          // Catégorie
           if (analysis.category != null) ...[
             const SizedBox(height: 8),
             Chip(

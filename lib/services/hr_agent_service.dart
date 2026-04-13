@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'api_config.dart';
+import 'auth_service.dart';
+import 'api_service.dart';
 
 class HrAgentService {
   // ══════════════════════════════════════════════════════════════════════════
   // Configuration
   // ══════════════════════════════════════════════════════════════════════════
 
+  static final AuthService _authService = AuthService();
   static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
   // ══════════════════════════════════════════════════════════════════════════
   // Hello
@@ -34,6 +37,68 @@ class HrAgentService {
         'success': false,
         'error': e.toString()
       };
+    }
+  }static Future<Map<String, dynamic>> getHistory({required String employeeId}) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/history/$employeeId'), // Vérifie que c'est bien ta route back
+      headers: {"Content-Type": "application/json"},
+    );
+    return jsonDecode(response.body);
+  }
+  static Future<Map<String, dynamic>> generateHeraDoc({
+    required String employeeId,
+    required String docType
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/generate-doc'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "employee_id": employeeId,
+        "doc_type": docType,
+      }),
+    );
+    return jsonDecode(response.body);
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // TIMO - Get Inbox
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> getTimoInbox() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/api/timo/inbox'),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {"success": false, "message": "Failed to fetch Timo inbox"};
+      }
+    } catch (e) {
+      return {"success": false, "error": e.toString()};
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // Get All Candidates
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> getAllCandidates() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/candidates'),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {"success": false, "message": "Failed to fetch candidates"};
+      }
+    } catch (e) {
+      return {"success": false, "error": e.toString()};
     }
   }
 
@@ -397,6 +462,18 @@ class HrAgentService {
         'success': false,
         'error': e.toString()
       };
+    }
+  }
+
+  static Future<Map<String, dynamic>> getDexoCheckup() async {
+    try {
+      final token = await _authService.getToken();
+      return await ApiService.get(
+        endpoint: '${ApiConfig.baseUrl}/api/dexo/daily-checkup',
+        token: token,
+      );
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
     }
   }
 }
