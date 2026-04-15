@@ -21,7 +21,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
   bool _showOnlySpam = false;
   int _selectedTab = 0; // 0 = Recus, 1 = Envoyes, 2 = Documents
   String? _errorMessage;
-  
+
   // Document management
   final TextEditingController _documentController = TextEditingController();
   DocumentClassification? _currentClassification;
@@ -165,7 +165,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        
+
         // Clear the form
         _documentController.clear();
         setState(() {
@@ -818,10 +818,10 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
                         onPressed: _isClassifying ? null : _classifyDocument,
                         icon: _isClassifying
                             ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
                             : const Icon(Icons.auto_awesome),
                         label: Text(_isClassifying ? 'Classification...' : 'Classifier'),
                         style: ElevatedButton.styleFrom(
@@ -840,10 +840,10 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
                         onPressed: (_currentClassification != null && !_isSaving) ? _saveDocument : null,
                         icon: _isSaving
                             ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
                             : const Icon(Icons.save),
                         label: Text(_isSaving ? 'Sauvegarde...' : 'Sauvegarder'),
                         style: ElevatedButton.styleFrom(
@@ -861,7 +861,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
               ],
             ),
           ),
-          
+
           // Classification Results
           if (_currentClassification != null) ...[
             const SizedBox(height: 16),
@@ -925,9 +925,9 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
               ),
             ),
           ],
-          
+
           const SizedBox(height: 24),
-          
+
           // Document Categories Section
           const Text(
             '📂 Catégories de Documents',

@@ -1,15 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'api_config.dart';
-import 'auth_service.dart';
-import 'api_service.dart';
-
+import 'api_service.dart'; // Assure-toi que le nom du fichier est correct
 class HrAgentService {
   // ══════════════════════════════════════════════════════════════════════════
   // Configuration
   // ══════════════════════════════════════════════════════════════════════════
 
-  static final AuthService _authService = AuthService();
   static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
   // ══════════════════════════════════════════════════════════════════════════
   // Hello
@@ -59,49 +56,42 @@ class HrAgentService {
     );
     return jsonDecode(response.body);
   }
-
-  // ══════════════════════════════════════════════════════════════════════════
-  // TIMO - Get Inbox
-  // ══════════════════════════════════════════════════════════════════════════
-
+// Ajoute cette fonction dans ta classe HrAgentService
+  static Future<Map<String, dynamic>> getDexoCheckup() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/dexo-checkup'), // ✅ L'URL doit correspondre à ton back
+        headers: {"Content-Type": "application/json"},
+      );
+      return jsonDecode(response.body);
+    } catch (e) {
+      throw Exception("Erreur de connexion Dexo: $e");
+    }
+  }
+  static Future<Map<String, dynamic>> getAllCandidates() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/candidates'), // ✅ Vérifie que c'est bien /candidates
+      headers: {"Content-Type": "application/json"},
+    );
+    return jsonDecode(response.body);
+  }
+  // Ajoute cette fonction dans ta classe HrAgentService
   static Future<Map<String, dynamic>> getTimoInbox() async {
     try {
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/api/timo/inbox'),
+        Uri.parse('$baseUrl/admin/timo-inbox'), // ✅ La route que nous avons créée au back
         headers: {"Content-Type": "application/json"},
       );
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        return {"success": false, "message": "Failed to fetch Timo inbox"};
+        return {"success": false, "message": "Erreur serveur Timo"};
       }
     } catch (e) {
       return {"success": false, "error": e.toString()};
     }
   }
-
-  // ══════════════════════════════════════════════════════════════════════════
-  // Get All Candidates
-  // ══════════════════════════════════════════════════════════════════════════
-
-  static Future<Map<String, dynamic>> getAllCandidates() async {
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/candidates'),
-        headers: {"Content-Type": "application/json"},
-      );
-
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        return {"success": false, "message": "Failed to fetch candidates"};
-      }
-    } catch (e) {
-      return {"success": false, "error": e.toString()};
-    }
-  }
-
   // ══════════════════════════════════════════════════════════════════════════
   // Envoyer un email à Echo
   // ══════════════════════════════════════════════════════════════════════════
@@ -138,7 +128,7 @@ class HrAgentService {
       };
     }
   }
-  
+
   // ══════════════════════════════════════════════════════════════════════════
   // Leave Request
   // ══════════════════════════════════════════════════════════════════════════
@@ -464,16 +454,49 @@ class HrAgentService {
       };
     }
   }
+  // Dans lib/services/hr_agent_service.dart
 
-  static Future<Map<String, dynamic>> getDexoCheckup() async {
+  static Future<bool> requestDexoDoc(String employeeId, String docType) async {
     try {
-      final token = await _authService.getToken();
-      return await ApiService.get(
-        endpoint: '${ApiConfig.baseUrl}/api/dexo/daily-checkup',
-        token: token,
+      final response = await ApiService.post(
+        endpoint: 'http://10.0.2.2:3000/api/dexo/request-doc', // Remplace par ton URL
+        body: {
+          'employeeId': employeeId,
+          'docType': docType,
+        },
       );
+      return response['success'] == true;
     } catch (e) {
-      return {'success': false, 'error': e.toString()};
+      print("❌ Erreur Dexo Service: $e");
+      return false;
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // DEXO - Get Document Actions
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> getDocumentActions({int limit = 20}) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/document-actions?limit=$limit'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to load document actions',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
     }
   }
 }

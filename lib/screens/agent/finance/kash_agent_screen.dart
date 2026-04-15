@@ -37,6 +37,8 @@ class _KashAgentScreenState extends State<KashAgentScreen>
   _ExtractedExpense? _pendingExtraction;
   Uint8List? _pendingReceiptBytes;
 
+  int _selectedTab = 0; // 0 = Chat, 1 = Expenses (placeholder)
+
   @override
   void initState() {
     super.initState();
@@ -141,7 +143,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
       );
 
       final extractedJson =
-          (response['data']?['extracted'] as Map?)?.cast<String, dynamic>();
+      (response['data']?['extracted'] as Map?)?.cast<String, dynamic>();
       final newBalance = response['data']?['energyBalance'];
 
       if (newBalance is num) {
@@ -160,7 +162,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
           _KashMsg(
             fromUser: false,
             text:
-                'Analyse terminée.\nMontant: ${extracted.amount} ${extracted.currency}\nFournisseur: ${extracted.vendor}\nCatégorie: ${extracted.category}',
+            'Analyse terminée.\nMontant: ${extracted.amount} ${extracted.currency}\nFournisseur: ${extracted.vendor}\nCatégorie: ${extracted.category}',
           ),
         );
       });
@@ -200,7 +202,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
         const _KashMsg(
           fromUser: false,
           text:
-              "Pour analyser une dépense, appuie sur l'icône Photo et sélectionne un reçu.",
+          "Pour analyser une dépense, appuie sur l'icône Photo et sélectionne un reçu.",
         ),
       );
     });
@@ -260,8 +262,264 @@ class _KashAgentScreenState extends State<KashAgentScreen>
       body: SafeArea(
         child: Column(
           children: [
-            _Header(energy: energy),
+            // New Profile Header
+            _buildProfileHeader(energy),
 
+            // Tab Navigation
+            _buildTabNavigation(),
+
+            // Tab Content
+            Expanded(
+              child: _buildTabContent(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader(int energy) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            _volt.withOpacity(0.15),
+            _gold.withOpacity(0.15),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: _volt.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: _volt.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(56, 10, 20, 20),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Kash Avatar
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: _volt.withOpacity(0.3), width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.asset(
+                      'assets/images/kash.png',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [_volt.withOpacity(0.6), _gold.withOpacity(0.6)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(
+                            Icons.trending_up,
+                            color: Colors.black,
+                            size: 30,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+
+                // Kash Info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Kash Dashboard',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Financial Analysis Agent',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: _volt.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.circle, color: Colors.greenAccent, size: 8),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Active',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: _gold.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.bolt, size: 14, color: _gold),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '$energy',
+                                  style: const TextStyle(
+                                    color: _volt,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Verified Icon
+                const Icon(Icons.verified_rounded, color: _volt, size: 24),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 10,
+            left: 10,
+            child: SafeArea(
+              top: false,
+              bottom: false,
+              left: false,
+              right: false,
+              child: CircleAvatar(
+                radius: 18,
+                backgroundColor: Colors.black26,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                  tooltip: 'Retour',
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabNavigation() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF111511),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          _buildTabButton('💬 Discussion', 0),
+          _buildTabButton('💰 Statistiques', 1),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabButton(String title, int index) {
+    final isSelected = _selectedTab == index;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedTab = index),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? _volt.withOpacity(0.2)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: isSelected
+                  ? _volt
+                  : Colors.white70,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabContent() {
+    return IndexedStack(
+      index: _selectedTab,
+      children: [
+        // Chat Tab
+        Column(
+          children: [
             Expanded(
               child: ListView.builder(
                 controller: _scrollController,
@@ -309,100 +567,41 @@ class _KashAgentScreenState extends State<KashAgentScreen>
             ),
           ],
         ),
-      ),
-    );
-  }
-}
 
-class _Header extends StatelessWidget {
-  static const _volt = Color(0xFFCDFF00);
-  static const _gold = Color(0xFFFFD54F);
-
-  final int energy;
-
-  const _Header({required this.energy});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFF111511),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white.withOpacity(0.06)),
-              ),
-              child: const Icon(Icons.arrow_back, color: Colors.white70),
-            ),
-          ),
-          const SizedBox(width: 12),
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: const Color(0xFF111511),
-            child: ClipOval(
-              child: Image.asset(
-                'assets/images/kash.png',
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Kash',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 16,
-                  ),
+        // Statistics Tab (Placeholder)
+        SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Statistiques financières',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                Text(
-                  'Agent Financier',
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF111511),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: _volt.withOpacity(0.2)),
+                ),
+                child: const Text(
+                  'Les statistiques sont disponibles dans le tableau de bord Kash',
                   style: TextStyle(
                     color: Colors.white70,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
+                    fontSize: 14,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF111511),
-              borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: _volt.withOpacity(0.25)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.bolt, size: 16, color: _gold),
-                const SizedBox(width: 6),
-                Text(
-                  '$energy',
-                  style: const TextStyle(
-                    color: _volt,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -450,7 +649,7 @@ class _Composer extends StatelessWidget {
                 filled: true,
                 fillColor: const Color(0xFF111511),
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide(color: Colors.white.withOpacity(0.06)),
@@ -534,7 +733,7 @@ class _MessageBubble extends StatelessWidget {
             ),
             child: Column(
               crossAxisAlignment:
-                  fromUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              fromUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Text(
                   msg.text,

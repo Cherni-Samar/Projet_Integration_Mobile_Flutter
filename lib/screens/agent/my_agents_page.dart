@@ -211,10 +211,10 @@ class MyAgentsPage extends StatelessWidget {
   }
 
   Widget _buildAgentsList(
-    OwnedAgentsProvider owned,
-    bool isDark,
-    BuildContext context,
-  ) {
+      OwnedAgentsProvider owned,
+      bool isDark,
+      BuildContext context,
+      ) {
     final energyBalance = context.watch<UserProvider>().energyBalance;
     final activeCount = context.watch<OwnedAgentsProvider>().count;
 
@@ -383,7 +383,7 @@ class MyAgentsPage extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (_) => EchoDashboardPage(
                             token:
-                                null, // Temporaire, à remplacer par le vrai token plus tard
+                            null, // Temporaire, à remplacer par le vrai token plus tard
                           ),
                         ),
                       );
@@ -466,7 +466,7 @@ class MyAgentsPage extends StatelessWidget {
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         agent.displayName,

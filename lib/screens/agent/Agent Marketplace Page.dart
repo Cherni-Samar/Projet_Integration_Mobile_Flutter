@@ -10,6 +10,7 @@ import '../../l10n/app_localizations.dart';
 
 import '../../screens/agent/AgentDetails Page.dart';
 import '../../screens/agent/my_agents_page.dart';
+import '../../screens/agent/agent_inter_flow_page.dart';
 import '../../screens/pricing_page.dart';
 import '../auth/user_profile_page.dart';
 import '../../services/api_service.dart';
@@ -830,11 +831,21 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                 isDark,
               ),
             ),
-            _buildNavItem(
-              Icons.bar_chart_rounded,
-              l10n.agentMarketplaceNavStats,
-              false,
-              isDark,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AgentInterFlowPage(),
+                  ),
+                );
+              },
+              child: _buildNavItem(
+                Icons.bar_chart_rounded,
+                l10n.agentMarketplaceNavStats,
+                false,
+                isDark,
+              ),
             ),
             GestureDetector(
               onTap: () {

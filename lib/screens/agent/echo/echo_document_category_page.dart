@@ -24,7 +24,7 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
 
   final List<String> _confidentialityLevels = [
     'public',
-    'interne', 
+    'interne',
     'confidentiel',
     'critique'
   ];
@@ -119,7 +119,7 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                 ],
               ),
               const Divider(),
-              
+
               // Document Info
               Container(
                 padding: const EdgeInsets.all(12),
@@ -139,9 +139,9 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Summary
               if (document.summary.isNotEmpty) ...[
                 const Text('📝 Résumé:', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -149,7 +149,7 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                 Text(document.summary),
                 const SizedBox(height: 12),
               ],
-              
+
               // Key Topics
               if (document.keyTopics.isNotEmpty) ...[
                 const Text('🏷️ Sujets clés:', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -163,11 +163,11 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                 ),
                 const SizedBox(height: 12),
               ],
-              
+
               // Content
               const Text('📄 Contenu:', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              
+
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(12),
@@ -183,9 +183,9 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Actions
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -363,53 +363,53 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                 ],
               ),
             ),
-          
+
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _errorMessage != null
                 ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
-                        const SizedBox(height: 16),
-                        Text(_errorMessage!, style: TextStyle(color: Colors.grey[600])),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _loadDocuments,
-                          child: const Text('Réessayer'),
-                        ),
-                      ],
-                    ),
-                  )
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
+                  const SizedBox(height: 16),
+                  Text(_errorMessage!, style: TextStyle(color: Colors.grey[600])),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadDocuments,
+                    child: const Text('Réessayer'),
+                  ),
+                ],
+              ),
+            )
                 : _documents.isEmpty
                 ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(_getCategoryIcon(), size: 64, color: Colors.grey[400]),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Aucun document dans ${widget.category}',
-                          style: TextStyle(color: Colors.grey[500], fontSize: 16),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Les documents classifiés par Echo apparaîtront ici',
-                          style: TextStyle(color: Colors.grey[400], fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  )
-                : RefreshIndicator(
-                    onRefresh: _loadDocuments,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _documents.length,
-                      itemBuilder: (context, index) => _buildDocumentCard(_documents[index]),
-                    ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(_getCategoryIcon(), size: 64, color: Colors.grey[400]),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Aucun document dans ${widget.category}',
+                    style: TextStyle(color: Colors.grey[500], fontSize: 16),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Les documents classifiés par Echo apparaîtront ici',
+                    style: TextStyle(color: Colors.grey[400], fontSize: 14),
+                  ),
+                ],
+              ),
+            )
+                : RefreshIndicator(
+              onRefresh: _loadDocuments,
+              child: ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: _documents.length,
+                itemBuilder: (context, index) => _buildDocumentCard(_documents[index]),
+              ),
+            ),
           ),
         ],
       ),
@@ -478,9 +478,9 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Summary
             if (document.summary.isNotEmpty) ...[
               Text(
@@ -494,7 +494,7 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
               ),
               const SizedBox(height: 12),
             ],
-            
+
             // Tags
             Wrap(
               spacing: 8,
@@ -527,7 +527,7 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                     ],
                   ),
                 ),
-                
+
                 // Document Type
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -544,7 +544,7 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                     ),
                   ),
                 ),
-                
+
                 // Urgency
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -572,7 +572,7 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                     ],
                   ),
                 ),
-                
+
                 // Size
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -591,7 +591,7 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                 ),
               ],
             ),
-            
+
             // Key Topics
             if (document.keyTopics.isNotEmpty) ...[
               const SizedBox(height: 8),
@@ -614,9 +614,9 @@ class _EchoDocumentCategoryPageState extends State<EchoDocumentCategoryPage> {
                 )).toList(),
               ),
             ],
-            
+
             const SizedBox(height: 8),
-            
+
             // View button
             Align(
               alignment: Alignment.centerRight,

@@ -105,7 +105,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get agentMarketplaceNavAgents => 'Agents';
 
   @override
-  String get agentMarketplaceNavStats => 'Stats';
+  String get agentMarketplaceNavStats => 'Logs';
 
   @override
   String get agentMarketplaceNavSettings => 'Settings';

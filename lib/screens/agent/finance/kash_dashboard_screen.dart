@@ -4,6 +4,26 @@ import 'package:intl/intl.dart';
 import '../../../providers/user_provider.dart';
 import '../../../services/kash_service.dart';
 
+// ─────────────────────────────────────────────────────────────
+//  PALETTE KASH - Teal/Green scheme matching Timo's design
+// ─────────────────────────────────────────────────────────────
+class KP {
+  static const primary   = Color(0xFF008B8B);  // Deep teal
+  static const primaryD  = Color(0xFF006666);  // Darker teal
+  static const accent    = Color(0xFF20B2AA); // Light sea green
+  static const success   = Color(0xFF10B981);
+  static const danger    = Color(0xFFEF4444);
+  static const warning   = Color(0xFFFB923C);
+
+  static Color bg(bool d)        => d ? const Color(0xFF0A0A0A) : const Color(0xFFF5F3F0);
+  static Color card(bool d)      => d ? const Color(0xFF141414) : Colors.white;
+  static Color cardSoft(bool d)  => d ? const Color(0xFF1C1C1C) : const Color(0xFFEEEBE7);
+  static Color border(bool d)    => d ? const Color(0xFF252525) : const Color(0xFFE0DBD4);
+  static Color text(bool d)      => d ? Colors.white            : const Color(0xFF1A1008);
+  static Color textMuted(bool d) => d ? const Color(0xFF777777) : const Color(0xFF8B7D6E);
+  static Color textSoft(bool d)  => d ? const Color(0xFF444444) : const Color(0xFFB5A99A);
+}
+
 class KashDashboardScreen extends StatefulWidget {
   const KashDashboardScreen({Key? key}) : super(key: key);
 
@@ -26,22 +46,41 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
   bool _loadingReminders = false;
   String _errorMessage = '';
   int _selectedTab = 0; // 0 = Overview, 1 = Expenses, 2 = Budgets, 3 = Reminders
+
   late AnimationController _fadeController;
+  late AnimationController _pulseController;
+  late AnimationController _glowController;
+
+  static const _tabs = [
+    (Icons.trending_up_rounded,      'Aperçu'),
+    (Icons.receipt_long_rounded,     'Dépenses'),
+    (Icons.account_balance_rounded,  'Budgets'),
+    (Icons.notifications_rounded,    'Paiements'),
+  ];
 
   @override
   void initState() {
     super.initState();
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 700),
       vsync: this,
-    );
-    _fadeController.forward();
+    )..forward();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+    _glowController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
     _loadDashboardData();
   }
 
   @override
   void dispose() {
     _fadeController.dispose();
+    _pulseController.dispose();
+    _glowController.dispose();
     super.dispose();
   }
 
@@ -698,159 +737,148 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final energyBalance = userProvider.user?.energyBalance ?? 0;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final d = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: _loadDashboardData,
-        child: Column(
-          children: [
-            // Professional Header
-            _buildProfileHeader(energyBalance, isDark),
-            
-            // Tab Navigation
-            _buildTabNavigation(isDark),
-            
-            // Content
-            Expanded(
-              child: _buildTabContent(isDark),
-            ),
-          ],
+      backgroundColor: KP.bg(d),
+      body: FadeTransition(
+        opacity: _fadeController,
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(d, energyBalance),
+              const SizedBox(height: 10),
+              _buildPillTabBar(d),
+              const SizedBox(height: 8),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _loadDashboardData,
+                  color: KP.primary,
+                  child: IndexedStack(
+                    index: _selectedTab,
+                    children: [
+                      _buildOverviewTab(d),
+                      _buildExpensesTab(d),
+                      _buildBudgetsTab(d),
+                      _buildRemindersTab(d),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildProfileHeader(int energyBalance, bool isDark) {
+  Widget _buildHeader(bool d, int energy) {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF00BCD4),
-            const Color(0xFF0097A7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF00BCD4).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: KP.card(d),
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: KP.border(d)),
       ),
-      child: Stack(
+      child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(56, 10, 20, 20),
-            child: Row(
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: d ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.07),
+              ),
+              child: Icon(Icons.arrow_back_ios_new_rounded, color: KP.text(d), size: 16),
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          AnimatedBuilder(
+            animation: _glowController,
+            builder: (_, child) => Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: KP.primary.withOpacity(0.25 + 0.2 * _glowController.value),
+                    blurRadius: 14 + 8 * _glowController.value,
+                  ),
+                ],
+              ),
+              child: child,
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(23),
+              child: Image.asset(
+                'assets/images/kash.png',
+                width: 46,
+                height: 46,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => CircleAvatar(
+                  backgroundColor: KP.primary,
+                  child: const Icon(Icons.account_balance_wallet, color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Kash Avatar
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.cyan.shade300, Colors.cyan.shade600],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(
-                        Icons.account_balance_wallet,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                    ),
+                Text(
+                  'Kash Dashboard',
+                  style: TextStyle(
+                    color: KP.text(d),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
-                const SizedBox(width: 16),
-
-                // Kash Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Kash Dashboard',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Financial Management Agent',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                Row(
+                  children: [
+                    AnimatedBuilder(
+                      animation: _pulseController,
+                      builder: (_, __) => Container(
+                        width: 7,
+                        height: 7,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '⚡ $energyBalance Energy',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          shape: BoxShape.circle,
+                          color: KP.primary.withOpacity(0.6 + 0.4 * _pulseController.value),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      'FINANCIAL MANAGEMENT',
+                      style: TextStyle(
+                        color: KP.primary,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          Positioned(
-            top: 10,
-            left: 10,
-            child: SafeArea(
-              top: false,
-              bottom: false,
-              left: false,
-              right: false,
-              child: CircleAvatar(
-                radius: 18,
-                backgroundColor: Colors.black26,
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
-                  tooltip: 'Back',
-                ),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+            decoration: BoxDecoration(
+              color: d ? Colors.white.withOpacity(0.07) : Colors.black.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '⚡ $energy',
+              style: TextStyle(
+                color: KP.text(d),
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
               ),
             ),
           ),
@@ -859,345 +887,418 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     );
   }
 
-  Widget _buildTabNavigation(bool isDark) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+  Widget _buildPillTabBar(bool d) => Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16),
+    padding: const EdgeInsets.all(4),
+    decoration: BoxDecoration(
+      color: KP.card(d),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: KP.border(d)),
+    ),
+    child: Row(
+      children: List.generate(_tabs.length, (i) {
+        final sel = _selectedTab == i;
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _selectedTab = i),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: sel ? KP.primary : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(_tabs[i].$1, size: 17, color: sel ? Colors.white : KP.textMuted(d)),
+                  const SizedBox(height: 3),
+                  Text(
+                    _tabs[i].$2,
+                    style: TextStyle(
+                      color: sel ? Colors.white : KP.textMuted(d),
+                      fontSize: 10,
+                      fontWeight: sel ? FontWeight.w800 : FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ],
+        );
+      }),
+    ),
+  );
+
+  Widget _buildOverviewTab(bool d) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+      children: [
+        _buildStatsPulse(d),
+        const SizedBox(height: 16),
+        _buildRecentExpenses(d),
+      ],
+    );
+  }
+
+  Widget _buildStatsPulse(bool d) {
+    final pct = _totalBudget > 0 ? (_totalSpent / _totalBudget).clamp(0.0, 1.0) : 0.0;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: KP.card(d),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: KP.border(d)),
       ),
-      child: Row(
+      child: Column(
         children: [
-          _buildTabButton('📊 Overview', 0, isDark),
-          _buildTabButton('💰 Expenses', 1, isDark),
-          _buildTabButton('💵 Budgets', 2, isDark),
-          _buildTabButton('🔔 Reminders', 3, isDark),
+          Row(
+            children: [
+              Expanded(
+                child: _statItem(
+                  _totalSpent.toStringAsFixed(2),
+                  'DÉPENSÉ',
+                  KP.danger,
+                  Icons.trending_down_rounded,
+                  d,
+                ),
+              ),
+              Container(width: 1, height: 50, color: KP.border(d)),
+              Expanded(
+                child: _statItem(
+                  _totalBudget.toStringAsFixed(2),
+                  'BUDGET',
+                  KP.primary,
+                  Icons.account_balance_rounded,
+                  d,
+                ),
+              ),
+              Container(width: 1, height: 50, color: KP.border(d)),
+              Expanded(
+                child: _statItem(
+                  '${_pendingReminders}',
+                  'PAIEMENTS',
+                  KP.warning,
+                  Icons.notifications_rounded,
+                  d,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Text('Utilisation du budget', style: TextStyle(color: KP.textMuted(d), fontSize: 11)),
+              const Spacer(),
+              Text(
+                '${(pct * 100).toStringAsFixed(0)}%',
+                style: TextStyle(
+                  color: pct > 0.8 ? KP.danger : KP.primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(99),
+            child: LinearProgressIndicator(
+              value: pct,
+              minHeight: 7,
+              backgroundColor: KP.cardSoft(d),
+              valueColor: AlwaysStoppedAnimation(pct > 0.8 ? KP.danger : KP.primary),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTabButton(String title, int index, bool isDark) {
-    final isSelected = _selectedTab == index;
-    
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedTab = index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: isSelected 
-                ? const Color(0xFF00BCD4)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
+  Widget _statItem(
+    String val,
+    String label,
+    Color color,
+    IconData icon,
+    bool d,
+  ) =>
+      Column(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 18),
           ),
-          child: Text(
-            title,
+          const SizedBox(height: 6),
+          Text(
+            val,
+            style: TextStyle(
+              color: KP.text(d),
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: isSelected 
-                  ? Colors.white
-                  : (isDark ? Colors.white70 : Colors.black54),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              fontSize: 12,
+              color: KP.textMuted(d),
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.4,
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTabContent(bool isDark) {
-    switch (_selectedTab) {
-      case 0:
-        return _buildOverviewTab(isDark);
-      case 1:
-        return _buildExpensesTab(isDark);
-      case 2:
-        return _buildBudgetsTab(isDark);
-      case 3:
-        return _buildRemindersTab(isDark);
-      default:
-        return _buildOverviewTab(isDark);
-    }
-  }
-
-  Widget _buildOverviewTab(bool isDark) {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Stats Cards Row 1
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  'Total Spent',
-                  '${_totalSpent.toStringAsFixed(2)} DT',
-                  Icons.trending_down,
-                  Colors.red,
-                  isDark,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatCard(
-                  'Total Budget',
-                  '${_totalBudget.toStringAsFixed(2)} DT',
-                  Icons.account_balance,
-                  Colors.blue,
-                  isDark,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          
-          // Stats Cards Row 2
-          Row(
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  'Budget Remaining',
-                  '${(_totalBudget - _totalSpent).toStringAsFixed(2)} DT',
-                  Icons.savings,
-                  Colors.green,
-                  isDark,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildStatCard(
-                  'This Month',
-                  '${_expensesThisMonth.toStringAsFixed(2)} DT',
-                  Icons.calendar_month,
-                  Colors.purple,
-                  isDark,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          
-          // Pending Reminders
-          _buildStatCard(
-            'Pending Payments',
-            _pendingReminders.toString(),
-            Icons.notifications,
-            Colors.orange,
-            isDark,
-          ),
-          
-          const SizedBox(height: 32),
-          
-          // Recent Expenses Section
-          _buildSectionHeader('Recent Expenses', isDark, _showAddExpenseSheet),
-          const SizedBox(height: 12),
-          if (_loadingExpenses)
-            const Center(child: CircularProgressIndicator())
-          else if (_expenses.isEmpty)
-            _buildEmptyState('No expenses yet', Icons.inbox, isDark)
-          else
-            ..._expenses.take(5).map((expense) => _buildExpenseCard(expense, isDark)),
         ],
-      ),
-    );
-  }
+      );
 
-  Widget _buildExpensesTab(bool isDark) {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'All Expenses',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              FloatingActionButton.small(
-                onPressed: _showAddExpenseSheet,
-                heroTag: 'add_expense',
-                child: const Icon(Icons.add),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (_loadingExpenses)
-            const Center(child: CircularProgressIndicator())
-          else if (_expenses.isEmpty)
-            _buildEmptyState('No expenses yet', Icons.inbox, isDark)
-          else
-            ..._expenses.map((expense) => _buildExpenseCard(expense, isDark)),
-        ],
-      ),
-    );
-  }
+  Widget _buildRecentExpenses(bool d) {
+    if (_loadingExpenses) return const Center(child: CircularProgressIndicator());
+    if (_expenses.isEmpty)
+      return _emptyState('Aucune dépense', Icons.inbox_rounded, d);
 
-  Widget _buildBudgetsTab(bool isDark) {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Budgets by Project',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'Dépenses récentes',
+              style: TextStyle(
+                color: KP.text(d),
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
               ),
-              FloatingActionButton.small(
-                onPressed: _showAddBudgetSheet,
-                heroTag: 'add_budget',
-                child: const Icon(Icons.add),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (_loadingBudgets)
-            const Center(child: CircularProgressIndicator())
-          else if (_budgets.isEmpty)
-            _buildEmptyState('No budgets yet', Icons.trending_up, isDark)
-          else
-            ..._budgets.map((budget) => _buildBudgetCard(budget, isDark)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRemindersTab(bool isDark) {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Payment Reminders',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              FloatingActionButton.small(
-                onPressed: _showAddReminderSheet,
-                heroTag: 'add_reminder',
-                child: const Icon(Icons.add),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          if (_loadingReminders)
-            const Center(child: CircularProgressIndicator())
-          else if (_reminders.isEmpty)
-            _buildEmptyState('No reminders yet', Icons.notifications_off, isDark)
-          else
-            ..._reminders.map((reminder) => _buildReminderCard(reminder, isDark)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, Color color, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
+            ),
+            const Spacer(),
+            GestureDetector(
+              onTap: _showAddExpenseSheet,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  color: KP.primary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Icon(icon, color: color, size: 20),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add_rounded, size: 13, color: KP.primary),
+                    const SizedBox(width: 5),
+                    const Text(
+                      'Ajouter',
+                      style: TextStyle(
+                        color: KP.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const Spacer(),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: isDark ? Colors.white60 : Colors.black54,
-            ),
-          ),
-        ],
-      ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        ..._expenses.take(5).map((e) => _buildExpenseCard(e, d)),
+      ],
     );
   }
 
-  Widget _buildExpenseCard(dynamic expense, bool isDark) {
+  Widget _buildExpensesTab(bool d) {
+    if (_loadingExpenses)
+      return const Center(child: CircularProgressIndicator());
+    if (_expenses.isEmpty)
+      return _emptyState('Aucune dépense', Icons.inbox_rounded, d);
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+      children: [
+        Row(
+          children: [
+            Text(
+              'Toutes les dépenses',
+              style: TextStyle(
+                color: KP.text(d),
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const Spacer(),
+            GestureDetector(
+              onTap: _showAddExpenseSheet,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  color: KP.primary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add_rounded, size: 13, color: KP.primary),
+                    const SizedBox(width: 5),
+                    const Text(
+                      'Ajouter',
+                      style: TextStyle(
+                        color: KP.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ..._expenses.map((e) => _buildExpenseCard(e, d)),
+      ],
+    );
+  }
+
+  Widget _buildBudgetsTab(bool d) {
+    if (_loadingBudgets)
+      return const Center(child: CircularProgressIndicator());
+    if (_budgets.isEmpty)
+      return _emptyState('Aucun budget', Icons.trending_up_rounded, d);
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+      children: [
+        Row(
+          children: [
+            Text(
+              'Budgets par projet',
+              style: TextStyle(
+                color: KP.text(d),
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const Spacer(),
+            GestureDetector(
+              onTap: _showAddBudgetSheet,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  color: KP.primary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add_rounded, size: 13, color: KP.primary),
+                    const SizedBox(width: 5),
+                    const Text(
+                      'Ajouter',
+                      style: TextStyle(
+                        color: KP.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ..._budgets.map((b) => _buildBudgetCard(b, d)),
+      ],
+    );
+  }
+
+  Widget _buildRemindersTab(bool d) {
+    if (_loadingReminders)
+      return const Center(child: CircularProgressIndicator());
+    if (_reminders.isEmpty)
+      return _emptyState('Aucun paiement', Icons.notifications_off_rounded, d);
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+      children: [
+        Row(
+          children: [
+            Text(
+              'Rappels de paiement',
+              style: TextStyle(
+                color: KP.text(d),
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const Spacer(),
+            GestureDetector(
+              onTap: _showAddReminderSheet,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  color: KP.primary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add_rounded, size: 13, color: KP.primary),
+                    const SizedBox(width: 5),
+                    const Text(
+                      'Ajouter',
+                      style: TextStyle(
+                        color: KP.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ..._reminders.map((r) => _buildReminderCard(r, d)),
+      ],
+    );
+  }
+
+  Widget _buildExpenseCard(dynamic expense, bool d) {
     final vendor = expense['vendor'] ?? 'Unknown';
     final amount = (expense['amount'] as num?)?.toDouble() ?? 0.0;
     final currency = expense['currency'] ?? 'TND';
     final category = expense['category'] ?? 'Other';
-    final date = expense['date'] != null
-        ? DateTime.parse(expense['date'].toString())
-        : DateTime.now();
+    final date =
+        expense['date'] != null ? DateTime.parse(expense['date'].toString()) : DateTime.now();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF252525) : Colors.grey.shade50,
-        border: Border.all(
-          color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-        ),
-        borderRadius: BorderRadius.circular(12),
+        color: KP.card(d),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: KP.border(d)),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 12,
-            height: 12,
+            width: 46,
+            height: 46,
             decoration: BoxDecoration(
+              color: _getCategoryColor(category).withOpacity(0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              Icons.receipt_long_rounded,
               color: _getCategoryColor(category),
-              borderRadius: BorderRadius.circular(4),
+              size: 22,
             ),
           ),
           const SizedBox(width: 12),
@@ -1207,52 +1308,65 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
               children: [
                 Text(
                   vendor,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+                  style: TextStyle(
+                    color: KP.text(d),
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  '${DateFormat('MMM dd, yyyy').format(date)} • $category',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isDark ? Colors.white60 : Colors.black54,
-                  ),
+                Row(
+                  children: [
+                    Icon(Icons.schedule_rounded, size: 12, color: KP.textMuted(d)),
+                    const SizedBox(width: 4),
+                    Text(
+                      DateFormat('EEE dd MMM', 'fr_FR').format(date),
+                      style: TextStyle(color: KP.textMuted(d), fontSize: 11),
+                    ),
+                    const SizedBox(width: 8),
+                    Text('•', style: TextStyle(color: KP.textMuted(d))),
+                    const SizedBox(width: 8),
+                    Text(
+                      category,
+                      style: TextStyle(color: KP.textMuted(d), fontSize: 11),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          Text(
-            '$amount $currency',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '$amount $currency',
+                style: TextStyle(
+                  color: KP.danger,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBudgetCard(dynamic budget, bool isDark) {
+  Widget _buildBudgetCard(dynamic budget, bool d) {
     final project = budget['project'] ?? 'Unknown';
     final amount = (budget['amount'] as num?)?.toDouble() ?? 0.0;
     final spent = (budget['spent'] as num?)?.toDouble() ?? 0.0;
     final percentage = amount > 0 ? (spent / amount).clamp(0.0, 1.0) : 0.0;
-    final color = percentage > 0.8
-        ? Colors.red
-        : percentage > 0.5
-            ? Colors.orange
-            : Colors.green;
+    final color = percentage > 0.8 ? KP.danger : percentage > 0.5 ? KP.warning : KP.success;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF252525) : Colors.grey.shade50,
-        border: Border.all(
-          color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-        ),
-        borderRadius: BorderRadius.circular(12),
+        color: KP.card(d),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: KP.border(d)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1262,125 +1376,182 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
             children: [
               Text(
                 project,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+                style: TextStyle(
+                  color: KP.text(d),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15,
                 ),
               ),
-              Text(
-                '${(percentage * 100).toStringAsFixed(0)}%',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.bold,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '${(percentage * 100).toStringAsFixed(0)}%',
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(99),
             child: LinearProgressIndicator(
               value: percentage,
-              minHeight: 10,
-              backgroundColor: Colors.grey.withOpacity(0.3),
-              valueColor: AlwaysStoppedAnimation<Color>(color),
+              minHeight: 8,
+              backgroundColor: KP.cardSoft(d),
+              valueColor: AlwaysStoppedAnimation(color),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             '${spent.toStringAsFixed(2)} / ${amount.toStringAsFixed(2)} DT',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: isDark ? Colors.white60 : Colors.black54,
-            ),
+            style: TextStyle(color: KP.textMuted(d), fontSize: 11),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildReminderCard(dynamic reminder, bool isDark) {
+  Widget _buildReminderCard(dynamic reminder, bool d) {
     final title = reminder['title'] ?? 'Unnamed';
     final status = reminder['status'] ?? 'pending';
     final amount = (reminder['amount'] as num?)?.toDouble() ?? 0.0;
-    final dueDate = reminder['dueDate'] != null
-        ? DateTime.parse(reminder['dueDate'].toString())
-        : DateTime.now();
+    final dueDate =
+        reminder['dueDate'] != null ? DateTime.parse(reminder['dueDate'].toString()) : DateTime.now();
     final isOverdue = status == 'pending' && dueDate.isBefore(DateTime.now());
+    final reminderId = reminder['_id'] ?? reminder['id'];
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF252525) : Colors.grey.shade50,
+        color: KP.card(d),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+          color: isOverdue ? KP.danger.withOpacity(0.3) : KP.border(d),
         ),
-        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: isOverdue ? KP.danger.withOpacity(0.12) : KP.warning.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  isOverdue ? Icons.priority_high_rounded : Icons.notifications_rounded,
+                  color: isOverdue ? KP.danger : KP.warning,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                      style: TextStyle(
+                        color: status == 'paid' ? KP.textMuted(d) : KP.text(d),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 15,
+                        decoration: status == 'paid' ? TextDecoration.lineThrough : null,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '${amount.toStringAsFixed(2)} DT • ${DateFormat('MMM dd').format(dueDate)}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: isDark ? Colors.white60 : Colors.black54,
-                      ),
+                    Row(
+                      children: [
+                        Icon(Icons.schedule_rounded, size: 12, color: KP.textMuted(d)),
+                        const SizedBox(width: 4),
+                        Text(
+                          DateFormat('EEE dd MMM', 'fr_FR').format(dueDate),
+                          style: TextStyle(color: KP.textMuted(d), fontSize: 11),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isOverdue
-                      ? Colors.red.withOpacity(0.1)
-                      : status == 'paid'
-                          ? Colors.green.withOpacity(0.1)
-                          : Colors.orange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  isOverdue
-                      ? 'OVERDUE'
-                      : status == 'paid'
-                          ? 'PAID'
-                          : 'UPCOMING',
-                  style: TextStyle(
-                    color: isOverdue
-                        ? Colors.red
-                        : status == 'paid'
-                            ? Colors.green
-                            : Colors.orange,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '$amount DT',
+                    style: TextStyle(
+                      color: isOverdue ? KP.danger : KP.text(d),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 6),
+                  if (status != 'paid')
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: isOverdue ? KP.danger.withOpacity(0.12) : KP.warning.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        isOverdue ? 'RETARD' : 'À VENIR',
+                        style: TextStyle(
+                          color: isOverdue ? KP.danger : KP.warning,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: KP.success.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        'PAYÉ',
+                        style: TextStyle(
+                          color: KP.success,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
-          if (status != 'paid') ...[
+          if (status == 'pending') ...[
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => _markReminderPaid(reminder['_id'] ?? reminder['id']),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+              child: FilledButton(
+                onPressed: () => _markReminderPaid(reminderId),
+                style: FilledButton.styleFrom(
+                  backgroundColor: KP.primary,
                   foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                 ),
-                child: const Text('Mark Paid'),
+                child: const Text(
+                  'Mark as Paid',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                  ),
+                ),
               ),
             ),
           ],
@@ -1389,59 +1560,45 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     );
   }
 
-  Widget _buildSectionHeader(String title, bool isDark, VoidCallback onPressed) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _emptyState(String message, IconData icon, bool d) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
       children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
+        Container(
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: KP.card(d),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: KP.border(d)),
           ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: onPressed,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 48, color: KP.textSoft(d)),
+              const SizedBox(height: 16),
+              Text(
+                message,
+                style: TextStyle(
+                  color: KP.textMuted(d),
+                  fontSize: 15,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildEmptyState(String message, IconData icon, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF252525) : Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 48, color: Colors.grey),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: isDark ? Colors.white60 : Colors.black54,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Color _getCategoryColor(String category) {
     final colors = {
-      'SaaS': Colors.blue,
+      'SaaS': KP.accent,
       'Marketing': Colors.purple,
       'Travel': Colors.orange,
       'Office': Colors.green,
-      'Salaries': Colors.red,
-      'Other': Colors.grey,
+      'Salaries': KP.danger,
+      'Other': KP.textMuted(false),
     };
-    return colors[category] ?? Colors.grey;
+    return colors[category] ?? KP.primary;
   }
 }

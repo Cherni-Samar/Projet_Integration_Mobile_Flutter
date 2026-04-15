@@ -1003,9 +1003,9 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     );
   }
 
-  // ═════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════
   //  INDEX 4 — RADAR DENSITÉ DÉPARTEMENTS
-  // ═════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════
   Widget _buildStatsRadarView() {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),

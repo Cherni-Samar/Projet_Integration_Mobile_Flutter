@@ -192,7 +192,7 @@ class _HeraVoicePageState extends State<HeraVoicePage>
   @override
   Widget build(BuildContext context) {
     const bg = Color(0xFF050505);
-    const accent = Color(0xFFCCFF00);
+    const accent = Color(0xFFB57BFF); // Mauve Hera
     const textPrimary = Colors.white;
     final textSecondary = Colors.white.withOpacity(0.65);
     final isActive = _vapiService.isActive;
@@ -228,7 +228,7 @@ class _HeraVoicePageState extends State<HeraVoicePage>
                             child: const Text(
                               'Hera Voice',
                               style: TextStyle(
-                                color: Colors.black,
+                                color: Colors.white,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -294,59 +294,59 @@ class _HeraVoicePageState extends State<HeraVoicePage>
                           child: _messages.isEmpty
                               ? const SizedBox.shrink()
                               : Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.06),
-                                    borderRadius: BorderRadius.circular(22),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.05),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.06),
+                              borderRadius: BorderRadius.circular(22),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.05),
+                              ),
+                            ),
+                            child: ListView.builder(
+                              itemCount: _messages.length,
+                              itemBuilder: (context, index) {
+                                final msg = _messages[index];
+                                return Align(
+                                  alignment: msg.isUser
+                                      ? Alignment.centerRight
+                                      : Alignment.centerLeft,
+                                  child: Container(
+                                    margin: const EdgeInsets.only(
+                                      bottom: 10,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 10,
+                                    ),
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 260,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: msg.isUser
+                                          ? accent
+                                          : Colors.white.withOpacity(
+                                        0.08,
+                                      ),
+                                      borderRadius: BorderRadius.circular(
+                                        18,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      msg.text,
+                                      style: TextStyle(
+                                        color: msg.isUser
+                                            ? Colors.white
+                                            : Colors.white,
+                                        fontSize: 13.5,
+                                        height: 1.35,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
-                                  child: ListView.builder(
-                                    itemCount: _messages.length,
-                                    itemBuilder: (context, index) {
-                                      final msg = _messages[index];
-                                      return Align(
-                                        alignment: msg.isUser
-                                            ? Alignment.centerRight
-                                            : Alignment.centerLeft,
-                                        child: Container(
-                                          margin: const EdgeInsets.only(
-                                            bottom: 10,
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 14,
-                                            vertical: 10,
-                                          ),
-                                          constraints: const BoxConstraints(
-                                            maxWidth: 260,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: msg.isUser
-                                                ? accent
-                                                : Colors.white.withOpacity(
-                                                    0.08,
-                                                  ),
-                                            borderRadius: BorderRadius.circular(
-                                              18,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            msg.text,
-                                            style: TextStyle(
-                                              color: msg.isUser
-                                                  ? Colors.black
-                                                  : Colors.white,
-                                              fontSize: 13.5,
-                                              height: 1.35,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
+                                );
+                              },
+                            ),
+                          ),
                         ),
 
                         const Spacer(),
@@ -362,84 +362,91 @@ class _HeraVoicePageState extends State<HeraVoicePage>
                             opacity: _showTextInput ? 1 : 0,
                             child: _showTextInput
                                 ? Container(
-                                    margin: const EdgeInsets.only(bottom: 18),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 14,
-                                      vertical: 10,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.07),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: Colors.white.withOpacity(0.05),
+                              margin: const EdgeInsets.only(bottom: 18),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF121212),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: const Color(0xFFB57BFF).withOpacity(0.4),
+                                  width: 1,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.4),
+                                    blurRadius: 10,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Theme(
+                                      data: Theme.of(context).copyWith(
+                                        inputDecorationTheme:
+                                        const InputDecorationTheme(
+                                          filled: false,
+                                          fillColor:
+                                          Colors.transparent,
+                                          border: InputBorder.none,
+                                          enabledBorder:
+                                          InputBorder.none,
+                                          focusedBorder:
+                                          InputBorder.none,
+                                          disabledBorder:
+                                          InputBorder.none,
+                                          errorBorder:
+                                          InputBorder.none,
+                                          focusedErrorBorder:
+                                          InputBorder.none,
+                                          contentPadding:
+                                          EdgeInsets.zero,
+                                          isDense: true,
+                                        ),
+                                      ),
+                                      child: TextField(
+                                        controller: _textController,
+                                        autofocus: true,
+                                        cursorColor: Colors.white,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                        decoration: InputDecoration(
+                                          hintText:
+                                          'Écrire un message à Hera...',
+                                          hintStyle: TextStyle(
+                                            color: Colors.white
+                                                .withOpacity(0.38),
+                                          ),
+                                        ),
+                                        onSubmitted: (_) => _sendText(),
                                       ),
                                     ),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Theme(
-                                            data: Theme.of(context).copyWith(
-                                              inputDecorationTheme:
-                                                  const InputDecorationTheme(
-                                                    filled: false,
-                                                    fillColor:
-                                                        Colors.transparent,
-                                                    border: InputBorder.none,
-                                                    enabledBorder:
-                                                        InputBorder.none,
-                                                    focusedBorder:
-                                                        InputBorder.none,
-                                                    disabledBorder:
-                                                        InputBorder.none,
-                                                    errorBorder:
-                                                        InputBorder.none,
-                                                    focusedErrorBorder:
-                                                        InputBorder.none,
-                                                    contentPadding:
-                                                        EdgeInsets.zero,
-                                                    isDense: true,
-                                                  ),
-                                            ),
-                                            child: TextField(
-                                              controller: _textController,
-                                              autofocus: true,
-                                              cursorColor: Colors.white,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                              ),
-                                              decoration: InputDecoration(
-                                                hintText:
-                                                    'Écrire un message à Hera...',
-                                                hintStyle: TextStyle(
-                                                  color: Colors.white
-                                                      .withOpacity(0.38),
-                                                ),
-                                              ),
-                                              onSubmitted: (_) => _sendText(),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        GestureDetector(
-                                          onTap: _sendText,
-                                          child: Container(
-                                            width: 40,
-                                            height: 40,
-                                            decoration: const BoxDecoration(
-                                              color: accent,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.arrow_upward_rounded,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                  ),
+                                  const SizedBox(width: 10),
+                                  GestureDetector(
+                                    onTap: _sendText,
+                                    child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFB57BFF),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.arrow_upward_rounded,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
                                     ),
-                                  )
+                                  ),
+                                ],
+                              ),
+                            )
                                 : const SizedBox.shrink(),
                           ),
                         ),
@@ -479,7 +486,7 @@ class _HeraVoicePageState extends State<HeraVoicePage>
                                   isActive
                                       ? Icons.graphic_eq_rounded
                                       : Icons.mic_rounded,
-                                  color: Colors.black,
+                                  color: Colors.white,
                                   size: 34,
                                 ),
                               ),
@@ -560,6 +567,7 @@ class _HeraOrb extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
+          // Halo extérieur mauve
           Container(
             width: 250,
             height: 250,
@@ -567,13 +575,14 @@ class _HeraOrb extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFCCFF00).withOpacity(0.10),
+                  color: const Color(0xFFB57BFF).withOpacity(0.18),
                   blurRadius: 60,
                   spreadRadius: 8,
                 ),
               ],
             ),
           ),
+          // Anneau SweepGradient mauve/violet
           Container(
             width: 214,
             height: 214,
@@ -581,17 +590,18 @@ class _HeraOrb extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: SweepGradient(
                 colors: [
-                  Color(0xFF181818),
-                  Color(0xFF6D6D6D),
-                  Color(0xFFD6D6D6),
-                  Color(0xFF7D5CFF),
-                  Color(0xFF0F0F0F),
-                  Color(0xFFCCFF00),
-                  Color(0xFF181818),
+                  Color(0xFF1A1A2E),
+                  Color(0xFF7B4FD4),
+                  Color(0xFFB57BFF),
+                  Color(0xFFD4A8FF),
+                  Color(0xFF7B4FD4),
+                  Color(0xFF3A1F6E),
+                  Color(0xFF1A1A2E),
                 ],
               ),
             ),
           ),
+          // Couche intermédiaire RadialGradient mauve
           Container(
             width: 194,
             height: 194,
@@ -599,14 +609,15 @@ class _HeraOrb extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  Colors.white.withOpacity(0.45),
-                  const Color(0xFF6B4CFF).withOpacity(0.45),
+                  Colors.white.withOpacity(0.35),
+                  const Color(0xFFB57BFF).withOpacity(0.50),
                   const Color(0xFF080808),
                 ],
                 stops: const [0.0, 0.38, 1.0],
               ),
             ),
           ),
+          // Noyau central mauve profond
           Container(
             width: 160,
             height: 160,
@@ -614,8 +625,8 @@ class _HeraOrb extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  const Color(0xFF8A7BFF).withOpacity(0.72),
-                  const Color(0xFF202020),
+                  const Color(0xFFB57BFF).withOpacity(0.80),
+                  const Color(0xFF6B3FA0).withOpacity(0.60),
                   Colors.black,
                 ],
                 stops: const [0.0, 0.45, 1.0],
@@ -641,7 +652,7 @@ class _LinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.06)
+      ..color = const Color(0xFFB57BFF).withOpacity(0.06)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
