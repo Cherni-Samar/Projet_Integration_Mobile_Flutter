@@ -4,9 +4,8 @@ import '../../../services/hr_agent_service.dart';
 
 class HeraHistoryPage extends StatefulWidget {
   final bool isDark;
-  final List<Map<String, dynamic>>? actions; // ✅ AJOUTE CETTE LIGNE
+  final List<Map<String, dynamic>>? actions;
 
-  // ✅ MODIFIE LE CONSTRUCTEUR ICI
   const HeraHistoryPage({super.key, required this.isDark, this.actions});
 
   @override
@@ -20,10 +19,17 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
   bool _hasMore = true;
   bool _loadingMore = false;
 
+  // ✅ FIX SUPPRESSION : On garde en mémoire les IDs supprimés
+  // pour les filtrer même après un refresh
+  final Set<String> _deletedIds = {};
+
+  // ─── PALETTE MAUVE HERA ───
+  static const _lime   = Color(0xFFB57BFF); // Mauve Hera principal
+  static const _purple = Color(0xFF7C3AED); // Violet profond secondaire
+
   @override
   void initState() {
     super.initState();
-    // ✅ MODIFICATION ICI
     if (widget.actions != null && widget.actions!.isNotEmpty) {
       _actions = List<Map<String, dynamic>>.from(widget.actions!);
       _loading = false;
@@ -31,7 +37,7 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
       _loadActions();
     }
   }
-  /// Extrait l'ID MongoDB qu'il soit String ou Map {"$oid": "xxx"}
+
   String? _extractId(dynamic id) {
     if (id == null) return null;
     if (id is String) return id;
@@ -56,8 +62,15 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
       final result = await HrAgentService.getAllActions(page: _page, limit: 20);
       if (result['success'] == true) {
         final newActions = List<Map<String, dynamic>>.from(result['actions'] ?? []);
+
+        // ✅ FIX : On filtre les actions déjà supprimées localement
+        final filtered = newActions.where((a) {
+          final id = _extractId(a['_id']);
+          return id == null || !_deletedIds.contains(id);
+        }).toList();
+
         setState(() {
-          _actions.addAll(newActions);
+          _actions.addAll(filtered);
           _hasMore = _page < (result['total_pages'] ?? 1);
           _loading = false;
           _loadingMore = false;
@@ -73,16 +86,29 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
   Future<void> _deleteAction(int index, String? actionId) async {
     if (index >= _actions.length) return;
     final removed = _actions[index];
+
+    // ✅ FIX : On marque l'ID comme supprimé AVANT l'appel API
+    if (actionId != null && actionId.isNotEmpty) {
+      _deletedIds.add(actionId);
+    }
+
     setState(() => _actions.removeAt(index));
 
     if (actionId != null && actionId.isNotEmpty) {
       try {
         await HrAgentService.deleteAction(actionId);
       } catch (e) {
+        // ✅ En cas d'erreur API, on annule la suppression locale ET on retire de _deletedIds
         if (mounted) {
+          _deletedIds.remove(actionId);
           setState(() => _actions.insert(index, removed));
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Erreur lors de la suppression')),
+            SnackBar(
+              content: const Text('Erreur lors de la suppression'),
+              backgroundColor: const Color(0xFF1A1A1A),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
           );
           return;
         }
@@ -92,7 +118,7 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('✅ Action supprimée'),
+          content: const Text('Action supprimée'),
           backgroundColor: const Color(0xFF1A1A1A),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -104,24 +130,23 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
   Map<String, dynamic> _getConfig(Map<String, dynamic> action) {
     switch (action['action_type']) {
       case 'onboarding_started':
-        return {'icon': Icons.person_add_rounded, 'color': const Color(
-            0xFFCCFF00), 'label': 'Onboarding démarré', 'badge': 'NOUVEAU'};
+        return {'icon': Icons.person_add_rounded,      'color': _lime,                      'label': 'Onboarding démarré',    'badge': 'NOUVEAU'};
       case 'onboarding_completed':
-        return {'icon': Icons.check_circle_rounded, 'color': const Color(0xFF10B981), 'label': 'Onboarding complété', 'badge': 'ACTIF'};
+        return {'icon': Icons.check_circle_rounded,    'color': const Color(0xFF10B981),    'label': 'Onboarding complété',   'badge': 'ACTIF'};
       case 'leave_approved':
-        return {'icon': Icons.event_available_rounded, 'color': const Color(0xFF10B981), 'label': 'Congé approuvé', 'badge': 'APPROUVÉ'};
+        return {'icon': Icons.event_available_rounded, 'color': const Color(0xFF10B981),    'label': 'Congé approuvé',        'badge': 'APPROUVÉ'};
       case 'leave_refused':
-        return {'icon': Icons.event_busy_rounded, 'color': const Color(0xFFEF4444), 'label': 'Congé refusé', 'badge': 'REFUSÉ'};
+        return {'icon': Icons.event_busy_rounded,      'color': const Color(0xFFEF4444),    'label': 'Congé refusé',          'badge': 'REFUSÉ'};
       case 'offboarding_started':
-        return {'icon': Icons.logout_rounded, 'color': const Color(0xFFF59E0B), 'label': 'Offboarding démarré', 'badge': 'DÉPART'};
+        return {'icon': Icons.logout_rounded,          'color': const Color(0xFFF59E0B),    'label': 'Offboarding démarré',   'badge': 'DÉPART'};
       case 'offboarding_completed':
-        return {'icon': Icons.exit_to_app_rounded, 'color': const Color(0xFFEF4444), 'label': 'Offboarding complété', 'badge': 'INACTIF'};
+        return {'icon': Icons.exit_to_app_rounded,     'color': const Color(0xFFEF4444),    'label': 'Offboarding complété',  'badge': 'INACTIF'};
       case 'promotion':
-        return {'icon': Icons.trending_up_rounded, 'color': const Color(0xFFA855F7), 'label': 'Promotion', 'badge': 'PROMU'};
+        return {'icon': Icons.trending_up_rounded,     'color': _purple,                    'label': 'Promotion',             'badge': 'PROMU'};
       case 'absence_alert':
-        return {'icon': Icons.warning_amber_rounded, 'color': const Color(0xFFF59E0B), 'label': 'Alerte absences', 'badge': 'ALERTE'};
+        return {'icon': Icons.warning_amber_rounded,   'color': const Color(0xFFF59E0B),    'label': 'Alerte absences',       'badge': 'ALERTE'};
       default:
-        return {'icon': Icons.info_outline_rounded, 'color': const Color(0xFFA855F7), 'label': 'Action Hera', 'badge': 'INFO'};
+        return {'icon': Icons.auto_awesome_rounded,    'color': _purple,                    'label': 'Action Hera',           'badge': 'INFO'};
     }
   }
 
@@ -137,9 +162,14 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = widget.isDark;
+    final bgColor      = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF8FAFC);
+    final headerColor  = isDark ? const Color(0xFF141414) : Colors.white;
+    final cardColor    = isDark ? const Color(0xFF141414) : Colors.white;
+    final textColor    = isDark ? Colors.white : const Color(0xFF0F172A);
+    final mutedColor   = isDark ? const Color(0xFF888888) : const Color(0xFF64748B);
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF8FAFC),
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -147,15 +177,14 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+                color: headerColor,
                 border: Border(
-                  bottom: BorderSide(
-                    color: const Color(0xFFCCFF00).withOpacity(0.1),
-                  ),
+                  bottom: BorderSide(color: _lime.withOpacity(0.12)),
                 ),
               ),
               child: Row(
                 children: [
+                  // Bouton retour
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
@@ -164,16 +193,28 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
                         color: isDark
                             ? Colors.white.withOpacity(0.08)
                             : Colors.black.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
-                        Icons.arrow_back_rounded,
-                        color: isDark ? Colors.white : Colors.black,
-                        size: 20,
+                        Icons.arrow_back_ios_new_rounded,
+                        color: textColor,
+                        size: 16,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 14),
+
+                  // Icône Hera + titre
+                  Container(
+                    width: 38, height: 38,
+                    decoration: BoxDecoration(
+                      color: _lime.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                    child: const Icon(Icons.history_rounded, color: _lime, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,36 +222,34 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
                         Text(
                           'Historique complet',
                           style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.3,
                           ),
                         ),
                         Text(
-                          'Toutes les actions Hera',
-                          style: TextStyle(
-                            color: isDark ? Colors.white54 : Colors.black54,
-                            fontSize: 12,
-                          ),
+                          'Toutes les actions de Hera',
+                          style: TextStyle(color: mutedColor, fontSize: 11),
                         ),
                       ],
                     ),
                   ),
+
+                  // Badge compteur
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFCCFF00).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: const Color(0xFFCCFF00).withOpacity(0.3),
-                      ),
+                      color: _lime.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: _lime.withOpacity(0.25)),
                     ),
                     child: Text(
                       '${_actions.length}',
                       style: const TextStyle(
-                        color: Color(0xFFCCFF00),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
+                        color: _lime,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -218,21 +257,20 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
               ),
             ),
 
-            // ── List ────────────────────────────────────────────────────
+            // ── Liste ───────────────────────────────────────────────────
             Expanded(
               child: _loading
-                  ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFFCCFF00)),
-              )
+                  ? Center(child: CircularProgressIndicator(color: _lime))
                   : _actions.isEmpty
-                  ? _buildEmpty(isDark)
+                  ? _buildEmpty(isDark, textColor, mutedColor)
                   : RefreshIndicator(
                 onRefresh: () => _loadActions(refresh: true),
-                color: const Color(0xFFCCFF00),
-                backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+                color: _lime,
+                backgroundColor: headerColor,
                 child: NotificationListener<ScrollNotification>(
                   onNotification: (scroll) {
-                    if (scroll.metrics.pixels >= scroll.metrics.maxScrollExtent - 200 &&
+                    if (scroll.metrics.pixels >=
+                        scroll.metrics.maxScrollExtent - 200 &&
                         _hasMore && !_loadingMore) {
                       _page++;
                       _loadActions();
@@ -240,22 +278,22 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
                     return false;
                   },
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                     itemCount: _actions.length + (_hasMore ? 1 : 0),
                     itemBuilder: (context, index) {
+                      // Loader pagination
                       if (index == _actions.length) {
-                        return const Center(
+                        return Center(
                           child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: CircularProgressIndicator(
-                              color: Color(0xFFCCFF00),
-                            ),
+                            padding: const EdgeInsets.all(16),
+                            child: CircularProgressIndicator(color: _lime),
                           ),
                         );
                       }
 
                       final action = _actions[index];
                       final config = _getConfig(action);
+                      final accent = config['color'] as Color;
                       final employeeName = action['employee_name'] ?? 'Employé';
                       final createdAt = action['created_at'] != null
                           ? DateTime.tryParse(action['created_at'].toString())
@@ -269,10 +307,10 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
                         background: Container(
                           margin: const EdgeInsets.only(bottom: 10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(14),
+                            color: const Color(0xFFEF4444).withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: const Color(0xFFEF4444).withOpacity(0.3),
+                              color: const Color(0xFFEF4444).withOpacity(0.25),
                             ),
                           ),
                           alignment: Alignment.centerLeft,
@@ -282,40 +320,47 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
                               Icon(Icons.delete_outline_rounded,
                                   color: Color(0xFFEF4444), size: 20),
                               SizedBox(width: 8),
-                              Text('Supprimer',
-                                  style: TextStyle(
-                                    color: Color(0xFFEF4444),
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13,
-                                  )),
+                              Text(
+                                'Supprimer',
+                                style: TextStyle(
+                                  color: Color(0xFFEF4444),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
+                              ),
                             ],
                           ),
                         ),
+
                         child: Container(
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF141414) : Colors.white,
-                            borderRadius: BorderRadius.circular(14),
+                            color: cardColor,
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: (config['color'] as Color).withOpacity(0.15),
+                              color: accent.withOpacity(0.15),
                               width: 1,
                             ),
                           ),
                           child: Row(
                             children: [
+                              // Icône
                               Container(
-                                width: 42, height: 42,
+                                width: 44, height: 44,
                                 decoration: BoxDecoration(
-                                  color: (config['color'] as Color).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(11),
+                                  color: accent.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(13),
                                 ),
                                 child: Icon(
                                   config['icon'] as IconData,
-                                  color: isDark ? Colors.white : Colors.black,                                  size: 20,
+                                  color: accent,
+                                  size: 20,
                                 ),
                               ),
                               const SizedBox(width: 12),
+
+                              // Texte
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -323,37 +368,38 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
                                     Text(
                                       employeeName,
                                       style: TextStyle(
-                                        color: isDark ? Colors.white : Colors.black,
-                                        fontWeight: FontWeight.w600,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w800,
                                         fontSize: 14,
                                       ),
                                     ),
                                     const SizedBox(height: 3),
                                     Text(
                                       config['label'] as String,
-                                      style: TextStyle(
-                                        color: isDark ? Colors.white54 : Colors.black54,
-                                        fontSize: 12,
-                                      ),
+                                      style: TextStyle(color: mutedColor, fontSize: 12),
                                     ),
                                   ],
                                 ),
                               ),
+
+                              // Badge + temps
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 7, vertical: 3),
+                                        horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFCCFF00).withOpacity(0.6),                                      borderRadius: BorderRadius.circular(5),
+                                      color: accent.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
                                       config['badge'] as String,
                                       style: TextStyle(
-                                        color: Colors.black, // ✅ TOUJOURS NOIR
+                                        color: accent,
                                         fontSize: 9,
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.5,
                                       ),
                                     ),
                                   ),
@@ -361,10 +407,7 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
                                     const SizedBox(height: 5),
                                     Text(
                                       _timeAgo(createdAt),
-                                      style: TextStyle(
-                                        color: isDark ? Colors.white30 : Colors.black38,
-                                        fontSize: 10,
-                                      ),
+                                      style: TextStyle(color: mutedColor, fontSize: 10),
                                     ),
                                   ],
                                 ],
@@ -384,35 +427,32 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
     );
   }
 
-  Widget _buildEmpty(bool isDark) {
+  Widget _buildEmpty(bool isDark, Color textColor, Color mutedColor) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 64, height: 64,
+            width: 72, height: 72,
             decoration: BoxDecoration(
-              color: const Color(0xFFCCFF00).withOpacity(0.08),
-              borderRadius: BorderRadius.circular(16),
+              color: _lime.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(Icons.history_rounded, color: Color(0xFF000000), size: 32),
+            child: const Icon(Icons.history_rounded, color: _lime, size: 34),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           Text(
             'Aucune action',
             style: TextStyle(
-              color: isDark ? Colors.white54 : Colors.black54,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+              color: textColor,
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'L\'historique apparaîtra ici',
-            style: TextStyle(
-              color: isDark ? Colors.white38 : Colors.black38,
-              fontSize: 13,
-            ),
+            'L\'historique Hera apparaîtra ici',
+            style: TextStyle(color: mutedColor, fontSize: 13),
           ),
         ],
       ),

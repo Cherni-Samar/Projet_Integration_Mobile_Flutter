@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'api_config.dart';
+import 'api_config.dart'; // Assure-toi d'importer ton URL de base
 
 class TimoService {
+  static const String baseUrl = "http://10.0.2.2:3000/api/hera"; // URL Android Emulator
+
   // ── LIRE L'INBOX ──
   static Future<Map<String, dynamic>> getTimoInbox() async {
     try {
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/api/timo/inbox'),
+        Uri.parse('$baseUrl/admin/timo-inbox'),
         headers: {"Content-Type": "application/json"},
       );
       return jsonDecode(response.body);
@@ -23,9 +25,10 @@ class TimoService {
     required String name,
   }) async {
     try {
-      final url = Uri.parse('${ApiConfig.baseUrl}/api/timo/confirm');
+      // ✅ On s'assure que le chemin est exact : /admin/timo-confirm
+      final url = Uri.parse('$baseUrl/admin/timo-confirm');
 
-      print("📡 Tentative POST sur: $url");
+      print("📡 Tentative POST sur: $url"); // Pour vérifier dans ta console Flutter
 
       final response = await http.post(
         url,
@@ -44,33 +47,9 @@ class TimoService {
   }
 
   static Future<Map<String, dynamic>> getTimoTasks() async {
-    try {
-      final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/api/timo/tasks'),
-        headers: {"Content-Type": "application/json"},
-      );
-      return jsonDecode(response.body);
-    } catch (e) {
-      return {"success": false, "error": e.toString()};
-    }
-  }
-
-  static Future<Map<String, dynamic>> autoPlanMeeting({
-    required String employeeName,
-    required String type,
-  }) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/api/timo/auto-plan'),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "employeeName": employeeName,
-          "type": type
-        }),
-      );
-      return jsonDecode(response.body);
-    } catch (e) {
-      return {"success": false, "error": e.toString()};
-    }
-  }
-}
+    final response = await http.get(
+      Uri.parse('$baseUrl/admin/timo-tasks'), // ✅ Route Ligne 55
+      headers: {"Content-Type": "application/json"},
+    );
+    return jsonDecode(response.body);
+  }}

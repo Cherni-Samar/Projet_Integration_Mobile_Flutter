@@ -2,31 +2,38 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../services/timo_service.dart';
 
-// ─────────────────────────────────────────────────────────────
-//  PALETTE TIMO
-// ─────────────────────────────────────────────────────────────
-class TP {
-  static const bronze  = Color(0xFFDB965B);
-  static const bronzeD = Color(0xFFC47A3A);
-  static const gold    = Color(0xFFFFD580);
-  static const success = Color(0xFF10B981);
-  static const info    = Color(0xFF06B6D4);
-  static const danger  = Color(0xFFEF4444);
-  static const violet  = Color(0xFF8B5CF6);
-
-  static Color bg(bool d)        => d ? const Color(0xFF0A0A0A) : const Color(0xFFF5F3F0);
-  static Color card(bool d)      => d ? const Color(0xFF141414) : Colors.white;
-  static Color cardSoft(bool d)  => d ? const Color(0xFF1C1C1C) : const Color(0xFFEEEBE7);
-  static Color border(bool d)    => d ? const Color(0xFF252525) : const Color(0xFFE0DBD4);
-  static Color text(bool d)      => d ? Colors.white            : const Color(0xFF1A1008);
-  static Color textMuted(bool d) => d ? const Color(0xFF777777) : const Color(0xFF8B7D6E);
-  static Color textSoft(bool d)  => d ? const Color(0xFF444444) : const Color(0xFFB5A99A);
+// ═══════════════════════════════════════════════════════════════
+// 🎨 WHITE SAAS PREMIUM DESIGN SYSTEM
+// ═══════════════════════════════════════════════════════════════
+class TimoDesignSystem {
+  // White SaaS Theme Colors
+  static const Color bg = Color(0xFFFFFFFF);           // Fond blanc pur
+  static const Color card = Color(0xFFFFFFFF);         // Cartes blanches
+  static const Color border = Color(0xFFF1F5F9);       // Bordures ultra-fines gris-bleu
+  static const Color textPrimary = Color(0xFF0F172A);  // Texte principal
+  static const Color textSecondary = Color(0xFF64748B); // Texte secondaire
+  static const Color textMuted = Color(0xFF94A3B8);    // Texte atténué
+  
+  // Task Type Colors
+  static const Color interview = Color(0xFF06B6D4);    // Cyan pour interviews
+  static const Color onboarding = Color(0xFF10B981);   // Emerald pour onboarding
+  static const Color offboarding = Color(0xFFF87171);  // Rouge Corail pour offboarding
+  static const Color other = Color(0xFFFF9800);        // Orange pour autres
+  
+  // Status Colors
+  static const Color success = Color(0xFF10B981);      // Vert succès
+  static const Color warning = Color(0xFFF59E0B);      // Orange warning
+  static const Color neonGreen = Color(0xFFCCFF00);    // Point de vie pulsant
+  
+  // Shadows & Effects
+  static const Color shadowLight = Color(0x08000000);  // Ombre ultra-légère
 }
 
 // ─────────────────────────────────────────────────────────────
-//  HELPERS — parser le titre "[TYPE] : Nom"
+//  TASK CLASSIFICATION - LOGIQUE CORRIGÉE PAR MOTS-CLÉS
 // ─────────────────────────────────────────────────────────────
 enum TaskType { interview, onboarding, offboarding, other }
 
@@ -55,28 +62,42 @@ class TimoTask {
     DateTime? deadline;
     try { deadline = DateTime.parse(m['deadline']); } catch (_) {}
 
-    // Parse "[INTERVIEW] : Ahmed" → type + nom
+    // ✅ NOUVELLE LOGIQUE DE CLASSIFICATION PAR MOTS-CLÉS
     TaskType type = TaskType.other;
-    String   name = title;
+    String employeeName = title;
 
-    final match = RegExp(r'\[(\w+)\]\s*:\s*(.+)').firstMatch(title);
-    if (match != null) {
-      final typeStr = match.group(1)?.toUpperCase() ?? '';
-      name = match.group(2)?.trim() ?? title;
-      switch (typeStr) {
-        case 'INTERVIEW':   type = TaskType.interview;   break;
-        case 'ONBOARDING':  type = TaskType.onboarding;  break;
-        case 'OFFBOARDING': type = TaskType.offboarding; break;
+    final lowerTitle = title.toLowerCase();
+    
+    // Classification par mots-clés
+    if (lowerTitle.contains('démission') || lowerTitle.contains('départ') || lowerTitle.contains('offboarding')) {
+      type = TaskType.offboarding;
+    } else if (lowerTitle.contains('intégration') || lowerTitle.contains('onboarding')) {
+      type = TaskType.onboarding;
+    } else if (lowerTitle.contains('entretien') || lowerTitle.contains('interview')) {
+      type = TaskType.interview;
+    }
+
+    // Extraction du nom après les deux points
+    if (title.contains(':')) {
+      final parts = title.split(':');
+      if (parts.length > 1) {
+        employeeName = parts[1].trim();
       }
     }
 
-    return TimoTask(raw: title, employeeName: name, type: type,
-        status: status, deadline: deadline, id: id);
+    return TimoTask(
+      raw: title, 
+      employeeName: employeeName, 
+      type: type,
+      status: status, 
+      deadline: deadline, 
+      id: id
+    );
   }
 
   bool get isDone => status == 'done';
 
-  // Config visuelle selon le type
+  // Configuration visuelle selon le type
   IconData get icon => switch (type) {
     TaskType.interview   => Icons.record_voice_over_rounded,
     TaskType.onboarding  => Icons.person_add_alt_1_rounded,
@@ -85,10 +106,10 @@ class TimoTask {
   };
 
   Color get color => switch (type) {
-    TaskType.interview   => TP.info,
-    TaskType.onboarding  => TP.success,
-    TaskType.offboarding => TP.danger,
-    TaskType.other       => TP.bronze,
+    TaskType.interview   => TimoDesignSystem.interview,
+    TaskType.onboarding  => TimoDesignSystem.onboarding,
+    TaskType.offboarding => TimoDesignSystem.offboarding,
+    TaskType.other       => TimoDesignSystem.other,
   };
 
   String get typeLabel => switch (type) {
@@ -111,8 +132,9 @@ class TimoDashboardPage extends StatefulWidget {
 class _TimoDashboardPageState extends State<TimoDashboardPage>
     with TickerProviderStateMixin {
 
-  int _tab    = 0;
+  int _tab = 0;
   TaskType? _activeFilter;
+
   bool _isLoading = true;
   List<TimoTask> _tasks = [];
 
@@ -120,29 +142,32 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
   DateTime? _selectedDay;
   CalendarFormat _calFmt = CalendarFormat.month;
 
-  late AnimationController _pulseCtrl;
-  late AnimationController _fadeCtrl;
-  late AnimationController _glowCtrl;
+  // ✅ ANIMATION CONTROLLER POUR PULSATION UNIQUEMENT
+  late AnimationController _pulseController;
 
   static const _tabs = [
     (Icons.article_rounded,        'Journal IA'),
     (Icons.calendar_month_rounded, 'Agenda'),
   ];
 
+  // ── Lifecycle ──────────────────────────────────────────────
   @override
   void initState() {
     super.initState();
-    _pulseCtrl = AnimationController(vsync: this, duration: const Duration(seconds: 3))..repeat(reverse: true);
-    _fadeCtrl  = AnimationController(vsync: this, duration: const Duration(milliseconds: 700))..forward();
-    _glowCtrl  = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+    
+    // ✅ INITIALISER UNIQUEMENT LE CONTROLLER DE PULSATION
+    _pulseController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+    
     _loadData();
   }
 
   @override
   void dispose() {
-    _pulseCtrl.dispose();
-    _fadeCtrl.dispose();
-    _glowCtrl.dispose();
+    // ✅ DISPOSER LE CONTROLLER
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -155,6 +180,15 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
         _tasks = List<Map<String, dynamic>>.from(r['tasks'] ?? [])
             .map(TimoTask.fromMap)
             .toList();
+        
+        // ✅ TRI CHRONOLOGIQUE PAR DATE (DEADLINE)
+        _tasks.sort((a, b) {
+          if (a.deadline == null && b.deadline == null) return 0;
+          if (a.deadline == null) return 1;
+          if (b.deadline == null) return -1;
+          return a.deadline!.compareTo(b.deadline!);
+        });
+        
         _isLoading = false;
       });
     } catch (_) {
@@ -162,6 +196,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
     }
   }
 
+  // ── Computed ───────────────────────────────────────────────
   List<TimoTask> get _interviews   => _tasks.where((t) => t.type == TaskType.interview).toList();
   List<TimoTask> get _onboardings  => _tasks.where((t) => t.type == TaskType.onboarding).toList();
   List<TimoTask> get _offboardings => _tasks.where((t) => t.type == TaskType.offboarding).toList();
@@ -174,214 +209,395 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
   List<TimoTask> _tasksOn(DateTime day) => _tasks.where((t) =>
   t.deadline != null && isSameDay(t.deadline!, day)).toList();
 
+  // ── Build ──────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final d = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: TP.bg(d),
-      body: FadeTransition(
-        opacity: _fadeCtrl,
-        child: SafeArea(child: Column(children: [
-          _buildHeader(d),
-          const SizedBox(height: 10),
-          _buildPillTabBar(d),
-          const SizedBox(height: 8),
-          Expanded(
-            child: _isLoading
-                ? Center(child: CircularProgressIndicator(color: TP.bronze))
-                : IndexedStack(index: _tab, children: [
-              _buildJournal(d),
-              _buildAgenda(d),
-            ]),
-          ),
-        ])),
+      backgroundColor: TimoDesignSystem.bg,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildProfessionalHeader(),
+            const SizedBox(height: 10),
+            _buildCleanNavigation(),
+            const SizedBox(height: 8),
+            Expanded(
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator(color: TimoDesignSystem.other))
+                  : IndexedStack(index: _tab, children: [
+                _buildJournal(),
+                _buildAgenda(),
+              ]),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeader(bool d) {
+  // ════════════════════════════════════════════════════════════
+  //  PROFESSIONAL HEADER - WHITE SAAS DESIGN
+  // ════════════════════════════════════════════════════════════
+  Widget _buildProfessionalHeader() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.all(18),
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-          color: TP.card(d),
-          borderRadius: BorderRadius.circular(26),
-          border: Border.all(color: TP.border(d))),
-      child: Row(children: [
-        GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: d ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.07)),
-              child: Icon(Icons.arrow_back_ios_new_rounded, color: TP.text(d), size: 16)),
-        ),
-        const SizedBox(width: 12),
-
-        AnimatedBuilder(
-          animation: _glowCtrl,
-          builder: (_, child) => Container(
-              decoration: BoxDecoration(shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(
-                      color: TP.bronze.withOpacity(0.25 + 0.2 * _glowCtrl.value),
-                      blurRadius: 14 + 8 * _glowCtrl.value)]),
-              child: child),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(23),
-            child: Image.asset(
-                'assets/images/krono.png',
-                width: 46, height: 46, fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => CircleAvatar(
-                    backgroundColor: TP.bronze,
-                    child: const Icon(Icons.timer_rounded, color: Colors.white))),
+        color: TimoDesignSystem.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: TimoDesignSystem.border, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: TimoDesignSystem.shadowLight,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-        ),
-        const SizedBox(width: 12),
-
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Agent Timo', style: TextStyle(
-              color: TP.text(d), fontSize: 18, fontWeight: FontWeight.w900)),
-          Row(children: [
-            AnimatedBuilder(
-              animation: _pulseCtrl,
-              builder: (_, __) => Container(
-                  width: 7, height: 7,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: TP.bronze.withOpacity(0.6 + 0.4 * _pulseCtrl.value))),
-            ),
-            const SizedBox(width: 5),
-            const Text('LOGISTICS MASTER SYNC',
-                style: TextStyle(color: TP.bronze, fontSize: 9,
-                    fontWeight: FontWeight.w900, letterSpacing: 1.2)),
-          ]),
-        ])),
-
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-          decoration: BoxDecoration(
-              color: d ? Colors.white.withOpacity(0.07) : Colors.black.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(12)),
-          child: Text('📋 ${_tasks.length}',
-              style: TextStyle(color: TP.text(d), fontSize: 13, fontWeight: FontWeight.w900)),
-        ),
-      ]),
-    );
-  }
-
-  Widget _buildPillTabBar(bool d) => Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16),
-    padding: const EdgeInsets.all(4),
-    decoration: BoxDecoration(
-        color: TP.card(d),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: TP.border(d))),
-    child: Row(children: List.generate(_tabs.length, (i) {
-      final sel = _tab == i;
-      return Expanded(child: GestureDetector(
-        onTap: () => setState(() => _tab = i),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-              color: sel ? TP.bronze : Colors.transparent,
-              borderRadius: BorderRadius.circular(16)),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(_tabs[i].$1, size: 17, color: sel ? Colors.white : TP.textMuted(d)),
-            const SizedBox(height: 3),
-            Text(_tabs[i].$2, style: TextStyle(
-                color: sel ? Colors.white : TP.textMuted(d),
-                fontSize: 10, fontWeight: sel ? FontWeight.w800 : FontWeight.w500)),
-          ]),
-        ),
-      ));
-    })),
-  );
-
-  Widget _buildJournal(bool d) {
-    if (_tasks.isEmpty) return _emptyState(
-        Icons.article_outlined, 'Aucune tâche planifiée',
-        'Hera n\'a encore rien envoyé à Timo.', d);
-
-    return RefreshIndicator(
-      onRefresh: _loadData,
-      color: TP.bronze,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+        ],
+      ),
+      child: Row(
         children: [
-          _buildStatsPulse(d),
-          const SizedBox(height: 16),
-          _buildFilterPills(d),
-          const SizedBox(height: 16),
-          if (_filtered.isEmpty)
-            _emptyState(Icons.filter_list_off_rounded,
-                'Aucun résultat', 'Pas de tâche pour ce filtre.', d)
-          else
-            ..._filtered.map((t) => _buildTaskCard(t, d)),
+          // Bouton de retour
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: TimoDesignSystem.bg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: TimoDesignSystem.border, width: 0.5),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
+              color: TimoDesignSystem.textPrimary,
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+          const SizedBox(width: 16),
+          
+          // Avatar Timo
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: TimoDesignSystem.other, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: TimoDesignSystem.shadowLight,
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: Image.asset(
+                'assets/images/krono.png',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: TimoDesignSystem.other.withOpacity(0.1),
+                    ),
+                    child: Icon(
+                      Icons.timer_rounded,
+                      color: TimoDesignSystem.other,
+                      size: 24,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(width: 20),
+          
+          // Nom et statut
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'TIMO COMMAND CENTER',
+                  style: GoogleFonts.plusJakartaSans(
+                    color: TimoDesignSystem.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                // ✅ PULSATION ANIMATION
+                Row(
+                  children: [
+                    AnimatedBuilder(
+                      animation: _pulseController,
+                      builder: (context, child) {
+                        return Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: TimoDesignSystem.neonGreen.withOpacity(0.4 + 0.6 * _pulseController.value),
+                            shape: BoxShape.circle,
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        'SCHEDULING ENGINE ONLINE',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: const Color(0xFFFF9800),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatsPulse(bool d) {
+  // ════════════════════════════════════════════════════════════
+  //  CLEAN NAVIGATION
+  // ════════════════════════════════════════════════════════════
+  Widget _buildCleanNavigation() {
+    return Container(
+      height: 60,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            TimoDesignSystem.other,
+            const Color(0xFFF57C00),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: TimoDesignSystem.other.withOpacity(0.15),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Row(
+          children: _tabs.asMap().entries.map((entry) {
+            final index = entry.key;
+            final tab = entry.value;
+            final isSelected = _tab == index;
+
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => setState(() => _tab = index),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Colors.white.withOpacity(0.25)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                    border: isSelected
+                        ? Border.all(color: Colors.white.withOpacity(0.3), width: 0.5)
+                        : null,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        tab.$1,
+                        color: Colors.white,
+                        size: isSelected ? 20 : 18,
+                      ),
+                      const SizedBox(height: 4),
+                      if (isSelected)
+                        Text(
+                          tab.$2,
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      else
+                        Container(
+                          height: 2,
+                          width: 20,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  // ════════════════════════════════════════════════════════════
+  //  TAB 0 — JOURNAL IA - WHITE SAAS DESIGN
+  // ════════════════════════════════════════════════════════════
+  Widget _buildJournal() {
+    if (_tasks.isEmpty) return _emptyState(
+        Icons.article_outlined, 'Aucune tâche planifiée',
+        'Hera n\'a encore rien envoyé à Timo.');
+
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      color: TimoDesignSystem.other,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+        children: [
+          // ── Stats par type ──
+          _buildCleanStats(),
+          const SizedBox(height: 16),
+
+          // ── Filtres pills ──
+          _buildFilterPills(),
+          const SizedBox(height: 16),
+
+          // ── Tâches filtrées ──
+          if (_filtered.isEmpty)
+            _emptyState(Icons.filter_list_off_rounded,
+                'Aucun résultat', 'Pas de tâche pour ce filtre.')
+          else
+            ..._filtered.map((t) => _buildTaskCard(t)),
+        ],
+      ),
+    );
+  }
+
+  // ── Stats: Interviews / Onboardings / Offboardings ─────────
+  Widget _buildCleanStats() {
     final total = _tasks.length;
     final done  = _done.length;
     final pct   = total == 0 ? 0.0 : done / total;
 
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-          color: TP.card(d),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: TP.border(d))),
-      child: Column(children: [
-        Row(children: [
-          Expanded(child: _statItem('${_interviews.length}',   'INTERVIEWS',   TP.info,    Icons.record_voice_over_rounded,  d)),
-          Container(width: 1, height: 50, color: TP.border(d)),
-          Expanded(child: _statItem('${_onboardings.length}',  'ONBOARDINGS',  TP.success, Icons.person_add_alt_1_rounded,   d)),
-          Container(width: 1, height: 50, color: TP.border(d)),
-          Expanded(child: _statItem('${_offboardings.length}', 'OFFBOARDINGS', TP.danger,  Icons.exit_to_app_rounded,        d)),
-        ]),
-        const SizedBox(height: 16),
+        color: TimoDesignSystem.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: TimoDesignSystem.border, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: TimoDesignSystem.shadowLight,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // 3 métriques métier
+          Row(
+            children: [
+              Expanded(child: _statItem('${_interviews.length}',   'INTERVIEWS',   TimoDesignSystem.interview,    Icons.record_voice_over_rounded)),
+              Container(width: 1, height: 50, color: TimoDesignSystem.border),
+              Expanded(child: _statItem('${_onboardings.length}',  'ONBOARDINGS',  TimoDesignSystem.onboarding, Icons.person_add_alt_1_rounded)),
+              Container(width: 1, height: 50, color: TimoDesignSystem.border),
+              Expanded(child: _statItem('${_offboardings.length}', 'OFFBOARDINGS', TimoDesignSystem.offboarding,  Icons.exit_to_app_rounded)),
+            ],
+          ),
+          const SizedBox(height: 16),
 
-        Row(children: [
-          Text('Complétés', style: TextStyle(color: TP.textMuted(d), fontSize: 11)),
-          const Spacer(),
-          Text('$done / $total',
-              style: TextStyle(color: pct > 0.7 ? TP.success : TP.bronze,
-                  fontSize: 12, fontWeight: FontWeight.w800)),
-        ]),
-        const SizedBox(height: 6),
-        ClipRRect(borderRadius: BorderRadius.circular(99),
+          // Barre de progression globale
+          Row(
+            children: [
+              Text(
+                'Complétés',
+                style: GoogleFonts.plusJakartaSans(
+                  color: TimoDesignSystem.textMuted,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '$done / $total',
+                style: GoogleFonts.plusJakartaSans(
+                  color: pct > 0.7 ? TimoDesignSystem.success : TimoDesignSystem.other,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(99),
             child: LinearProgressIndicator(
-                value: pct, minHeight: 7,
-                backgroundColor: TP.cardSoft(d),
-                valueColor: AlwaysStoppedAnimation(pct > 0.7 ? TP.success : TP.bronze))),
-      ]),
+              value: pct,
+              minHeight: 7,
+              backgroundColor: TimoDesignSystem.border,
+              valueColor: AlwaysStoppedAnimation(pct > 0.7 ? TimoDesignSystem.success : TimoDesignSystem.other),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _statItem(String val, String label, Color color, IconData icon, bool d) =>
-      Column(children: [
-        Container(width: 38, height: 38,
-            decoration: BoxDecoration(color: color.withOpacity(0.12), shape: BoxShape.circle),
-            child: Icon(icon, color: color, size: 18)),
-        const SizedBox(height: 6),
-        Text(val, style: TextStyle(color: TP.text(d), fontSize: 22,
-            fontWeight: FontWeight.w900, height: 1)),
-        const SizedBox(height: 2),
-        Text(label, textAlign: TextAlign.center,
-            style: TextStyle(color: TP.textMuted(d), fontSize: 8, fontWeight: FontWeight.w700, letterSpacing: 0.4)),
-      ]);
+  Widget _statItem(String val, String label, Color color, IconData icon) =>
+      Column(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            val,
+            style: GoogleFonts.plusJakartaSans(
+              color: TimoDesignSystem.textPrimary,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.plusJakartaSans(
+              color: TimoDesignSystem.textMuted,
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.4,
+            ),
+          ),
+        ],
+      );
 
-  Widget _buildFilterPills(bool d) {
+  // ── Filtres pills ───────────────────────────────────────────
+  Widget _buildFilterPills() {
     final filters = [
-      (null,               'Tous',         TP.bronze),
-      (TaskType.interview,  'Interview',   TP.info),
-      (TaskType.onboarding, 'Onboarding',  TP.success),
-      (TaskType.offboarding,'Offboarding', TP.danger),
+      (null,               'Tous',         TimoDesignSystem.other),
+      (TaskType.interview,  'Interview',   TimoDesignSystem.interview),
+      (TaskType.onboarding, 'Onboarding',  TimoDesignSystem.onboarding),
+      (TaskType.offboarding,'Offboarding', TimoDesignSystem.offboarding),
     ];
     return SizedBox(
       height: 34,
@@ -391,18 +607,25 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
           final sel = _activeFilter == f.$1;
           return GestureDetector(
             onTap: () => setState(() => _activeFilter = f.$1),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
+            child: Container(
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
               decoration: BoxDecoration(
-                  color: sel ? f.$3 : TP.cardSoft(d),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                      color: sel ? f.$3 : TP.border(d))),
-              child: Text(f.$2, style: TextStyle(
-                  color: sel ? Colors.white : TP.textMuted(d),
-                  fontSize: 12, fontWeight: FontWeight.w700)),
+                color: sel ? f.$3 : TimoDesignSystem.card,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: sel ? f.$3 : TimoDesignSystem.border,
+                  width: 0.5,
+                ),
+              ),
+              child: Text(
+                f.$2,
+                style: GoogleFonts.plusJakartaSans(
+                  color: sel ? Colors.white : TimoDesignSystem.textMuted,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           );
         }).toList(),
@@ -410,235 +633,488 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
     );
   }
 
-  Widget _buildTaskCard(TimoTask task, bool d) {
+  // ── Carte tâche avec design amélioré ─────────────────────────────────────────────
+  Widget _buildTaskCard(TimoTask task) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(15),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-          color: TP.card(d),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-              color: task.isDone
-                  ? TP.success.withOpacity(0.25)
-                  : task.color.withOpacity(0.2))),
-      child: Row(children: [
-        Container(
-            width: 46, height: 46,
-            decoration: BoxDecoration(
-                color: task.isDone
-                    ? TP.success.withOpacity(0.12)
-                    : task.color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(14)),
-            child: Icon(
-                task.isDone ? Icons.task_alt_rounded : task.icon,
-                color: task.isDone ? TP.success : task.color, size: 22)),
-        const SizedBox(width: 12),
-
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(task.employeeName, style: TextStyle(
-              color: task.isDone ? TP.textMuted(d) : TP.text(d),
-              fontWeight: FontWeight.w900, fontSize: 15,
-              decoration: task.isDone ? TextDecoration.lineThrough : null,
-              decorationColor: TP.textMuted(d))),
-          const SizedBox(height: 4),
-          if (task.deadline != null)
-            Row(children: [
-              Icon(Icons.schedule_rounded, size: 12, color: TP.textMuted(d)),
-              const SizedBox(width: 4),
-              Text(
-                  DateFormat('EEE dd MMM · HH:mm', 'fr_FR').format(task.deadline!),
-                  style: TextStyle(color: TP.textMuted(d), fontSize: 11)),
-            ]),
-        ])),
-
-        Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: BoxDecoration(
-                  color: task.color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20)),
-              child: Text(task.typeLabel, style: TextStyle(
-                  color: task.color, fontSize: 8,
-                  fontWeight: FontWeight.w900, letterSpacing: 0.5))),
-          if (task.isDone) ...[
-            const SizedBox(height: 6),
-            const Icon(Icons.verified_rounded, color: TP.success, size: 16),
-          ],
-        ]),
-      ]),
-    );
-  }
-
-  Widget _buildAgenda(bool d) {
-    final dayTasks = _selectedDay != null ? _tasksOn(_selectedDay!) : <TimoTask>[];
-
-    return RefreshIndicator(
-      onRefresh: _loadData,
-      color: TP.bronze,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+        color: TimoDesignSystem.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: task.isDone
+              ? TimoDesignSystem.success.withOpacity(0.25)
+              : task.color.withOpacity(0.2),
+          width: 0.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: TimoDesignSystem.shadowLight,
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
         children: [
+          // Icône type
           Container(
+            width: 46,
+            height: 46,
             decoration: BoxDecoration(
-                color: TP.card(d),
-                borderRadius: BorderRadius.circular(26),
-                border: Border.all(color: TP.border(d))),
-            child: Column(children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
-                child: Row(children: [
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(
-                        DateFormat('MMMM yyyy', 'fr_FR').format(_focusedDay).toUpperCase(),
-                        style: TextStyle(color: TP.text(d), fontSize: 15,
-                            fontWeight: FontWeight.w900, letterSpacing: -0.3)),
-                    Text('${_tasks.length} événements',
-                        style: TextStyle(color: TP.textMuted(d), fontSize: 11)),
-                  ]),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () => setState(() => _calFmt = _calFmt == CalendarFormat.month
-                        ? CalendarFormat.week : CalendarFormat.month),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                      decoration: BoxDecoration(
-                          color: TP.bronze.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: Row(children: [
-                        Icon(_calFmt == CalendarFormat.month
-                            ? Icons.view_week_rounded : Icons.calendar_month_rounded,
-                            size: 13, color: TP.bronze),
-                        const SizedBox(width: 5),
-                        Text(_calFmt == CalendarFormat.month ? 'Semaine' : 'Mois',
-                            style: const TextStyle(color: TP.bronze,
-                                fontSize: 11, fontWeight: FontWeight.w800)),
-                      ]),
-                    ),
+              color: task.isDone
+                  ? TimoDesignSystem.success.withOpacity(0.12)
+                  : task.color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              task.isDone ? Icons.task_alt_rounded : task.icon,
+              color: task.isDone ? TimoDesignSystem.success : task.color,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Nom de l'employé/candidat
+                Text(
+                  task.employeeName,
+                  style: GoogleFonts.plusJakartaSans(
+                    color: task.isDone ? TimoDesignSystem.textMuted : TimoDesignSystem.textPrimary,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15,
+                    decoration: task.isDone ? TextDecoration.lineThrough : null,
+                    decorationColor: TimoDesignSystem.textMuted,
                   ),
-                ]),
-              ),
-
-              TableCalendar(
-                firstDay: DateTime.utc(2020, 1, 1),
-                lastDay: DateTime.utc(2030, 12, 31),
-                focusedDay: _focusedDay,
-                calendarFormat: _calFmt,
-                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                onDaySelected: (sel, foc) => setState(() { _selectedDay = sel; _focusedDay = foc; }),
-                onFormatChanged: (f) => setState(() => _calFmt = f),
-                onPageChanged: (f) => setState(() => _focusedDay = f),
-                eventLoader: _tasksOn,
-                calendarBuilders: CalendarBuilders(
-                  defaultBuilder: (ctx, day, _) {
-                    final ts = _tasksOn(day);
-                    if (ts.isEmpty) return null;
-                    return Container(
-                      margin: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                          color: TP.bronze.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: TP.bronze.withOpacity(0.45))),
-                      child: Center(child: Text('${day.day}', style: TextStyle(
-                          color: TP.text(d), fontWeight: FontWeight.w900, fontSize: 13))),
-                    );
-                  },
                 ),
-                calendarStyle: CalendarStyle(
-                  todayDecoration:    const BoxDecoration(),
-                  selectedDecoration: const BoxDecoration(),
-                  defaultTextStyle:   TextStyle(color: TP.text(d), fontSize: 13),
-                  weekendTextStyle:   TextStyle(color: TP.textMuted(d), fontSize: 13),
-                  outsideTextStyle:   TextStyle(color: TP.textSoft(d).withOpacity(0.35)),
-                ),
-                headerStyle: HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: false,
-                  titleTextStyle: const TextStyle(fontSize: 0),
-                  leftChevronIcon:  Icon(Icons.chevron_left_rounded,  color: TP.text(d), size: 24),
-                  rightChevronIcon: Icon(Icons.chevron_right_rounded, color: TP.text(d), size: 24),
-                  headerPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                ),
-                daysOfWeekStyle: DaysOfWeekStyle(
-                  weekdayStyle: TextStyle(color: TP.textMuted(d), fontWeight: FontWeight.w700, fontSize: 11),
-                  weekendStyle: TextStyle(color: TP.bronze.withOpacity(0.7), fontWeight: FontWeight.w700, fontSize: 11),
-                ),
-              ),
-            ]),
+                const SizedBox(height: 4),
+                // ✅ DATE + HEURE TRÈS LISIBLE (ex: '15 Avr • 09:00')
+                if (task.deadline != null)
+                  Row(
+                    children: [
+                      Icon(Icons.schedule_rounded, size: 12, color: TimoDesignSystem.textMuted),
+                      const SizedBox(width: 4),
+                      Text(
+                        DateFormat('dd MMM • HH:mm', 'fr_FR').format(task.deadline!),
+                        style: GoogleFonts.plusJakartaSans(
+                          color: TimoDesignSystem.textMuted,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
           ),
-          const SizedBox(height: 14),
 
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-                color: TP.card(d),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: TP.border(d))),
-            child: Wrap(spacing: 18, runSpacing: 8, children: [
-              _legendChip('Interview',   TP.info),
-              _legendChip('Onboarding',  TP.success),
-              _legendChip('Offboarding', TP.danger),
-            ]),
-          ),
-          const SizedBox(height: 20),
-
-          Row(children: [
-            Text(
-                _selectedDay != null
-                    ? 'Plannings du ${DateFormat('d MMMM', 'fr_FR').format(_selectedDay!)}'
-                    : 'Sélectionnez une date',
-                style: TextStyle(color: TP.text(d), fontSize: 15, fontWeight: FontWeight.w900)),
-            const Spacer(),
-            if (dayTasks.isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              // Badge type
               Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                      color: TP.bronze.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(20)),
-                  child: Text('${dayTasks.length}',
-                      style: const TextStyle(color: TP.bronze,
-                          fontSize: 12, fontWeight: FontWeight.w900))),
-          ]),
-          const SizedBox(height: 12),
-
-          if (dayTasks.isEmpty)
-            _emptyState(Icons.event_available_rounded,
-                'Aucun planning', 'Rien de planifié ce jour-là.', d)
-          else
-            ...dayTasks.map((t) => _buildTaskCard(t, d)),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: task.color.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  task.typeLabel,
+                  style: GoogleFonts.plusJakartaSans(
+                    color: task.color,
+                    fontSize: 8,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              if (task.isDone) ...[
+                const SizedBox(height: 6),
+                Icon(Icons.verified_rounded, color: TimoDesignSystem.success, size: 16),
+              ],
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _legendChip(String label, Color color) => Row(mainAxisSize: MainAxisSize.min, children: [
-    Container(width: 10, height: 10,
-        decoration: BoxDecoration(
-            color: color.withOpacity(0.2), borderRadius: BorderRadius.circular(3),
-            border: Border.all(color: color, width: 1.5))),
-    const SizedBox(width: 5),
-    Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600)),
-  ]);
+  // ════════════════════════════════════════════════════════════
+  //  TAB 1 — AGENDA - WHITE SAAS DESIGN
+  // ════════════════════════════════════════════════════════════
+  Widget _buildAgenda() {
+    final dayTasks = _selectedDay != null ? _tasksOn(_selectedDay!) : <TimoTask>[];
 
-  Widget _emptyState(IconData icon, String title, String sub, bool d) => Padding(
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      color: TimoDesignSystem.other,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+        children: [
+          // Calendrier
+          Container(
+            decoration: BoxDecoration(
+              color: TimoDesignSystem.card,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: TimoDesignSystem.border, width: 0.5),
+              boxShadow: [
+                BoxShadow(
+                  color: TimoDesignSystem.shadowLight,
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                // Header custom
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            DateFormat('MMMM yyyy', 'fr_FR').format(_focusedDay).toUpperCase(),
+                            style: GoogleFonts.plusJakartaSans(
+                              color: TimoDesignSystem.textPrimary,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+                          Text(
+                            '${_tasks.length} événements',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: TimoDesignSystem.textMuted,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      // Toggle semaine / mois
+                      GestureDetector(
+                        onTap: () => setState(() => _calFmt = _calFmt == CalendarFormat.month
+                            ? CalendarFormat.week : CalendarFormat.month),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                          decoration: BoxDecoration(
+                            color: TimoDesignSystem.other.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _calFmt == CalendarFormat.month
+                                    ? Icons.view_week_rounded : Icons.calendar_month_rounded,
+                                size: 13,
+                                color: TimoDesignSystem.other,
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                _calFmt == CalendarFormat.month ? 'Semaine' : 'Mois',
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: TimoDesignSystem.other,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                TableCalendar(
+                  firstDay: DateTime.utc(2020, 1, 1),
+                  lastDay: DateTime.utc(2030, 12, 31),
+                  focusedDay: _focusedDay,
+                  calendarFormat: _calFmt,
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                  onDaySelected: (sel, foc) => setState(() { _selectedDay = sel; _focusedDay = foc; }),
+                  onFormatChanged: (f) => setState(() => _calFmt = f),
+                  onPageChanged: (f) => setState(() => _focusedDay = f),
+                  eventLoader: _tasksOn,
+                  calendarBuilders: CalendarBuilders(
+                    defaultBuilder: (ctx, day, _) {
+                      final ts = _tasksOn(day);
+                      if (ts.isEmpty) return null;
+                      return Container(
+                        margin: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: TimoDesignSystem.other.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: TimoDesignSystem.other.withOpacity(0.45)),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${day.day}',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: TimoDesignSystem.textPrimary,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    todayBuilder: (ctx, day, _) => Container(
+                      margin: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: TimoDesignSystem.other,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${day.day}',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                    selectedBuilder: (ctx, day, _) => Container(
+                      margin: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF57C00),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: TimoDesignSystem.other.withOpacity(0.5),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${day.day}',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Points colorés selon le type
+                    markerBuilder: (ctx, date, events) {
+                      final ts = events.cast<TimoTask>();
+                      if (ts.isEmpty) return null;
+                      return Positioned(
+                        bottom: 4,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: ts.take(3).map((t) => Container(
+                            width: 5,
+                            height: 5,
+                            margin: const EdgeInsets.symmetric(horizontal: 1),
+                            decoration: BoxDecoration(
+                              color: t.color,
+                              shape: BoxShape.circle,
+                            ),
+                          )).toList(),
+                        ),
+                      );
+                    },
+                  ),
+                  calendarStyle: CalendarStyle(
+                    todayDecoration: const BoxDecoration(),
+                    selectedDecoration: const BoxDecoration(),
+                    defaultTextStyle: GoogleFonts.plusJakartaSans(
+                      color: TimoDesignSystem.textPrimary,
+                      fontSize: 13,
+                    ),
+                    weekendTextStyle: GoogleFonts.plusJakartaSans(
+                      color: TimoDesignSystem.textMuted,
+                      fontSize: 13,
+                    ),
+                    outsideTextStyle: GoogleFonts.plusJakartaSans(
+                      color: TimoDesignSystem.textMuted.withOpacity(0.35),
+                    ),
+                  ),
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false,
+                    titleCentered: false,
+                    titleTextStyle: const TextStyle(fontSize: 0),
+                    leftChevronIcon: Icon(
+                      Icons.chevron_left_rounded,
+                      color: TimoDesignSystem.textPrimary,
+                      size: 24,
+                    ),
+                    rightChevronIcon: Icon(
+                      Icons.chevron_right_rounded,
+                      color: TimoDesignSystem.textPrimary,
+                      size: 24,
+                    ),
+                    headerPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  ),
+                  daysOfWeekStyle: DaysOfWeekStyle(
+                    weekdayStyle: GoogleFonts.plusJakartaSans(
+                      color: TimoDesignSystem.textMuted,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                    ),
+                    weekendStyle: GoogleFonts.plusJakartaSans(
+                      color: TimoDesignSystem.other.withOpacity(0.7),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Légende types
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: TimoDesignSystem.card,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: TimoDesignSystem.border, width: 0.5),
+            ),
+            child: Wrap(
+              spacing: 18,
+              runSpacing: 8,
+              children: [
+                _legendChip('Interview', TimoDesignSystem.interview),
+                _legendChip('Onboarding', TimoDesignSystem.onboarding),
+                _legendChip('Offboarding', TimoDesignSystem.offboarding),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Tâches du jour sélectionné
+          Row(
+            children: [
+              Text(
+                _selectedDay != null
+                    ? 'Plannings du ${DateFormat('d MMMM', 'fr_FR').format(_selectedDay!)}'
+                    : 'Sélectionnez une date',
+                style: GoogleFonts.plusJakartaSans(
+                  color: TimoDesignSystem.textPrimary,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const Spacer(),
+              if (dayTasks.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: TimoDesignSystem.other.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${dayTasks.length}',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: TimoDesignSystem.other,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          if (dayTasks.isEmpty)
+            _emptyState(Icons.event_available_rounded,
+                'Aucun planning', 'Rien de planifié ce jour-là.')
+          else
+            ...dayTasks.map((t) => _buildTaskCard(t)),
+        ],
+      ),
+    );
+  }
+
+  // ════════════════════════════════════════════════════════════
+  //  SHARED HELPERS - WHITE SAAS DESIGN
+  // ════════════════════════════════════════════════════════════
+  Widget _legendChip(String label, Color color) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(
+        width: 10,
+        height: 10,
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(3),
+          border: Border.all(color: color, width: 1.5),
+        ),
+      ),
+      const SizedBox(width: 5),
+      Text(
+        label,
+        style: GoogleFonts.plusJakartaSans(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ],
+  );
+
+  Widget _emptyState(IconData icon, String title, String sub) => Padding(
     padding: const EdgeInsets.all(8),
     child: Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-          color: TP.card(d),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: TP.border(d))),
-      child: Column(children: [
-        Container(width: 60, height: 60,
+        color: TimoDesignSystem.card,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: TimoDesignSystem.border, width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: TimoDesignSystem.shadowLight,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
             decoration: BoxDecoration(
-                color: TP.bronze.withOpacity(0.12), borderRadius: BorderRadius.circular(18)),
-            child: Icon(icon, color: TP.bronze, size: 28)),
-        const SizedBox(height: 14),
-        Text(title, style: TextStyle(
-            color: TP.text(d), fontWeight: FontWeight.w900, fontSize: 16)),
-        const SizedBox(height: 6),
-        Text(sub, textAlign: TextAlign.center,
-            style: TextStyle(color: TP.textMuted(d), fontSize: 13)),
-      ]),
+              color: TimoDesignSystem.other.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Icon(icon, color: TimoDesignSystem.other, size: 28),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            title,
+            style: GoogleFonts.plusJakartaSans(
+              color: TimoDesignSystem.textPrimary,
+              fontWeight: FontWeight.w900,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            sub,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.plusJakartaSans(
+              color: TimoDesignSystem.textMuted,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }

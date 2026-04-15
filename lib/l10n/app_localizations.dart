@@ -278,7 +278,7 @@ abstract class AppLocalizations {
   /// No description provided for @agentMarketplaceNavStats.
   ///
   /// In en, this message translates to:
-  /// **'Stats'**
+  /// **'Logs'**
   String get agentMarketplaceNavStats;
 
   /// No description provided for @agentMarketplaceNavSettings.

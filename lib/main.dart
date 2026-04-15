@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vapi/vapi.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/splash_screen.dart';
@@ -21,16 +20,14 @@ import 'providers/locale_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/cart_provider.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  final bool showOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
 
   // 💳 Initialize Stripe — replace with your publishable key from
   // https://dashboard.stripe.com/test/apikeys
   Stripe.publishableKey = 'pk_test_51RIdV7QLtPq7s5k7xiLNgDPFR81G2fA4H8JxNWEK9Adrlm29M0FfWbBytw6astsugguURilr6OYtxzis36aTPhKc00b5eVc6Cm';
 
-  await SystemChrome.setPreferredOrientations([
+  SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
@@ -50,15 +47,13 @@ Future<void> main() async {
           },
         ),
       ],
-        child: MyApp(showOnboarding: !showOnboarding),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final bool showOnboarding;
-
-  const MyApp({super.key, required this.showOnboarding});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -168,13 +163,15 @@ class MyApp extends StatelessWidget {
               ? ThemeMode.dark
               : ThemeMode.light,
 
-            home: showOnboarding
-              ? const OnboardingWelcomeScreen(email: 'test@example.com')
-              : const SplashScreen(),
+          // ✅ MODE PRODUCTION : Démarrer sur splash
+          // initialRoute: '/',
+
+          // ✅ MODE TEST : Tester directement l'onboarding
+          //home: const OnboardingWelcomeScreen(email: 'test@example.com'),
 
           routes: {
             // NOTE: La route '/' est commentée car on utilise 'home' au lieu de 'initialRoute'
-            // '/': (context) => const SplashScreen(),
+             '/': (context) => const SplashScreen(),
             '/splash': (context) => const SplashScreen(),
             '/login': (context) => const LoginScreen(),
             '/signup': (context) => const SignUpScreen(),

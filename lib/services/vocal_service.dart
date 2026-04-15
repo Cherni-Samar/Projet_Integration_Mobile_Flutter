@@ -6,7 +6,7 @@ class VocalService {
   Future<void> init() async {
     try {
       await _tts.setLanguage("fr-FR");
-      await _tts.setVolume(1.0);
+      await _tts.setVolume(1.0); // ✅ Assure-toi que c'est à 1.0
       await _tts.setSpeechRate(0.5);
       await _tts.setPitch(1.0);
       print("✅ Moteur TTS Initialisé");
@@ -17,7 +17,7 @@ class VocalService {
 
   Future<void> speak(String text) async {
     if (text.isNotEmpty) {
-      print("🗣️ Vocal service: $text");
+      print("🗣️ Dexo commence à parler : $text");
       var result = await _tts.speak(text);
       if (result == 1) print("🔊 Lecture en cours...");
     }
