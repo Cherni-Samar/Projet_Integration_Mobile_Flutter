@@ -7,8 +7,9 @@ import '../../services/stripe_service.dart';
 import 'agent_chat_page.dart';
 import 'hr/hr_dashboard_page.dart';
 import 'echo/echo_dashboard_page.dart';
-import 'dexo_agent_page.dart';
-
+import 'finance/kash_dashboard_screen.dart';
+import 'timo/timo_dashboard_page.dart';
+import 'dexo/dexo_agent_page.dart';
 
 class MyAgentsPage extends StatelessWidget {
   const MyAgentsPage({Key? key}) : super(key: key);
@@ -30,8 +31,9 @@ class MyAgentsPage extends StatelessWidget {
     });
 
     return Scaffold(
-      backgroundColor:
-      isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFFAFAFA),
       appBar: AppBar(
         title: Text(
           'My Agents',
@@ -43,7 +45,10 @@ class MyAgentsPage extends StatelessWidget {
         backgroundColor: isDark ? const Color(0xFF0A0A0A) : Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? Colors.white : Colors.black,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -77,13 +82,10 @@ class MyAgentsPage extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Purchase energy packs to activate agents',
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 14,
-            ),
+            style: TextStyle(color: Colors.grey[400], fontSize: 14),
           ),
           const SizedBox(height: 24),
-          
+
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
@@ -147,7 +149,9 @@ class MyAgentsPage extends StatelessWidget {
               color: isDark ? Colors.grey[600] : Colors.grey[400],
             ),
             filled: true,
-            fillColor: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF5F5F5),
+            fillColor: isDark
+                ? const Color(0xFF2A2A2A)
+                : const Color(0xFFF5F5F5),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
@@ -171,8 +175,10 @@ class MyAgentsPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              final owned =
-              Provider.of<OwnedAgentsProvider>(context, listen: false);
+              final owned = Provider.of<OwnedAgentsProvider>(
+                context,
+                listen: false,
+              );
               owned.renameAgent(agent.agentName, controller.text);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
@@ -180,10 +186,13 @@ class MyAgentsPage extends StatelessWidget {
                   content: Text(
                     'Renamed to "${controller.text.trim().isEmpty ? agent.agentName : controller.text.trim()}"',
                   ),
-                  backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.black,
+                  backgroundColor: isDark
+                      ? const Color(0xFF1E1E1E)
+                      : Colors.black,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               );
             },
@@ -191,7 +200,8 @@ class MyAgentsPage extends StatelessWidget {
               backgroundColor: agent.agentColor,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             child: const Text('Save'),
           ),
@@ -201,7 +211,10 @@ class MyAgentsPage extends StatelessWidget {
   }
 
   Widget _buildAgentsList(
-      OwnedAgentsProvider owned, bool isDark, BuildContext context) {
+      OwnedAgentsProvider owned,
+      bool isDark,
+      BuildContext context,
+      ) {
     final energyBalance = context.watch<UserProvider>().energyBalance;
     final activeCount = context.watch<OwnedAgentsProvider>().count;
 
@@ -287,7 +300,7 @@ class MyAgentsPage extends StatelessWidget {
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -369,7 +382,8 @@ class MyAgentsPage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => EchoDashboardPage(
-                            token: null,  // Temporaire, à remplacer par le vrai token plus tard
+                            token:
+                            null, // Temporaire, à remplacer par le vrai token plus tard
                           ),
                         ),
                       );
@@ -381,13 +395,35 @@ class MyAgentsPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const DexoAgentPage(),
+                          builder: (_) => const DexoDashboardPage(),
                         ),
                       );
                       return;
                     }
 
-                    // ✅ Pour les autres agents (Timo, Kash, etc.)
+                    // ✅ Pour Kash
+                    if (id == 'kash') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const KashDashboardScreen(),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Pour Timo
+                    if (id == 'timo') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const TimoDashboardPage(),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // ✅ Pour les autres agents (Timo, etc.)
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -410,8 +446,11 @@ class MyAgentsPage extends StatelessWidget {
                           child: Image.asset(
                             agent.agentIllustration,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Icon(Icons.smart_toy,
-                                color: agent.agentColor, size: 30),
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.smart_toy,
+                              color: agent.agentColor,
+                              size: 30,
+                            ),
                           ),
                         ),
                       ),
@@ -481,7 +520,9 @@ class MyAgentsPage extends StatelessWidget {
                               children: [
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 3),
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: agent.agentColor.withOpacity(0.12),
                                     borderRadius: BorderRadius.circular(6),
@@ -496,8 +537,11 @@ class MyAgentsPage extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 10),
-                                Icon(Icons.bolt,
-                                    color: agent.agentColor, size: 14),
+                                Icon(
+                                  Icons.bolt,
+                                  color: agent.agentColor,
+                                  size: 14,
+                                ),
                                 const SizedBox(width: 2),
                                 Text(
                                   _fmtEnergy(agent.energy),
@@ -517,8 +561,10 @@ class MyAgentsPage extends StatelessWidget {
 
                       // Status
                       Container(
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF10B981).withOpacity(0.12),
                           borderRadius: BorderRadius.circular(8),
@@ -698,9 +744,7 @@ class _TopupOptionTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
-            ),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
           ),
           child: Row(
             children: [
@@ -730,7 +774,10 @@ class _TopupOptionTile extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: accent,
                   borderRadius: BorderRadius.circular(12),

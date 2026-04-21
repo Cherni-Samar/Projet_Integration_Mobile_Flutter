@@ -56,7 +56,14 @@ class StripeService {
     try {
       await Stripe.instance.presentPaymentSheet();
 
-      return true; // Payment succeeded
+      // 5. ✅ Confirm on backend to actually credit energy/credits
+      final confirmRes = await ApiService.post(
+        endpoint: ApiConstants.confirmPayment,
+        body: {'paymentIntentId': paymentIntentId.toString()},
+        token: token,
+      );
+
+      return confirmRes['success'] == true;
     } on StripeException catch (e) {
       if (e.error.code == FailureCode.Canceled) {
         _lastPaymentIntentId = null;

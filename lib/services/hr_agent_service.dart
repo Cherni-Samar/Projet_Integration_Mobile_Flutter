@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+import 'api_config.dart';
+import 'api_service.dart'; // Assure-toi que le nom du fichier est correct
 class HrAgentService {
   // ══════════════════════════════════════════════════════════════════════════
   // Configuration
   // ══════════════════════════════════════════════════════════════════════════
 
-  static const String baseUrl = 'http://192.168.1.102:3000/api/hera';
+  static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
   // ══════════════════════════════════════════════════════════════════════════
   // Hello
   // ══════════════════════════════════════════════════════════════════════════
@@ -33,6 +34,62 @@ class HrAgentService {
         'success': false,
         'error': e.toString()
       };
+    }
+  }static Future<Map<String, dynamic>> getHistory({required String employeeId}) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/history/$employeeId'), // Vérifie que c'est bien ta route back
+      headers: {"Content-Type": "application/json"},
+    );
+    return jsonDecode(response.body);
+  }
+  static Future<Map<String, dynamic>> generateHeraDoc({
+    required String employeeId,
+    required String docType
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/generate-doc'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "employee_id": employeeId,
+        "doc_type": docType,
+      }),
+    );
+    return jsonDecode(response.body);
+  }
+// Ajoute cette fonction dans ta classe HrAgentService
+  static Future<Map<String, dynamic>> getDexoCheckup() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/dexo-checkup'), // ✅ L'URL doit correspondre à ton back
+        headers: {"Content-Type": "application/json"},
+      );
+      return jsonDecode(response.body);
+    } catch (e) {
+      throw Exception("Erreur de connexion Dexo: $e");
+    }
+  }
+  static Future<Map<String, dynamic>> getAllCandidates() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/candidates'), // ✅ Vérifie que c'est bien /candidates
+      headers: {"Content-Type": "application/json"},
+    );
+    return jsonDecode(response.body);
+  }
+  // Ajoute cette fonction dans ta classe HrAgentService
+  static Future<Map<String, dynamic>> getTimoInbox() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/timo-inbox'), // ✅ La route que nous avons créée au back
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {"success": false, "message": "Erreur serveur Timo"};
+      }
+    } catch (e) {
+      return {"success": false, "error": e.toString()};
     }
   }
   // ══════════════════════════════════════════════════════════════════════════
@@ -71,6 +128,7 @@ class HrAgentService {
       };
     }
   }
+
   // ══════════════════════════════════════════════════════════════════════════
   // Leave Request
   // ══════════════════════════════════════════════════════════════════════════
@@ -350,6 +408,25 @@ class HrAgentService {
     }
   }
 
+  static Future<Map<String, dynamic>> deleteAction(String actionId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/admin/action/$actionId'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    return json.decode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> getAllActions({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/admin/all-actions?page=$page&limit=$limit'),
+      headers: {'Content-Type': 'application/json'},
+    );
+    return json.decode(response.body);
+  }
+
   // ══════════════════════════════════════════════════════════════════════════
   // ADMIN - Get Recent Actions
   // ══════════════════════════════════════════════════════════════════════════
@@ -367,6 +444,51 @@ class HrAgentService {
         return {
           'success': false,
           'error': 'Failed to load recent actions',
+          'status_code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': e.toString()
+      };
+    }
+  }
+  // Dans lib/services/hr_agent_service.dart
+
+  static Future<bool> requestDexoDoc(String employeeId, String docType) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: 'http://10.0.2.2:3000/api/dexo/request-doc', // Remplace par ton URL
+        body: {
+          'employeeId': employeeId,
+          'docType': docType,
+        },
+      );
+      return response['success'] == true;
+    } catch (e) {
+      print("❌ Erreur Dexo Service: $e");
+      return false;
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // DEXO - Get Document Actions
+  // ══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> getDocumentActions({int limit = 20}) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/admin/document-actions?limit=$limit'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'error': 'Failed to load document actions',
           'status_code': response.statusCode,
         };
       }

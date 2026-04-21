@@ -9,7 +9,7 @@ class OnboardingChatbotScreen extends StatefulWidget {
   final String email;
 
   const OnboardingChatbotScreen({Key? key, required this.email})
-      : super(key: key);
+    : super(key: key);
 
   @override
   State<OnboardingChatbotScreen> createState() =>
@@ -245,7 +245,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
       _messages.add(
         ChatMessage(
           text:
-          "✨ Based on your needs, I recommend these agents:\n\n$recommendationsText\n\n⚡ I've added them to your cart with a Starter Energy Pack (1,000 ⚡ each)!",
+              "✨ Based on your needs, I recommend these agents:\n\n$recommendationsText\n\n⚡ I've added them to your cart with a Starter Energy Pack (1,000 ⚡ each)!",
           isBot: true,
           showActions: true,
         ),
@@ -292,31 +292,31 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
         'key': 'hera',
         'name': '🤝 **Hera** (HR Agent)',
         'description':
-        'Manages leave requests, employee onboarding, and team coordination',
+            'Manages leave requests, employee onboarding, and team coordination',
       },
       {
         'key': 'kash',
         'name': '💰 **Kash** (Financial Agent)',
         'description':
-        'Validates expenses, tracks budgets, and generates financial reports',
+            'Validates expenses, tracks budgets, and generates financial reports',
       },
       {
         'key': 'dox',
         'name': '📋 **Dox** (Administrative Agent)',
         'description':
-        'Classifies documents, manages files, and handles access rights',
+            'Classifies documents, manages files, and handles access rights',
       },
       {
         'key': 'timo',
         'name': '⏰ **Timo** (Planning Agent)',
         'description':
-        'Avoids scheduling conflicts, prioritizes tasks, and sends deadline reminders',
+            'Avoids scheduling conflicts, prioritizes tasks, and sends deadline reminders',
       },
       {
         'key': 'echo',
         'name': '💬 **Echo** (Communication Agent)',
         'description':
-        'Summarizes conversations, filters messages, and sends smart notifications',
+            'Summarizes conversations, filters messages, and sends smart notifications',
       },
     ];
 
@@ -923,8 +923,8 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
               decoration: BoxDecoration(
                 gradient: isSelected
                     ? const LinearGradient(
-                  colors: [Colors.black, Color(0xFF2A2A2A)],
-                )
+                        colors: [Colors.black, Color(0xFF2A2A2A)],
+                      )
                     : null,
                 color: isSelected ? null : Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -968,10 +968,10 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                       ),
                       child: isSelected
                           ? const Icon(
-                        Icons.check,
-                        size: 14,
-                        color: Colors.black,
-                      )
+                              Icons.check,
+                              size: 14,
+                              color: Colors.black,
+                            )
                           : null,
                     ),
                     const SizedBox(width: 10),

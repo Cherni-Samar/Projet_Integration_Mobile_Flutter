@@ -36,17 +36,19 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final receivedEmails = _emails.where((e) =>
-    e.sender != 'echo@e-team.com' &&
-        e.category != 'auto_reply' &&
-        e.category != 'auto_reply_pending' &&
-        e.sender != 'hera@e-team.com'
-    ).toList();
+    final receivedEmails = _emails
+        .where((e) =>
+            e.sender != 'echo@e-team.com' &&
+            e.category != 'auto_reply' &&
+            e.category != 'auto_reply_pending' &&
+            e.sender != 'hera@e-team.com')
+        .toList();
 
-    final sentEmails = _emails.where((e) =>
-    e.sender == 'hera@e-team.com' ||
-        (e.category == 'reply' && e.sender == 'echo@e-team.com')
-    ).toList();
+    final sentEmails = _emails
+        .where((e) =>
+            e.sender == 'hera@e-team.com' ||
+            (e.category == 'reply' && e.sender == 'echo@e-team.com'))
+        .toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -64,7 +66,6 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
       ),
       body: Column(
         children: [
-          // Onglets
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
@@ -79,14 +80,18 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: _selectedTab == 0 ? Colors.orange : Colors.transparent,
+                        color: _selectedTab == 0
+                            ? Colors.orange
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         '📥 Reçus',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: _selectedTab == 0 ? Colors.white : Colors.grey[600],
+                          color: _selectedTab == 0
+                              ? Colors.white
+                              : Colors.grey[600],
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -99,14 +104,18 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: _selectedTab == 1 ? Colors.orange : Colors.transparent,
+                        color: _selectedTab == 1
+                            ? Colors.orange
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         '📤 Envoyés',
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: _selectedTab == 1 ? Colors.white : Colors.grey[600],
+                          color: _selectedTab == 1
+                              ? Colors.white
+                              : Colors.grey[600],
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -120,8 +129,8 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _selectedTab == 0
-                ? _buildEmailList(receivedEmails, 'reçus')
-                : _buildEmailList(sentEmails, 'envoyés'),
+                    ? _buildEmailList(receivedEmails, 'reçus')
+                    : _buildEmailList(sentEmails, 'envoyés'),
           ),
         ],
       ),
@@ -134,7 +143,8 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(type == 'reçus' ? Icons.inbox : Icons.send, size: 64, color: Colors.grey[400]),
+            Icon(type == 'reçus' ? Icons.inbox : Icons.send,
+                size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               type == 'reçus' ? 'Aucun message reçu' : 'Aucun message envoyé',
@@ -178,7 +188,9 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
             offset: const Offset(0, 1),
           ),
         ],
-        border: email.isUrgent ? Border.all(color: Colors.red.shade300, width: 1) : null,
+        border: email.isUrgent
+            ? Border.all(color: Colors.red.shade300, width: 1)
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,10 +199,14 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: isFromEcho ? Colors.deepPurple : _getSenderColor(email.sender),
+                backgroundColor:
+                    isFromEcho ? Colors.deepPurple : _getSenderColor(email.sender),
                 child: Text(
                   email.sender[0].toUpperCase(),
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
               const SizedBox(width: 12),
@@ -203,14 +219,16 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
                         Text(
                           email.sender,
                           style: TextStyle(
-                            fontWeight: isFromEcho ? FontWeight.bold : FontWeight.w500,
+                            fontWeight:
+                                isFromEcho ? FontWeight.bold : FontWeight.w500,
                             fontSize: 14,
                           ),
                         ),
                         if (isFromEcho)
                           Container(
                             margin: const EdgeInsets.only(left: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: Colors.deepPurple.shade50,
                               borderRadius: BorderRadius.circular(8),
@@ -231,30 +249,43 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
                   ],
                 ),
               ),
-              Text(_formatTime(email.receivedAt), style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+              Text(
+                _formatTime(email.receivedAt),
+                style: TextStyle(fontSize: 10, color: Colors.grey[500]),
+              ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            email.summary.length > 80 ? '${email.summary.substring(0, 80)}...' : email.summary,
+            email.summary.length > 80
+                ? '${email.summary.substring(0, 80)}...'
+                : email.summary,
             style: TextStyle(fontSize: 12, color: Colors.grey[600]),
           ),
           if (email.isUrgent)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(8)),
-                child: const Text('Urgent', style: TextStyle(fontSize: 10, color: Colors.red)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8)),
+                child: const Text('Urgent',
+                    style: TextStyle(fontSize: 10, color: Colors.red)),
               ),
             ),
           if (isFromEcho && email.category == 'reply')
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(8)),
-                child: const Text('Réponse', style: TextStyle(fontSize: 10, color: Colors.green)),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(8)),
+                child: const Text('Réponse',
+                    style: TextStyle(fontSize: 10, color: Colors.green)),
               ),
             ),
         ],
@@ -263,7 +294,15 @@ class _HrInboxScreenState extends State<HrInboxScreen> {
   }
 
   Color _getSenderColor(String sender) {
-    final colors = [Colors.blue, Colors.green, Colors.orange, Colors.purple, Colors.teal, Colors.pink, Colors.indigo];
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.pink,
+      Colors.indigo
+    ];
     return colors[sender.length % colors.length];
   }
 

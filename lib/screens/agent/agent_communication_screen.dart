@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../services/echo_service.dart';
-import '../../../services/hr_agent_service.dart';
+import '../../services/echo_service.dart';
+import '../../services/hr_agent_service.dart';
 
 class AgentCommunicationScreen extends StatefulWidget {
   final String? token;
@@ -72,7 +72,7 @@ class _AgentCommunicationScreenState extends State<AgentCommunicationScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('$agentName'),
+        title: Text(agentName),
         backgroundColor: agentColor,
         foregroundColor: Colors.white,
       ),
@@ -80,7 +80,6 @@ class _AgentCommunicationScreenState extends State<AgentCommunicationScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Sujet
             TextField(
               controller: _subjectController,
               decoration: InputDecoration(
@@ -92,8 +91,6 @@ class _AgentCommunicationScreenState extends State<AgentCommunicationScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Contenu
             TextField(
               controller: _contentController,
               maxLines: 5,
@@ -107,8 +104,6 @@ class _AgentCommunicationScreenState extends State<AgentCommunicationScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // Bouton envoyer
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -122,22 +117,20 @@ class _AgentCommunicationScreenState extends State<AgentCommunicationScreen> {
                 ),
                 child: _isSending
                     ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
                     : Text(
-                  'Envoyer à ${isEcho ? 'Hera' : 'Echo'}',
-                  style: const TextStyle(fontSize: 16),
-                ),
+                        'Envoyer à ${isEcho ? 'Hera' : 'Echo'}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
               ),
             ),
             const SizedBox(height: 16),
-
-            // Message de résultat
             if (_resultMessage.isNotEmpty)
               Container(
                 padding: const EdgeInsets.all(12),

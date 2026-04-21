@@ -10,6 +10,8 @@ import '../../l10n/app_localizations.dart';
 
 import '../../screens/agent/AgentDetails Page.dart';
 import '../../screens/agent/my_agents_page.dart';
+import '../../screens/agent/agent_inter_flow_page.dart';
+import '../../screens/activity/activity_logs_screen.dart';
 import '../../screens/pricing_page.dart';
 import '../auth/user_profile_page.dart';
 import '../../services/api_service.dart';
@@ -707,25 +709,25 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                               ],
                             ),
                             child: ElevatedButton(
-                              onPressed: (user == null || _isHiring)
-                                  ? null
-                                  : isActive
-                                  ? null
-                                  : hasSlots
-                                  ? () => _hireAgent(currentAgentId)
-                                  : () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                    const PricingPage(),
-                                  ),
-                                ).then((result) {
-                                  if (result == true) {
-                                    _loadUserData();
-                                  }
-                                });
-                              },
+                                  onPressed: (user == null || _isHiring)
+                                      ? null
+                                      : isActive
+                                          ? null
+                                          : hasSlots
+                                              ? () => _hireAgent(currentAgentId)
+                                              : () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const PricingPage(),
+                                                    ),
+                                                  ).then((result) {
+                                                    if (result == true) {
+                                                      _loadUserData();
+                                                    }
+                                                  });
+                                                },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
                                 foregroundColor: buttonFg,
@@ -739,40 +741,40 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  if (_isHiring)
-                                    SizedBox(
-                                      height: 18,
-                                      width: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.2,
-                                        color: buttonFg,
-                                      ),
-                                    )
-                                  else ...[
-                                    Icon(
-                                      isActive
-                                          ? Icons.verified
-                                          : hasSlots
-                                          ? Icons.person_add_alt_1
-                                          : Icons.workspace_premium,
-                                      size: 22,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      isActive
-                                          ? 'Actif'
-                                          : hasSlots
-                                          ? 'Hire'
-                                          : 'Plan plein - Améliorer mon offre',
-                                      style: TextStyle(
-                                        color: buttonFg,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.5,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
+                                      if (_isHiring)
+                                        SizedBox(
+                                          height: 18,
+                                          width: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.2,
+                                            color: buttonFg,
+                                          ),
+                                        )
+                                      else ...[
+                                        Icon(
+                                          isActive
+                                              ? Icons.verified
+                                              : hasSlots
+                                                  ? Icons.person_add_alt_1
+                                                  : Icons.workspace_premium,
+                                          size: 22,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          isActive
+                                              ? 'Actif'
+                                              : hasSlots
+                                                  ? 'Hire'
+                                                  : 'Plan plein - Améliorer mon offre',
+                                          style: TextStyle(
+                                            color: buttonFg,
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 0.5,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
                                 ],
                               ),
                             ),
@@ -830,11 +832,37 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                 isDark,
               ),
             ),
-            _buildNavItem(
-              Icons.bar_chart_rounded,
-              l10n.agentMarketplaceNavStats,
-              false,
-              isDark,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ActivityLogsScreen(),
+                  ),
+                );
+              },
+              child: _buildNavItem(
+                Icons.history,
+                'Activity',
+                false,
+                isDark,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AgentInterFlowPage(),
+                  ),
+                );
+              },
+              child: _buildNavItem(
+                Icons.bar_chart_rounded,
+                l10n.agentMarketplaceNavStats,
+                false,
+                isDark,
+              ),
             ),
             GestureDetector(
               onTap: () {

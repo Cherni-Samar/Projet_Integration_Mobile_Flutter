@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
+import 'package:vapi/vapi.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
@@ -17,11 +18,14 @@ import 'providers/owned_agents_provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/user_provider.dart';
-
 import 'providers/cart_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 💳 Initialize Stripe — replace with your publishable key from
+  // https://dashboard.stripe.com/test/apikeys
+  Stripe.publishableKey = 'pk_test_51RIdV7QLtPq7s5k7xiLNgDPFR81G2fA4H8JxNWEK9Adrlm29M0FfWbBytw6astsugguURilr6OYtxzis36aTPhKc00b5eVc6Cm';
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -163,11 +167,11 @@ class MyApp extends StatelessWidget {
           // initialRoute: '/',
 
           // ✅ MODE TEST : Tester directement l'onboarding
-          home: const OnboardingWelcomeScreen(email: 'test@example.com'),
+          //home: const OnboardingWelcomeScreen(email: 'test@example.com'),
 
           routes: {
             // NOTE: La route '/' est commentée car on utilise 'home' au lieu de 'initialRoute'
-            // '/': (context) => const SplashScreen(),
+             '/': (context) => const SplashScreen(),
             '/splash': (context) => const SplashScreen(),
             '/login': (context) => const LoginScreen(),
             '/signup': (context) => const SignUpScreen(),

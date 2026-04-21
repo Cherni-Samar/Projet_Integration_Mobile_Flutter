@@ -301,7 +301,7 @@ class AgentData {
         color: const Color(0xFF8B5CF6),
         action: 'Processed 3 leave requests',
         details:
-        '• Approved: Sarah M.\n• Pending: John D.\n• Rejected: Mike R. (insufficient balance)',
+            '• Approved: Sarah M.\n• Pending: John D.\n• Rejected: Mike R. (insufficient balance)',
         timestamp: DateTime.now().subtract(const Duration(minutes: 2)),
       ),
       Activity(
@@ -312,7 +312,7 @@ class AgentData {
         color: const Color(0xFF10B981),
         action: 'Archived 12 documents',
         details:
-        'Organized files into Q4 2025 folder\nCategories: Invoices (5), Contracts (7)',
+            'Organized files into Q4 2025 folder\nCategories: Invoices (5), Contracts (7)',
         timestamp: DateTime.now().subtract(const Duration(minutes: 15)),
       ),
       Activity(
@@ -323,7 +323,7 @@ class AgentData {
         color: const Color(0xFFEC4899),
         action: 'Scheduled 2 meetings',
         details:
-        '• Team Sync - Tomorrow 10:00 AM\n• Client Review - Friday 2:00 PM',
+            '• Team Sync - Tomorrow 10:00 AM\n• Client Review - Friday 2:00 PM',
         timestamp: DateTime.now().subtract(const Duration(hours: 1)),
       ),
       Activity(

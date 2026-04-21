@@ -604,9 +604,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             borderRadius: BorderRadius.circular(12),
                             side: isDark
                                 ? BorderSide(
-                              color: Colors.white.withValues(alpha: 0.1),
-                              width: 1,
-                            )
+                                    color: Colors.white.withValues(alpha: 0.1),
+                                    width: 1,
+                                  )
                                 : BorderSide.none,
                           ),
                         ),
@@ -933,8 +933,8 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             ),
                             child: Column(
                               children: energyCosts.asMap().entries.map((
-                                  entry,
-                                  ) {
+                                entry,
+                              ) {
                                 final i = entry.key;
                                 final task = entry.value;
                                 return Container(
@@ -945,29 +945,29 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                   decoration: BoxDecoration(
                                     border: i < energyCosts.length - 1
                                         ? Border(
-                                      bottom: BorderSide(
-                                        color: isDark
-                                            ? Colors.white.withValues(
-                                          alpha: 0.06,
-                                        )
-                                            : Colors.black.withValues(
-                                          alpha: 0.06,
-                                        ),
-                                      ),
-                                    )
+                                            bottom: BorderSide(
+                                              color: isDark
+                                                  ? Colors.white.withValues(
+                                                      alpha: 0.06,
+                                                    )
+                                                  : Colors.black.withValues(
+                                                      alpha: 0.06,
+                                                    ),
+                                            ),
+                                          )
                                         : null,
                                   ),
                                   child: Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         task['task'] as String,
                                         style: TextStyle(
                                           color: isDark
                                               ? Colors.white.withValues(
-                                            alpha: 0.8,
-                                          )
+                                                  alpha: 0.8,
+                                                )
                                               : Colors.black87,
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
@@ -1025,7 +1025,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             ),
                             const SizedBox(height: 16),
                             ...multiScenarios.map(
-                                  (s) => Container(
+                              (s) => Container(
                                 margin: const EdgeInsets.only(bottom: 12),
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
@@ -1058,15 +1058,15 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                     const SizedBox(height: 8),
                                     Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           s['agents'] as String,
                                           style: TextStyle(
                                             color: isDark
                                                 ? Colors.white.withValues(
-                                              alpha: 0.6,
-                                            )
+                                                    alpha: 0.6,
+                                                  )
                                                 : Colors.black54,
                                             fontSize: 13,
                                           ),
@@ -1215,12 +1215,12 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
   // ✅ NOUVELLE méthode — Handle Hire Agent
   // ---------------------------
   Future<void> _handleHireAgent(
-      BuildContext context,
-      bool isDark,
-      String name,
-      Color color,
-      String icon,
-      ) async {
+    BuildContext context,
+    bool isDark,
+    String name,
+    Color color,
+    String icon,
+  ) async {
     if (name == 'Hera') {
       // 1. Loading dialog
       showDialog(
@@ -1309,12 +1309,12 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
   // Energy Pack Sheet (inchangé)
   // ---------------------------
   void _showEnergyPackSheet(
-      BuildContext ctx,
-      bool isDark,
-      String agentName,
-      Color agentColor,
-      String agentIcon,
-      ) {
+    BuildContext ctx,
+    bool isDark,
+    String agentName,
+    Color agentColor,
+    String agentIcon,
+  ) {
     final cart = Provider.of<CartProvider>(ctx, listen: false);
     final packs = _getEnergyPacksForAgent(agentName);
     showModalBottomSheet(

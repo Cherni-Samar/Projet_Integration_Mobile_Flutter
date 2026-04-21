@@ -1,8 +1,9 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'api_config.dart';
 
 class AgentMailService {
-  static const String baseUrl = 'http://192.168.1.102:3000';
+  static String get baseUrl => ApiConfig.baseUrl;
 
   // Envoyer un email d'un agent à un autre
   static Future<bool> sendEmail({

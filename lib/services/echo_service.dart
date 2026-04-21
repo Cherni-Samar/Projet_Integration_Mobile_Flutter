@@ -1,9 +1,9 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:characters/characters.dart';
 import 'api_service.dart';
 
 class EchoService {
-  static const String _baseUrl = 'http://192.168.1.102:3000';
+  static const String _baseUrl = 'http://10.0.2.2:3000';
 
   static Future<EchoResponse> sendTextMessage({
     required String message,
@@ -13,10 +13,7 @@ class EchoService {
     try {
       final response = await ApiService.post(
         endpoint: '$_baseUrl/api/echo/echo',
-        body: {
-          'message': message,
-          'sender': sender,
-        },
+        body: {'message': message, 'sender': sender},
         token: token,
       );
       return EchoResponse.fromJson(response);
@@ -25,7 +22,20 @@ class EchoService {
       return EchoResponse.error(e.toString());
     }
   }
-
+// À ajouter dans la classe EchoService
+  static Future<Map<String, dynamic>> getSocialFeed({String? token}) async {
+    try {
+      final response = await ApiService.get(
+        endpoint: '$_baseUrl/api/echo/social-feed',
+        token: token,
+      );
+      // On retourne le Map complet qui contient {success: true, feed: [...]}
+      return response;
+    } catch (e) {
+      print('❌ EchoService - getSocialFeed error: $e');
+      return {'success': false, 'feed': [], 'error': e.toString()};
+    }
+  }
   static Future<EmailsResponse> getEmails({String? token}) async {
     try {
       final response = await ApiService.get(
@@ -77,6 +87,110 @@ class EchoService {
       print('❌ EchoService - deleteEmail error: $e');
       return false;
     }
+  }
+
+  /// Réponses API considérées comme succès (selon implémentation backend).
+  /// Transforme JSON / analyse en **texte de courriel** (réponse), pas en fiche résumé.
+  static String humanReadableAutoReplyBody(String raw) {
+    final t = raw.trim();
+    if (t.isEmpty) return t;
+    if (!t.startsWith('{') && !t.startsWith('[')) return raw;
+
+    Map<String, dynamic>? map;
+    try {
+      final decoded = jsonDecode(t);
+      if (decoded is Map<String, dynamic>) map = decoded;
+    } catch (_) {
+      try {
+        final normalized = t.replaceAll("'", '"');
+        final decoded = jsonDecode(normalized);
+        if (decoded is Map<String, dynamic>) map = decoded;
+      } catch (_) {}
+    }
+    if (map == null) {
+      final g1 = RegExp(r"summary\s*:\s*'([^']*)'").firstMatch(t)?.group(1);
+      if (g1 != null && g1.trim().isNotEmpty) {
+        return _composeAutoReplyFromAnalysis({'summary': g1.trim()});
+      }
+      final g2 = RegExp(r'summary\s*:\s*"([^"]*)"').firstMatch(t)?.group(1);
+      if (g2 != null && g2.trim().isNotEmpty) {
+        return _composeAutoReplyFromAnalysis({'summary': g2.trim()});
+      }
+      return raw;
+    }
+
+    final direct = map['reply'] ??
+        map['replyText'] ??
+        map['replyContent'] ??
+        map['generatedReply'] ??
+        map['emailBody'] ??
+        map['body'] ??
+        map['message'] ??
+        map['text'];
+    if (direct != null && direct.toString().trim().isNotEmpty) {
+      return direct.toString().trim();
+    }
+
+    return _composeAutoReplyFromAnalysis(map);
+  }
+
+  /// Construit un paragraphe de réponse type e-mail à partir des champs d’analyse.
+  static String _composeAutoReplyFromAnalysis(Map<String, dynamic> map) {
+    final summary = map['summary']?.toString().trim() ?? '';
+    final actions = map['actions'];
+    final urgent = map['isUrgent'] == true || map['isUrgent'] == 1;
+    final priority = map['priority']?.toString().toLowerCase() ?? '';
+
+    final buf = StringBuffer();
+    buf.writeln('Bonjour,');
+    buf.writeln();
+
+    if (summary.isNotEmpty) {
+      var line = summary.trimRight();
+      final endsWell = line.endsWith('.') ||
+          line.endsWith('!') ||
+          line.endsWith('?') ||
+          line.endsWith('…');
+      if (!endsWell) line = '$line.';
+      buf.writeln(line);
+      buf.writeln();
+    }
+
+    if (actions is List && actions.isNotEmpty) {
+      buf.writeln(
+        'Pour la suite, nous vous confirmons la prise en charge des points suivants :',
+      );
+      for (final a in actions) {
+        final s = a.toString().trim();
+        if (s.isNotEmpty) buf.writeln('• $s');
+      }
+      buf.writeln();
+    }
+
+    if (urgent || priority == 'high') {
+      buf.writeln(
+        'Nous traitons votre demande en priorité et vous tiendrons informé(e) dans les meilleurs délais.',
+      );
+      buf.writeln();
+    } else {
+      buf.writeln(
+        'Nous restons à votre disposition pour toute précision.',
+      );
+      buf.writeln();
+    }
+
+    final out = buf.toString().trim();
+    if (out.isEmpty) return map.toString();
+    return out;
+  }
+
+  static bool replySucceeded(Map<String, dynamic> response) {
+    final s = response['success'];
+    if (s == true || s == 1 || s == 'true') return true;
+    if (response['ok'] == true || response['saved'] == true) return true;
+    if (response['status'] == 'ok' || response['status'] == 'success')
+      return true;
+    return false;
   }
 
   static Future<Map<String, dynamic>> replyToEmail({
@@ -181,8 +295,10 @@ class EchoService {
     int vowelCount = 0;
     int consonantCount = 0;
     for (var char in message.characters) {
-      if (vowels.contains(char)) vowelCount++;
-      else if (consonants.contains(char)) consonantCount++;
+      if (vowels.contains(char))
+        vowelCount++;
+      else if (consonants.contains(char))
+        consonantCount++;
     }
     if (consonantCount > 0 && vowelCount / consonantCount < 0.2) {
       return false;
@@ -219,10 +335,7 @@ class EchoService {
     try {
       final response = await ApiService.post(
         endpoint: '$_baseUrl/api/echo/save-document',
-        body: {
-          'content': content,
-          'classification': classification,
-        },
+        body: {'content': content, 'classification': classification},
         token: token,
       );
       return response;
@@ -242,11 +355,8 @@ class EchoService {
       if (confidentialityLevel != null) {
         endpoint += '?confidentialityLevel=$confidentialityLevel';
       }
-      
-      final response = await ApiService.get(
-        endpoint: endpoint,
-        token: token,
-      );
+
+      final response = await ApiService.get(endpoint: endpoint, token: token);
       return DocumentListResponse.fromJson(response);
     } catch (e) {
       print('❌ EchoService - getDocumentsByCategory error: $e');
@@ -308,16 +418,15 @@ class EchoService {
       Map<String, String> queryParams = {};
       if (status != null) queryParams['status'] = status;
       if (category != null) queryParams['category'] = category;
-      
+
       String endpoint = '$_baseUrl/api/echo/tasks';
       if (queryParams.isNotEmpty) {
-        endpoint += '?' + queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+        endpoint +=
+            '?' +
+                queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
       }
 
-      final response = await ApiService.get(
-        endpoint: endpoint,
-        token: token,
-      );
+      final response = await ApiService.get(endpoint: endpoint, token: token);
       return TaskListResponse.fromJson(response);
     } catch (e) {
       print('❌ EchoService - getTasks error: $e');
@@ -356,6 +465,149 @@ class EchoService {
     } catch (e) {
       print('❌ EchoService - deleteTask error: $e');
       return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 📱 MOBILE POSTS MANAGEMENT METHODS
+  // ═══════════════════════════════════════════════════════════════
+
+  static Future<PostsResponse> getMobilePosts({
+    int page = 1,
+    int limit = 20,
+    String? platform,
+    String? token,
+  }) async {
+    try {
+      Map<String, String> queryParams = {
+        'page': page.toString(),
+        'limit': limit.toString(),
+      };
+      if (platform != null) queryParams['platform'] = platform;
+
+      String endpoint = '$_baseUrl/api/echo/mobile/posts';
+      if (queryParams.isNotEmpty) {
+        endpoint +=
+            '?' +
+                queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+      }
+
+      final response = await ApiService.get(endpoint: endpoint, token: token);
+      return PostsResponse.fromJson(response);
+    } catch (e) {
+      print('❌ EchoService - getMobilePosts error: $e');
+      return PostsResponse.error(e.toString());
+    }
+  }
+
+  static Future<Map<String, dynamic>> forcePost({String? token}) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/api/echo/mobile/force-post',
+        body: {},
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - forcePost error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🛍️ PRODUCT MARKETING METHODS
+  // ═══════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> scrapeProduct({
+    required String productUrl,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/api/echo/product/scrape',
+        body: {'productUrl': productUrl},
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - scrapeProduct error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> startProductCampaign({
+    required String productUrl,
+    required String frequency,
+    required List<String> platforms,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/api/echo/product/campaign/start',
+        body: {
+          'productUrl': productUrl,
+          'frequency': frequency,
+          'platforms': platforms,
+        },
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - startProductCampaign error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> getCampaignStatus({String? token}) async {
+    try {
+      final response = await ApiService.get(
+        endpoint: '$_baseUrl/api/echo/product/campaign/status',
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - getCampaignStatus error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> stopProductCampaign({String? token}) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/api/echo/product/campaign/stop',
+        body: {},
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - stopProductCampaign error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> getCampaignHistory({
+    int limit = 50,
+    String? status,
+    String? token,
+  }) async {
+    try {
+      Map<String, String> queryParams = {
+        'limit': limit.toString(),
+      };
+      if (status != null) queryParams['status'] = status;
+
+      String endpoint = '$_baseUrl/api/echo/product/campaign/history';
+      if (queryParams.isNotEmpty) {
+        endpoint +=
+            '?' +
+                queryParams.entries.map((e) => '${e.key}=${e.value}').join('&');
+      }
+
+      final response = await ApiService.get(endpoint: endpoint, token: token);
+      return response;
+    } catch (e) {
+      print('❌ EchoService - getCampaignHistory error: $e');
+      return {'success': false, 'error': e.toString(), 'campaigns': []};
     }
   }
 }
@@ -410,7 +662,8 @@ class EchoResponse {
   String get formattedText {
     String text = '';
     if (summary != null) text += '📝 Resume\n$summary\n\n';
-    if (transcribedText != null) text += '🎤 Message transcrit\n$transcribedText\n\n';
+    if (transcribedText != null)
+      text += '🎤 Message transcrit\n$transcribedText\n\n';
     text += '⚠️ Urgent : ${isUrgent ? 'OUI' : 'NON'}\n';
     text += '⭐ Priorite : ${_getPriorityIcon()}\n\n';
     if (actions.isNotEmpty) {
@@ -424,9 +677,12 @@ class EchoResponse {
 
   String _getPriorityIcon() {
     switch (priority.toLowerCase()) {
-      case 'high': return '🔴 HIGH';
-      case 'medium': return '🟠 MEDIUM';
-      default: return '🟢 LOW';
+      case 'high':
+        return '🔴 HIGH';
+      case 'medium':
+        return '🟠 MEDIUM';
+      default:
+        return '🟢 LOW';
     }
   }
 }
@@ -496,9 +752,14 @@ class PendingResponse {
 
   factory PendingResponse.fromJson(Map<String, dynamic> json) {
     final pendingList = <PendingItem>[];
-    if (json['pending'] != null) {
-      for (var item in json['pending']) {
-        pendingList.add(PendingItem.fromJson(item));
+    List? list = json['pending'] is List ? json['pending'] as List : null;
+    list ??= json['items'] is List ? json['items'] as List : null;
+    list ??= json['data'] is List ? json['data'] as List : null;
+    if (list != null) {
+      for (var item in list) {
+        if (item is Map) {
+          pendingList.add(PendingItem.fromJson(Map<String, dynamic>.from(item)));
+        }
       }
     }
     return PendingResponse(
@@ -537,14 +798,67 @@ class PendingItem {
   });
 
   factory PendingItem.fromJson(Map<String, dynamic> json) {
-    return PendingItem(
-      emailId: json['emailId'] ?? '',
-      subject: json['subject'] ?? '',
-      sender: json['sender'] ?? '',
-      scheduledAt: DateTime.tryParse(json['scheduledAt'] ?? '') ?? DateTime.now(),
-      remainingMinutes: (json['remainingMinutes'] ?? 0).toDouble(),
-      willSendIn: json['willSendIn'] ?? '',
+    String str(dynamic v) => v == null ? '' : v.toString();
+
+    final parsedEmailId =
+    str(json['emailId'] ?? json['email_id'] ?? json['id'] ?? json['_id']);
+    final parsedSubject = str(json['subject']);
+    final parsedSender = str(
+      json['sender'] ?? json['from'] ?? json['senderEmail'] ?? json['fromEmail'],
     );
+    var parsedScheduledAt = DateTime.tryParse(
+      str(json['scheduledAt'] ?? json['scheduled_at']),
+    ) ??
+        DateTime.tryParse(str(json['sendAt'] ?? json['send_at'])) ??
+        DateTime.now();
+
+    final rmRaw = json['remainingMinutes'] ?? json['remaining_minutes'];
+    double parsedRemaining =
+    rmRaw == null ? 0 : (rmRaw as num).toDouble();
+
+    var parsedWillSendIn =
+    str(json['willSendIn'] ?? json['will_send_in'] ?? json['timeRemaining']);
+
+    final now = DateTime.now();
+    if (parsedRemaining <= 0 && parsedScheduledAt.isAfter(now)) {
+      parsedRemaining = parsedScheduledAt.difference(now).inSeconds / 60.0;
+    }
+    if (parsedWillSendIn.isEmpty && parsedRemaining > 0) {
+      final mins = parsedRemaining.ceil().clamp(1, 9999);
+      parsedWillSendIn = mins <= 1 ? '1 minute' : '$mins minutes';
+    }
+
+    return PendingItem(
+      emailId: parsedEmailId,
+      subject: parsedSubject,
+      sender: parsedSender,
+      scheduledAt: parsedScheduledAt,
+      remainingMinutes: parsedRemaining,
+      willSendIn: parsedWillSendIn,
+    );
+  }
+
+  /// Réponse encore planifiée (date future ou compte à rebours serveur encore positif).
+  bool get isStillScheduled {
+    if (emailId.isEmpty) return false;
+    if (scheduledAt.isAfter(DateTime.now())) return true;
+    return remainingMinutes > 0.25;
+  }
+
+  double get effectiveRemainingMinutes {
+    if (remainingMinutes > 0) return remainingMinutes;
+    final now = DateTime.now();
+    if (!scheduledAt.isAfter(now)) return 0;
+    return scheduledAt.difference(now).inSeconds / 60.0;
+  }
+
+  String get displayWillSendIn {
+    if (!isStillScheduled) return '';
+    final m = effectiveRemainingMinutes;
+    if (m <= 0) return '';
+    final ceil = m.ceil();
+    if (willSendIn.isNotEmpty) return willSendIn;
+    return ceil <= 1 ? '1 minute' : '$ceil minutes';
   }
 }
 
@@ -579,13 +893,16 @@ class EmailItem {
 
   factory EmailItem.fromJson(Map<String, dynamic> json) {
     return EmailItem(
-      id: json['id'] ?? '',
-      subject: json['subject'] ?? '',
-      sender: json['sender'] ?? '',
-      content: json['content'] ?? '',
-      summary: json['summary'] ?? '',
-      isUrgent: json['isUrgent'] ?? false,
-      isSpam: json['isSpam'] ?? false,
+      id: (json['id'] ?? json['_id'] ?? '').toString(),
+      subject: (json['subject'] ?? '').toString(),
+      sender: (json['sender'] ?? json['from'] ?? '').toString(),
+      content: (json['content'] ?? json['body'] ?? '').toString(),
+      summary: (json['summary'] ?? '').toString(),
+      isUrgent: json['isUrgent'] == true || json['isUrgent'] == 1,
+      isSpam: json['isSpam'] == true ||
+          json['isSpam'] == 1 ||
+          json['is_spam'] == true ||
+          (json['category']?.toString().toLowerCase() == 'spam'),
       priority: json['priority'] ?? 'low',
       actions: List<String>.from(json['actions'] ?? []),
       category: json['category'] ?? '',
@@ -682,12 +999,90 @@ class StatsResponse {
     this.error,
   });
 
+  static int _readInt(dynamic v) {
+    if (v == null) return 0;
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v.toString()) ?? 0;
+  }
+
+  static int _pickInt(Map<String, dynamic>? m, List<String> keys) {
+    if (m == null) return 0;
+    for (final k in keys) {
+      if (m.containsKey(k) && m[k] != null) return _readInt(m[k]);
+    }
+    return 0;
+  }
+
+  /// Accepte plusieurs formes JSON (stats imbriquées, clés à la racine, snake_case).
   factory StatsResponse.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic>? asMap(dynamic x) =>
+        x is Map<String, dynamic> ? x : null;
+
+    final stats = asMap(json['stats']);
+    final data = asMap(json['data']);
+    const totalKeys = [
+      'totalProcessed',
+      'total_processed',
+      'messagesProcessed',
+      'messages_processed',
+      'processed',
+      'handled',
+      'total',
+      'totalMessages',
+      'total_messages',
+      'messageCount',
+      'count',
+    ];
+    const spamKeys = [
+      'spamBlocked',
+      'spam_blocked',
+      'spam',
+      'blockedSpam',
+      'spamCount',
+      'spam_count',
+    ];
+
+    double readUptime(Map<String, dynamic>? m) {
+      if (m == null) return 0;
+      for (final k in ['uptime', 'uptimeSeconds', 'uptime_seconds']) {
+        final v = m[k];
+        if (v == null) continue;
+        if (v is num) return v.toDouble();
+        return double.tryParse(v.toString()) ?? 0;
+      }
+      return 0;
+    }
+
+    int total = _pickInt(stats, totalKeys);
+    int spam = _pickInt(stats, spamKeys);
+    double up = readUptime(stats);
+
+    if (total == 0) total = _pickInt(json, totalKeys);
+    if (spam == 0) spam = _pickInt(json, spamKeys);
+    if (up == 0) up = readUptime(json);
+
+    if (data != null) {
+      if (total == 0) total = _pickInt(data, totalKeys);
+      if (spam == 0) spam = _pickInt(data, spamKeys);
+      if (up == 0) up = readUptime(data);
+    }
+
+    final explicitFailure = json['success'] == false;
+    final ok =
+        !explicitFailure &&
+            (json['success'] == true ||
+                stats != null ||
+                data != null ||
+                json.keys.any(
+                      (k) => totalKeys.contains(k) || spamKeys.contains(k),
+                ));
+
     return StatsResponse(
-      success: json['success'] ?? false,
-      totalProcessed: json['stats']?['totalProcessed'] ?? 0,
-      spamBlocked: json['stats']?['spamBlocked'] ?? 0,
-      uptime: (json['stats']?['uptime'] ?? 0).toDouble(),
+      success: ok,
+      totalProcessed: total,
+      spamBlocked: spam,
+      uptime: up,
       error: null,
     );
   }
@@ -796,7 +1191,7 @@ class DocumentClassificationResponse {
   factory DocumentClassificationResponse.fromJson(Map<String, dynamic> json) {
     return DocumentClassificationResponse(
       success: json['success'] ?? false,
-      classification: json['classification'] != null 
+      classification: json['classification'] != null
           ? DocumentClassification.fromJson(json['classification'])
           : null,
       error: json['error'],
@@ -804,10 +1199,7 @@ class DocumentClassificationResponse {
   }
 
   factory DocumentClassificationResponse.error(String message) {
-    return DocumentClassificationResponse(
-      success: false,
-      error: message,
-    );
+    return DocumentClassificationResponse(success: false, error: message);
   }
 }
 
@@ -881,11 +1273,7 @@ class DocumentListResponse {
   }
 
   factory DocumentListResponse.error(String message) {
-    return DocumentListResponse(
-      success: false,
-      documents: [],
-      error: message,
-    );
+    return DocumentListResponse(success: false, documents: [], error: message);
   }
 }
 
@@ -935,16 +1323,12 @@ class DocumentContentResponse {
   final DocumentContent? document;
   final String? error;
 
-  DocumentContentResponse({
-    required this.success,
-    this.document,
-    this.error,
-  });
+  DocumentContentResponse({required this.success, this.document, this.error});
 
   factory DocumentContentResponse.fromJson(Map<String, dynamic> json) {
     return DocumentContentResponse(
       success: json['success'] ?? false,
-      document: json['document'] != null 
+      document: json['document'] != null
           ? DocumentContent.fromJson(json['document'])
           : null,
       error: json['error'],
@@ -952,10 +1336,7 @@ class DocumentContentResponse {
   }
 
   factory DocumentContentResponse.error(String message) {
-    return DocumentContentResponse(
-      success: false,
-      error: message,
-    );
+    return DocumentContentResponse(success: false, error: message);
   }
 }
 
@@ -1026,8 +1407,8 @@ class ResponseSuggestionsResponse {
       success: json['success'] ?? false,
       suggestions: json['suggestions'] != null
           ? (json['suggestions'] as List)
-              .map((item) => ResponseSuggestion.fromJson(item))
-              .toList()
+          .map((item) => ResponseSuggestion.fromJson(item))
+          .toList()
           : [],
       error: json['error'],
     );
@@ -1047,10 +1428,14 @@ class ResponseSuggestion {
   final String title;
   final String content;
 
+  /// Catégorie métier (ex: congés, recrutement) si fournie par l’API.
+  final String? category;
+
   ResponseSuggestion({
     required this.type,
     required this.title,
     required this.content,
+    this.category,
   });
 
   factory ResponseSuggestion.fromJson(Map<String, dynamic> json) {
@@ -1058,6 +1443,8 @@ class ResponseSuggestion {
       type: json['type'] ?? '',
       title: json['title'] ?? '',
       content: json['content'] ?? '',
+      category:
+      json['category'] as String? ?? json['messageCategory'] as String?,
     );
   }
 }
@@ -1089,8 +1476,8 @@ class TaskExtractionResponse {
       message: json['message'] ?? '',
       tasks: json['tasks'] != null
           ? (json['tasks'] as List)
-              .map((item) => TaskItem.fromJson(item))
-              .toList()
+          .map((item) => TaskItem.fromJson(item))
+          .toList()
           : [],
       totalExtracted: json['totalExtracted'] ?? 0,
       confidence: json['confidence']?.toDouble(),
@@ -1129,31 +1516,59 @@ class TaskListResponse {
   });
 
   factory TaskListResponse.fromJson(Map<String, dynamic> json) {
+    final root = json['data'] is Map<String, dynamic>
+        ? json['data'] as Map<String, dynamic>
+        : json;
+
     Map<String, List<TaskItem>> grouped = {};
-    if (json['groupedTasks'] != null) {
-      (json['groupedTasks'] as Map<String, dynamic>).forEach((key, value) {
-        grouped[key] = (value as List)
-            .map((item) => TaskItem.fromJson(item))
-            .toList();
+    final groupedRaw = root['groupedTasks'] ?? root['grouped_tasks'];
+    if (groupedRaw is Map<String, dynamic>) {
+      groupedRaw.forEach((key, value) {
+        if (value is List) {
+          grouped[key] = value
+              .map((item) => TaskItem.fromJson(Map<String, dynamic>.from(item as Map)))
+              .toList();
+        }
       });
     }
 
+    List<TaskItem> tasksList = [];
+    dynamic tasksRaw = root['tasks'] ?? root['items'] ?? root['results'];
+    if (tasksRaw == null && json['tasks'] is List) tasksRaw = json['tasks'];
+    if (tasksRaw is List) {
+      tasksList = tasksRaw
+          .map((item) => TaskItem.fromJson(Map<String, dynamic>.from(item as Map)))
+          .toList();
+    }
+    if (tasksList.isEmpty && root['data'] is List) {
+      tasksList = (root['data'] as List)
+          .map((item) => TaskItem.fromJson(Map<String, dynamic>.from(item as Map)))
+          .toList();
+    }
+
+    List<TaskItem> overdueList = [];
+    final overdueRaw = root['overdueTasks'] ?? root['overdue_tasks'];
+    if (overdueRaw is List) {
+      overdueList = overdueRaw
+          .map((item) => TaskItem.fromJson(item as Map<String, dynamic>))
+          .toList();
+    }
+
+
     return TaskListResponse(
-      success: json['success'] ?? false,
-      tasks: json['tasks'] != null
-          ? (json['tasks'] as List)
-              .map((item) => TaskItem.fromJson(item))
-              .toList()
-          : [],
+      success: (json['success'] == true ||
+          json['success'] == 1 ||
+          root['success'] == true ||
+          root['success'] == 1) ||
+          (tasksList.isNotEmpty || grouped.isNotEmpty),
+      tasks: tasksList,
       groupedTasks: grouped,
-      overdueTasks: json['overdueTasks'] != null
-          ? (json['overdueTasks'] as List)
-              .map((item) => TaskItem.fromJson(item))
-              .toList()
-          : [],
-      totalTasks: json['totalTasks'] ?? 0,
-      stats: TaskStats.fromJson(json['stats'] ?? {}),
-      error: json['error'],
+      overdueTasks: overdueList,
+      totalTasks: root['totalTasks'] ?? root['total_tasks'] ?? tasksList.length,
+      stats: TaskStats.fromJson(
+        root['stats'] is Map<String, dynamic> ? root['stats'] as Map<String, dynamic> : {},
+      ),
+      error: root['error']?.toString() ?? json['error']?.toString(),
     );
   }
 
@@ -1204,25 +1619,43 @@ class TaskItem {
   factory TaskItem.fromJson(Map<String, dynamic> json) {
     return TaskItem(
       id: json['_id'] ?? json['id'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
+      title: (json['title'] ?? json['name'] ?? json['taskTitle'] ?? '').toString(),
+      description: (json['description'] ?? json['details'] ?? '').toString(),
       assignee: json['assignee'],
-      deadline: json['deadline'] != null ? DateTime.tryParse(json['deadline']) : null,
+      deadline: json['deadline'] != null
+          ? DateTime.tryParse(json['deadline'])
+          : null,
       category: json['category'] ?? 'other',
       priority: json['priority'] ?? 'medium',
-      status: json['status'] ?? 'todo',
+      status: (json['status'] ?? json['state'] ?? json['taskStatus'] ?? 'todo')
+          .toString(),
       confidence: (json['confidence'] ?? 0.5).toDouble(),
-      extractedFrom: json['extractedFrom'] != null 
+      extractedFrom: json['extractedFrom'] != null
           ? TaskExtractedFrom.fromJson(json['extractedFrom'])
           : null,
       notes: json['notes'],
-      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
-      completedAt: json['completedAt'] != null ? DateTime.tryParse(json['completedAt']) : null,
+      createdAt: DateTime.tryParse(json['createdAt'] ?? json['created_at'] ?? '') ??
+          DateTime.now(),
+      completedAt: json['completedAt'] != null
+          ? DateTime.tryParse(json['completedAt'].toString())
+          : (json['completed_at'] != null
+          ? DateTime.tryParse(json['completed_at'].toString())
+          : null),
     );
   }
 
+  bool get _statusIsCompleted {
+    final s = status.toLowerCase();
+    return s.contains('complete') ||
+        s.contains('termine') ||
+        s == 'done' ||
+        s == 'closed';
+  }
+
   bool get isOverdue {
-    return deadline != null && deadline!.isBefore(DateTime.now()) && status != 'completed';
+    return deadline != null &&
+        deadline!.isBefore(DateTime.now()) &&
+        !_statusIsCompleted;
   }
 }
 
@@ -1244,7 +1677,8 @@ class TaskExtractedFrom {
       emailId: json['emailId'],
       sender: json['sender'],
       subject: json['subject'],
-      extractedAt: DateTime.tryParse(json['extractedAt'] ?? '') ?? DateTime.now(),
+      extractedAt:
+      DateTime.tryParse(json['extractedAt'] ?? '') ?? DateTime.now(),
     );
   }
 }
@@ -1264,19 +1698,216 @@ class TaskStats {
 
   factory TaskStats.fromJson(Map<String, dynamic> json) {
     return TaskStats(
-      todo: json['todo'] ?? 0,
-      inProgress: json['in_progress'] ?? 0,
+      todo: json['todo'] ?? json['to_do'] ?? 0,
+      inProgress: json['in_progress'] ?? json['inProgress'] ?? 0,
       completed: json['completed'] ?? 0,
       overdue: json['overdue'] ?? 0,
     );
   }
 
   factory TaskStats.empty() {
-    return TaskStats(
-      todo: 0,
-      inProgress: 0,
-      completed: 0,
-      overdue: 0,
+    return TaskStats(todo: 0, inProgress: 0, completed: 0, overdue: 0);
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// 📱 MOBILE POSTS CLASSES
+// ═══════════════════════════════════════════════════════════════
+
+class PostsResponse {
+  final bool success;
+  final List<PostItem> posts;
+  final PostsPagination pagination;
+  final String? error;
+
+  PostsResponse({
+    required this.success,
+    required this.posts,
+    required this.pagination,
+    this.error,
+  });
+
+  factory PostsResponse.fromJson(Map<String, dynamic> json) {
+    final data = json['data'] as Map<String, dynamic>? ?? {};
+    
+    List<PostItem> postsList = [];
+    if (data['posts'] is List) {
+      postsList = (data['posts'] as List)
+          .map((item) => PostItem.fromJson(item as Map<String, dynamic>))
+          .toList();
+    }
+
+    return PostsResponse(
+      success: json['success'] ?? false,
+      posts: postsList,
+      pagination: PostsPagination.fromJson(
+        data['pagination'] as Map<String, dynamic>? ?? {},
+      ),
+      error: json['error'],
+    );
+  }
+
+  factory PostsResponse.error(String message) {
+    return PostsResponse(
+      success: false,
+      posts: [],
+      pagination: PostsPagination.empty(),
+      error: message,
+    );
+  }
+}
+
+class PostItem {
+  final String id;
+  final String content;
+  final String fullContent;
+  final PostImage? image;
+  final List<PostPlatform> platforms;
+  final bool hasProductLink;
+  final String? productLinkUrl;
+  final DateTime createdAt;
+  final bool isForced;
+  final PostStats stats;
+
+  PostItem({
+    required this.id,
+    required this.content,
+    required this.fullContent,
+    this.image,
+    required this.platforms,
+    required this.hasProductLink,
+    this.productLinkUrl,
+    required this.createdAt,
+    required this.isForced,
+    required this.stats,
+  });
+
+  factory PostItem.fromJson(Map<String, dynamic> json) {
+    List<PostPlatform> platformsList = [];
+    if (json['platforms'] is List) {
+      platformsList = (json['platforms'] as List)
+          .map((item) => PostPlatform.fromJson(item as Map<String, dynamic>))
+          .toList();
+    }
+
+    return PostItem(
+      id: json['id'] ?? '',
+      content: json['content'] ?? '',
+      fullContent: json['fullContent'] ?? json['content'] ?? '',
+      image: json['image'] != null ? PostImage.fromJson(json['image']) : null,
+      platforms: platformsList,
+      hasProductLink: json['hasProductLink'] ?? false,
+      productLinkUrl: json['productLinkUrl'],
+      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      isForced: json['isForced'] ?? false,
+      stats: PostStats.fromJson(json['stats'] as Map<String, dynamic>? ?? {}),
+    );
+  }
+}
+
+class PostImage {
+  final String url;
+  final String type; // 'ai-generated', 'original', 'none'
+  final String? source; // 'pollinations', 'huggingface', 'product', 'echo'
+
+  PostImage({
+    required this.url,
+    required this.type,
+    this.source,
+  });
+
+  factory PostImage.fromJson(Map<String, dynamic> json) {
+    return PostImage(
+      url: json['url'] ?? '',
+      type: json['type'] ?? 'none',
+      source: json['source'],
+    );
+  }
+}
+
+class PostPlatform {
+  final String name;
+  final String status;
+  final String? url;
+  final DateTime? publishedAt;
+  final String icon;
+
+  PostPlatform({
+    required this.name,
+    required this.status,
+    this.url,
+    this.publishedAt,
+    required this.icon,
+  });
+
+  factory PostPlatform.fromJson(Map<String, dynamic> json) {
+    return PostPlatform(
+      name: json['name'] ?? '',
+      status: json['status'] ?? '',
+      url: json['url'],
+      publishedAt: json['publishedAt'] != null
+          ? DateTime.tryParse(json['publishedAt'])
+          : null,
+      icon: json['icon'] ?? (json['name'] == 'linkedin' ? '💼' : '🐘'),
+    );
+  }
+}
+
+class PostStats {
+  final int likes;
+  final int shares;
+  final int comments;
+
+  PostStats({
+    required this.likes,
+    required this.shares,
+    required this.comments,
+  });
+
+  factory PostStats.fromJson(Map<String, dynamic> json) {
+    return PostStats(
+      likes: json['likes'] ?? 0,
+      shares: json['shares'] ?? 0,
+      comments: json['comments'] ?? 0,
+    );
+  }
+
+  int get totalEngagement => likes + shares + comments;
+}
+
+class PostsPagination {
+  final int currentPage;
+  final int totalPages;
+  final int totalPosts;
+  final bool hasNext;
+  final bool hasPrev;
+
+  PostsPagination({
+    required this.currentPage,
+    required this.totalPages,
+    required this.totalPosts,
+    required this.hasNext,
+    required this.hasPrev,
+  });
+
+  factory PostsPagination.fromJson(Map<String, dynamic> json) {
+    return PostsPagination(
+      currentPage: json['currentPage'] ?? 1,
+      totalPages: json['totalPages'] ?? 1,
+      totalPosts: json['totalPosts'] ?? 0,
+      hasNext: json['hasNext'] ?? false,
+      hasPrev: json['hasPrev'] ?? false,
+    );
+  }
+
+  factory PostsPagination.empty() {
+    return PostsPagination(
+      currentPage: 1,
+      totalPages: 1,
+      totalPosts: 0,
+      hasNext: false,
+      hasPrev: false,
     );
   }
 }
