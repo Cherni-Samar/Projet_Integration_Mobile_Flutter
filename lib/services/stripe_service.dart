@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import '../services/api_service.dart';
+import '../core/network/api_client.dart';
 import '../services/auth_service.dart';
-import '../utils/constants.dart';
+import '../core/utils/constants.dart';
 
 class StripeService {
   static final AuthService _authService = AuthService();
@@ -23,7 +23,7 @@ class StripeService {
       throw Exception('You must be logged in to make a payment');
     }
 
-    final response = await ApiService.post(
+    final response = await ApiClient.post(
       endpoint: ApiConstants.createPaymentIntent,
       body: {
         'packId': packId,
@@ -57,7 +57,7 @@ class StripeService {
       await Stripe.instance.presentPaymentSheet();
 
       // 5. ✅ Confirm on backend to actually credit energy/credits
-      final confirmRes = await ApiService.post(
+      final confirmRes = await ApiClient.post(
         endpoint: ApiConstants.confirmPayment,
         body: {'paymentIntentId': paymentIntentId.toString()},
         token: token,

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/user_model.dart';
-import '../utils/constants.dart';
+import '../data/models/user.dart';
+import '../core/utils/constants.dart';
 import 'api_service.dart';
 
 class AuthService {
@@ -23,8 +23,8 @@ class AuthService {
 
     if (response['success'] == true) {
       final token = response['data']['token'];
-      final user = User.fromJson(response['data']['user']);
-      await _saveToken(token);
+      final user = User.fromJson(response['data']['user'] as Map<String, dynamic>);
+      await _saveToken(token as String);
       await _saveUser(user);
       return {'success': true, 'user': user};
     }
@@ -44,8 +44,8 @@ class AuthService {
 
     if (response['success'] == true) {
       final token = response['data']['token'];
-      final user = User.fromJson(response['data']['user']);
-      await _saveToken(token);
+      final user = User.fromJson(response['data']['user'] as Map<String, dynamic>);
+      await _saveToken(token as String);
       await _saveUser(user);
       return {'success': true, 'user': user};
     }
@@ -64,38 +64,26 @@ class AuthService {
     );
 
     if (response['success'] == true) {
-      final user = User.fromJson(response['data']['user']);
+      final user = User.fromJson(response['data']['user'] as Map<String, dynamic>);
       await _saveUser(user);
       return user;
     }
     return null;
   }
 
-  // ✅ Public helper to persist an updated user locally
+  // Public helper to persist an updated user locally
   Future<void> saveUser(User user) async {
     await _saveUser(user);
   }
 
-  // ✅ UPDATE USER PROFILE
+  // UPDATE USER PROFILE
   Future<User> updateUser({
     String? name,
     String? email,
     String? currentPassword,
     String? newPassword,
   }) async {
-    print('🔄 ========== UPDATE USER START ==========');
-
     final token = await getToken();
-
-    print('🔑 Token récupéré:');
-    print('   - Existe: ${token != null}');
-    print('   - Longueur: ${token?.length ?? 0}');
-    print('   - Début: ${token != null ? token.substring(0, 30) : "NULL"}');
-    print(
-      '   - Fin: ${token != null && token.length > 30 ? token.substring(token.length - 30) : "N/A"}',
-    );
-    print('   - COMPLET: $token'); // ✅ Afficher le token complet
-
     if (token == null) {
       throw Exception('No authentication token found');
     }
@@ -106,20 +94,15 @@ class AuthService {
     if (currentPassword != null) body['currentPassword'] = currentPassword;
     if (newPassword != null) body['newPassword'] = newPassword;
 
-    print('📤 Update request body: $body');
-
     final response = await ApiService.patch(
       endpoint: ApiConstants.updateProfile,
       body: body,
       token: token,
     );
 
-    print('📥 Update response: $response');
-
     if (response['success'] == true) {
-      final user = User.fromJson(response['data']['user']);
+      final user = User.fromJson(response['data']['user'] as Map<String, dynamic>);
       await _saveUser(user);
-      print('🔄 ========== UPDATE USER SUCCESS ==========');
       return user;
     } else {
       throw Exception(response['message'] ?? 'Failed to update profile');
@@ -136,8 +119,8 @@ class AuthService {
           body: {},
           token: token,
         );
-      } catch (e) {
-        print('Logout error: $e');
+      } catch (_) {
+        // Proceed with local logout even if server call fails
       }
     }
     await _clearStorage();
@@ -192,7 +175,7 @@ class AuthService {
     return response['success'] == true;
   }
 
-  // ✅ REMEMBER ME - SAVE CREDENTIALS
+  // REMEMBER ME - SAVE CREDENTIALS
   Future<void> saveCredentials({
     required String email,
     required String password,
@@ -200,84 +183,47 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_credentialsEmailKey, email);
     await prefs.setString(_credentialsPasswordKey, password);
-    print('✅ Credentials sauvegardés: $email');
   }
 
-  // ✅ REMEMBER ME - GET SAVED CREDENTIALS
+  // REMEMBER ME - GET SAVED CREDENTIALS
   Future<Map<String, String>?> getSavedCredentials() async {
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString(_credentialsEmailKey);
     final password = prefs.getString(_credentialsPasswordKey);
-
     if (email != null && password != null) {
-      print('✅ Credentials trouvés: $email');
       return {'email': email, 'password': password};
     }
-
-    print('ℹ️ Aucun credential sauvegardé');
     return null;
   }
 
-  // ✅ REMEMBER ME - CLEAR SAVED CREDENTIALS
+  // REMEMBER ME - CLEAR SAVED CREDENTIALS
   Future<void> clearSavedCredentials() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_credentialsEmailKey);
     await prefs.remove(_credentialsPasswordKey);
-    print('🗑️ Credentials supprimés');
   }
 
   // STORAGE HELPERS
   Future<void> _saveToken(String token) async {
-    print('💾 ========== SAVE TOKEN ==========');
-    print('💾 Token à sauvegarder:');
-    print('   - Longueur: ${token.length}');
-    print('   - Début: ${token.substring(0, 30)}');
-    print('   - Fin: ${token.substring(token.length - 30)}');
-    print('   - COMPLET: $token');
-
     final prefs = await SharedPreferences.getInstance();
-    final result = await prefs.setString(_tokenKey, token);
-
-    print('💾 Résultat sauvegarde: $result');
-
-    // Vérification immédiate
-    final saved = prefs.getString(_tokenKey);
-    print('💾 Vérification:');
-    print('   - Sauvegardé: ${saved != null}');
-    print('   - Longueur: ${saved?.length ?? 0}');
-    print('   - Match: ${saved == token}');
-    print('💾 ========== SAVE TOKEN END ==========');
+    await prefs.setString(_tokenKey, token);
   }
 
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString(_tokenKey);
-
-    print('🔍 ========== GET TOKEN ==========');
-    print('🔍 Token récupéré:');
-    print('   - Existe: ${token != null}');
-    print('   - Longueur: ${token?.length ?? 0}');
-    if (token != null) {
-      print('   - Début: ${token.substring(0, 30)}');
-      print('   - Fin: ${token.substring(token.length - 30)}');
-      print('   - COMPLET: $token');
-    }
-    print('🔍 ========== GET TOKEN END ==========');
-
-    return token;
+    return prefs.getString(_tokenKey);
   }
 
   Future<void> _saveUser(User user) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_userKey, jsonEncode(user.toJson()));
-    print('💾 User sauvegardé: ${user.email}');
   }
 
   Future<User?> getSavedUser() async {
     final prefs = await SharedPreferences.getInstance();
     final userData = prefs.getString(_userKey);
     if (userData != null) {
-      return User.fromJson(jsonDecode(userData));
+      return User.fromJson(jsonDecode(userData) as Map<String, dynamic>);
     }
     return null;
   }
@@ -286,7 +232,6 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
     await prefs.remove(_userKey);
-    print('🗑️ Storage cleared');
   }
 
   Future<bool> isLoggedIn() async {
