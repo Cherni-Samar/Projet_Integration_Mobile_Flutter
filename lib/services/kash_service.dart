@@ -128,6 +128,47 @@ class KashService {
     }
   }
 
+  /// Create a new budget entry
+  /// POST /api/kash/budget/create
+  /// Body: { category, limit, currency }
+  static Future<Map<String, dynamic>> createBudget({
+    required String category,
+    required double limit,
+    String currency = 'TND',
+  }) async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) throw Exception('No authentication token found');
+
+      if (category.trim().isEmpty) {
+        throw Exception('Category is required');
+      }
+
+      if (limit <= 0) {
+        throw Exception('Budget limit must be greater than 0');
+      }
+
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/budget/create',
+        body: {
+          'category': category.trim(),
+          'limit': limit,
+          'currency': currency.toUpperCase(),
+        },
+        token: token,
+      );
+
+      if (response['success'] != true) {
+        throw Exception(response['message'] ?? 'Failed to create budget');
+      }
+
+      return response['data'] ?? {};
+    } catch (e) {
+      print('❌ KashService - createBudget error: $e');
+      rethrow;
+    }
+  }
+
   // ===========================================================================
   // REMINDERS
   // ===========================================================================
