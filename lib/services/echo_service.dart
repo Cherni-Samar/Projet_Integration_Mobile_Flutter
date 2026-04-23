@@ -467,6 +467,67 @@ class EchoService {
       return {'success': false, 'error': e.toString()};
     }
   }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🛍️ PRODUCT MARKETING METHODS
+  // ═══════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> scrapeProduct({
+    required String productUrl,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/api/echo/product/scrape',
+        body: {'productUrl': productUrl},
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - scrapeProduct error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> startProductCampaign({
+    required String productUrl,
+    required String frequency,
+    required List<String> platforms,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/api/echo/product/campaign/start',
+        body: {
+          'productUrl': productUrl,
+          'frequency': frequency,
+          'platforms': platforms,
+        },
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - startProductCampaign error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  static Future<Map<String, dynamic>> getCampaignHistory({
+    int limit = 50,
+    int offset = 0,
+    String? token,
+  }) async {
+    try {
+      final response = await ApiService.get(
+        endpoint: '$_baseUrl/api/echo/product/campaigns?limit=$limit&offset=$offset',
+        token: token,
+      );
+      return response;
+    } catch (e) {
+      print('❌ EchoService - getCampaignHistory error: $e');
+      return {'success': false, 'campaigns': [], 'error': e.toString()};
+    }
+  }
 }
 
 class EchoResponse {
