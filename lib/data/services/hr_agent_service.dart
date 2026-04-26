@@ -4,17 +4,12 @@ import 'package:http/http.dart' as http;
 import 'package:e_team/data/services/api_config.dart';
 import 'package:e_team/data/services/api_service.dart';
 import 'package:e_team/data/dtos/hera_dto.dart';
-
+import 'package:flutter/material.dart';
+import 'package:e_team/data/services/auth_service.dart';
 class HrAgentService {
   static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
 
-  static Future<Map<String, dynamic>> _getRaw(String endpoint) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: {'Content-Type': 'application/json'},
-    );
-    return jsonDecode(response.body);
-  }
+
 
   static Future<Map<String, dynamic>> _postRaw(
       String endpoint,
@@ -267,10 +262,55 @@ class HrAgentService {
       };
     }
   }
+
+  static Future<Map<String, dynamic>> _getRaw(String endpoint) async {
+    final token = await AuthService().getToken();
+
+    final response = await http.get(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': token ?? '',
+      },
+    );
+
+    debugPrint('📡 GET $endpoint');
+    debugPrint('🔐 Token: $token');
+    debugPrint('📥 Status: ${response.statusCode}');
+    debugPrint('📥 Body: ${response.body}');
+
+    return jsonDecode(response.body);
+  }
+
+  // Dans lib/data/services/hr_agent_service.dart
+
+  static Future<Map<String, dynamic>> getOpportunities() async {
+    try {
+      final response = await ApiService.get(
+        endpoint: 'http://10.0.2.2:3000/api/hera/admin/opportunities',
+      );
+      return response;
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  static Future<bool> approveProject(String projectId) async {
+    try {
+      final response = await ApiService.post(
+        endpoint: 'http://10.0.2.2:3000/api/hera/admin/approve-project',
+        body: {'projectId': projectId},
+      );
+      return response['success'] == true;
+    } catch (e) {
+      return false;
+    }
+  }
   static Future<Map<String, dynamic>> getDocumentActions({int limit = 20}) async {
     try {
       return await _getRaw('/admin/document-actions?limit=$limit');
     } catch (e) {
+      debugPrint('❌ getDocumentActions error: $e');
       return {
         'success': false,
         'actions': [],

@@ -366,7 +366,7 @@ class _PricingPageState extends State<PricingPage> {
         child: Ink(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: PricingPage.cardBg,
+            color: isDark ? PricingPage.cardBg : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: borderColor,
@@ -390,7 +390,8 @@ class _PricingPageState extends State<PricingPage> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black,
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                       ),
@@ -417,7 +418,8 @@ class _PricingPageState extends State<PricingPage> {
               else
                 Text(
                   price,
-                  style: const TextStyle(
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                   ),
@@ -434,9 +436,13 @@ class _PricingPageState extends State<PricingPage> {
     required String? agentsLabel,
     required bool isDark,
   }) {
-    final textColor = Colors.white.withValues(alpha: 0.7);
-    final separatorColor = Colors.white.withValues(alpha: 0.45);
+    final textColor = isDark
+        ? Colors.white.withValues(alpha: 0.7)
+        : Colors.black.withValues(alpha: 0.65);
 
+    final separatorColor = isDark
+        ? Colors.white.withValues(alpha: 0.45)
+        : Colors.black.withValues(alpha: 0.35);
     final baseStyle = TextStyle(
       color: textColor,
       fontSize: 13,

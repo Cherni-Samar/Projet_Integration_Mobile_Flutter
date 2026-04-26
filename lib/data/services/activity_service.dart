@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+import 'auth_service.dart'; // ou là où est ton AuthService
 class ActivityService {
   static const String baseUrl = 'http://10.0.2.2:3000/api/activities';
 
@@ -14,14 +14,20 @@ class ActivityService {
       final queryParams = {
         'page': page.toString(),
         'limit': limit.toString(),
-        if (agentFilter != null && agentFilter != 'all') 'agentFilter': agentFilter,
+        if (agentFilter != null && agentFilter != 'all')
+          'agentFilter': agentFilter,
       };
-      
-      final uri = Uri.parse('$baseUrl/mobile/feed').replace(queryParameters: queryParams);
-      
+
+      final uri = Uri.parse('$baseUrl/mobile/feed')
+          .replace(queryParameters: queryParams);
+
+      final token = await AuthService().getToken();
       final response = await http.get(
         uri,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
       );
 
       if (response.statusCode == 200) {
@@ -30,7 +36,7 @@ class ActivityService {
           return ActivityFeedResponse.fromJson(jsonData['data']);
         }
       }
-      
+
       throw Exception('Failed to load activity feed: ${response.statusCode}');
     } catch (e) {
       print('❌ Error fetching activity feed: $e');
@@ -41,9 +47,13 @@ class ActivityService {
   /// Get activity dashboard statistics
   static Future<ActivityDashboard> getDashboard() async {
     try {
+      final token = await AuthService().getToken();
       final response = await http.get(
         Uri.parse('$baseUrl/mobile/dashboard'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
       );
 
       if (response.statusCode == 200) {
@@ -52,7 +62,7 @@ class ActivityService {
           return ActivityDashboard.fromJson(jsonData['data']);
         }
       }
-      
+
       throw Exception('Failed to load dashboard: ${response.statusCode}');
     } catch (e) {
       print('❌ Error fetching dashboard: $e');
@@ -61,21 +71,30 @@ class ActivityService {
   }
 
   /// Get activities by specific agent
-  static Future<List<ActivityItem>> getActivitiesByAgent(String agentName, {int limit = 50}) async {
+  static Future<List<ActivityItem>> getActivitiesByAgent(
+      String agentName, {
+        int limit = 50,
+      }) async {
     try {
+      final token = await AuthService().getToken();
       final response = await http.get(
         Uri.parse('$baseUrl/agent/$agentName?limit=$limit'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
       );
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         if (jsonData['success'] == true) {
           final activities = jsonData['activities'] as List;
-          return activities.map((json) => ActivityItem.fromJson(json)).toList();
+          return activities
+              .map((json) => ActivityItem.fromJson(json))
+              .toList();
         }
       }
-      
+
       throw Exception('Failed to load agent activities: ${response.statusCode}');
     } catch (e) {
       print('❌ Error fetching agent activities: $e');
@@ -83,7 +102,6 @@ class ActivityService {
     }
   }
 }
-
 // Data Models
 class ActivityFeedResponse {
   final List<ActivityItem> activities;

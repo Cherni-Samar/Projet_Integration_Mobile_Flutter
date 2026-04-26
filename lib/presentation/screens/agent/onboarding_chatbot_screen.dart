@@ -1,15 +1,21 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
-import 'dart:math' as math;
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
+import 'package:e_team/data/services/api_config.dart';
 import '../../providers/cart_provider.dart';
 
 class OnboardingChatbotScreen extends StatefulWidget {
   final String email;
 
-  const OnboardingChatbotScreen({Key? key, required this.email})
-    : super(key: key);
+  const OnboardingChatbotScreen({
+    super.key,
+    required this.email,
+  });
 
   @override
   State<OnboardingChatbotScreen> createState() =>
@@ -19,1033 +25,541 @@ class OnboardingChatbotScreen extends StatefulWidget {
 class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
     with TickerProviderStateMixin {
   final List<ChatMessage> _messages = [];
+  final List<Map<String, String>> _aiMessages = [];
+
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _inputController = TextEditingController();
 
-  int _currentQuestion = 0;
+  late AnimationController _pulseController;
+
   bool _isTyping = false;
-  late AnimationController _glowController;
+  bool _hasBlueprint = false;
+  String _vision = '';
 
-  final Map<String, List<String>> _userData = {
-    'role': [],
-    'teamSize': [],
-    'challenges': [],
-    'priority': [],
-  };
+  static const Color _primary = Color(0xFFCDFF00);
+  static const Color _dark = Color(0xFF0A0A0A);
+  static const Color _bg = Color(0xFFFFFFFF);
+  static const Color _botBubble = Color(0xFFF8FAFC);
+  static const Color _border = Color(0xFFE5E7EB);
+  static const Color _textMain = Color(0xFF0F172A);
+  static const Color _textMuted = Color(0xFF64748B);
+  static const Color _green = Color(0xFF22C55E);
 
-  // ✅ Catalog agents (match Marketplace + Cart)
   final Map<String, Map<String, dynamic>> _agentCatalog = {
     'hera': {
-      'display': 'Hera',
       'title': 'Hera',
       'illustration': 'assets/images/hera.png',
-      'color': Color(0xFF8B5CF6),
-      'energyCost': 10,
-    },
-    'kash': {
-      'display': 'Kash',
-      'title': 'Kash',
-      'illustration': 'assets/images/kash.png',
-      'color': Color(0xFFF59E0B),
-      'energyCost': 15,
-    },
-    'dox': {
-      'display': 'Dox',
-      'title': 'Dox',
-      'illustration': 'assets/images/dexo.png',
-      'color': Color(0xFF10B981),
-      'energyCost': 8,
-    },
-    'timo': {
-      'display': 'Timo',
-      'title': 'Timo',
-      'illustration': 'assets/images/krono.png',
-      'color': Color(0xFFEC4899),
-      'energyCost': 20,
+      'color': const Color(0xFF8B5CF6),
     },
     'echo': {
-      'display': 'Echo',
       'title': 'Echo',
       'illustration': 'assets/images/voxi.png',
-      'color': Color(0xFFA855F7),
-      'energyCost': 5,
+      'color': const Color(0xFFA855F7),
+    },
+    'timo': {
+      'title': 'Timo',
+      'illustration': 'assets/images/krono.png',
+      'color': const Color(0xFFEC4899),
+    },
+    'dexo': {
+      'title': 'Dexo',
+      'illustration': 'assets/images/dexo.png',
+      'color': const Color(0xFF10B981),
+    },
+    'kash': {
+      'title': 'Kash',
+      'illustration': 'assets/images/kash.png',
+      'color': const Color(0xFFF59E0B),
     },
   };
-
-  final List<BotQuestion> _questions = [
-    BotQuestion(
-      id: 'role',
-      question: "👋 Nice to meet you!\n\nWhat's your role?",
-      options: [
-        '👔 CEO / Founder',
-        '📊 Manager',
-        '💼 Department Head',
-        '👨‍💻 Employee',
-        '🎓 Student',
-      ],
-      multiSelect: false,
-    ),
-    BotQuestion(
-      id: 'teamSize',
-      question: "How large is your team?",
-      options: [
-        'Solo',
-        '2-5 people',
-        '6-20 people',
-        '21-50 people',
-        '50+ people',
-      ],
-      multiSelect: false,
-    ),
-    BotQuestion(
-      id: 'challenges',
-      question: "What are your biggest challenges?",
-      subtitle: "Select all that apply",
-      options: [
-        '⏰ Time management',
-        '📈 Growth management',
-        '💰 Cost optimization',
-        '🤝 Team coordination',
-        '📊 Data analysis',
-        '🔄 Task automation',
-      ],
-      multiSelect: true,
-    ),
-    BotQuestion(
-      id: 'priority',
-      question: "What's your #1 priority?",
-      options: [
-        '🚀 Productivity',
-        '💡 Innovation',
-        '📈 Revenue growth',
-        '👥 Team development',
-        '⚡ Time saving',
-      ],
-      multiSelect: false,
-    ),
-  ];
-
-  Set<String> _selectedOptions = {};
 
   @override
   void initState() {
     super.initState();
-    _glowController = AnimationController(
+
+    _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+
     _startConversation();
   }
 
   @override
   void dispose() {
+    _pulseController.dispose();
     _scrollController.dispose();
-    _glowController.dispose();
+    _inputController.dispose();
     super.dispose();
   }
 
-  Future<void> _startConversation() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    _askQuestion();
+  void _startConversation() {
+    _addBotMessage(
+      "I am Dexo, your Strategic Supervisor. To activate your company network, I need to understand your organization. What type of company are you building and what is its main activity?",
+      delay: const Duration(milliseconds: 700),
+    );
   }
 
-  Future<void> _askQuestion() async {
-    if (_currentQuestion >= _questions.length) {
-      _showRecommendations();
-      return;
-    }
-
+  void _addBotMessage(
+      String text, {
+        Duration delay = const Duration(milliseconds: 800),
+      }) {
     setState(() => _isTyping = true);
-    await Future.delayed(const Duration(milliseconds: 800));
 
-    final question = _questions[_currentQuestion];
-    setState(() {
-      _messages.add(
-        ChatMessage(
-          text: question.question,
-          subtitle: question.subtitle,
-          isBot: true,
-          options: question.options,
-          multiSelect: question.multiSelect,
-        ),
-      );
-      _isTyping = false;
-      _selectedOptions.clear();
-    });
+    Timer(delay, () {
+      if (!mounted) return;
 
-    _scrollToBottom();
-  }
-
-  void _toggleOption(String option) {
-    final question = _questions[_currentQuestion];
-
-    setState(() {
-      if (question.multiSelect) {
-        if (_selectedOptions.contains(option)) {
-          _selectedOptions.remove(option);
-        } else {
-          _selectedOptions.add(option);
-        }
-      } else {
-        _selectedOptions = {option};
-        Future.delayed(const Duration(milliseconds: 200), () {
-          _handleAnswer([option]);
+      setState(() {
+        _messages.add(ChatMessage.bot(text));
+        _aiMessages.add({
+          'role': 'assistant',
+          'content': text,
         });
+        _isTyping = false;
+      });
+
+      _scrollToBottom();
+    });
+  }
+
+  Future<void> _handleSend() async {
+    final text = _inputController.text.trim();
+
+    if (text.isEmpty || _hasBlueprint) return;
+
+    if (_vision.isEmpty) _vision = text;
+
+    setState(() {
+      _messages.add(ChatMessage.user(text));
+      _aiMessages.add({
+        'role': 'user',
+        'content': text,
+      });
+      _inputController.clear();
+      _isTyping = true;
+    });
+
+    _scrollToBottom();
+
+    try {
+      final result = await _requestStrategicAdvice();
+
+      if (!mounted) return;
+
+      if (result.isFinished == false) {
+        final question = result.nextQuestion?.trim().isNotEmpty == true
+            ? result.nextQuestion!
+            : 'Pouvez-vous préciser le type de votre entreprise et son fonctionnement ?';
+
+        setState(() {
+          _messages.add(ChatMessage.bot(question));
+          _aiMessages.add({
+            'role': 'assistant',
+            'content': question,
+          });
+          _isTyping = false;
+        });
+
+        _scrollToBottom();
+        return;
       }
-    });
-  }
 
-  void _handleAnswer(List<String> answers) {
-    final question = _questions[_currentQuestion];
+      final plan = result.plan;
 
-    setState(() {
-      _messages.add(ChatMessage(text: answers.join(', '), isBot: false));
-      _userData[question.id] = answers;
-      _currentQuestion++;
-      _selectedOptions.clear();
-    });
-
-    _scrollToBottom();
-
-    Future.delayed(const Duration(milliseconds: 500), () {
-      _askQuestion();
-    });
-  }
-
-  void _confirmSelection() {
-    if (_selectedOptions.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please select at least one option'),
-          backgroundColor: const Color(0xFFB55AF6), // ✅ violet
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+      setState(() {
+        _messages.add(
+          ChatMessage.bot(
+            "Analysis complete. I prepared your dynamic Organization Blueprint and selected the AI agents needed to activate your company network.",
           ),
-          margin: const EdgeInsets.all(20),
-        ),
+        );
+
+        _messages.add(
+          ChatMessage.blueprint(
+            OrganizationBlueprintCard(
+              initialPlan: plan,
+              onConfirm: _activateOrganizationVision,
+            ),
+          ),
+        );
+
+        _hasBlueprint = true;
+        _isTyping = false;
+      });
+
+      _scrollToBottom();
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() => _isTyping = false);
+
+      _addBotMessage(
+        "I could not analyze your company strategy right now. Please try again.",
       );
-      return;
     }
-    _handleAnswer(_selectedOptions.toList());
   }
 
-  Future<void> _showRecommendations() async {
-    setState(() => _isTyping = true);
-    await Future.delayed(const Duration(milliseconds: 1000));
+  Future<StrategicAdviceResult> _requestStrategicAdvice() async {
+    final uri = Uri.parse('${ApiConfig.baseUrl}/api/dexo/strategic-advice');
 
-    // ✅ now returns structured list + text
-    final rec = _generateRecommendations();
-    final recommendationsText = rec.text;
-    final recommendedKeys = rec.agentKeys;
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'messages': _aiMessages,
+      }),
+    );
 
-    // ✅ add recommended agents to cart
-    _addRecommendedAgentsToCart(recommendedKeys);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('HTTP ${response.statusCode}: ${response.body}');
+    }
 
-    setState(() {
-      _messages.add(
-        ChatMessage(
-          text:
-              "✨ Based on your needs, I recommend these agents:\n\n$recommendationsText\n\n⚡ I've added them to your cart with a Starter Energy Pack (1,000 ⚡ each)!",
-          isBot: true,
-          showActions: true,
-        ),
+    final decoded = jsonDecode(response.body);
+
+    if (decoded['success'] != true) {
+      throw Exception(decoded['error'] ?? decoded['message'] ?? 'AI failed');
+    }
+
+    return StrategicAdviceResult.fromJson(Map<String, dynamic>.from(decoded));
+  }
+
+  Future<void> _activateOrganizationVision(WorkforcePlan plan) async {
+    try {
+      final uri = Uri.parse('${ApiConfig.baseUrl}/api/dexo/save-vision');
+
+      final response = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': widget.email,
+          'vision': _vision,
+          'workforceSettings': plan.toApiList(),
+          'recommendedAgents':
+          plan.recommendedAgents.map((agent) => agent.toJson()).toList(),
+        }),
       );
-      _isTyping = false;
-    });
 
-    _scrollToBottom();
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception('HTTP ${response.statusCode}: ${response.body}');
+      }
+
+      final decoded = jsonDecode(response.body);
+
+      if (decoded['success'] != true) {
+        throw Exception(decoded['error'] ?? decoded['message'] ?? 'Save failed');
+      }
+
+      _addRecommendedAgentsToCart(plan.recommendedAgents);
+
+      if (!mounted) return;
+
+      _addBotMessage(
+        "Your organization vision has been activated. I added the recommended AI agents to your cart so you can launch the execution network.",
+      );
+
+      Timer(const Duration(seconds: 2), () {
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, '/cart');
+      });
+    } catch (e) {
+      _addBotMessage(
+        "I could not save your organization vision. Please verify /api/dexo/save-vision.",
+      );
+    }
   }
 
-  // ✅ Add recommended agents to cart with Starter pack
-  void _addRecommendedAgentsToCart(List<String> keys) {
+  void _addRecommendedAgentsToCart(List<RecommendedAgent> agents) {
     final cart = Provider.of<CartProvider>(context, listen: false);
 
-    for (final key in keys) {
+    if (agents.length >= 4) {
+      cart.setPaymentPack('premium_plan');
+    } else if (agents.length >= 2) {
+      cart.setPaymentPack('basic_plan');
+    } else {
+      cart.setPaymentPack('energy_boost');
+    }
+
+    for (final agent in agents) {
+      final key = agent.id.toLowerCase().trim();
       final data = _agentCatalog[key];
+
       if (data == null) continue;
 
       final agentName = data['title'] as String;
+
       final item = CartItem(
         id: 'agent-$agentName',
         agentName: agentName,
         agentIllustration: data['illustration'] as String,
         agentColor: data['color'] as Color,
-        packTitle: 'Pack Éco',
-        energy: 1000,
-        price: 10.0,
+        packTitle: agents.length >= 4
+            ? 'Premium Plan'
+            : agents.length >= 2
+            ? 'Basic Plan'
+            : 'Pack Boost',
+        energy: 0,
+        price: 0.0,
       );
 
-      cart.addToCart(item); // silently skips if already in cart
+      cart.addToCart(item);
     }
-  }
-
-  // ✅ Return: text + agent keys
-  _RecommendationResult _generateRecommendations() {
-    final challenges = _userData['challenges'] ?? [];
-    final priority = _userData['priority']?.isNotEmpty == true
-        ? _userData['priority']![0]
-        : '';
-
-    // ✅ definitions used to print
-    final List<Map<String, String>> agents = [
-      {
-        'key': 'hera',
-        'name': '🤝 **Hera** (HR Agent)',
-        'description':
-            'Manages leave requests, employee onboarding, and team coordination',
-      },
-      {
-        'key': 'kash',
-        'name': '💰 **Kash** (Financial Agent)',
-        'description':
-            'Validates expenses, tracks budgets, and generates financial reports',
-      },
-      {
-        'key': 'dox',
-        'name': '📋 **Dox** (Administrative Agent)',
-        'description':
-            'Classifies documents, manages files, and handles access rights',
-      },
-      {
-        'key': 'timo',
-        'name': '⏰ **Timo** (Planning Agent)',
-        'description':
-            'Avoids scheduling conflicts, prioritizes tasks, and sends deadline reminders',
-      },
-      {
-        'key': 'echo',
-        'name': '💬 **Echo** (Communication Agent)',
-        'description':
-            'Summarizes conversations, filters messages, and sends smart notifications',
-      },
-    ];
-
-    final List<String> recommendedBlocks = [];
-    final List<String> recommendedKeys = [];
-
-    void addAgentByKey(String key) {
-      final a = agents.firstWhere((x) => x['key'] == key, orElse: () => {});
-      if (a.isEmpty) return;
-
-      final block = "${a['name']}\n   • ${a['description']}";
-      if (!recommendedBlocks.contains(block)) {
-        recommendedBlocks.add(block);
-        recommendedKeys.add(key);
-      }
-    }
-
-    // Challenges logic
-    if (challenges.contains('⏰ Time management') ||
-        challenges.contains('🔄 Task automation')) {
-      addAgentByKey('timo');
-    }
-
-    if (challenges.contains('🤝 Team coordination')) {
-      addAgentByKey('hera');
-      addAgentByKey('echo');
-    }
-
-    if (challenges.contains('💰 Cost optimization')) {
-      addAgentByKey('kash');
-    }
-
-    if (challenges.contains('📊 Data analysis')) {
-      addAgentByKey('kash');
-      addAgentByKey('dox');
-    }
-
-    // Priority logic
-    if (priority.contains('🚀 Productivity') ||
-        priority.contains('⚡ Time saving')) {
-      addAgentByKey('timo');
-    }
-
-    if (priority.contains('👥 Team development')) {
-      addAgentByKey('hera');
-    }
-
-    // fallback
-    if (recommendedBlocks.isEmpty) {
-      addAgentByKey('hera');
-      addAgentByKey('kash');
-      addAgentByKey('timo');
-    }
-
-    // limit to 3
-    final blocks = recommendedBlocks.take(3).toList();
-    final keys = recommendedKeys.take(3).toList();
-
-    return _RecommendationResult(text: blocks.join('\n\n'), agentKeys: keys);
-  }
-
-  void _skipToMarketplace() {
-    Navigator.pushReplacementNamed(context, '/agent-marketplace');
   }
 
   void _scrollToBottom() {
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeOutCubic,
-        );
-      }
+    Timer(const Duration(milliseconds: 120), () {
+      if (!_scrollController.hasClients) return;
+
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeOutCubic,
+      );
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentQuestion = _currentQuestion < _questions.length
-        ? _questions[_currentQuestion]
-        : null;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black, size: 20),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        title: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedBuilder(
-                animation: _glowController,
-                builder: (context, child) {
-                  return Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFCDFF00),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(
-                            0xFFCDFF00,
-                          ).withOpacity(0.5 * _glowController.value),
-                          blurRadius: 15,
-                          spreadRadius: 3,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.auto_awesome,
-                      color: Colors.black,
-                      size: 18,
-                    ),
-                  );
+      resizeToAvoidBottomInset: true,
+      backgroundColor: _bg,
+      appBar: _buildHeader(),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
+                itemCount: _messages.length + (_isTyping ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == _messages.length) {
+                    return _buildTypingIndicator();
+                  }
+
+                  return _buildMessage(_messages[index]);
                 },
               ),
-              const SizedBox(width: 10),
-              const Text(
-                'E-Team AI',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
+            ),
+            AnimatedPadding(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOut,
+              padding: EdgeInsets.only(bottom: bottomInset > 0 ? 8 : 0),
+              child: _buildInputBar(),
+            ),
+          ],
         ),
-        centerTitle: true,
       ),
-      body: Stack(
+    );
+  }
+
+  PreferredSizeWidget _buildHeader() {
+    return AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      surfaceTintColor: Colors.white,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new_rounded),
+        color: _dark,
+        onPressed: () => Navigator.pop(context),
+      ),
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(color: Colors.white),
-          Column(
-            children: [
-              const SizedBox(height: 100),
-
-              if (_currentQuestion < _questions.length)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 20,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+          AnimatedBuilder(
+            animation: _pulseController,
+            builder: (_, __) {
+              return Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: _green.withOpacity(0.4 + 0.6 * _pulseController.value),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: _green.withOpacity(0.25),
+                      blurRadius: 10,
+                      spreadRadius: 2,
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFCDFF00).withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                '${_currentQuestion + 1}/${_questions.length}',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'Question ${_currentQuestion + 1}',
-                                style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFCDFF00),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                '${(((_currentQuestion + 1) / _questions.length) * 100).round()}%',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: LinearProgressIndicator(
-                            value: (_currentQuestion + 1) / _questions.length,
-                            backgroundColor: Colors.black.withOpacity(0.05),
-                            valueColor: const AlwaysStoppedAnimation<Color>(
-                              Color(0xFFCDFF00),
-                            ),
-                            minHeight: 8,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
-
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(20),
-                  itemCount: _messages.length + (_isTyping ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == _messages.length && _isTyping) {
-                      return _buildTypingIndicator();
-                    }
-                    return _buildMessage(_messages[index], index);
-                  },
-                ),
-              ),
-
-              if (currentQuestion != null &&
-                  currentQuestion.multiSelect &&
-                  _selectedOptions.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 20,
-                        offset: const Offset(0, -5),
-                      ),
-                    ],
-                  ),
-                  child: SafeArea(
-                    child: Container(
-                      width: double.infinity,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Colors.black, Color(0xFF2A2A2A)],
-                        ),
-                        borderRadius: BorderRadius.circular(28),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: _confirmSelection,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(28),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFCDFF00),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '${_selectedOptions.length}',
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'Continue',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(
-                              Icons.arrow_forward_rounded,
-                              color: Color(0xFFCDFF00),
-                              size: 20,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+              );
+            },
+          ),
+          const SizedBox(width: 10),
+          Text(
+            "DEXO CONSULTATION",
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              color: _dark,
+              letterSpacing: 1.4,
+            ),
           ),
         ],
       ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(1),
+        child: Container(height: 0.5, color: _border),
+      ),
     );
   }
 
-  Widget _buildMessage(ChatMessage message, int index) {
-    return TweenAnimationBuilder<double>(
-      key: ValueKey('message_$index'),
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 400 + (index * 50)),
-      curve: Curves.easeOutBack,
-      builder: (context, value, child) {
-        final clampedValue = value.clamp(0.0, 1.0);
+  Widget _buildMessage(ChatMessage message) {
+    if (message.type == ChatMessageType.blueprint) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 24),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: message.widget!,
+        ),
+      );
+    }
 
-        return Transform.scale(
-          scale: clampedValue,
-          alignment: message.isBot
-              ? Alignment.centerLeft
-              : Alignment.centerRight,
-          child: Opacity(
-            opacity: clampedValue,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: Column(
-                crossAxisAlignment: message.isBot
-                    ? CrossAxisAlignment.start
-                    : CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    mainAxisAlignment: message.isBot
-                        ? MainAxisAlignment.start
-                        : MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      if (message.isBot) ...[
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFCDFF00), Color(0xFFB8E600)],
-                            ),
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFCDFF00).withOpacity(0.4),
-                                blurRadius: 15,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.auto_awesome,
-                            color: Colors.black,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                      ],
-                      Flexible(
-                        child: Container(
-                          constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * 0.75,
-                          ),
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: message.isBot ? Colors.white : Colors.black,
-                            borderRadius: BorderRadius.only(
-                              topLeft: const Radius.circular(24),
-                              topRight: const Radius.circular(24),
-                              bottomLeft: Radius.circular(
-                                message.isBot ? 4 : 24,
-                              ),
-                              bottomRight: Radius.circular(
-                                message.isBot ? 24 : 4,
-                              ),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: message.isBot
-                                    ? Colors.black.withOpacity(0.08)
-                                    : Colors.black.withOpacity(0.3),
-                                blurRadius: 20,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                message.text,
-                                style: TextStyle(
-                                  color: message.isBot
-                                      ? Colors.black87
-                                      : Colors.white,
-                                  fontSize: 15,
-                                  height: 1.5,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              if (message.subtitle != null) ...[
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFFCDFF00,
-                                    ).withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    message.subtitle!,
-                                    style: const TextStyle(
-                                      color: Colors.black87,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                      if (!message.isBot) ...[
-                        const SizedBox(width: 12),
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFCDFF00),
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFFCDFF00).withOpacity(0.4),
-                                blurRadius: 15,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Text(
-                              widget.email.substring(0, 1).toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 16),
+    final isBot = message.type == ChatMessageType.bot;
 
-                  if (message.options != null && message.options!.isNotEmpty)
-                    Padding(
-                      padding: EdgeInsets.only(left: message.isBot ? 56 : 0),
-                      child: Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: message.options!.map((option) {
-                          final isSelected = _selectedOptions.contains(option);
-                          return _buildOptionButton(
-                            option,
-                            isSelected,
-                            message.multiSelect,
-                          );
-                        }).toList(),
-                      ),
-                    ),
-
-                  if (message.showActions == true)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 24),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 60,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Colors.black, Color(0xFF2A2A2A)],
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.3),
-                                blurRadius: 25,
-                                offset: const Offset(0, 8),
-                              ),
-                            ],
-                          ),
-                          child: ElevatedButton.icon(
-                            onPressed: _skipToMarketplace,
-                            icon: const Icon(
-                              Icons.explore,
-                              size: 24,
-                              color: Color(0xFFCDFF00),
-                            ),
-                            label: const Text(
-                              'Discover Marketplace',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Align(
+        alignment: isBot ? Alignment.centerLeft : Alignment.centerRight,
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.78,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: isBot ? _botBubble : _dark,
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(20),
+              topRight: const Radius.circular(20),
+              bottomLeft: Radius.circular(isBot ? 4 : 20),
+              bottomRight: Radius.circular(isBot ? 20 : 4),
+            ),
+            border: isBot ? Border.all(color: _border, width: 0.5) : null,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.025),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
               ),
+            ],
+          ),
+          child: Text(
+            message.text,
+            style: GoogleFonts.plusJakartaSans(
+              color: isBot ? _textMain : _primary,
+              fontSize: 14,
+              height: 1.55,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _buildOptionButton(String option, bool isSelected, bool multiSelect) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutBack,
-      builder: (context, value, child) {
-        final clampedValue = value.clamp(0.0, 1.0);
-
-        return Transform.scale(
-          scale: clampedValue,
-          child: InkWell(
-            onTap: () => _toggleOption(option),
-            borderRadius: BorderRadius.circular(16),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOut,
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-              decoration: BoxDecoration(
-                gradient: isSelected
-                    ? const LinearGradient(
-                        colors: [Colors.black, Color(0xFF2A2A2A)],
-                      )
-                    : null,
-                color: isSelected ? null : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: isSelected ? Colors.transparent : Colors.black12,
-                  width: 2,
-                ),
-                boxShadow: [
-                  if (isSelected)
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 15,
-                      offset: const Offset(0, 4),
-                    )
-                  else
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (multiSelect) ...[
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? const Color(0xFFCDFF00)
-                            : Colors.transparent,
-                        border: Border.all(
-                          color: isSelected
-                              ? const Color(0xFFCDFF00)
-                              : Colors.black26,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: isSelected
-                          ? const Icon(
-                              Icons.check,
-                              size: 14,
-                              color: Colors.black,
-                            )
-                          : null,
-                    ),
-                    const SizedBox(width: 10),
-                  ],
-                  Flexible(
-                    child: Text(
-                      option,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black87,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+        ),
+      ),
     );
   }
 
   Widget _buildTypingIndicator() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: _botBubble,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: _border, width: 0.5),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const _DotDelay(delay: 0),
+              const SizedBox(width: 4),
+              const _DotDelay(delay: 150),
+              const SizedBox(width: 4),
+              const _DotDelay(delay: 300),
+              const SizedBox(width: 10),
+              Text(
+                "Dexo is analyzing your company...",
+                style: GoogleFonts.plusJakartaSans(
+                  color: _textMuted,
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputBar() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: _border, width: 0.5)),
+      ),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFCDFF00), Color(0xFFB8E600)],
+          Expanded(
+            child: TextField(
+              controller: _inputController,
+              enabled: !_hasBlueprint,
+              minLines: 1,
+              maxLines: 4,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: _textMain,
+                fontWeight: FontWeight.w500,
               ),
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFCDFF00).withOpacity(0.4),
-                  blurRadius: 15,
-                  offset: const Offset(0, 4),
+              decoration: InputDecoration(
+                hintText: _hasBlueprint
+                    ? "Blueprint generated"
+                    : "Describe your company...",
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  color: _textMuted,
+                  fontSize: 13,
                 ),
-              ],
-            ),
-            child: const Icon(
-              Icons.auto_awesome,
-              color: Colors.black,
-              size: 24,
+                filled: true,
+                fillColor: _botBubble,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 13,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(28),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              onSubmitted: (_) => _handleSend(),
             ),
           ),
           const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                _AnimatedDot(delay: 0),
-                SizedBox(width: 6),
-                _AnimatedDot(delay: 200),
-                SizedBox(width: 6),
-                _AnimatedDot(delay: 400),
-              ],
+          GestureDetector(
+            onTap: _handleSend,
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: _hasBlueprint ? _textMuted : _dark,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: _dark.withOpacity(0.18),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.arrow_upward_rounded,
+                color: _primary,
+                size: 22,
+              ),
             ),
           ),
         ],
@@ -1054,34 +568,654 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
   }
 }
 
-// ✅ small DTO
-class _RecommendationResult {
-  final String text;
-  final List<String> agentKeys;
-
-  _RecommendationResult({required this.text, required this.agentKeys});
+enum ChatMessageType {
+  bot,
+  user,
+  blueprint,
 }
 
-class _AnimatedDot extends StatefulWidget {
-  final int delay;
+class ChatMessage {
+  final ChatMessageType type;
+  final String text;
+  final Widget? widget;
 
-  const _AnimatedDot({required this.delay});
+  const ChatMessage._({
+    required this.type,
+    this.text = '',
+    this.widget,
+  });
+
+  factory ChatMessage.bot(String text) {
+    return ChatMessage._(type: ChatMessageType.bot, text: text);
+  }
+
+  factory ChatMessage.user(String text) {
+    return ChatMessage._(type: ChatMessageType.user, text: text);
+  }
+
+  factory ChatMessage.blueprint(Widget widget) {
+    return ChatMessage._(type: ChatMessageType.blueprint, widget: widget);
+  }
+}
+
+class StrategicAdviceResult {
+  final bool isFinished;
+  final String? nextQuestion;
+  final WorkforcePlan plan;
+
+  StrategicAdviceResult({
+    required this.isFinished,
+    required this.nextQuestion,
+    required this.plan,
+  });
+
+  factory StrategicAdviceResult.fromJson(Map<String, dynamic> json) {
+    return StrategicAdviceResult(
+      isFinished: json['isFinished'] == true,
+      nextQuestion: json['nextQuestion']?.toString(),
+      plan: WorkforcePlan.fromJson(json),
+    );
+  }
+}
+
+class WorkforceDepartment {
+  String name;
+  int targetCount;
+  final String reason;
+
+  WorkforceDepartment({
+    required this.name,
+    required this.targetCount,
+    required this.reason,
+  });
+
+  factory WorkforceDepartment.fromJson(Map<String, dynamic> json) {
+    return WorkforceDepartment(
+      name: json['name']?.toString() ??
+          json['department']?.toString() ??
+          'Department',
+      targetCount: WorkforcePlan._toInt(
+        json['targetCount'] ?? json['count'] ?? json['employees'],
+        1,
+      ),
+      reason: json['reason']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'department': name,
+      'targetCount': targetCount,
+      'currentCount': 0,
+      'reason': reason,
+    };
+  }
+}
+
+class WorkforcePlan {
+  List<WorkforceDepartment> departments;
+  String explanation;
+  List<RecommendedAgent> recommendedAgents;
+
+  WorkforcePlan({
+    required this.departments,
+    required this.explanation,
+    required this.recommendedAgents,
+  });
+
+  factory WorkforcePlan.fromJson(Map<String, dynamic> json) {
+    final proposal = json['proposal'] is Map
+        ? Map<String, dynamic>.from(json['proposal'])
+        : json;
+
+    final departmentsRaw =
+        proposal['departments'] ?? json['departments'] ?? [];
+
+    List<WorkforceDepartment> parsedDepartments = [];
+
+    if (departmentsRaw is List) {
+      parsedDepartments = departmentsRaw
+          .whereType<Map>()
+          .map((e) => WorkforceDepartment.fromJson(
+        Map<String, dynamic>.from(e),
+      ))
+          .where((d) => d.name.trim().isNotEmpty)
+          .toList();
+    }
+
+    if (parsedDepartments.isEmpty) {
+      parsedDepartments = [
+        WorkforceDepartment(
+          name: 'Operations',
+          targetCount: 2,
+          reason: 'Manage daily company operations.',
+        ),
+        WorkforceDepartment(
+          name: 'Marketing',
+          targetCount: 2,
+          reason: 'Acquire customers and grow the brand.',
+        ),
+        WorkforceDepartment(
+          name: 'Administration',
+          targetCount: 1,
+          reason: 'Coordinate internal organization.',
+        ),
+      ];
+    }
+
+    final agentsRaw =
+        json['recommendedAgents'] ?? proposal['recommendedAgents'] ?? [];
+
+    return WorkforcePlan(
+      departments: parsedDepartments,
+      explanation: proposal['explanation']?.toString() ??
+          'Dexo generated this organization structure from your company vision.',
+      recommendedAgents: (agentsRaw as List? ?? [])
+          .whereType<Map>()
+          .map((e) => RecommendedAgent.fromJson(
+        Map<String, dynamic>.from(e),
+      ))
+          .toList(),
+    );
+  }
+
+  List<Map<String, dynamic>> toApiList() {
+    return departments.map((d) => d.toJson()).toList();
+  }
+
+  static int _toInt(dynamic value, int fallback) {
+    if (value == null) return fallback;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString()) ?? fallback;
+  }
+}
+
+class RecommendedAgent {
+  final String id;
+  final String name;
+  final String reason;
+
+  RecommendedAgent({
+    required this.id,
+    required this.name,
+    required this.reason,
+  });
+
+  factory RecommendedAgent.fromJson(Map<String, dynamic> json) {
+    return RecommendedAgent(
+      id: json['id']?.toString().toLowerCase() ?? '',
+      name: json['name']?.toString() ?? '',
+      reason: json['reason']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'reason': reason,
+    };
+  }
+}
+
+class OrganizationBlueprintCard extends StatefulWidget {
+  final WorkforcePlan initialPlan;
+  final Future<void> Function(WorkforcePlan plan) onConfirm;
+
+  const OrganizationBlueprintCard({
+    super.key,
+    required this.initialPlan,
+    required this.onConfirm,
+  });
 
   @override
-  State<_AnimatedDot> createState() => _AnimatedDotState();
+  State<OrganizationBlueprintCard> createState() =>
+      _OrganizationBlueprintCardState();
 }
 
-class _AnimatedDotState extends State<_AnimatedDot>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _OrganizationBlueprintCardState extends State<OrganizationBlueprintCard> {
+  late WorkforcePlan _plan;
+  bool _isSaving = false;
+
+  static const Color _primary = Color(0xFFCDFF00);
+  static const Color _dark = Color(0xFF0A0A0A);
+  static const Color _border = Color(0xFFE5E7EB);
+  static const Color _textMain = Color(0xFF0F172A);
+  static const Color _textMuted = Color(0xFF64748B);
 
   @override
   void initState() {
     super.initState();
+
+    _plan = WorkforcePlan(
+      departments: widget.initialPlan.departments
+          .map(
+            (d) => WorkforceDepartment(
+          name: d.name,
+          targetCount: d.targetCount,
+          reason: d.reason,
+        ),
+      )
+          .toList(),
+      explanation: widget.initialPlan.explanation,
+      recommendedAgents: widget.initialPlan.recommendedAgents,
+    );
+  }
+
+  int get _total =>
+      _plan.departments.fold(0, (sum, d) => sum + d.targetCount);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.92,
+      ),
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: _border, width: 0.6),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 28,
+            offset: const Offset(0, 14),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildCardHeader(),
+          const SizedBox(height: 14),
+          Text(
+            _plan.explanation,
+            style: GoogleFonts.plusJakartaSans(
+              color: _textMuted,
+              fontSize: 12,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 20),
+          ..._plan.departments.map(
+                (dept) => Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: _buildRow(
+                icon: _iconForDepartment(dept.name),
+                label: dept.name,
+                subtitle: dept.reason.isNotEmpty
+                    ? dept.reason
+                    : 'Required function for this company',
+                value: dept.targetCount,
+                onMinus: () => _changeDepartment(dept, -1),
+                onPlus: () => _changeDepartment(dept, 1),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          _buildTotalBox(),
+          if (_plan.recommendedAgents.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            _buildAgentsSection(),
+          ],
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            height: 54,
+            child: ElevatedButton(
+              onPressed: _isSaving
+                  ? null
+                  : () async {
+                setState(() => _isSaving = true);
+                await widget.onConfirm(_plan);
+                if (mounted) setState(() => _isSaving = false);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _dark,
+                disabledBackgroundColor: _dark.withOpacity(0.45),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: _isSaving
+                  ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.2,
+                  color: _primary,
+                ),
+              )
+                  : Text(
+                'ACTIVATE ORGANIZATION VISION',
+                style: GoogleFonts.plusJakartaSans(
+                  color: _primary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCardHeader() {
+    return Row(
+      children: [
+        Container(
+          width: 46,
+          height: 46,
+          decoration: BoxDecoration(
+            color: _primary,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Icon(
+            Icons.account_tree_rounded,
+            color: _dark,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'ORGANIZATION BLUEPRINT',
+                style: GoogleFonts.plusJakartaSans(
+                  color: _dark,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Adjust Dexo’s dynamic company structure.',
+                style: GoogleFonts.plusJakartaSans(
+                  color: _textMuted,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRow({
+    required IconData icon,
+    required String label,
+    required String subtitle,
+    required int value,
+    required VoidCallback onMinus,
+    required VoidCallback onPlus,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAFAFA),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _border, width: 0.6),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: _dark,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: _primary, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.plusJakartaSans(
+                    color: _textMain,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.plusJakartaSans(
+                    color: _textMuted,
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          _counterButton(Icons.remove_rounded, onMinus),
+          SizedBox(
+            width: 38,
+            child: Center(
+              child: Text(
+                '$value',
+                style: GoogleFonts.plusJakartaSans(
+                  color: _textMain,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+          _counterButton(Icons.add_rounded, onPlus),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTotalBox() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _dark,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.groups_rounded, color: _primary, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Total recommended workforce',
+              style: GoogleFonts.plusJakartaSans(
+                color: Colors.white.withOpacity(0.72),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Text(
+            '$_total',
+            style: GoogleFonts.plusJakartaSans(
+              color: _primary,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAgentsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'RECOMMENDED AI AGENTS',
+          style: GoogleFonts.plusJakartaSans(
+            color: _dark,
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.1,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ..._plan.recommendedAgents.map(
+              (agent) => Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAFAFA),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: _border, width: 0.6),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.auto_awesome, color: _dark, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        agent.name.isNotEmpty ? agent.name : agent.id,
+                        style: GoogleFonts.plusJakartaSans(
+                          color: _textMain,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        agent.reason,
+                        style: GoogleFonts.plusJakartaSans(
+                          color: _textMuted,
+                          fontSize: 11,
+                          height: 1.4,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _counterButton(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(color: _border, width: 0.6),
+        ),
+        child: Icon(icon, size: 18, color: _dark),
+      ),
+    );
+  }
+
+  IconData _iconForDepartment(String name) {
+    final n = name.toLowerCase();
+
+    if (n.contains('tech') || n.contains('software') || n.contains('it')) {
+      return Icons.code_rounded;
+    }
+    if (n.contains('design') || n.contains('brand') || n.contains('ux')) {
+      return Icons.palette_rounded;
+    }
+    if (n.contains('marketing') ||
+        n.contains('growth') ||
+        n.contains('sales')) {
+      return Icons.campaign_rounded;
+    }
+    if (n.contains('finance') ||
+        n.contains('accounting') ||
+        n.contains('budget')) {
+      return Icons.account_balance_wallet_rounded;
+    }
+    if (n.contains('operation') || n.contains('logistic')) {
+      return Icons.settings_suggest_rounded;
+    }
+    if (n.contains('support') ||
+        n.contains('client') ||
+        n.contains('customer')) {
+      return Icons.support_agent_rounded;
+    }
+    if (n.contains('rh') || n.contains('hr') || n.contains('human')) {
+      return Icons.groups_rounded;
+    }
+    if (n.contains('admin')) {
+      return Icons.admin_panel_settings_rounded;
+    }
+    if (n.contains('legal') || n.contains('juridique')) {
+      return Icons.gavel_rounded;
+    }
+
+    return Icons.business_center_rounded;
+  }
+
+  void _changeDepartment(WorkforceDepartment department, int delta) {
+    setState(() {
+      department.targetCount =
+          (department.targetCount + delta).clamp(0, 99);
+    });
+  }
+}
+
+class _DotDelay extends StatefulWidget {
+  final int delay;
+
+  const _DotDelay({
+    required this.delay,
+  });
+
+  @override
+  State<_DotDelay> createState() => _DotDelayState();
+}
+
+class _DotDelayState extends State<_DotDelay>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat();
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _opacity = Tween<double>(begin: 0.25, end: 1).animate(_controller);
+
+    Future.delayed(Duration(milliseconds: widget.delay), () {
+      if (mounted) _controller.repeat(reverse: true);
+    });
   }
 
   @override
@@ -1092,65 +1226,16 @@ class _AnimatedDotState extends State<_AnimatedDot>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        final value = (_controller.value + (widget.delay / 1200)) % 1.0;
-        final scale = (0.6 + (math.sin(value * math.pi * 2) * 0.4)).clamp(
-          0.0,
-          1.0,
-        );
-        final opacity = (0.3 + (math.sin(value * math.pi * 2) * 0.7)).clamp(
-          0.0,
-          1.0,
-        );
-
-        return Transform.scale(
-          scale: scale,
-          child: Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(opacity),
-              shape: BoxShape.circle,
-            ),
-          ),
-        );
-      },
+    return FadeTransition(
+      opacity: _opacity,
+      child: Container(
+        width: 6,
+        height: 6,
+        decoration: const BoxDecoration(
+          color: Color(0xFF64748B),
+          shape: BoxShape.circle,
+        ),
+      ),
     );
   }
-}
-
-class ChatMessage {
-  final String text;
-  final String? subtitle;
-  final bool isBot;
-  final List<String>? options;
-  final bool multiSelect;
-  final bool showActions;
-
-  ChatMessage({
-    required this.text,
-    this.subtitle,
-    required this.isBot,
-    this.options,
-    this.multiSelect = false,
-    this.showActions = false,
-  });
-}
-
-class BotQuestion {
-  final String id;
-  final String question;
-  final String? subtitle;
-  final List<String> options;
-  final bool multiSelect;
-
-  BotQuestion({
-    required this.id,
-    required this.question,
-    this.subtitle,
-    required this.options,
-    this.multiSelect = false,
-  });
 }

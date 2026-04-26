@@ -9,8 +9,7 @@ import 'hr/hr_dashboard_page.dart';
 import 'echo/echo_dashboard_page.dart';
 import 'finance/kash_dashboard_screen.dart';
 import 'timo/timo_dashboard_page.dart';
-import 'dexo/dexo_agent_page.dart';
-
+import 'dexo/dexo_dashboard_page.dart';
 class MyAgentsPage extends StatelessWidget {
   const MyAgentsPage({Key? key}) : super(key: key);
 

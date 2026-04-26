@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import 'package:e_team/presentation/providers/user_provider.dart';
-import 'package:e_team/data/services/api_service.dart';
-import 'package:e_team/data/services/auth_service.dart';
-import 'package:e_team/utils/constants.dart';
+import '../../../providers/user_provider.dart';
+import '/data/services/api_service.dart';
+import '/data/services/auth_service.dart';
+import '/utils/constants.dart';
 
 class KashAgentScreen extends StatefulWidget {
   const KashAgentScreen({super.key});
@@ -61,6 +61,26 @@ class _KashAgentScreenState extends State<KashAgentScreen>
     _scrollController.dispose();
     _shimmerController.dispose();
     super.dispose();
+  }
+
+  Widget _buildFloatingActionButton(int energy) {
+    return FloatingActionButton.extended(
+      onPressed: _isAnalyzing ? null : () => _pickReceipt(),
+      backgroundColor: _volt,
+      foregroundColor: Colors.black,
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      icon: const Icon(Icons.camera_alt, size: 20),
+      label: const Text(
+        'Scanner facture',
+        style: TextStyle(
+          fontWeight: FontWeight.w900,
+          fontSize: 14,
+        ),
+      ),
+    );
   }
 
   Future<void> _scrollToBottom() async {
@@ -259,6 +279,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
 
     return Scaffold(
       backgroundColor: const Color(0xFF0B0E0B),
+      floatingActionButton: _buildFloatingActionButton(energy),
       body: SafeArea(
         child: Column(
           children: [
@@ -568,40 +589,136 @@ class _KashAgentScreenState extends State<KashAgentScreen>
           ],
         ),
 
-        // Statistics Tab (Placeholder)
-        SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Statistiques financières',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF111511),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: _volt.withOpacity(0.2)),
-                ),
-                child: const Text(
-                  'Les statistiques sont disponibles dans le tableau de bord Kash',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        // Statistics Tab with Empty State
+        _buildStatisticsTab(),
       ],
+    );
+  }
+
+  Widget _buildStatisticsTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Statistiques financières',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 24),
+          _buildEmptyStateCard(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyStateCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF111511),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: _volt.withOpacity(0.15)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            _volt.withOpacity(0.05),
+            _gold.withOpacity(0.03),
+          ],
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Wallet Icon Container
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: [_volt.withOpacity(0.3), _gold.withOpacity(0.2)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              border: Border.all(color: _volt.withOpacity(0.2), width: 2),
+            ),
+            child: Center(
+              child: Icon(
+                Icons.account_balance_wallet_outlined,
+                color: _volt,
+                size: 48,
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Empty State Text
+          const Text(
+            'Aucune dépense enregistrée',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Commencez à scanner vos factures pour\nanalyser et catégoriser vos dépenses.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.6),
+              fontSize: 14,
+              height: 1.6,
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          // Main CTA Button
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _volt,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 8,
+              ),
+              onPressed: _isAnalyzing ? null : () => _pickReceipt(),
+              icon: const Icon(Icons.camera_alt, size: 20),
+              label: const Text(
+                'Scanner ma première facture',
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Alternative Text
+          Text(
+            'Appuyez sur le bouton flottant pour commencer',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -664,24 +781,6 @@ class _Composer extends StatelessWidget {
                 ),
               ),
               onSubmitted: (_) => onSend(),
-            ),
-          ),
-          const SizedBox(width: 10),
-          InkWell(
-            onTap: isBusy ? null : onPickPhoto,
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: const Color(0xFF111511),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: _volt.withOpacity(0.25)),
-              ),
-              child: Icon(
-                Icons.photo_camera_outlined,
-                color: isBusy ? Colors.white30 : _volt,
-              ),
             ),
           ),
           const SizedBox(width: 10),

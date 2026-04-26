@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../providers/user_provider.dart';
-import 'package:e_team/data/services/kash_service.dart';
+import '/data/services/kash_service.dart';
 
 // ─────────────────────────────────────────────────────────────
 //  PALETTE KASH - Teal/Green scheme matching Timo's design
@@ -101,7 +101,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       // Update energy balance on refresh
       if (mounted) {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
-        await userProvider.refreshFromApi();
+        await userProvider.refreshUser();
       }
     } catch (e) {
       setState(() {
@@ -151,92 +151,122 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       setState(() => _loadingReminders = false);
     }
   }
+  dynamic _readExpenseValue(dynamic expense, String key) {
+    if (expense is Map) {
+      return expense[key];
+    }
 
+    switch (key) {
+      case 'vendor':
+        return expense.vendor;
+      case 'amount':
+        return expense.amount;
+      case 'currency':
+        return expense.currency;
+      case 'category':
+        return expense.category;
+      case 'date':
+        return expense.date;
+      default:
+        return null;
+    }
+  }
+  dynamic _readValue(dynamic item, String key) {
+    if (item is Map) return item[key];
+
+    try {
+      switch (key) {
+        case 'vendor':
+          return item.vendor;
+        case 'amount':
+          return item.amount;
+        case 'currency':
+          return item.currency;
+        case 'category':
+          return item.category;
+        case 'date':
+          return item.date;
+        case 'limit':
+          return item.limit;
+        case 'spent':
+          return item.spent;
+        case 'status':
+          return item.status;
+        case 'title':
+          return item.title;
+        case 'dueDate':
+          return item.dueDate;
+        case 'id':
+          return item.id;
+        case '_id':
+          return item.id;
+        default:
+          return null;
+      }
+    } catch (_) {
+      return null;
+    }
+  }
+
+  DateTime _safeDate(dynamic value) {
+    if (value is DateTime) return value;
+    if (value != null) {
+      return DateTime.tryParse(value.toString()) ?? DateTime.now();
+    }
+    return DateTime.now();
+  }
   void _calculateMetrics() {
     setState(() {
-      // Total spent from expenses
       _totalSpent = 0.0;
-      for (var expense in _expenses) {
-        final amount = (expense['amount'] as num?)?.toDouble() ?? 0.0;
+
+      for (final expense in _expenses) {
+        final amount = (_readValue(expense, 'amount') as num?)?.toDouble() ?? 0.0;
         _totalSpent += amount;
       }
 
-      // Total budget from budgets
       _totalBudget = 0.0;
-      for (var budget in _budgets) {
-        final amount = (budget['amount'] as num?)?.toDouble() ?? 0.0;
-        _totalBudget += amount;
+
+      for (final budget in _budgets) {
+        final limit = (_readValue(budget, 'limit') as num?)?.toDouble() ?? 0.0;
+        _totalBudget += limit;
       }
 
-      // Pending reminders count
       _pendingReminders = _reminders
-          .where((r) => r['status'] == 'pending')
-          .toList()
+          .where((r) => _readValue(r, 'status') == 'pending')
           .length;
 
-      // Expenses this month
       _expensesThisMonth = 0.0;
       final now = DateTime.now();
-      for (var expense in _expenses) {
-        final date = expense['date'] != null
-            ? DateTime.parse(expense['date'].toString())
-            : null;
-        if (date != null &&
-            date.year == now.year &&
-            date.month == now.month) {
-          final amount = (expense['amount'] as num?)?.toDouble() ?? 0.0;
+
+      for (final expense in _expenses) {
+        final date = _safeDate(_readValue(expense, 'date'));
+        if (date.year == now.year && date.month == now.month) {
+          final amount =
+              (_readValue(expense, 'amount') as num?)?.toDouble() ?? 0.0;
           _expensesThisMonth += amount;
         }
       }
     });
   }
-
-  /// Get combined list of categories: budget projects first, then standard categories
+  /// Get combined list of categories: budget categories first, then standard categories
   /// Removes duplicates automatically
   List<String> _getCombinedCategories() {
     final categories = <String>{};
 
-    // Add budget project names first
-    for (var budget in _budgets) {
-      final project = budget['project'] as String?;
-      if (project != null && project.isNotEmpty) {
-        categories.add(project);
+    for (final budget in _budgets) {
+      final category = _readValue(budget, 'category')?.toString();
+      if (category != null && category.isNotEmpty) {
+        categories.add(category);
       }
     }
 
-    // Add standard categories
     categories.addAll(['SaaS', 'Marketing', 'Travel', 'Office', 'Salaries', 'Other']);
 
     return categories.toList();
   }
-
   Future<void> _markReminderPaid(String reminderId) async {
     try {
-      final updatedReminder =
-          await KashService.markReminderPaid(reminderId);
-      setState(() {
-        // Update reminder status locally
-        final index = _reminders.indexWhere(
-          (r) => r['_id'] == reminderId || r['id'] == reminderId,
-        );
-        if (index >= 0) {
-          _reminders[index]['status'] = 'paid';
-        }
-
-        // Add new expense from reminder data
-        final newExpense = {
-          'vendor': updatedReminder['title'] ?? 'Payment',
-          'amount': updatedReminder['amount'],
-          'currency': updatedReminder['currency'] ?? 'TND',
-          'category': 'Other',
-          'date': DateTime.now().toIso8601String(),
-          'description': updatedReminder['notes'] ?? '',
-        };
-        _expenses.insert(0, newExpense);
-
-        // Recalculate metrics
-        _calculateMetrics();
-      });
+      await KashService.markReminderPaid(reminderId);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -245,10 +275,12 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
             backgroundColor: Colors.green,
           ),
         );
-        _loadDashboardData();
-        // Update energy balance after reminder is paid
+
+        await _loadDashboardData();
+
         final userProvider = Provider.of<UserProvider>(context, listen: false);
-        await userProvider.refreshFromApi();      }
+        await userProvider.refreshUser();
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -260,105 +292,246 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       }
     }
   }
-
   void _showAddBudgetSheet() {
-    final projectController = TextEditingController();
+    final categoryController = TextEditingController();
     final amountController = TextEditingController();
+    String selectedCurrency = 'TND';
+    String selectedCategory = 'Marketing';
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-          left: 20,
-          right: 20,
-          top: 20,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Add Budget',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: projectController,
-              decoration: InputDecoration(
-                labelText: 'Project name',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+      backgroundColor: KP.card(Theme.of(context).brightness == Brightness.dark),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            left: 20,
+            right: 20,
+            top: 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Ajouter un Budget',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: amountController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Amount',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: () async {
-                    if (projectController.text.isEmpty ||
-                        amountController.text.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please fill all fields'),
-                        ),
-                      );
-                      return;
-                    }
+              const SizedBox(height: 16),
 
-                    try {
-                      await KashService.setBudget(
-                        projectController.text,
-                        double.parse(amountController.text),
-                      );
-                      if (mounted) {
-                        Navigator.pop(context);
-                        _loadDashboardData();
-                        // Update energy balance after budget is added
-                        final userProvider = Provider.of<UserProvider>(context, listen: false);
-                        await userProvider.refreshFromApi();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('✅ Budget added'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('❌ Error: $e'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  child: const Text('Add'),
+              // Category Dropdown
+              Text(
+                'Catégorie',
+                style: TextStyle(
+                  color: KP.text(Theme.of(context).brightness == Brightness.dark),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<String>(
+                value: selectedCategory,
+                decoration: InputDecoration(
+                  labelText: 'Sélectionner une catégorie',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: KP.cardSoft(Theme.of(context).brightness == Brightness.dark),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'SaaS', child: Text('SaaS')),
+                  DropdownMenuItem(value: 'Marketing', child: Text('Marketing')),
+                  DropdownMenuItem(value: 'Travel', child: Text('Travel')),
+                  DropdownMenuItem(value: 'Office', child: Text('Office')),
+                  DropdownMenuItem(value: 'Salaries', child: Text('Salaries')),
+                  DropdownMenuItem(value: 'Other', child: Text('Other')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setModalState(() => selectedCategory = value);
+                  }
+                },
+                dropdownColor: KP.card(Theme.of(context).brightness == Brightness.dark),
+              ),
+              const SizedBox(height: 14),
+
+              // Limit Amount TextField
+              Text(
+                'Montant Limite',
+                style: TextStyle(
+                  color: KP.text(Theme.of(context).brightness == Brightness.dark),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                controller: amountController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                  signed: false,
+                ),
+                style: TextStyle(
+                  color: KP.text(Theme.of(context).brightness == Brightness.dark),
+                ),
+                decoration: InputDecoration(
+                  labelText: 'Ex: 5000',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: KP.cardSoft(Theme.of(context).brightness == Brightness.dark),
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // Currency Dropdown
+              Text(
+                'Devise',
+                style: TextStyle(
+                  color: KP.text(Theme.of(context).brightness == Brightness.dark),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<String>(
+                value: selectedCurrency,
+                decoration: InputDecoration(
+                  labelText: 'Sélectionner une devise',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: KP.cardSoft(Theme.of(context).brightness == Brightness.dark),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'TND', child: Text('TND (Tunisien)')),
+                  DropdownMenuItem(value: 'USD', child: Text('USD (Américain)')),
+                  DropdownMenuItem(value: 'EUR', child: Text('EUR (Européen)')),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setModalState(() => selectedCurrency = value);
+                  }
+                },
+                dropdownColor: KP.card(Theme.of(context).brightness == Brightness.dark),
+              ),
+              const SizedBox(height: 20),
+
+              // Action Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Annuler',
+                      style: TextStyle(
+                        color: KP.textMuted(Theme.of(context).brightness == Brightness.dark),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: KP.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () async {
+                      if (selectedCategory.isEmpty || amountController.text.isEmpty) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Veuillez remplir tous les champs'),
+                              backgroundColor: KP.danger,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                        return;
+                      }
+
+                      try {
+                        final amount = double.parse(amountController.text);
+                        if (amount <= 0) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('Le montant doit être supérieur à 0'),
+                                backgroundColor: KP.danger,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                          return;
+                        }
+
+                        // Call the API to create budget
+                        await KashService.createBudget(
+                          category: selectedCategory,
+                          limit: amount,
+                          currency: selectedCurrency,
+                        );
+
+                        if (mounted) {
+                          Navigator.pop(context);
+
+                          // Refresh the dashboard and user data
+                          await _loadDashboardData();
+
+                          final userProvider = Provider.of<UserProvider>(context, listen: false);
+                          await userProvider.refreshUser();
+
+                          // Show success message
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('✅ Budget créé avec succès'),
+                              backgroundColor: Colors.green,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      } on FormatException {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Montant invalide'),
+                              backgroundColor: KP.danger,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('❌ Erreur: $e'),
+                              backgroundColor: KP.danger,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: const Text(
+                      'Créer le Budget',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -506,7 +679,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                           _loadDashboardData();
                           // Update energy balance after reminder is created
                           final userProvider = Provider.of<UserProvider>(context, listen: false);
-                          await userProvider.refreshFromApi();
+                          await userProvider.refreshUser();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('✅ Reminder created'),
@@ -702,7 +875,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                           _loadDashboardData();
                           // Update energy balance after expense is added
                           final userProvider = Provider.of<UserProvider>(context, listen: false);
-                          await userProvider.refreshFromApi();
+                          await userProvider.refreshUser();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('✅ Expense added'),
@@ -1017,12 +1190,12 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
   }
 
   Widget _statItem(
-    String val,
-    String label,
-    Color color,
-    IconData icon,
-    bool d,
-  ) =>
+      String val,
+      String label,
+      Color color,
+      IconData icon,
+      bool d,
+      ) =>
       Column(
         children: [
           Container(
@@ -1113,52 +1286,63 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
   Widget _buildExpensesTab(bool d) {
     if (_loadingExpenses)
       return const Center(child: CircularProgressIndicator());
-    if (_expenses.isEmpty)
-      return _emptyState('Aucune dépense', Icons.inbox_rounded, d);
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+    return Column(
       children: [
-        Row(
-          children: [
-            Text(
-              'Toutes les dépenses',
-              style: TextStyle(
-                color: KP.text(d),
-                fontSize: 15,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const Spacer(),
-            GestureDetector(
-              onTap: _showAddExpenseSheet,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                decoration: BoxDecoration(
-                  color: KP.primary.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
+        // Header with Add button - ALWAYS VISIBLE
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+          child: Row(
+            children: [
+              Text(
+                'Toutes les dépenses',
+                style: TextStyle(
+                  color: KP.text(d),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.add_rounded, size: 13, color: KP.primary),
-                    const SizedBox(width: 5),
-                    const Text(
-                      'Ajouter',
-                      style: TextStyle(
-                        color: KP.primary,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: _showAddExpenseSheet,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: KP.primary.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add_rounded, size: 13, color: KP.primary),
+                      const SizedBox(width: 5),
+                      const Text(
+                        'Ajouter',
+                        style: TextStyle(
+                          color: KP.primary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 16),
-        ..._expenses.map((e) => _buildExpenseCard(e, d)),
+        // Content - either list or empty state
+        Expanded(
+          child: _expenses.isEmpty
+              ? Center(
+            child: _emptyState('Aucune dépense', Icons.inbox_rounded, d),
+          )
+              : ListView(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+            children: _expenses.map((e) => _buildExpenseCard(e, d)).toList(),
+          ),
+        ),
       ],
     );
   }
@@ -1166,52 +1350,63 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
   Widget _buildBudgetsTab(bool d) {
     if (_loadingBudgets)
       return const Center(child: CircularProgressIndicator());
-    if (_budgets.isEmpty)
-      return _emptyState('Aucun budget', Icons.trending_up_rounded, d);
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+    return Column(
       children: [
-        Row(
-          children: [
-            Text(
-              'Budgets par projet',
-              style: TextStyle(
-                color: KP.text(d),
-                fontSize: 15,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const Spacer(),
-            GestureDetector(
-              onTap: _showAddBudgetSheet,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                decoration: BoxDecoration(
-                  color: KP.primary.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
+        // Header with Add button - ALWAYS VISIBLE
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+          child: Row(
+            children: [
+              Text(
+                'Budgets par projet',
+                style: TextStyle(
+                  color: KP.text(d),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.add_rounded, size: 13, color: KP.primary),
-                    const SizedBox(width: 5),
-                    const Text(
-                      'Ajouter',
-                      style: TextStyle(
-                        color: KP.primary,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: _showAddBudgetSheet,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: KP.primary.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add_rounded, size: 13, color: KP.primary),
+                      const SizedBox(width: 5),
+                      const Text(
+                        'Ajouter',
+                        style: TextStyle(
+                          color: KP.primary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 16),
-        ..._budgets.map((b) => _buildBudgetCard(b, d)),
+        // Content - either list or empty state
+        Expanded(
+          child: _budgets.isEmpty
+              ? Center(
+            child: _emptyState('Aucun budget', Icons.trending_up_rounded, d),
+          )
+              : ListView(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+            children: _budgets.map((b) => _buildBudgetCard(b, d)).toList(),
+          ),
+        ),
       ],
     );
   }
@@ -1219,63 +1414,73 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
   Widget _buildRemindersTab(bool d) {
     if (_loadingReminders)
       return const Center(child: CircularProgressIndicator());
-    if (_reminders.isEmpty)
-      return _emptyState('Aucun paiement', Icons.notifications_off_rounded, d);
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+    return Column(
       children: [
-        Row(
-          children: [
-            Text(
-              'Rappels de paiement',
-              style: TextStyle(
-                color: KP.text(d),
-                fontSize: 15,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const Spacer(),
-            GestureDetector(
-              onTap: _showAddReminderSheet,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                decoration: BoxDecoration(
-                  color: KP.primary.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
+        // Header with Add button - ALWAYS VISIBLE
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+          child: Row(
+            children: [
+              Text(
+                'Rappels de paiement',
+                style: TextStyle(
+                  color: KP.text(d),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.add_rounded, size: 13, color: KP.primary),
-                    const SizedBox(width: 5),
-                    const Text(
-                      'Ajouter',
-                      style: TextStyle(
-                        color: KP.primary,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: _showAddReminderSheet,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: KP.primary.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add_rounded, size: 13, color: KP.primary),
+                      const SizedBox(width: 5),
+                      const Text(
+                        'Ajouter',
+                        style: TextStyle(
+                          color: KP.primary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 16),
-        ..._reminders.map((r) => _buildReminderCard(r, d)),
+        // Content - either list or empty state
+        Expanded(
+          child: _reminders.isEmpty
+              ? Center(
+            child: _emptyState('Aucun paiement', Icons.notifications_off_rounded, d),
+          )
+              : ListView(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+            children: _reminders.map((r) => _buildReminderCard(r, d)).toList(),
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildExpenseCard(dynamic expense, bool d) {
-    final vendor = expense['vendor'] ?? 'Unknown';
-    final amount = (expense['amount'] as num?)?.toDouble() ?? 0.0;
-    final currency = expense['currency'] ?? 'TND';
-    final category = expense['category'] ?? 'Other';
-    final date =
-        expense['date'] != null ? DateTime.parse(expense['date'].toString()) : DateTime.now();
+    final vendor = (_readValue(expense, 'vendor') ?? 'Unknown').toString();
+    final amount = (_readValue(expense, 'amount') as num?)?.toDouble() ?? 0.0;
+    final currency = (_readValue(expense, 'currency') ?? 'TND').toString();
+    final category = (_readValue(expense, 'category') ?? 'Other').toString();
+    final date = _safeDate(_readValue(expense, 'date'));
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -1334,30 +1539,27 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '$amount $currency',
-                style: TextStyle(
-                  color: KP.danger,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ],
+          Text(
+            '${amount.toStringAsFixed(2)} $currency',
+            style: TextStyle(
+              color: KP.danger,
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ],
       ),
     );
   }
-
   Widget _buildBudgetCard(dynamic budget, bool d) {
-    final project = budget['project'] ?? 'Unknown';
-    final amount = (budget['amount'] as num?)?.toDouble() ?? 0.0;
-    final spent = (budget['spent'] as num?)?.toDouble() ?? 0.0;
-    final percentage = amount > 0 ? (spent / amount).clamp(0.0, 1.0) : 0.0;
-    final color = percentage > 0.8 ? KP.danger : percentage > 0.5 ? KP.warning : KP.success;
+    final category = (_readValue(budget, 'category') ?? 'Unknown').toString();
+    final limit = (_readValue(budget, 'limit') as num?)?.toDouble() ?? 0.0;
+    final spent = (_readValue(budget, 'spent') as num?)?.toDouble() ?? 0.0;
+    final currency = (_readValue(budget, 'currency') ?? 'TND').toString();
+
+    final percentage = limit > 0 ? (spent / limit).clamp(0.0, 1.0) : 0.0;
+    final color =
+    percentage > 0.8 ? KP.danger : percentage > 0.5 ? KP.warning : KP.success;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -1374,7 +1576,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                project,
+                category,
                 style: TextStyle(
                   color: KP.text(d),
                   fontWeight: FontWeight.w900,
@@ -1410,22 +1612,26 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            '${spent.toStringAsFixed(2)} / ${amount.toStringAsFixed(2)} DT',
+            '${spent.toStringAsFixed(2)} / ${limit.toStringAsFixed(2)} $currency',
             style: TextStyle(color: KP.textMuted(d), fontSize: 11),
           ),
         ],
       ),
     );
   }
-
   Widget _buildReminderCard(dynamic reminder, bool d) {
-    final title = reminder['title'] ?? 'Unnamed';
-    final status = reminder['status'] ?? 'pending';
-    final amount = (reminder['amount'] as num?)?.toDouble() ?? 0.0;
-    final dueDate =
-        reminder['dueDate'] != null ? DateTime.parse(reminder['dueDate'].toString()) : DateTime.now();
-    final isOverdue = status == 'pending' && dueDate.isBefore(DateTime.now());
-    final reminderId = reminder['_id'] ?? reminder['id'];
+    final title = (_readValue(reminder, 'title') ?? 'Unnamed').toString();
+    final status = (_readValue(reminder, 'status') ?? 'pending').toString();
+    final amount =
+        (_readValue(reminder, 'amount') as num?)?.toDouble() ?? 0.0;
+
+    final dueDate = _safeDate(_readValue(reminder, 'dueDate'));
+
+    final isOverdue =
+        status == 'pending' && dueDate.isBefore(DateTime.now());
+
+    final reminderId =
+        _readValue(reminder, '_id') ?? _readValue(reminder, 'id');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -1445,11 +1651,15 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: isOverdue ? KP.danger.withOpacity(0.12) : KP.warning.withOpacity(0.12),
+                  color: isOverdue
+                      ? KP.danger.withOpacity(0.12)
+                      : KP.warning.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
-                  isOverdue ? Icons.priority_high_rounded : Icons.notifications_rounded,
+                  isOverdue
+                      ? Icons.priority_high_rounded
+                      : Icons.notifications_rounded,
                   color: isOverdue ? KP.danger : KP.warning,
                   size: 22,
                 ),
@@ -1462,20 +1672,27 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                     Text(
                       title,
                       style: TextStyle(
-                        color: status == 'paid' ? KP.textMuted(d) : KP.text(d),
+                        color: status == 'paid'
+                            ? KP.textMuted(d)
+                            : KP.text(d),
                         fontWeight: FontWeight.w900,
                         fontSize: 15,
-                        decoration: status == 'paid' ? TextDecoration.lineThrough : null,
+                        decoration: status == 'paid'
+                            ? TextDecoration.lineThrough
+                            : null,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.schedule_rounded, size: 12, color: KP.textMuted(d)),
+                        Icon(Icons.schedule_rounded,
+                            size: 12, color: KP.textMuted(d)),
                         const SizedBox(width: 4),
                         Text(
-                          DateFormat('EEE dd MMM', 'fr_FR').format(dueDate),
-                          style: TextStyle(color: KP.textMuted(d), fontSize: 11),
+                          DateFormat('EEE dd MMM', 'fr_FR')
+                              .format(dueDate),
+                          style: TextStyle(
+                              color: KP.textMuted(d), fontSize: 11),
                         ),
                       ],
                     ),
@@ -1496,15 +1713,20 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                   const SizedBox(height: 6),
                   if (status != 'paid')
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: isOverdue ? KP.danger.withOpacity(0.12) : KP.warning.withOpacity(0.12),
+                        color: isOverdue
+                            ? KP.danger.withOpacity(0.12)
+                            : KP.warning.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         isOverdue ? 'RETARD' : 'À VENIR',
                         style: TextStyle(
-                          color: isOverdue ? KP.danger : KP.warning,
+                          color: isOverdue
+                              ? KP.danger
+                              : KP.warning,
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
                         ),
@@ -1512,7 +1734,8 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                     )
                   else
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: KP.success.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(6),
@@ -1539,7 +1762,8 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                 style: FilledButton.styleFrom(
                   backgroundColor: KP.primary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -1558,7 +1782,6 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       ),
     );
   }
-
   Widget _emptyState(String message, IconData icon, bool d) {
     return ListView(
       padding: const EdgeInsets.all(16),

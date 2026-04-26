@@ -2,7 +2,16 @@ import 'package:intl/intl.dart';
 import 'api_config.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
+import '../../domain/models/kash/kash_expense_model.dart';
+import '../../domain/models/kash/kash_budget_model.dart';
+import '../../domain/models/kash/kash_reminder_model.dart';
+import '../../domain/models/kash/kash_staffing_analysis_model.dart';
+import '../dtos/kash/kash_expense_dto.dart';
+import '../dtos/kash/kash_budget_dto.dart';
+import '../dtos/kash/kash_reminder_dto.dart';
+import '../dtos/kash/kash_staffing_analysis_dto.dart';
 
+import '../mappers/kash/kash_mapper.dart';
 class KashService {
   static final AuthService _authService = AuthService();
 
@@ -14,33 +23,27 @@ class KashService {
 
   /// Fetch all expenses for the current user (last 50, sorted by date desc)
   /// GET /api/kash/expenses
-  static Future<List<dynamic>> getExpenses() async {
-    try {
-      final token = await _authService.getToken();
-      if (token == null) throw Exception('No authentication token found');
+  static Future<List<KashExpense>> getExpenses() async {
+    final token = await _authService.getToken();
 
-      final response = await ApiService.get(
-        endpoint: '$_baseUrl/expenses',
-        token: token,
-      );
+    final response = await ApiService.get(
+      endpoint: '$_baseUrl/expenses',
+      token: token,
+    );
 
-      if (response['success'] != true) {
-        throw Exception(response['message'] ?? 'Failed to fetch expenses');
-      }
+    final list = response['data']['expenses'] as List;
 
-      return response['data']['expenses'] ?? [];
-    } catch (e) {
-      print('❌ KashService - getExpenses error: $e');
-      rethrow;
-    }
+    return list
+        .map((e) => KashMapper.toExpense(KashExpenseDTO.fromJson(e)))
+        .toList();
   }
 
   /// Add a new expense
   /// POST /api/kash/add
   /// Body: { amount, currency, vendor, category, date, description, ... }
   static Future<Map<String, dynamic>> addExpense(
-    Map<String, dynamic> data,
-  ) async {
+      Map<String, dynamic> data,
+      ) async {
     try {
       final token = await _authService.getToken();
       if (token == null) throw Exception('No authentication token found');
@@ -68,34 +71,28 @@ class KashService {
 
   /// Get budget array for the current user
   /// GET /api/kash/budget
-  static Future<List<dynamic>> getBudget() async {
-    try {
-      final token = await _authService.getToken();
-      if (token == null) throw Exception('No authentication token found');
+  static Future<List<KashBudget>> getBudget() async {
+    final token = await _authService.getToken();
 
-      final response = await ApiService.get(
-        endpoint: '$_baseUrl/budget',
-        token: token,
-      );
+    final response = await ApiService.get(
+      endpoint: '$_baseUrl/budget',
+      token: token,
+    );
 
-      if (response['success'] != true) {
-        throw Exception(response['message'] ?? 'Failed to fetch budget');
-      }
+    final list = response['data']['budget'] as List;
 
-      return response['data']['budget'] ?? [];
-    } catch (e) {
-      print('❌ KashService - getBudget error: $e');
-      rethrow;
-    }
+    return list
+        .map((e) => KashMapper.toBudget(KashBudgetDTO.fromJson(e)))
+        .toList();
   }
 
   /// Add or update a budget entry
   /// POST /api/kash/budget
   /// Body: { project, amount }
   static Future<List<dynamic>> setBudget(
-    String project,
-    double amount,
-  ) async {
+      String project,
+      double amount,
+      ) async {
     try {
       final token = await _authService.getToken();
       if (token == null) throw Exception('No authentication token found');
@@ -128,39 +125,74 @@ class KashService {
     }
   }
 
+  /// Create a new budget entry
+  /// POST /api/kash/budget/create
+  /// Body: { category, limit, currency }
+  static Future<Map<String, dynamic>> createBudget({
+    required String category,
+    required double limit,
+    String currency = 'TND',
+  }) async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) throw Exception('No authentication token found');
+
+      if (category.trim().isEmpty) {
+        throw Exception('Category is required');
+      }
+
+      if (limit <= 0) {
+        throw Exception('Budget limit must be greater than 0');
+      }
+
+      final response = await ApiService.post(
+        endpoint: '$_baseUrl/budget/create',
+        body: {
+          'category': category.trim(),
+          'limit': limit,
+          'currency': currency.toUpperCase(),
+        },
+        token: token,
+      );
+
+      if (response['success'] != true) {
+        throw Exception(response['message'] ?? 'Failed to create budget');
+      }
+
+      return response['data'] ?? {};
+    } catch (e) {
+      print('❌ KashService - createBudget error: $e');
+      rethrow;
+    }
+  }
+
   // ===========================================================================
   // REMINDERS
   // ===========================================================================
 
   /// Fetch all reminders for the current user (sorted by dueDate asc)
   /// GET /api/kash/reminders
-  static Future<List<dynamic>> getReminders() async {
-    try {
-      final token = await _authService.getToken();
-      if (token == null) throw Exception('No authentication token found');
+  static Future<List<KashReminder>> getReminders() async {
+    final token = await _authService.getToken();
 
-      final response = await ApiService.get(
-        endpoint: '$_baseUrl/reminders',
-        token: token,
-      );
+    final response = await ApiService.get(
+      endpoint: '$_baseUrl/reminders',
+      token: token,
+    );
 
-      if (response['success'] != true) {
-        throw Exception(response['message'] ?? 'Failed to fetch reminders');
-      }
+    final list = response['data']['reminders'] as List;
 
-      return response['data']['reminders'] ?? [];
-    } catch (e) {
-      print('❌ KashService - getReminders error: $e');
-      rethrow;
-    }
+    return list
+        .map((e) => KashMapper.toReminder(KashReminderDTO.fromJson(e)))
+        .toList();
   }
 
   /// Create a new payment reminder
   /// POST /api/kash/reminders
   /// Body: { title, amount, currency, dueDate, notes }
   static Future<Map<String, dynamic>> createReminder(
-    Map<String, dynamic> data,
-  ) async {
+      Map<String, dynamic> data,
+      ) async {
     try {
       final token = await _authService.getToken();
       if (token == null) throw Exception('No authentication token found');

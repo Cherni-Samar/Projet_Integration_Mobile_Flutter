@@ -72,7 +72,14 @@ class _LoginScreenState extends State<LoginScreen>
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
-
+      if (_rememberMe) {
+        await _authService.saveCredentials(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+      } else {
+        await _authService.clearSavedCredentials();
+      }
       print('✅ User: $user');
 
       if (user != null && mounted) {

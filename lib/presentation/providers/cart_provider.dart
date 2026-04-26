@@ -34,7 +34,12 @@ class CartProvider extends ChangeNotifier {
   int get totalEnergy {
     return _items.fold(0, (sum, item) => sum + item.energy);
   }
+  String selectedPackId = 'energy_boost';
 
+  void setPaymentPack(String packId) {
+    selectedPackId = packId;
+    notifyListeners();
+  }
   /// Returns false if the agent is already in the cart (regardless of pack)
   bool addToCart(CartItem item) {
     if (_items.any((existing) => existing.agentName == item.agentName)) {
