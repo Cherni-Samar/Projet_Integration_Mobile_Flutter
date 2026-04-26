@@ -25,11 +25,13 @@ class EchoTheme {
   static const bg = Color(0xFFFFFFFF);           // Blanc pur
   static const card = Color(0xFFFFFFFF);         // Cartes blanches
   static const border = Color(0xFFE0E0E0);       // Bordure grise légère
-  static const violet = Color(0xFF9C27B0);       // Violet accent
+  static const violet = Color(0xFF7C3AED);      // Violet accent
   static const neon = Color(0xFF4CAF50);         // Vert pour statut online
   static const textMain = Color(0xFF1A1A1A);     // Gris anthracite
   static const textMuted = Color(0xFF757575);    // Gris moyen
-  static const shadow = Color(0x08000000);       // Ombre ultra-légère
+  static const shadow = Color(0x08000000);
+  static const softViolet = Color(0xFFF3E8FF);
+  static const softBlue = Color(0xFFEFF6FF);// Ombre ultra-légère
 }
 
 class EchoDashboardPage extends StatefulWidget {
@@ -273,7 +275,7 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'ECHO COMMAND CENTER',
+                      'ECHO BRAIN',
                       style: GoogleFonts.inter(color: EchoTheme.textMain, fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
@@ -296,7 +298,7 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(
-                            'AUTONOMOUS COMMUNICATION ACTIVE',
+                            'COMMUNICATION AGENT ONLINE',
                             style: GoogleFonts.inter(
                               color: Color(0xFF9C27B0),
                               fontSize: 11,
@@ -389,14 +391,6 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
             ),
           ),
           Container(width: 1, height: 30, color: EchoTheme.border),
-          Expanded(
-            child: _buildStatusMetric(
-              'SPAM',
-              '${_stats?['spamBlocked'] ?? 0}',
-              Icons.shield_outlined,
-              Colors.redAccent,
-            ),
-          ),
           Container(width: 1, height: 30, color: EchoTheme.border),
           Expanded(
             child: _buildStatusMetric(
@@ -450,10 +444,9 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
   // 2. CLEAN PROFESSIONAL NAVIGATION
   Widget _buildCleanNavigation() {
     final tabs = [
-      {'label': 'OVERVIEW', 'icon': Icons.dashboard_outlined},
-      {'label': 'MESSAGES', 'icon': Icons.email_outlined},
-      {'label': 'LOGS', 'icon': Icons.timeline_outlined},
-      {'label': 'POSTS', 'icon': Icons.article_outlined}, // NEW POSTS TAB
+      {'label': 'OVERVIEW', 'icon': Icons.dashboard_rounded},
+      {'label': 'MESSAGES', 'icon': Icons.mark_email_unread_rounded},
+      {'label': 'POSTS', 'icon': Icons.auto_awesome_rounded},
     ];
 
     return Container(
@@ -545,8 +538,7 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
     switch (_selectedTab) {
       case 0: return _buildOverviewTab();
       case 1: return _buildMessagesTab();
-      case 2: return _buildAutomationLogsTab();
-      case 3: return _buildPostsTab(); // NEW POSTS TAB
+      case 2: return _buildPostsTab();
       default: return _buildOverviewTab();
     }
   }
@@ -558,18 +550,84 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('OPERATIONAL METRICS'),
-          const SizedBox(height: 16),
-          _buildCleanStats(),
+
           const SizedBox(height: 24),
-          _buildSectionTitle('RECENT ACTIVITY'),
+          _buildSectionTitle('LATEST COMMUNICATIONS'),
           const SizedBox(height: 16),
           _buildRecentActivityCards(),
         ],
       ),
     );
   }
-
+  Widget _buildEchoMissionCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF7C3AED),
+            Color(0xFFA855F7),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7C3AED).withOpacity(0.18),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.18),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.white.withOpacity(0.25)),
+            ),
+            child: const Icon(
+              Icons.campaign_rounded,
+              color: Colors.white,
+              size: 30,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Communication layer online',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Echo handles urgent messages, spam filtering, recruitment alerts and social media publishing.',
+                  style: GoogleFonts.inter(
+                    color: Colors.white.withOpacity(0.84),
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildCleanStats() {
     return Row(
       children: [
@@ -661,91 +719,147 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
       );
     }
 
-    if (_recentEmails.isEmpty) {
-      return _buildEmptyState('No recent activity', Icons.inbox_outlined);
+    final recent = _recentEmails.take(3).toList();
+
+    if (recent.isEmpty) {
+      return _buildEmptyState('No recent communications', Icons.inbox_outlined);
     }
 
     return Column(
-      children: _recentEmails.take(3).map((email) => _buildActivityCard(email)).toList(),
+      children: recent.map((email) => _buildActivityCard(email)).toList(),
     );
   }
 
   Widget _buildActivityCard(EmailItem email) {
+    final bool isRecruitment = email.subject.toLowerCase().contains('recrutement');
+    final bool isApproved = email.subject.toLowerCase().contains('validé');
+    final bool isFromHera = email.sender.contains('hera@e-team.com');
+
+    final Color accentColor = isApproved
+        ? Colors.green
+        : isRecruitment
+        ? Colors.orange
+        : EchoTheme.violet;
+
+    final IconData icon = isApproved
+        ? Icons.check_circle_rounded
+        : isRecruitment
+        ? Icons.campaign_rounded
+        : Icons.mail_rounded;
+
+    final String badge = isApproved
+        ? 'APPROVED'
+        : email.isUrgent
+        ? 'URGENT'
+        : 'INFO';
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: EchoTheme.card,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: EchoTheme.border, width: 0.5),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: accentColor.withOpacity(0.22),
+          width: 0.8,
+        ),
         boxShadow: [
           BoxShadow(
-            color: EchoTheme.shadow,
-            blurRadius: 4,
-            offset: const Offset(0, 1),
+            color: Colors.black.withOpacity(0.035),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: _getSenderColor(email.sender),
-            child: Text(
-              email.sender[0].toUpperCase(),
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: accentColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
+              icon,
+              color: accentColor,
+              size: 24,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
+                  isFromHera ? 'Hera → Echo' : 'Incoming communication',
+                  style: GoogleFonts.inter(
+                    color: EchoTheme.textMuted,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
                   email.subject,
                   style: GoogleFonts.inter(
                     color: EchoTheme.textMain,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    height: 1.25,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 6),
                 Text(
-                  email.summary,
+                  email.summary.isNotEmpty
+                      ? email.summary
+                      : 'Echo processed this communication automatically.',
                   style: GoogleFonts.inter(
                     color: EchoTheme.textMuted,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w400,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
                   ),
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-          if (email.isUrgent)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.redAccent.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'URGENT',
-                style: GoogleFonts.inter(
-                  color: Colors.redAccent,
-                  fontSize: 8,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.11),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  badge,
+                  style: GoogleFonts.inter(
+                    color: accentColor,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(height: 10),
+              Text(
+                _formatTime(email.receivedAt),
+                style: GoogleFonts.inter(
+                  color: EchoTheme.textMuted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -810,81 +924,8 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
   }
 
   Widget _buildEmailControls() {
-    final urgentCount = _emails.where((e) => e.isUrgent && !e.isRead && e.sender != 'echo@e-team.com').length;
-    final spamCount = _emails.where((e) => e.isSpam).length;
-
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: EchoTheme.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: EchoTheme.border, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: EchoTheme.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildFilterChip(
-                    'URGENT',
-                    urgentCount,
-                    _showOnlyUrgent,
-                    Colors.redAccent,
-                        () {
-                      setState(() {
-                        _showOnlyUrgent = !_showOnlyUrgent;
-                        if (_showOnlyUrgent) _showOnlySpam = false;
-                      });
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  _buildFilterChip(
-                    'SPAM',
-                    spamCount,
-                    _showOnlySpam,
-                    Colors.orangeAccent,
-                        () {
-                      setState(() {
-                        _showOnlySpam = !_showOnlySpam;
-                        if (_showOnlySpam) _showOnlyUrgent = false;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: _loadAllEmails,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: EchoTheme.bg,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: EchoTheme.border, width: 0.5),
-              ),
-              child: Icon(
-                Icons.refresh,
-                color: EchoTheme.textMain,
-                size: 16,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    return const SizedBox.shrink();
   }
-
   Widget _buildFilterChip(String label, int count, bool isActive, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -1105,410 +1146,12 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
     );
   }
 
-  // 6. AUTOMATION LOGS TAB - NOUVEAU PIPELINE DYNAMIQUE
-  Widget _buildAutomationLogsTab() {
-    return Container(
-      color: const Color(0xFFFFFFFF), // Fond blanc pur
-      child: Column(
-        children: [
-          _buildAutomationHeader(),
-          Expanded(
-            child: _buildDynamicAutomationLogs(),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildAutomationHeader() {
-    final heraEmails = _emails.where((email) => email.sender == 'hera@e-team.com').length;
 
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: EchoTheme.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: EchoTheme.border, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: EchoTheme.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: EchoTheme.violet.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              Icons.timeline_outlined,
-              color: EchoTheme.violet,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'AUTOMATION PIPELINE',
-                  style: GoogleFonts.inter(
-                    color: EchoTheme.textMain,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Real-time Echo activity logs',
-                  style: GoogleFonts.inter(
-                    color: EchoTheme.textMuted,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: EchoTheme.violet.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: EchoTheme.violet.withOpacity(0.3), width: 0.5),
-            ),
-            child: Text(
-              '$heraEmails ALERTS',
-              style: GoogleFonts.inter(
-                color: EchoTheme.violet,
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildDynamicAutomationLogs() {
-    // Filtrer uniquement les emails de Hera
-    final heraEmails = _emails.where((email) => email.sender == 'hera@e-team.com').toList();
 
-    if (heraEmails.isEmpty) {
-      return _buildEmptyAutomationState();
-    }
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: heraEmails.length,
-      itemBuilder: (context, index) => _buildAutomationPipelineCard(heraEmails[index]),
-    );
-  }
 
-  Widget _buildEmptyAutomationState() {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: EchoTheme.violet.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.timeline_outlined,
-              size: 48,
-              color: EchoTheme.violet.withOpacity(0.5),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No automation logs',
-            style: GoogleFonts.inter(
-              color: EchoTheme.textMuted,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Waiting for Hera alerts to trigger automation',
-            style: GoogleFonts.inter(
-              color: EchoTheme.textMuted,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAutomationPipelineCard(EmailItem email) {
-    // Extraire le département du sujet
-    final department = _extractDepartmentFromSubject(email.subject);
-
-    // Déterminer l'état des étapes - Logique réaliste du workflow Echo
-    final step1Complete = true; // Toujours vrai car l'email est présent
-
-    // Step 2 : Echo génère automatiquement du contenu pour toutes les alertes Hera
-    // Considéré comme complété après quelques minutes (simulation)
-    final emailAge = DateTime.now().difference(email.receivedAt).inMinutes;
-    final step2Complete = emailAge >= 2; // Complété après 2 minutes
-
-    // Step 3 : Réponse envoyée à Hera - Logique basée sur l'âge de l'email
-    // Simulation : Echo répond automatiquement après 5 minutes
-    final step3Complete = emailAge >= 5 || email.isRead || email.category.contains('auto_reply');
-
-    /*
-    LOGIQUE DU PIPELINE ECHO :
-    1. TRIGGER : Alerte reçue de Hera → Toujours ✅
-    2. AI ACTION : Echo génère du contenu → ✅ après 2min (simulation temps de traitement)
-    3. FEEDBACK : Echo répond à Hera → ✅ quand email lu ou auto_reply envoyé
-    */
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: EchoTheme.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: EchoTheme.border, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: EchoTheme.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header du pipeline
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _getDepartmentColor(department).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  _getDepartmentIcon(department),
-                  color: _getDepartmentColor(department),
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'HERA ALERT • ${department.toUpperCase()}',
-                      style: GoogleFonts.inter(
-                        color: EchoTheme.textMain,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _formatTime(email.receivedAt),
-                      style: GoogleFonts.inter(
-                        color: EchoTheme.textMuted,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: step3Complete ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  step3Complete ? 'COMPLETED' : 'PROCESSING',
-                  style: GoogleFonts.inter(
-                    color: step3Complete ? Colors.green : Colors.orange,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          // Pipeline Steps
-          _buildPipelineStep(
-            1,
-            'TRIGGER',
-            'Hera Alert Received',
-            step1Complete,
-            false,
-            Icons.notification_important_outlined,
-          ),
-          _buildPipelineConnector(),
-          _buildPipelineStep(
-            2,
-            'AI ACTION',
-            step2Complete ? 'Content Generated ✓' : 'Generating LinkedIn Post...',
-            step2Complete,
-            !step2Complete && step1Complete,
-            Icons.auto_awesome_outlined,
-          ),
-          _buildPipelineConnector(),
-          _buildPipelineStep(
-            3,
-            'FEEDBACK',
-            step3Complete ? 'Reply Sent ✓' : 'Preparing Response...',
-            step3Complete,
-            !step3Complete && step2Complete,
-            Icons.reply_outlined,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPipelineStep(int stepNumber, String type, String description, bool isComplete, bool isProcessing, IconData icon) {
-    Color stepColor;
-    Widget stepIcon;
-
-    if (isComplete) {
-      stepColor = Colors.green;
-      stepIcon = const Icon(Icons.check_circle, color: Colors.green, size: 20);
-    } else if (isProcessing) {
-      stepColor = EchoTheme.violet;
-      stepIcon = SizedBox(
-        width: 16,
-        height: 16,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(EchoTheme.violet),
-        ),
-      );
-    } else {
-      stepColor = EchoTheme.textMuted;
-      stepIcon = Icon(Icons.radio_button_unchecked, color: EchoTheme.textMuted, size: 20);
-    }
-
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: stepColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: stepColor.withOpacity(0.3)),
-          ),
-          child: Center(child: stepIcon),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'STEP $stepNumber',
-                    style: GoogleFonts.inter(
-                      color: stepColor,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: stepColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      type,
-                      style: GoogleFonts.inter(
-                        color: stepColor,
-                        fontSize: 8,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: GoogleFonts.inter(
-                  color: EchoTheme.textMain,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Icon(
-          icon,
-          color: stepColor.withOpacity(0.7),
-          size: 16,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPipelineConnector() {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          const SizedBox(width: 16),
-          Container(
-            width: 2,
-            height: 20,
-            decoration: BoxDecoration(
-              color: EchoTheme.border,
-              borderRadius: BorderRadius.circular(1),
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Container(
-              height: 1,
-              decoration: BoxDecoration(
-                color: EchoTheme.border,
-                borderRadius: BorderRadius.circular(0.5),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // Helper methods pour le pipeline
   String _extractDepartmentFromSubject(String subject) {
@@ -1569,16 +1212,22 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
   Widget _buildPostsHeader() {
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: EchoTheme.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: EchoTheme.border, width: 0.5),
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF7C3AED),
+            Color(0xFFA855F7),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: EchoTheme.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF7C3AED).withOpacity(0.22),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -1587,64 +1236,66 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 54,
+                height: 54,
                 decoration: BoxDecoration(
-                  color: EchoTheme.violet.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: Colors.white.withOpacity(0.25)),
                 ),
                 child: const Icon(
-                  Icons.article_outlined,
-                  color: EchoTheme.violet,
-                  size: 20,
+                  Icons.auto_awesome_rounded,
+                  color: Colors.white,
+                  size: 28,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'SOCIAL MEDIA POSTS',
+                      'Social Media Studio',
                       style: GoogleFonts.inter(
-                        color: EchoTheme.textMain,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.4,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Automated LinkedIn & Mastodon posts',
+                      'AI-generated posts, campaigns and engagement tracking',
                       style: GoogleFonts.inter(
-                        color: EchoTheme.textMuted,
-                        fontSize: 11,
+                        color: Colors.white.withOpacity(0.82),
+                        fontSize: 12,
                         fontWeight: FontWeight.w500,
+                        height: 1.35,
                       ),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.green.withOpacity(0.3), width: 0.5),
+                  color: Colors.white.withOpacity(0.16),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: Colors.white.withOpacity(0.22)),
                 ),
                 child: Text(
-                  'ACTIVE',
+                  '${_posts.length} POSTS',
                   style: GoogleFonts.inter(
-                    color: Colors.green,
+                    color: Colors.white,
                     fontSize: 10,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          // Product Marketing Button
+          const SizedBox(height: 18),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -1655,30 +1306,29 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
                     builder: (context) => ProductMarketingScreen(token: widget.token),
                   ),
                 );
-                // Refresh posts if campaign was started
                 if (result == true) {
                   _loadSocialPosts();
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: EchoTheme.violet,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                backgroundColor: Colors.white,
+                foregroundColor: EchoTheme.violet,
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 0,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.shopping_bag_outlined, size: 18),
+                  const Icon(Icons.campaign_rounded, size: 19),
                   const SizedBox(width: 8),
                   Text(
-                    'Product Marketing Setup',
+                    'Launch Product Campaign',
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
@@ -1718,33 +1368,40 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(20),
+            width: 92,
+            height: 92,
             decoration: BoxDecoration(
-              color: EchoTheme.violet.withOpacity(0.1),
+              gradient: LinearGradient(
+                colors: [
+                  EchoTheme.violet.withOpacity(0.14),
+                  EchoTheme.violet.withOpacity(0.06),
+                ],
+              ),
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.article_outlined,
-              size: 48,
-              color: EchoTheme.violet.withOpacity(0.5),
+              Icons.auto_awesome_rounded,
+              size: 44,
+              color: EchoTheme.violet.withOpacity(0.75),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           Text(
-            'No posts yet',
+            'No social posts yet',
             style: GoogleFonts.inter(
-              color: EchoTheme.textMuted,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+              color: EchoTheme.textMain,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Automated posts will appear here',
+            'Start a product campaign and Echo will generate posts automatically.',
             style: GoogleFonts.inter(
               color: EchoTheme.textMuted,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              height: 1.4,
             ),
             textAlign: TextAlign.center,
           ),
@@ -1755,105 +1412,137 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
 
   Widget _buildPostCard(PostItem post) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 18),
       decoration: BoxDecoration(
         color: EchoTheme.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: EchoTheme.border, width: 0.5),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: EchoTheme.border.withOpacity(0.75), width: 0.7),
         boxShadow: [
           BoxShadow(
-            color: EchoTheme.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.035),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Post header
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: EchoTheme.violet.withOpacity(0.1),
-                child: const Text(
-                  'E',
-                  style: TextStyle(
-                    color: EchoTheme.violet,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF7C3AED), Color(0xFFA855F7)],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.smart_toy_rounded,
+                    color: Colors.white,
+                    size: 23,
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Echo Agent',
-                      style: GoogleFonts.inter(
-                        color: EchoTheme.textMain,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Echo Agent',
+                        style: GoogleFonts.inter(
+                          color: EchoTheme.textMain,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
-                    Text(
-                      _formatTime(post.createdAt),
-                      style: GoogleFonts.inter(
-                        color: EchoTheme.textMuted,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
+                      const SizedBox(height: 3),
+                      Text(
+                        _formatTime(post.createdAt),
+                        style: GoogleFonts.inter(
+                          color: EchoTheme.textMuted,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Post content
-          Text(
-            post.fullContent,
-            style: GoogleFonts.inter(
-              color: EchoTheme.textMain,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              height: 1.5,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: EchoTheme.violet.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    'AI POST',
+                    style: GoogleFonts.inter(
+                      color: EchoTheme.violet,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+
+          if (post.image != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: _buildPostImage(post),
+            ),
+
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Text(
+              post.fullContent,
+              style: GoogleFonts.inter(
+                color: EchoTheme.textMain,
+                fontSize: 13.5,
+                fontWeight: FontWeight.w500,
+                height: 1.55,
+              ),
+            ),
+          ),
+
+          if (post.platforms.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: _buildPlatformBadges(post),
+            ),
+
           const SizedBox(height: 16),
 
-          // AI-generated image
-          if (post.image != null) _buildPostImage(post),
-
-          // Platform badges (clickable)
-          if (post.platforms.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            _buildPlatformBadges(post),
-          ],
-
-          const SizedBox(height: 16),
-
-          // Engagement stats
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             decoration: BoxDecoration(
-              color: EchoTheme.bg,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: EchoTheme.border, width: 0.5),
+              color: const Color(0xFFFAFAFA),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(24),
+              ),
+              border: Border(
+                top: BorderSide(color: EchoTheme.border.withOpacity(0.7)),
+              ),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStatItem('👍', post.stats.likes),
-                Container(width: 1, height: 20, color: EchoTheme.border),
-                _buildStatItem('💬', post.stats.comments),
-                Container(width: 1, height: 20, color: EchoTheme.border),
-                _buildStatItem('🔄', post.stats.shares),
+                Expanded(child: _buildStatItem('👍', post.stats.likes)),
+                Expanded(child: _buildStatItem('💬', post.stats.comments)),
+                Expanded(child: _buildStatItem('🔄', post.stats.shares)),
+                GestureDetector(
+                  onTap: _loadSocialPosts,
+                  child: Icon(
+                    Icons.refresh_rounded,
+                    color: EchoTheme.textMuted,
+                    size: 18,
+                  ),
+                ),
               ],
             ),
           ),

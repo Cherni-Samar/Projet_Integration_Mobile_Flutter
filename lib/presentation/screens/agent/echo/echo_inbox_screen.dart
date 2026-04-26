@@ -19,7 +19,6 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
 
   bool _isLoading = true;
   bool _showOnlyUrgent = false;
-  bool _showOnlySpam = false;
 
   int _selectedTab = 0; // 0 = Reçus, 1 = Envoyés
   String? _errorMessage;
@@ -115,7 +114,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
   Widget build(BuildContext context) {
     final receivedEmails = _emails.where((email) {
       if (_showOnlyUrgent && !email.isUrgent) return false;
-      if (_showOnlySpam && !email.isSpam) return false;
+      if (email.isSpam) return false;
       if (email.category == 'auto_reply' ||
           email.category == 'auto_reply_pending') {
         return false;
@@ -146,169 +145,43 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        title: const Text(
-          'Agent Echo',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: Colors.black87,
-        actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.timer),
-                onPressed: _showPendingDialog,
-                tooltip: 'Réponses en attente',
-              ),
-              if (pendingCount > 0)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Colors.orange,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: Text(
-                      '$pendingCount',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildEchoInboxHeader(),
+            _buildTabs(),
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFF7C3AED),
                 ),
-            ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.send, color: Colors.deepPurple),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => AgentCommunicationScreen(
-                    token: widget.token,
-                    fromAgent: 'echo',
-                  ),
-                ),
-              );
-            },
-            tooltip: 'Envoyer à Hera',
-          ),
-          Stack(
-            children: [
-              IconButton(
-                icon: Icon(
-                  _showOnlyUrgent
-                      ? Icons.warning
-                      : Icons.warning_amber_rounded,
-                  color: _showOnlyUrgent ? Colors.red : Colors.grey,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _showOnlyUrgent = !_showOnlyUrgent;
-                    if (_showOnlyUrgent) _showOnlySpam = false;
-                  });
-                },
-                tooltip: 'Urgents',
-              ),
-              if (urgentCount > 0 && !_showOnlyUrgent)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    child: Text(
-                      '$urgentCount',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          IconButton(
-            icon: Icon(
-              _showOnlySpam ? Icons.report : Icons.report_outlined,
-              color: _showOnlySpam ? Colors.orange : Colors.grey,
+              )
+                  : _selectedTab == 0
+                  ? _buildBody(receivedEmails)
+                  : _buildSentEmails(sentEmails),
             ),
-            onPressed: () {
-              setState(() {
-                _showOnlySpam = !_showOnlySpam;
-                if (_showOnlySpam) _showOnlyUrgent = false;
-              });
-            },
-            tooltip: 'Spams',
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadData,
-            tooltip: 'Rafraîchir',
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _buildTabs(),
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _selectedTab == 0
-                ? _buildBody(receivedEmails)
-                : _buildSentEmails(sentEmails),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
-
   Widget _buildTabs() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         children: [
-          Expanded(
-            child: _buildTabButton(
-              label: '📥 Reçus',
-              index: 0,
-            ),
-          ),
-          Expanded(
-            child: _buildTabButton(
-              label: '📤 Envoyés',
-              index: 1,
-            ),
-          ),
+          Expanded(child: _buildTabButton(label: 'Received', index: 0)),
+          Expanded(child: _buildTabButton(label: 'Sent', index: 1)),
         ],
       ),
     );
   }
-
   Widget _buildTabButton({
     required String label,
     required int index,
@@ -317,36 +190,237 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
 
     return GestureDetector(
       onTap: () => setState(() => _selectedTab = index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? Colors.deepPurple : Colors.transparent,
+          color: selected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
+          boxShadow: selected
+              ? [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            )
+          ]
+              : [],
         ),
         child: Text(
           label,
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: selected ? Colors.white : Colors.grey[600],
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
+            color: selected ? Colors.black87 : Colors.grey[600],
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
           ),
         ),
       ),
     );
   }
+  Widget _buildHeaderAction({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.16)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 20),
+            const SizedBox(height: 6),
+            Text(
+              value.isEmpty ? label : value,
+              style: TextStyle(
+                color: const Color(0xFF111827),
+                fontSize: value.isEmpty ? 11 : 16,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            if (value.isNotEmpty)
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.6,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget _buildEchoInboxHeader() {
+    final urgentCount = _emails
+        .where((e) => e.isUrgent && !e.isRead && e.sender != 'echo@e-team.com')
+        .length;
 
+    final pendingCount = _pending.length;
+
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.035),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF9FAFB),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFE5E7EB)),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 17,
+                    color: Color(0xFF111827),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF7C3AED), Color(0xFFA855F7)],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: const Icon(
+                  Icons.mark_email_unread_rounded,
+                  color: Colors.white,
+                  size: 26,
+                ),
+              ),
+              const SizedBox(width: 14),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Echo Inbox',
+                      style: TextStyle(
+                        color: Color(0xFF111827),
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Communication triage center',
+                      style: TextStyle(
+                        color: Color(0xFF6B7280),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: _loadData,
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3E8FF),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.refresh_rounded,
+                    color: Color(0xFF7C3AED),
+                    size: 21,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: _buildHeaderAction(
+                  icon: Icons.timer_rounded,
+                  label: 'Pending',
+                  value: '$pendingCount',
+                  color: Colors.orange,
+                  onTap: _showPendingDialog,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildHeaderAction(
+                  icon: _showOnlyUrgent
+                      ? Icons.warning_rounded
+                      : Icons.warning_amber_rounded,
+                  label: 'Urgent',
+                  value: '$urgentCount',
+                  color: Colors.red,
+                  onTap: () {
+                    setState(() {
+                      _showOnlyUrgent = !_showOnlyUrgent;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildHeaderAction(
+                  icon: Icons.send_rounded,
+                  label: 'Send',
+                  value: '',
+                  color: const Color(0xFF7C3AED),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AgentCommunicationScreen(
+                          token: widget.token,
+                          fromAgent: 'echo',
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildBody(List<EmailItem> emails) {
     if (_errorMessage != null) {
       return _buildErrorState();
-    }
-
-    if (emails.isEmpty) {
-      return _buildEmptyState(
-        icon: Icons.inbox,
-        title: _getEmptyMessage(),
-        subtitle: _getEmptySubMessage(),
-      );
     }
 
     return RefreshIndicator(
@@ -424,18 +498,11 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
     );
   }
 
-  String _getEmptyMessage() {
-    if (_showOnlyUrgent) return 'Aucun message urgent';
-    if (_showOnlySpam) return 'Aucun spam détecté';
-    return 'Aucun email reçu';
-  }
+
 
   String _getEmptySubMessage() {
     if (_showOnlyUrgent) {
       return 'Les nouveaux messages urgents apparaîtront ici';
-    }
-    if (_showOnlySpam) {
-      return 'Les spams détectés apparaîtront ici';
     }
     return 'Les emails reçus apparaîtront ici';
   }
@@ -613,7 +680,6 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
       runSpacing: 4,
       children: [
         if (email.isUrgent) _chipUrgent(),
-        if (email.isSpam) _chipSpam(),
         if (email.category.isNotEmpty && !email.isSpam && !isAutoReply)
           _chipText(
             text: email.category,
@@ -661,23 +727,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
     );
   }
 
-  Widget _chipSpam() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: const Text(
-        'Spam',
-        style: TextStyle(
-          fontSize: 9,
-          color: Colors.grey,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
+
 
   Widget _chipText({
     required String text,
