@@ -17,6 +17,7 @@ import 'agent_inter_flow_page.dart';
 import '../activity/activity_logs_screen.dart';
 import '../pricing_page.dart';
 import '../auth/user_profile_page.dart';
+import 'package:e_team/presentation/screens/predictions/predictions_home_screen.dart';
 
 class AgentMarketplacePage extends StatefulWidget {
   const AgentMarketplacePage({Key? key}) : super(key: key);
@@ -251,164 +252,241 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
     final buttonFg = isDark ? Colors.black : Colors.white;
 
     return Scaffold(
-      backgroundColor:
-      isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF8F9FA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFF8F9FA),
       body: SafeArea(
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
-          child: Column(
-            children: [
-              AnimatedBuilder(
-                animation: _headerAnimationController,
-                builder: (context, child) {
-                  return Container(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-                    decoration: BoxDecoration(
-                      gradient: isDark
-                          ? LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          const Color(0xFF1A1A1A),
-                          const Color(0xFF2D2D2D),
-                          Color.lerp(
-                            const Color(0xFF2D2D2D),
-                            const Color(0xFFCDFF00).withOpacity(0.05),
-                            _headerAnimationController.value,
-                          )!,
-                        ],
-                      )
-                          : LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white,
-                          const Color(0xFFFAFAFA),
-                          Color.lerp(
-                            const Color(0xFFFAFAFA),
-                            const Color(0xFFCDFF00).withOpacity(0.03),
-                            _headerAnimationController.value,
-                          )!,
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isDark
-                              ? Colors.black.withOpacity(0.5)
-                              : Colors.black.withOpacity(0.08),
-                          blurRadius: 30,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(32),
-                        bottomRight: Radius.circular(32),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      UserProfilePage(user: _currentUser),
-                                ),
-                              ).then((_) => _loadUserData());
-                            },
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 52,
-                                  height: 52,
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFA855F7),
-                                        Color(0xFF8B5CF6),
-                                      ],
-                                    ),
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xFFA855F7)
-                                            .withOpacity(0.5),
-                                        blurRadius: 20,
-                                        offset: const Offset(0, 4),
-                                      ),
+                child: Column(
+                  children: [
+                    AnimatedBuilder(
+                      animation: _headerAnimationController,
+                      builder: (context, child) {
+                        return Container(
+                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                          decoration: BoxDecoration(
+                            gradient: isDark
+                                ? LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      const Color(0xFF1A1A1A),
+                                      const Color(0xFF2D2D2D),
+                                      Color.lerp(
+                                        const Color(0xFF2D2D2D),
+                                        const Color(
+                                          0xFFCDFF00,
+                                        ).withOpacity(0.05),
+                                        _headerAnimationController.value,
+                                      )!,
                                     ],
-                                    border: Border.all(
-                                      color: isDark
-                                          ? const Color(0xFFCDFF00)
-                                          .withOpacity(0.3)
-                                          : Colors.white,
-                                      width: 2.5,
-                                    ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      _userInitial(_currentUser),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        l10n.agentMarketplaceWelcomeBack,
-                                        style: TextStyle(
-                                          color: isDark
-                                              ? Colors.white.withOpacity(0.5)
-                                              : Colors.black.withOpacity(0.5),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        _userDisplayName(_currentUser),
-                                        style: TextStyle(
-                                          color: isDark
-                                              ? Colors.white
-                                              : Colors.black,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: -0.5,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
+                                  )
+                                : LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Colors.white,
+                                      const Color(0xFFFAFAFA),
+                                      Color.lerp(
+                                        const Color(0xFFFAFAFA),
+                                        const Color(
+                                          0xFFCDFF00,
+                                        ).withOpacity(0.03),
+                                        _headerAnimationController.value,
+                                      )!,
                                     ],
                                   ),
-                                ),
-                              ],
+                            boxShadow: [
+                              BoxShadow(
+                                color: isDark
+                                    ? Colors.black.withOpacity(0.5)
+                                    : Colors.black.withOpacity(0.08),
+                                blurRadius: 30,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(32),
+                              bottomRight: Radius.circular(32),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Consumer<CartProvider>(
-                          builder: (context, cart, child) {
-                            return Stack(
-                              children: [
-                                _roundIconButton(
-                                  isDark: isDark,
-                                  icon: Icons.shopping_cart_outlined,
-                                  onPressed: () =>
-                                      Navigator.pushNamed(context, '/cart'),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            UserProfilePage(user: _currentUser),
+                                      ),
+                                    ).then((_) => _loadUserData());
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 52,
+                                        height: 52,
+                                        decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                            colors: [
+                                              Color(0xFFA855F7),
+                                              Color(0xFF8B5CF6),
+                                            ],
+                                          ),
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: const Color(
+                                                0xFFA855F7,
+                                              ).withOpacity(0.5),
+                                              blurRadius: 20,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                          border: Border.all(
+                                            color: isDark
+                                                ? const Color(
+                                                    0xFFCDFF00,
+                                                  ).withOpacity(0.3)
+                                                : Colors.white,
+                                            width: 2.5,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            _userInitial(_currentUser),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              l10n.agentMarketplaceWelcomeBack,
+                                              style: TextStyle(
+                                                color: isDark
+                                                    ? Colors.white.withOpacity(
+                                                        0.5,
+                                                      )
+                                                    : Colors.black.withOpacity(
+                                                        0.5,
+                                                      ),
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              _userDisplayName(_currentUser),
+                                              style: TextStyle(
+                                                color: isDark
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: -0.5,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                if (cart.itemCount > 0)
+                              ),
+                              const SizedBox(width: 12),
+                              Consumer<CartProvider>(
+                                builder: (context, cart, child) {
+                                  return Stack(
+                                    children: [
+                                      _roundIconButton(
+                                        isDark: isDark,
+                                        icon: Icons.shopping_cart_outlined,
+                                        onPressed: () => Navigator.pushNamed(
+                                          context,
+                                          '/cart',
+                                        ),
+                                      ),
+                                      if (cart.itemCount > 0)
+                                        Positioned(
+                                          top: 10,
+                                          right: 10,
+                                          child: Container(
+                                            width: 10,
+                                            height: 10,
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              shape: BoxShape.circle,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.red.withOpacity(
+                                                    0.8,
+                                                  ),
+                                                  blurRadius: 8,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  );
+                                },
+                              ),
+                              const SizedBox(width: 8),
+                              Stack(
+                                children: [
+                                  _roundIconButton(
+                                    isDark: isDark,
+                                    icon: Icons.notifications_outlined,
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.notifications_active,
+                                                color: Colors.white,
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Text(
+                                                  l10n.agentMarketplaceNoNewNotifications,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          backgroundColor: isDark
+                                              ? const Color(0xFF2A2A2A)
+                                              : Colors.black87,
+                                          behavior: SnackBarBehavior.floating,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          duration: const Duration(seconds: 2),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                   Positioned(
                                     top: 10,
                                     right: 10,
@@ -416,11 +494,18 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                       width: 10,
                                       height: 10,
                                       decoration: BoxDecoration(
-                                        color: Colors.red,
+                                        gradient: const LinearGradient(
+                                          colors: [
+                                            Color(0xFFCDFF00),
+                                            Color(0xFFAADD00),
+                                          ],
+                                        ),
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.red.withOpacity(0.8),
+                                            color: const Color(
+                                              0xFFCDFF00,
+                                            ).withOpacity(0.8),
                                             blurRadius: 8,
                                             spreadRadius: 2,
                                           ),
@@ -428,313 +513,253 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                       ),
                                     ),
                                   ),
-                              ],
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        Stack(
-                          children: [
-                            _roundIconButton(
-                              isDark: isDark,
-                              icon: Icons.notifications_outlined,
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.notifications_active,
-                                          color: Colors.white,
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Text(
-                                            l10n.agentMarketplaceNoNewNotifications,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    backgroundColor: isDark
-                                        ? const Color(0xFF2A2A2A)
-                                        : Colors.black87,
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    duration: const Duration(seconds: 2),
-                                  ),
-                                );
-                              },
-                            ),
-                            Positioned(
-                              top: 10,
-                              right: 10,
-                              child: Container(
-                                width: 10,
-                                height: 10,
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 4,
+                                height: 28,
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
                                     colors: [
                                       Color(0xFFCDFF00),
                                       Color(0xFFAADD00),
                                     ],
                                   ),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFFCDFF00)
-                                          .withOpacity(0.8),
-                                      blurRadius: 8,
-                                      spreadRadius: 2,
-                                    ),
-                                  ],
+                                  borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(width: 12),
+                              Text(
+                                l10n.agentMarketplaceTitle,
+                                style: TextStyle(
+                                  color: isDark ? Colors.white : Colors.black,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.touch_app,
+                                color: isDark
+                                    ? Colors.white.withOpacity(0.5)
+                                    : Colors.black.withOpacity(0.5),
+                                size: 16,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                l10n.agentMarketplaceSwipeToExplore(
+                                  _agents.length,
+                                ),
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.white.withOpacity(0.5)
+                                      : Colors.black.withOpacity(0.5),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  );
-                },
-              ),
-              const SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 4,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Color(0xFFCDFF00),
-                                Color(0xFFAADD00),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          l10n.agentMarketplaceTitle,
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 26,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      height: 400,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: _agents.length,
+                        itemBuilder: (context, index) {
+                          return _build3DCard(index, isDark);
+                        },
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
+                    const SizedBox(height: 16),
+                    Column(
                       children: [
-                        Icon(
-                          Icons.touch_app,
-                          color: isDark
-                              ? Colors.white.withOpacity(0.5)
-                              : Colors.black.withOpacity(0.5),
-                          size: 16,
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: _buildAgentInfo(currentAgent, isDark),
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          l10n.agentMarketplaceSwipeToExplore(
-                            _agents.length,
-                          ),
-                          style: TextStyle(
-                            color: isDark
-                                ? Colors.white.withOpacity(0.5)
-                                : Colors.black.withOpacity(0.5),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? Colors.white.withOpacity(0.08)
+                                      : Colors.black.withOpacity(0.05),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? Colors.white.withOpacity(0.15)
+                                        : Colors.black.withOpacity(0.1),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    if (_currentPage.round() <
+                                        _agents.length - 1) {
+                                      _pageController.nextPage(
+                                        duration: const Duration(
+                                          milliseconds: 400,
+                                        ),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    }
+                                  },
+                                  icon: Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: isDark
+                                        ? Colors.white.withOpacity(0.7)
+                                        : Colors.black.withOpacity(0.7),
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Container(
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    gradient: isDark
+                                        ? const LinearGradient(
+                                            colors: [
+                                              Color(0xFFCDFF00),
+                                              Color(0xFFAADD00),
+                                            ],
+                                          )
+                                        : const LinearGradient(
+                                            colors: [
+                                              Colors.black,
+                                              Color(0xFF1A1A1A),
+                                            ],
+                                          ),
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: isDark
+                                            ? const Color(
+                                                0xFFCDFF00,
+                                              ).withOpacity(0.4)
+                                            : Colors.black.withOpacity(0.15),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: (user == null || _isHiring)
+                                        ? null
+                                        : isActive
+                                        ? null
+                                        : hasSlots
+                                        ? () => _hireAgent(currentAgentId)
+                                        : () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const PricingPage(),
+                                              ),
+                                            ).then((result) {
+                                              if (result == true) {
+                                                _loadUserData();
+                                              }
+                                            });
+                                          },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: buttonFg,
+                                      disabledForegroundColor: buttonFg,
+                                      disabledBackgroundColor:
+                                          Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        if (_isHiring)
+                                          SizedBox(
+                                            height: 18,
+                                            width: 18,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.2,
+                                              color: buttonFg,
+                                            ),
+                                          )
+                                        else ...[
+                                          Icon(
+                                            isActive
+                                                ? Icons.verified
+                                                : hasSlots
+                                                ? Icons.person_add_alt_1
+                                                : Icons.workspace_premium,
+                                            size: 22,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Flexible(
+                                            child: Text(
+                                              isActive
+                                                  ? 'Actif'
+                                                  : hasSlots
+                                                  ? 'Hire'
+                                                  : 'Plan plein - Améliorer mon offre',
+                                              style: TextStyle(
+                                                color: buttonFg,
+                                                fontSize: 17,
+                                                fontWeight: FontWeight.bold,
+                                                letterSpacing: 0.5,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                        const SizedBox(height: 24),
                       ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-              SizedBox(
-                height: 400,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: _agents.length,
-                  itemBuilder: (context, index) {
-                    return _build3DCard(index, isDark);
-                  },
-                ),
-              ),
-              const SizedBox(height: 16),
-              Column(
-                children: [
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: _buildAgentInfo(currentAgent, isDark),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? Colors.white.withOpacity(0.08)
-                                : Colors.black.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.15)
-                                  : Colors.black.withOpacity(0.1),
-                              width: 2,
-                            ),
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              if (_currentPage.round() <
-                                  _agents.length - 1) {
-                                _pageController.nextPage(
-                                  duration:
-                                  const Duration(milliseconds: 400),
-                                  curve: Curves.easeInOut,
-                                );
-                              }
-                            },
-                            icon: Icon(
-                              Icons.arrow_forward_ios,
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.7)
-                                  : Colors.black.withOpacity(0.7),
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Container(
-                            height: 56,
-                            decoration: BoxDecoration(
-                              gradient: isDark
-                                  ? const LinearGradient(
-                                colors: [
-                                  Color(0xFFCDFF00),
-                                  Color(0xFFAADD00),
-                                ],
-                              )
-                                  : const LinearGradient(
-                                colors: [
-                                  Colors.black,
-                                  Color(0xFF1A1A1A),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: isDark
-                                      ? const Color(0xFFCDFF00)
-                                      .withOpacity(0.4)
-                                      : Colors.black.withOpacity(0.15),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: (user == null || _isHiring)
-                                  ? null
-                                  : isActive
-                                  ? null
-                                  : hasSlots
-                                  ? () => _hireAgent(currentAgentId)
-                                  : () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                    const PricingPage(),
-                                  ),
-                                ).then((result) {
-                                  if (result == true) {
-                                    _loadUserData();
-                                  }
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                foregroundColor: buttonFg,
-                                disabledForegroundColor: buttonFg,
-                                disabledBackgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (_isHiring)
-                                    SizedBox(
-                                      height: 18,
-                                      width: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.2,
-                                        color: buttonFg,
-                                      ),
-                                    )
-                                  else ...[
-                                    Icon(
-                                      isActive
-                                          ? Icons.verified
-                                          : hasSlots
-                                          ? Icons.person_add_alt_1
-                                          : Icons.workspace_premium,
-                                      size: 22,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Flexible(
-                                      child: Text(
-                                        isActive
-                                            ? 'Actif'
-                                            : hasSlots
-                                            ? 'Hire'
-                                            : 'Plan plein - Améliorer mon offre',
-                                        style: TextStyle(
-                                          color: buttonFg,
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 0.5,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ],
-          ),
-        ),
       ),
       bottomNavigationBar: Container(
         height: 72,
@@ -807,6 +832,22 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
+                    builder: (context) => const PredictionsHomeScreen(),
+                  ),
+                );
+              },
+              child: _buildNavItem(
+                Icons.local_fire_department_outlined,
+                'Daily',
+                false,
+                isDark,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
                     builder: (context) => UserProfilePage(user: _currentUser),
                   ),
                 ).then((_) => _loadUserData());
@@ -849,21 +890,21 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
       width: 48,
       height: 48,
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.05),
+        color: isDark
+            ? Colors.white.withOpacity(0.08)
+            : Colors.black.withOpacity(0.05),
         shape: BoxShape.circle,
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.15) : Colors.black.withOpacity(0.1),
+          color: isDark
+              ? Colors.white.withOpacity(0.15)
+              : Colors.black.withOpacity(0.1),
           width: 1.5,
         ),
       ),
       child: IconButton(
         onPressed: onPressed,
         padding: EdgeInsets.zero,
-        icon: Icon(
-          icon,
-          color: isDark ? Colors.white : Colors.black,
-          size: 22,
-        ),
+        icon: Icon(icon, color: isDark ? Colors.white : Colors.black, size: 22),
       ),
     );
   }
@@ -914,19 +955,22 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                   }
                 },
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 24,
+                  ),
                   decoration: BoxDecoration(
                     gradient: isDark
                         ? const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFF1E1E1E), Color(0xFF2A2A2A)],
-                    )
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF1E1E1E), Color(0xFF2A2A2A)],
+                          )
                         : const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Colors.white, Color(0xFFFAFAFA)],
-                    ),
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Colors.white, Color(0xFFFAFAFA)],
+                          ),
                     borderRadius: BorderRadius.circular(32),
                     border: Border.all(
                       color: isCenter
@@ -1000,7 +1044,10 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                       ),
                       const SizedBox(height: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
@@ -1050,15 +1097,21 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                       ),
                       const SizedBox(height: 14),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           gradient: isDark
                               ? const LinearGradient(
-                            colors: [Color(0xFFCDFF00), Color(0xFFAADD00)],
-                          )
+                                  colors: [
+                                    Color(0xFFCDFF00),
+                                    Color(0xFFAADD00),
+                                  ],
+                                )
                               : const LinearGradient(
-                            colors: [Colors.black, Color(0xFF1A1A1A)],
-                          ),
+                                  colors: [Colors.black, Color(0xFF1A1A1A)],
+                                ),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -1073,7 +1126,9 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                         child: Text(
                           l10n.agentMarketplacePriceFrom(agent['price']),
                           style: TextStyle(
-                            color: isDark ? Colors.black : const Color(0xFFCDFF00),
+                            color: isDark
+                                ? Colors.black
+                                : const Color(0xFFCDFF00),
                             fontSize: 16,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 0.5,
@@ -1092,11 +1147,11 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
   }
 
   Widget _buildNavItem(
-      IconData icon,
-      String label,
-      bool isActive,
-      bool isDark,
-      ) {
+    IconData icon,
+    String label,
+    bool isActive,
+    bool isDark,
+  ) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -1105,8 +1160,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
           color: isActive
               ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
               : (isDark
-              ? Colors.white.withOpacity(0.4)
-              : Colors.black.withOpacity(0.4)),
+                    ? Colors.white.withOpacity(0.4)
+                    : Colors.black.withOpacity(0.4)),
           size: 26,
         ),
         const SizedBox(height: 6),
@@ -1116,8 +1171,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
             color: isActive
                 ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
                 : (isDark
-                ? Colors.white.withOpacity(0.4)
-                : Colors.black.withOpacity(0.4)),
+                      ? Colors.white.withOpacity(0.4)
+                      : Colors.black.withOpacity(0.4)),
             fontSize: 11,
             fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           ),

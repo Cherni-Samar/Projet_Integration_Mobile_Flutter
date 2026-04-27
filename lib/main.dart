@@ -19,13 +19,18 @@ import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/locale_provider.dart';
 import 'presentation/providers/user_provider.dart';
 import 'presentation/providers/cart_provider.dart';
+import 'presentation/providers/predictions_provider.dart';
+import 'presentation/screens/predictions/daily_prediction_screen.dart';
+import 'presentation/screens/predictions/predictions_history_screen.dart';
+import 'presentation/screens/predictions/predictions_home_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 💳 Initialize Stripe — replace with your publishable key from
   // https://dashboard.stripe.com/test/apikeys
-  Stripe.publishableKey = 'pk_test_51RIdV7QLtPq7s5k7xiLNgDPFR81G2fA4H8JxNWEK9Adrlm29M0FfWbBytw6astsugguURilr6OYtxzis36aTPhKc00b5eVc6Cm';
+  Stripe.publishableKey =
+      'pk_test_51RIdV7QLtPq7s5k7xiLNgDPFR81G2fA4H8JxNWEK9Adrlm29M0FfWbBytw6astsugguURilr6OYtxzis36aTPhKc00b5eVc6Cm';
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -46,6 +51,7 @@ void main() {
             return owned;
           },
         ),
+        ChangeNotifierProvider(create: (_) => PredictionsProvider()),
       ],
       child: const MyApp(),
     ),
@@ -168,10 +174,9 @@ class MyApp extends StatelessWidget {
 
           // ✅ MODE TEST : Tester directement l'onboarding
           //home: const OnboardingWelcomeScreen(email: 'test@example.com'),
-
           routes: {
             // NOTE: La route '/' est commentée car on utilise 'home' au lieu de 'initialRoute'
-             '/': (context) => const SplashScreen(),
+            '/': (context) => const SplashScreen(),
             '/splash': (context) => const SplashScreen(),
             '/login': (context) => const LoginScreen(),
             '/signup': (context) => const SignUpScreen(),
@@ -181,8 +186,8 @@ class MyApp extends StatelessWidget {
             // ✅ Route onboarding welcome
             '/onboarding-welcome': (context) {
               final args =
-              ModalRoute.of(context)?.settings.arguments
-              as Map<String, dynamic>?;
+                  ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>?;
               return OnboardingWelcomeScreen(
                 email: args?['email'] ?? 'user@example.com',
               );
@@ -191,8 +196,8 @@ class MyApp extends StatelessWidget {
             // ✅ Route onboarding chatbot
             '/onboarding-chatbot': (context) {
               final args =
-              ModalRoute.of(context)?.settings.arguments
-              as Map<String, dynamic>?;
+                  ModalRoute.of(context)?.settings.arguments
+                      as Map<String, dynamic>?;
               return OnboardingChatbotScreen(
                 email: args?['email'] ?? 'user@example.com',
               );
@@ -200,6 +205,10 @@ class MyApp extends StatelessWidget {
 
             '/agent-marketplace': (context) => const AgentMarketplacePage(),
             '/cart': (context) => const CartPage(),
+            '/predictions': (context) => const PredictionsHomeScreen(),
+            '/predictions/daily': (context) => const DailyPredictionScreen(),
+            '/predictions/history': (context) =>
+                const PredictionsHistoryScreen(),
           },
 
           onGenerateRoute: (settings) {

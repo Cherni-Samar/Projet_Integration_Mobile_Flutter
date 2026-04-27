@@ -258,7 +258,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
       Timer(const Duration(seconds: 2), () {
         if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/cart');
+        Navigator.pushNamed(context, '/cart');
       });
     } catch (e) {
       _addBotMessage(
@@ -270,13 +270,29 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
   void _addRecommendedAgentsToCart(List<RecommendedAgent> agents) {
     final cart = Provider.of<CartProvider>(context, listen: false);
 
+    String packId;
+    String packTitle;
+    int energy;
+    double price;
+
     if (agents.length >= 4) {
-      cart.setPaymentPack('premium_plan');
+      packId = 'premium_plan';
+      packTitle = 'Premium Plan';
+      energy = 1000;
+      price = 99.0;
     } else if (agents.length >= 2) {
-      cart.setPaymentPack('basic_plan');
+      packId = 'basic_plan';
+      packTitle = 'Basic Plan';
+      energy = 500;
+      price = 59.0;
     } else {
-      cart.setPaymentPack('energy_boost');
+      packId = 'energy_boost';
+      packTitle = 'Pack Boost';
+      energy = 200;
+      price = 35.0;
     }
+
+    cart.setPaymentPack(packId);
 
     for (final agent in agents) {
       final key = agent.id.toLowerCase().trim();
@@ -291,19 +307,14 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
         agentName: agentName,
         agentIllustration: data['illustration'] as String,
         agentColor: data['color'] as Color,
-        packTitle: agents.length >= 4
-            ? 'Premium Plan'
-            : agents.length >= 2
-            ? 'Basic Plan'
-            : 'Pack Boost',
-        energy: 0,
-        price: 0.0,
+        packTitle: packTitle,
+        energy: energy,
+        price: cart.items.isEmpty ? price : 0.0,
       );
 
       cart.addToCart(item);
     }
   }
-
   void _scrollToBottom() {
     Timer(const Duration(milliseconds: 120), () {
       if (!_scrollController.hasClients) return;
@@ -362,8 +373,13 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
         color: _dark,
-        onPressed: () => Navigator.pop(context),
-      ),
+        onPressed: () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/marketplace',
+                (route) => false,
+          );
+        },      ),
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
