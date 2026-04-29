@@ -92,7 +92,16 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         );
 
-        Navigator.pushReplacementNamed(context, '/agent-marketplace');
+        // ✅ Check if onboarding is completed
+        if (!user.onboardingCompleted) {
+          Navigator.pushReplacementNamed(
+            context, 
+            '/onboarding-welcome',
+            arguments: {'email': _emailController.text.trim()},
+          );
+        } else {
+          Navigator.pushReplacementNamed(context, '/agent-marketplace');
+        }
       }
     } catch (e) {
       print('❌ Erreur: $e');

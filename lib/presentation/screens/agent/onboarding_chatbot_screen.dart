@@ -258,7 +258,11 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
       Timer(const Duration(seconds: 2), () {
         if (!mounted) return;
-        Navigator.pushNamed(context, '/cart');
+        Navigator.pushNamed(
+          context, 
+          '/cart',
+          arguments: {'isOnboardingPayment': true},
+        );
       });
     } catch (e) {
       _addBotMessage(
@@ -272,27 +276,44 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
     String packId;
     String packTitle;
-    int energy;
+    int energyCredits;
     double price;
+    int agentsAllowed;
 
     if (agents.length >= 4) {
       packId = 'premium_plan';
       packTitle = 'Premium Plan';
-      energy = 1000;
+      energyCredits = 500; // Backend-aligned: premium_plan gives 500 credits
       price = 99.0;
+      agentsAllowed = 5;
     } else if (agents.length >= 2) {
       packId = 'basic_plan';
       packTitle = 'Basic Plan';
-      energy = 500;
+      energyCredits = 250; // Backend-aligned: basic_plan gives 250 credits
       price = 59.0;
+      agentsAllowed = 3;
     } else {
       packId = 'energy_boost';
       packTitle = 'Pack Boost';
-      energy = 200;
+      energyCredits = 500; // Energy boost pack
       price = 35.0;
+      agentsAllowed = 1;
     }
 
     cart.setPaymentPack(packId);
+
+    // Add the plan item first
+    final planItem = CartItem(
+      id: 'plan-$packId',
+      agentName: packTitle,
+      agentIllustration: 'assets/images/plan_icon.png', // You might want to add a plan icon
+      agentColor: const Color(0xFF6366F1), // Plan color
+      packTitle: 'Pack $agentsAllowed agents',
+      energy: energyCredits, // Plan energy only, not multiplied by agents
+      price: price, // Plan price
+      isPlan: true,
+    );
+    cart.addToCart(planItem);
 
     for (final agent in agents) {
       final key = agent.id.toLowerCase().trim();
@@ -307,9 +328,10 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
         agentName: agentName,
         agentIllustration: data['illustration'] as String,
         agentColor: data['color'] as Color,
-        packTitle: packTitle,
-        energy: energy,
-        price: cart.items.isEmpty ? price : 0.0,
+        packTitle: 'Included',
+        energy: 0, // Agents have 0 energy, energy comes from plan only
+        price: 0.0, // Agents are included in the pack, so price is 0
+        isPlan: false,
       );
 
       cart.addToCart(item);
@@ -374,12 +396,14 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
         color: _dark,
         onPressed: () {
+          // ✅ FIX: Use correct route name '/agent-marketplace'
           Navigator.pushNamedAndRemoveUntil(
             context,
-            '/marketplace',
-                (route) => false,
+            '/agent-marketplace',
+            (route) => false,
           );
-        },      ),
+        },
+      ),
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

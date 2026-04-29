@@ -686,7 +686,10 @@ class MyAgentsPage extends StatelessWidget {
     Navigator.pop(sheetContext);
 
     try {
-      final success = await StripeService.makePayment(packId: packId);
+      final success = await StripeService.makePayment(
+        packId: packId,
+        suggestedAgents: null, // No suggested agents from this flow
+      );
       if (!rootContext.mounted) return;
 
       if (success) {

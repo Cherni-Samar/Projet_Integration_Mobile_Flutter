@@ -114,7 +114,10 @@ class _PricingPageState extends State<PricingPage> {
     });
 
     try {
-      final paid = await StripeService.makePayment(packId: offer.packId);
+      final paid = await StripeService.makePayment(
+        packId: offer.packId,
+        suggestedAgents: null, // No suggested agents from this flow
+      );
       if (!mounted) return;
 
       if (!paid) {

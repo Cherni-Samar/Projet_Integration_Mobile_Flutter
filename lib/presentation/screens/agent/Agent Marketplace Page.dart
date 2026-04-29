@@ -17,7 +17,6 @@ import 'agent_inter_flow_page.dart';
 import '../activity/activity_logs_screen.dart';
 import '../pricing_page.dart';
 import '../auth/user_profile_page.dart';
-import 'package:e_team/presentation/screens/predictions/predictions_home_screen.dart';
 
 class AgentMarketplacePage extends StatefulWidget {
   const AgentMarketplacePage({Key? key}) : super(key: key);
@@ -827,22 +826,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                 isDark,
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const PredictionsHomeScreen(),
-                  ),
-                );
-              },
-              child: _buildNavItem(
-                Icons.local_fire_department_outlined,
-                'Daily',
-                false,
-                isDark,
-              ),
-            ),
+
             GestureDetector(
               onTap: () {
                 Navigator.push(

@@ -35,6 +35,7 @@ class UserDTO {
   final String? name;
   final String email;
   final bool isEmailVerified;
+  final bool onboardingCompleted; // ✅ NOUVEAU CHAMP
   final String subscriptionPlan;
   final String? subscriptionStatus;
   final int maxAgentsAllowed;
@@ -53,6 +54,7 @@ class UserDTO {
     this.name,
     required this.email,
     required this.isEmailVerified,
+    required this.onboardingCompleted, // ✅ ADDED
     required this.subscriptionPlan,
     this.subscriptionStatus,
     required this.maxAgentsAllowed,
@@ -75,6 +77,7 @@ class UserDTO {
       id: json['id'] ?? json['_id'] ?? '',
       name: json['name'],
       email: json['email'] ?? '',
+      onboardingCompleted: json['onboardingCompleted'] ?? false, // ✅ PARSED
       isEmailVerified: json['isEmailVerified'] ?? false,
       subscriptionPlan: (json['subscriptionPlan'] ?? 'free').toString(),
       subscriptionStatus: json['subscriptionStatus']?.toString(),
@@ -97,6 +100,7 @@ class UserDTO {
       'name': name,
       'email': email,
       'isEmailVerified': isEmailVerified,
+      'onboardingCompleted': onboardingCompleted, // ✅ Added
       'subscriptionPlan': subscriptionPlan,
       'subscriptionStatus': subscriptionStatus,
       'maxAgentsAllowed': maxAgentsAllowed,

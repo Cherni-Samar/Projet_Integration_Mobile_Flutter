@@ -18,6 +18,7 @@ class User {
   final String? name;
   final String email;
   final bool isEmailVerified;
+  final bool onboardingCompleted; // ✅ NOUVEAU CHAMP
   final String subscriptionPlan;
   final String? subscriptionStatus;
   final int maxAgentsAllowed;
@@ -36,6 +37,7 @@ class User {
     this.name,
     required this.email,
     required this.isEmailVerified,
+    required this.onboardingCompleted, // ✅ ADDED
     required this.subscriptionPlan,
     this.subscriptionStatus,
     required this.maxAgentsAllowed,
@@ -50,6 +52,7 @@ class User {
 
   // ✅ Mise à jour du copyWith pour inclure les nouveaux champs
   User copyWith({
+    bool? onboardingCompleted,
     String? subscriptionPlan,
     String? subscriptionStatus,
     int? maxAgentsAllowed,
@@ -63,6 +66,7 @@ class User {
       name: name,
       email: email,
       isEmailVerified: isEmailVerified,
+      onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
       subscriptionPlan: subscriptionPlan ?? this.subscriptionPlan,
       subscriptionStatus: subscriptionStatus ?? this.subscriptionStatus,
       maxAgentsAllowed: maxAgentsAllowed ?? this.maxAgentsAllowed,

@@ -109,14 +109,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           ),
         );
 
-        // ✅ Navigation vers le chatbot d'onboarding
+        // ✅ Navigation vers le login après vérification de l'email
         await Future.delayed(const Duration(milliseconds: 500));
 
         if (mounted) {
-          Navigator.pushReplacementNamed(
+          Navigator.pushNamedAndRemoveUntil(
             context,
-            '/onboarding-welcome',  // ✅ Changé de /login à /onboarding-chatbot
-            arguments: {'email': _email!},  // ✅ Passez l'email
+            '/login',
+            (route) => false,
           );
         }
 

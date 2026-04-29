@@ -12,10 +12,12 @@ class StripeService {
 
   /// Creates a PaymentIntent on the backend and presents the Stripe PaymentSheet.
   /// [packId] is a server-defined identifier (e.g. energy_eco, energy_boost, basic_plan).
+  /// [suggestedAgents] is an optional list of agent names to auto-hire after payment.
   /// Returns true on success, false on cancel.
   /// Throws on error.
   static Future<bool> makePayment({
     required String packId,
+    List<String>? suggestedAgents,
   }) async {
     // 1. Get the auth token
     final token = await _authService.getToken();
@@ -27,6 +29,8 @@ class StripeService {
       endpoint: ApiConstants.createPaymentIntent,
       body: {
         'packId': packId,
+        if (suggestedAgents != null && suggestedAgents.isNotEmpty)
+          'suggestedAgents': suggestedAgents,
       },
       token: token,
     );

@@ -26,6 +26,14 @@ class AuthService {
     );
 
     if (response['success'] == true) {
+      // ✅ FIX: Save the JWT token (matching login() pattern)
+      await _saveToken(response['data']['token']);
+      
+      // ✅ FIX: Save user data to SharedPreferences (matching login() pattern)
+      final dto = UserDTO.fromJson(response['data']['user']);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_userKey, jsonEncode(dto.toJson()));
+      
       return response;
     }
 

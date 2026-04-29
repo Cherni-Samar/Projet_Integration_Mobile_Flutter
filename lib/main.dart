@@ -19,10 +19,7 @@ import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/locale_provider.dart';
 import 'presentation/providers/user_provider.dart';
 import 'presentation/providers/cart_provider.dart';
-import 'presentation/providers/predictions_provider.dart';
-import 'presentation/screens/predictions/daily_prediction_screen.dart';
-import 'presentation/screens/predictions/predictions_history_screen.dart';
-import 'presentation/screens/predictions/predictions_home_screen.dart';
+
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,7 +48,6 @@ void main() {
             return owned;
           },
         ),
-        ChangeNotifierProvider(create: (_) => PredictionsProvider()),
       ],
       child: const MyApp(),
     ),
@@ -204,11 +200,12 @@ class MyApp extends StatelessWidget {
             },
 
             '/agent-marketplace': (context) => const AgentMarketplacePage(),
-            '/cart': (context) => const CartPage(),
-            '/predictions': (context) => const PredictionsHomeScreen(),
-            '/predictions/daily': (context) => const DailyPredictionScreen(),
-            '/predictions/history': (context) =>
-                const PredictionsHistoryScreen(),
+            '/cart': (context) {
+              final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+              final isOnboardingPayment = args?['isOnboardingPayment'] ?? false;
+              return CartPage(isOnboardingPayment: isOnboardingPayment);
+            },
+
           },
 
           onGenerateRoute: (settings) {
