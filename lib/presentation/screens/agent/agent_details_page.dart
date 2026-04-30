@@ -7,6 +7,10 @@ import '../../providers/theme_provider.dart';
 import '../../providers/user_provider.dart';
 import '/data/services/hr_agent_service.dart';
 import 'hr/hr_dashboard_page.dart';
+import '../../widgets/agent/agent_stat_card.dart';
+import '../../widgets/agent/agent_skill_chip.dart';
+import '../../widgets/agent/agent_energy_cost_item.dart';
+import '/data/services/agent_metadata_service.dart';
 
 class AgentDetailsPage extends StatefulWidget {
   // ✅ Legacy single agent (optionnel)
@@ -145,285 +149,30 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
   // Skills
   // ---------------------------
   List<String> _getSkillsForAgent(AppLocalizations l10n, String agentName) {
-    switch (agentName) {
-      case 'Hera':
-        return [
-          l10n.skillRecruitmentOnboarding,
-          l10n.skillEmployeeRecords,
-          l10n.skillPayrollManagement,
-          l10n.skillLeaveTracking,
-          l10n.skillPerformanceReviews,
-        ];
-      case 'Kash':
-        return [
-          l10n.skillInvoiceProcessing,
-          l10n.skillExpenseTracking,
-          l10n.skillFinancialReports,
-          l10n.skillBudgetPlanning,
-          l10n.skillTaxCompliance,
-        ];
-      case 'Dexo':
-        return [
-          l10n.skillDocumentManagement,
-          l10n.skillFileOrganization,
-          l10n.skillDataEntry,
-          l10n.skillMeetingScheduling,
-          l10n.skillEmailManagement,
-        ];
-      case 'Timo':
-        return [
-          l10n.skillProjectPlanning,
-          l10n.skillTaskManagement,
-          l10n.skillResourceAllocation,
-          l10n.skillDeadlineTracking,
-          l10n.skillTeamCoordination,
-        ];
-      case 'Echo':
-        return [
-          l10n.skillEmailCampaigns,
-          l10n.skillTeamCommunications,
-          l10n.skillNotifications,
-          l10n.skillAnnouncementDistribution,
-          l10n.skillChatManagement,
-        ];
-      default:
-        return [
-          l10n.skillNaturalLanguage,
-          l10n.skillApiIntegration,
-          l10n.skillMultilingualSupport,
-          l10n.skillDataAnalysis,
-          l10n.skillAutomation,
-        ];
-    }
+    return AgentMetadataService.getSkillsForAgent(l10n, agentName);
   }
 
   // ---------------------------
   // Energy Costs
   // ---------------------------
   List<Map<String, dynamic>> _getEnergyCostsForAgent(String agentName) {
-    switch (agentName) {
-      case 'Hera':
-        return [
-          {'task': 'Approve leave', 'cost': 10},
-          {'task': 'Employee onboarding', 'cost': 15},
-          {'task': 'Team coordination', 'cost': 12},
-        ];
-      case 'Kash':
-        return [
-          {'task': 'Add expense', 'cost': 15},
-          {'task': 'Generate report', 'cost': 20},
-          {'task': 'Track budget', 'cost': 12},
-        ];
-      case 'Dexo':
-        return [
-          {'task': 'Upload document', 'cost': 8},
-          {'task': 'Classify files', 'cost': 10},
-          {'task': 'Manage access', 'cost': 12},
-        ];
-      case 'Timo':
-        return [
-          {'task': 'Plan meeting', 'cost': 20},
-          {'task': 'Prioritize tasks', 'cost': 15},
-          {'task': 'Deadline reminder', 'cost': 8},
-        ];
-      case 'Echo':
-        return [
-          {'task': 'Summarize email', 'cost': 5},
-          {'task': 'Filter messages', 'cost': 8},
-          {'task': 'Smart notification', 'cost': 6},
-        ];
-      default:
-        return [
-          {'task': 'Basic task', 'cost': 10},
-        ];
-    }
+    return AgentMetadataService.getEnergyCostsForAgent(agentName);
   }
 
   List<Map<String, dynamic>> _getMultiAgentScenarios(String agentName) {
-    switch (agentName) {
-      case 'Hera':
-        return [
-          {
-            'scenario': 'Leave + schedule update',
-            'agents': 'Hera + Timo',
-            'cost': 25,
-          },
-        ];
-      case 'Kash':
-        return [
-          {
-            'scenario': 'Invoice + storage + analysis',
-            'agents': 'Kash + Dexo',
-            'cost': 30,
-          },
-        ];
-      case 'Dexo':
-        return [
-          {
-            'scenario': 'Invoice + storage + analysis',
-            'agents': 'Kash + Dexo',
-            'cost': 30,
-          },
-        ];
-      case 'Timo':
-        return [
-          {
-            'scenario': 'Leave + schedule update',
-            'agents': 'Hera + Timo',
-            'cost': 25,
-          },
-          {
-            'scenario': 'Meeting + summary + tasks',
-            'agents': 'Timo + Echo',
-            'cost': 35,
-          },
-        ];
-      case 'Echo':
-        return [
-          {
-            'scenario': 'Meeting + summary + tasks',
-            'agents': 'Timo + Echo',
-            'cost': 35,
-          },
-        ];
-      default:
-        return [];
-    }
+    return AgentMetadataService.getMultiAgentScenarios(agentName);
   }
 
   List<Map<String, dynamic>> _getEnergyPacksForAgent(String agentName) {
-    switch (agentName) {
-      case 'Hera':
-        return [
-          {
-            'title': 'Starter',
-            'energy': 1000,
-            'price': 10.0,
-            'color': 0xFF10B981,
-          },
-          {'title': 'Pro', 'energy': 6000, 'price': 45.0, 'color': 0xFF8B5CF6},
-          {
-            'title': 'Business',
-            'energy': 15000,
-            'price': 100.0,
-            'color': 0xFFF59E0B,
-          },
-        ];
-      case 'Kash':
-        return [
-          {
-            'title': 'Starter',
-            'energy': 1000,
-            'price': 15.0,
-            'color': 0xFF10B981,
-          },
-          {'title': 'Pro', 'energy': 6000, 'price': 55.0, 'color': 0xFF8B5CF6},
-          {
-            'title': 'Business',
-            'energy': 15000,
-            'price': 120.0,
-            'color': 0xFFF59E0B,
-          },
-        ];
-      case 'Dexo':
-        return [
-          {
-            'title': 'Starter',
-            'energy': 1000,
-            'price': 8.0,
-            'color': 0xFF10B981,
-          },
-          {'title': 'Pro', 'energy': 6000, 'price': 35.0, 'color': 0xFF8B5CF6},
-          {
-            'title': 'Business',
-            'energy': 15000,
-            'price': 80.0,
-            'color': 0xFFF59E0B,
-          },
-        ];
-      case 'Timo':
-        return [
-          {
-            'title': 'Starter',
-            'energy': 1000,
-            'price': 12.0,
-            'color': 0xFF10B981,
-          },
-          {'title': 'Pro', 'energy': 6000, 'price': 50.0, 'color': 0xFF8B5CF6},
-          {
-            'title': 'Business',
-            'energy': 15000,
-            'price': 110.0,
-            'color': 0xFFF59E0B,
-          },
-        ];
-      case 'Echo':
-        return [
-          {
-            'title': 'Starter',
-            'energy': 1000,
-            'price': 5.0,
-            'color': 0xFF10B981,
-          },
-          {'title': 'Pro', 'energy': 6000, 'price': 25.0, 'color': 0xFF8B5CF6},
-          {
-            'title': 'Business',
-            'energy': 15000,
-            'price': 60.0,
-            'color': 0xFFF59E0B,
-          },
-        ];
-      default:
-        return [
-          {
-            'title': 'Starter',
-            'energy': 1000,
-            'price': 10.0,
-            'color': 0xFF10B981,
-          },
-          {'title': 'Pro', 'energy': 6000, 'price': 45.0, 'color': 0xFF8B5CF6},
-          {
-            'title': 'Business',
-            'energy': 15000,
-            'price': 100.0,
-            'color': 0xFFF59E0B,
-          },
-        ];
-    }
+    return AgentMetadataService.getEnergyPacksForAgent(agentName);
   }
 
   String _getVersionForAgent(AppLocalizations l10n, String agentName) {
-    switch (agentName) {
-      case 'Hera':
-        return l10n.agentVersionAlpha;
-      case 'Kash':
-        return l10n.agentVersionFinanceWizard;
-      case 'Dexo':
-        return l10n.agentVersionAdminPro;
-      case 'Timo':
-        return l10n.agentVersionPlanningBot;
-      case 'Echo':
-        return l10n.agentVersionCommSync;
-      default:
-        return l10n.agentVersionDefault;
-    }
+    return AgentMetadataService.getVersionForAgent(l10n, agentName);
   }
 
   Map<String, dynamic> _getRatingForAgent(String agentName) {
-    switch (agentName) {
-      case 'Hera':
-        return {'stars': 4.9, 'hires': '1.2k'};
-      case 'Kash':
-        return {'stars': 4.8, 'hires': '980'};
-      case 'Dexo':
-        return {'stars': 5.0, 'hires': '2.1k'};
-      case 'Timo':
-        return {'stars': 4.7, 'hires': '850'};
-      case 'Echo':
-        return {'stars': 4.9, 'hires': '1.5k'};
-      default:
-        return {'stars': 4.8, 'hires': '1.2k'};
-    }
+    return AgentMetadataService.getRatingForAgent(agentName);
   }
 
   // ---------------------------
@@ -854,7 +603,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                           Row(
                             children: [
                               Expanded(
-                                child: _buildStatCard(
+                                child: AgentStatCard(
                                   icon: Icons.flash_on,
                                   label: l10n.agentDetailsStatResponse,
                                   value: _agentTimesSaved(agent),
@@ -864,7 +613,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: _buildStatCard(
+                                child: AgentStatCard(
                                   icon: Icons.check_circle_outline,
                                   label: l10n.agentDetailsStatAccuracy,
                                   value: '99.4%',
@@ -874,7 +623,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: _buildStatCard(
+                                child: AgentStatCard(
                                   icon: Icons.language,
                                   label: l10n.agentDetailsStatLanguages,
                                   value: '42+',
@@ -902,7 +651,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                             spacing: 12,
                             runSpacing: 12,
                             children: skills
-                                .map((skill) => _buildSkillChip(skill, isDark))
+                                .map((skill) => AgentSkillChip(label: skill, isDark: isDark))
                                 .toList(),
                           ),
 
@@ -937,75 +686,11 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                               ) {
                                 final i = entry.key;
                                 final task = entry.value;
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 14,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    border: i < energyCosts.length - 1
-                                        ? Border(
-                                            bottom: BorderSide(
-                                              color: isDark
-                                                  ? Colors.white.withValues(
-                                                      alpha: 0.06,
-                                                    )
-                                                  : Colors.black.withValues(
-                                                      alpha: 0.06,
-                                                    ),
-                                            ),
-                                          )
-                                        : null,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        task['task'] as String,
-                                        style: TextStyle(
-                                          color: isDark
-                                              ? Colors.white.withValues(
-                                                  alpha: 0.8,
-                                                )
-                                              : Colors.black87,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: color.withValues(alpha: 0.12),
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.bolt,
-                                              color: color,
-                                              size: 16,
-                                            ),
-                                            const SizedBox(width: 2),
-                                            Text(
-                                              '${task['cost']}',
-                                              style: TextStyle(
-                                                color: color,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                return AgentEnergyCostItem(
+                                  task: task,
+                                  color: color,
+                                  isDark: isDark,
+                                  isLast: i == energyCosts.length - 1,
                                 );
                               }).toList(),
                             ),
@@ -1518,82 +1203,6 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     return n.toString();
   }
 
-  // ---------------------------
-  // UI helpers
-  // ---------------------------
-  Widget _buildStatCard({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-    required bool isDark,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.1)
-              : Colors.black.withValues(alpha: 0.1),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.5)
-                  : Colors.black.withValues(alpha: 0.5),
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSkillChip(String label, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFA855F7), width: 1.5),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Color(0xFFA855F7),
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
 }
 
 // ---------------------------

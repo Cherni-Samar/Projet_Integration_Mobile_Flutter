@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'package:e_team/data/services/api_config.dart';
 import '../../providers/cart_provider.dart';
+import 'package:e_team/data/services/payment_plan_metadata_service.dart';
 
 class OnboardingChatbotScreen extends StatefulWidget {
   final String email;
@@ -274,31 +275,14 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
   void _addRecommendedAgentsToCart(List<RecommendedAgent> agents) {
     final cart = Provider.of<CartProvider>(context, listen: false);
 
-    String packId;
-    String packTitle;
-    int energyCredits;
-    double price;
-    int agentsAllowed;
-
-    if (agents.length >= 4) {
-      packId = 'premium_plan';
-      packTitle = 'Premium Plan';
-      energyCredits = 500; // Backend-aligned: premium_plan gives 500 credits
-      price = 99.0;
-      agentsAllowed = 5;
-    } else if (agents.length >= 2) {
-      packId = 'basic_plan';
-      packTitle = 'Basic Plan';
-      energyCredits = 250; // Backend-aligned: basic_plan gives 250 credits
-      price = 59.0;
-      agentsAllowed = 3;
-    } else {
-      packId = 'energy_boost';
-      packTitle = 'Pack Boost';
-      energyCredits = 500; // Energy boost pack
-      price = 35.0;
-      agentsAllowed = 1;
-    }
+    // Get plan data from service
+    final planData = PaymentPlanMetadataService.getOnboardingPlanData(agents.length);
+    
+    final packId = planData['packId'] as String;
+    final packTitle = planData['packTitle'] as String;
+    final energyCredits = planData['energyCredits'] as int;
+    final price = planData['price'] as double;
+    final agentsAllowed = planData['agentsAllowed'] as int;
 
     cart.setPaymentPack(packId);
 

@@ -10,13 +10,17 @@ import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/data/services/api_service.dart';
 import 'package:e_team/utils/constants.dart';
+import 'package:e_team/data/services/agent_metadata_service.dart';
 
-import 'AgentDetails Page.dart';
+import 'agent_details_page.dart';
 import 'my_agents_page.dart';
 import 'agent_inter_flow_page.dart';
 import '../activity/activity_logs_screen.dart';
 import '../pricing_page.dart';
 import '../auth/user_profile_page.dart';
+import '../../widgets/agent/agent_marketplace_card.dart';
+import '../../widgets/common/app_bottom_nav_bar.dart';
+import '../../widgets/common/round_icon_button.dart';
 
 class AgentMarketplacePage extends StatefulWidget {
   const AgentMarketplacePage({Key? key}) : super(key: key);
@@ -38,86 +42,6 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
   late AnimationController _headerAnimationController;
 
   List<Map<String, dynamic>> _agents = [];
-
-  List<Map<String, dynamic>> _buildAgents(AppLocalizations l10n) {
-    return [
-      {
-        'name': 'Hera',
-        'role': l10n.agentRoleHrSpecialist,
-        'description': l10n.agentDescAlpha,
-        'icon': 'assets/images/hera.png',
-        'color': const Color(0xFF8B5CF6),
-        'stats': {
-          'response': '< 1.2s',
-          'accuracy': '99.4%',
-          'languages': '42+',
-        },
-        'rating': 4.9,
-        'hires': '1.2k',
-        'price': '10 ⚡/task',
-      },
-      {
-        'name': 'Kash',
-        'role': l10n.agentRoleFinancialExpert,
-        'description': l10n.agentDescFinanceWizard,
-        'icon': 'assets/images/kash.png',
-        'color': const Color(0xFFF59E0B),
-        'stats': {
-          'response': '< 0.8s',
-          'accuracy': '98.9%',
-          'languages': '35+',
-        },
-        'rating': 4.8,
-        'hires': '980',
-        'price': '15 ⚡/task',
-      },
-      {
-        'name': 'Dexo',
-        'role': l10n.agentRoleAdminAssistant,
-        'description': l10n.agentDescAdminPro,
-        'icon': 'assets/images/dexo.png',
-        'color': const Color(0xFF10B981),
-        'stats': {
-          'response': '< 1.5s',
-          'accuracy': '97.8%',
-          'languages': '28+',
-        },
-        'rating': 5.0,
-        'hires': '2.1k',
-        'price': '8 ⚡/task',
-      },
-      {
-        'name': 'Timo',
-        'role': l10n.agentRolePlanningManager,
-        'description': l10n.agentDescPlanningBot,
-        'icon': 'assets/images/krono.png',
-        'color': const Color(0xFFEC4899),
-        'stats': {
-          'response': '< 1.0s',
-          'accuracy': '96.5%',
-          'languages': '30+',
-        },
-        'rating': 4.7,
-        'hires': '850',
-        'price': '20 ⚡/task',
-      },
-      {
-        'name': 'Echo',
-        'role': l10n.agentRoleCommunicationPro,
-        'description': l10n.agentDescCommSync,
-        'icon': 'assets/images/voxi.png',
-        'color': const Color(0xFFA855F7),
-        'stats': {
-          'response': '< 0.9s',
-          'accuracy': '98.2%',
-          'languages': '45+',
-        },
-        'rating': 4.9,
-        'hires': '1.5k',
-        'price': '5 ⚡/task',
-      },
-    ];
-  }
 
   @override
   void initState() {
@@ -237,7 +161,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
     final isDark = themeProvider.isDarkMode;
     final l10n = AppLocalizations.of(context)!;
 
-    _agents = _buildAgents(l10n);
+    _agents = AgentMetadataService.getAllAgentsAsMap(l10n);
 
     final currentIndex = _currentPage.round().clamp(0, _agents.length - 1);
     final currentAgent = _agents[currentIndex];
@@ -413,7 +337,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                 builder: (context, cart, child) {
                                   return Stack(
                                     children: [
-                                      _roundIconButton(
+                                      RoundIconButton(
                                         isDark: isDark,
                                         icon: Icons.shopping_cart_outlined,
                                         onPressed: () => Navigator.pushNamed(
@@ -450,7 +374,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                               const SizedBox(width: 8),
                               Stack(
                                 children: [
-                                  _roundIconButton(
+                                  RoundIconButton(
                                     isDark: isDark,
                                     icon: Icons.notifications_outlined,
                                     onPressed: () {
@@ -589,7 +513,34 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                         controller: _pageController,
                         itemCount: _agents.length,
                         itemBuilder: (context, index) {
-                          return _build3DCard(index, isDark);
+                          return AgentMarketplaceCard(
+                            agent: _agents[index],
+                            index: index,
+                            pageController: _pageController,
+                            currentPage: _currentPage,
+                            isDark: isDark,
+                            onTap: () {
+                              final isCenter = (_currentPage - index).abs() < 0.5;
+                              if (!isCenter) {
+                                _pageController.animateToPage(
+                                  index,
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeInOut,
+                                );
+                              } else {
+                                final currentIndex = _currentPage.round().clamp(0, _agents.length - 1);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AgentDetailsPage(
+                                      agents: _agents,
+                                      initialIndex: currentIndex,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                          );
                         },
                       ),
                     ),
@@ -760,91 +711,41 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                 ),
               ),
       ),
-      bottomNavigationBar: Container(
-        height: 72,
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
-              blurRadius: 30,
-              offset: const Offset(0, -10),
+      bottomNavigationBar: AppBottomNavBar(
+        isDark: isDark,
+        onMarketTap: () {
+          // Already on market page
+        },
+        onAgentsTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MyAgentsPage()),
+          );
+        },
+        onActivityTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ActivityLogsScreen(),
             ),
-          ],
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(
-              Icons.storefront_outlined,
-              l10n.agentMarketplaceNavMarket,
-              true,
-              isDark,
+          );
+        },
+        onStatsTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AgentInterFlowPage(),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyAgentsPage()),
-                );
-              },
-              child: _buildNavItem(
-                Icons.people_outline,
-                l10n.agentMarketplaceNavAgents,
-                false,
-                isDark,
-              ),
+          );
+        },
+        onSettingsTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserProfilePage(user: _currentUser),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ActivityLogsScreen(),
-                  ),
-                );
-              },
-              child: _buildNavItem(Icons.history, 'Activity', false, isDark),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AgentInterFlowPage(),
-                  ),
-                );
-              },
-              child: _buildNavItem(
-                Icons.bar_chart_rounded,
-                l10n.agentMarketplaceNavStats,
-                false,
-                isDark,
-              ),
-            ),
-
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UserProfilePage(user: _currentUser),
-                  ),
-                ).then((_) => _loadUserData());
-              },
-              child: _buildNavItem(
-                Icons.settings_outlined,
-                l10n.agentMarketplaceNavSettings,
-                false,
-                isDark,
-              ),
-            ),
-          ],
-        ),
+          ).then((_) => _loadUserData());
+        },
       ),
     );
   }
@@ -863,306 +764,6 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
     final email = user?.email;
     if (email != null && email.isNotEmpty) return email.split('@').first;
     return 'User';
-  }
-
-  Widget _roundIconButton({
-    required bool isDark,
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withOpacity(0.08)
-            : Colors.black.withOpacity(0.05),
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.15)
-              : Colors.black.withOpacity(0.1),
-          width: 1.5,
-        ),
-      ),
-      child: IconButton(
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        icon: Icon(icon, color: isDark ? Colors.white : Colors.black, size: 22),
-      ),
-    );
-  }
-
-  Widget _build3DCard(int index, bool isDark) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return AnimatedBuilder(
-      animation: _pageController,
-      builder: (context, child) {
-        double value = 0.0;
-        if (_pageController.position.haveDimensions) {
-          value = index - _currentPage;
-          value = (value * 0.038).clamp(-1, 1);
-        }
-
-        final agent = _agents[index];
-        final isCenter = (_currentPage - index).abs() < 0.5;
-        final currentIndex = _currentPage.round().clamp(0, _agents.length - 1);
-
-        return Transform(
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.001)
-            ..rotateY(value * math.pi),
-          alignment: Alignment.center,
-          child: Opacity(
-            opacity: isCenter ? 1.0 : 0.6,
-            child: Transform.scale(
-              scale: isCenter ? 1.0 : 0.88,
-              child: GestureDetector(
-                onTap: () {
-                  if (!isCenter) {
-                    _pageController.animateToPage(
-                      index,
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.easeInOut,
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AgentDetailsPage(
-                          agents: _agents,
-                          initialIndex: currentIndex,
-                        ),
-                      ),
-                    );
-                  }
-                },
-                child: Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 24,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: isDark
-                        ? const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF1E1E1E), Color(0xFF2A2A2A)],
-                          )
-                        : const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Colors.white, Color(0xFFFAFAFA)],
-                          ),
-                    borderRadius: BorderRadius.circular(32),
-                    border: Border.all(
-                      color: isCenter
-                          ? (agent['color'] as Color).withOpacity(0.5)
-                          : Colors.transparent,
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (agent['color'] as Color).withOpacity(
-                          isCenter ? 0.35 : 0.15,
-                        ),
-                        blurRadius: isCenter ? 40 : 20,
-                        offset: const Offset(0, 15),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 110,
-                        height: 110,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              (agent['color'] as Color).withOpacity(0.25),
-                              (agent['color'] as Color).withOpacity(0.08),
-                            ],
-                          ),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: agent['color'] as Color,
-                            width: 3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: (agent['color'] as Color).withOpacity(0.4),
-                              blurRadius: 25,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(55),
-                            child: Image.asset(
-                              agent['icon'],
-                              width: 110,
-                              height: 110,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          agent['name'],
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              (agent['color'] as Color).withOpacity(0.15),
-                              (agent['color'] as Color).withOpacity(0.08),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: (agent['color'] as Color).withOpacity(0.5),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Text(
-                          agent['role'],
-                          style: TextStyle(
-                            color: agent['color'] as Color,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ...List.generate(5, (i) {
-                            return Icon(
-                              i < (agent['rating'] as double).floor()
-                                  ? Icons.star
-                                  : Icons.star_border,
-                              color: const Color(0xFFFBBF24),
-                              size: 18,
-                            );
-                          }),
-                          const SizedBox(width: 6),
-                          Text(
-                            '${agent['rating']}',
-                            style: TextStyle(
-                              color: isDark ? Colors.white : Colors.black,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: isDark
-                              ? const LinearGradient(
-                                  colors: [
-                                    Color(0xFFCDFF00),
-                                    Color(0xFFAADD00),
-                                  ],
-                                )
-                              : const LinearGradient(
-                                  colors: [Colors.black, Color(0xFF1A1A1A)],
-                                ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: isDark
-                                  ? const Color(0xFFCDFF00).withOpacity(0.4)
-                                  : Colors.black.withOpacity(0.2),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          l10n.agentMarketplacePriceFrom(agent['price']),
-                          style: TextStyle(
-                            color: isDark
-                                ? Colors.black
-                                : const Color(0xFFCDFF00),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildNavItem(
-    IconData icon,
-    String label,
-    bool isActive,
-    bool isDark,
-  ) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          color: isActive
-              ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
-              : (isDark
-                    ? Colors.white.withOpacity(0.4)
-                    : Colors.black.withOpacity(0.4)),
-          size: 26,
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: TextStyle(
-            color: isActive
-                ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
-                : (isDark
-                      ? Colors.white.withOpacity(0.4)
-                      : Colors.black.withOpacity(0.4)),
-            fontSize: 11,
-            fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-          ),
-        ),
-      ],
-    );
   }
 
   Widget _buildAgentInfo(Map<String, dynamic> agent, bool isDark) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '/data/services/agent_metadata_service.dart';
 
 class OwnedAgent {
   final String agentName;
@@ -74,11 +75,11 @@ class OwnedAgentsProvider extends ChangeNotifier {
       final defaults = _defaultsFor(id);
       next.add(
         OwnedAgent(
-          agentName: defaults.displayName,
-          agentIllustration: defaults.illustration,
-          agentColor: defaults.color,
+          agentName: defaults['displayName'],
+          agentIllustration: defaults['illustration'],
+          agentColor: defaults['color'],
           packTitle: 'Active',
-          energy: agentEnergyMap[id] ?? 170, // Use API energy or default to 170
+          energy: agentEnergyMap[id] ?? defaults['defaultEnergy'], // Use API energy or default
           purchasedAt: DateTime.now(),
         ),
       );
@@ -136,11 +137,11 @@ class OwnedAgentsProvider extends ChangeNotifier {
     
     // Return default energies if API fails
     return {
-      'dexo': 170,
-      'echo': 170,
-      'hera': 170,
-      'kash': 170,
-      'timo': 170,
+      'dexo': AgentMetadataService.getDefaultEnergyForAgent('dexo'),
+      'echo': AgentMetadataService.getDefaultEnergyForAgent('echo'),
+      'hera': AgentMetadataService.getDefaultEnergyForAgent('hera'),
+      'kash': AgentMetadataService.getDefaultEnergyForAgent('kash'),
+      'timo': AgentMetadataService.getDefaultEnergyForAgent('timo'),
     };
   }
 
@@ -152,47 +153,8 @@ class OwnedAgentsProvider extends ChangeNotifier {
     return true;
   }
 
-  _AgentDefaults _defaultsFor(String agentId) {
-    switch (_norm(agentId)) {
-      case 'hera':
-        return const _AgentDefaults(
-          displayName: 'Hera',
-          illustration: 'assets/images/hera.png',
-          color: Color(0xFF8B5CF6),
-        );
-      case 'kash':
-        return const _AgentDefaults(
-          displayName: 'Kash',
-          illustration: 'assets/images/kash.png',
-          color: Color(0xFFF59E0B),
-        );
-      case 'dexo':
-        return const _AgentDefaults(
-          displayName: 'Dexo',
-          illustration: 'assets/images/dexo.png',
-          color: Color(0xFF10B981),
-        );
-      case 'timo':
-        return const _AgentDefaults(
-          displayName: 'Timo',
-          illustration: 'assets/images/krono.png',
-          color: Color(0xFFEC4899),
-        );
-      case 'echo':
-        return const _AgentDefaults(
-          displayName: 'Echo',
-          illustration: 'assets/images/voxi.png',
-          color: Color(0xFFA855F7),
-        );
-      default:
-        return _AgentDefaults(
-          displayName: agentId.isEmpty
-              ? 'Agent'
-              : '${agentId[0].toUpperCase()}${agentId.substring(1)}',
-          illustration: 'assets/images/hera.png',
-          color: const Color(0xFF8B5CF6),
-        );
-    }
+  Map<String, dynamic> _defaultsFor(String agentId) {
+    return AgentMetadataService.getAgentDefaults(agentId);
   }
 
   /// Add a new agent or STACK energy if already owned
@@ -252,16 +214,4 @@ class OwnedAgentsProvider extends ChangeNotifier {
       print('ℹ️ [ENERGY] No energy changes detected');
     }
   }
-}
-
-class _AgentDefaults {
-  final String displayName;
-  final String illustration;
-  final Color color;
-
-  const _AgentDefaults({
-    required this.displayName,
-    required this.illustration,
-    required this.color,
-  });
 }

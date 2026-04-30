@@ -445,31 +445,31 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                       ),
                     ),
                     onPressed: () async {
+                      // Capture parent context references before async operations
+                      final messenger = ScaffoldMessenger.of(this.context);
+                      final navigator = Navigator.of(context);
+
                       if (selectedCategory.isEmpty || amountController.text.isEmpty) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text('Veuillez remplir tous les champs'),
-                              backgroundColor: KP.danger,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: const Text('Veuillez remplir tous les champs'),
+                            backgroundColor: KP.danger,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
                         return;
                       }
 
                       try {
                         final amount = double.parse(amountController.text);
                         if (amount <= 0) {
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text('Le montant doit être supérieur à 0'),
-                                backgroundColor: KP.danger,
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          }
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: const Text('Le montant doit être supérieur à 0'),
+                              backgroundColor: KP.danger,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
                           return;
                         }
 
@@ -480,44 +480,43 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                           currency: selectedCurrency,
                         );
 
-                        if (mounted) {
-                          Navigator.pop(context);
+                        // Check if widget is still mounted before proceeding
+                        if (!mounted) return;
 
-                          // Refresh the dashboard and user data
-                          await _loadDashboardData();
+                        navigator.pop();
 
-                          final userProvider = Provider.of<UserProvider>(context, listen: false);
-                          await userProvider.refreshUser();
+                        // Refresh the dashboard and user data
+                        await _loadDashboardData();
 
-                          // Show success message
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text('✅ Budget créé avec succès'),
-                              backgroundColor: Colors.green,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
+                        final userProvider = Provider.of<UserProvider>(this.context, listen: false);
+                        await userProvider.refreshUser();
+
+                        // Show success message using captured messenger
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: const Text('✅ Budget créé avec succès'),
+                            backgroundColor: Colors.green,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
                       } on FormatException {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: const Text('Montant invalide'),
-                              backgroundColor: KP.danger,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: const Text('Montant invalide'),
+                            backgroundColor: KP.danger,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
                       } catch (e) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('❌ Erreur: $e'),
-                              backgroundColor: KP.danger,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text('❌ Erreur: $e'),
+                            backgroundColor: KP.danger,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
                       }
                     },
                     child: const Text(
@@ -656,9 +655,13 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                   const SizedBox(width: 8),
                   FilledButton(
                     onPressed: () async {
+                      // Capture parent context references before async operations
+                      final messenger = ScaffoldMessenger.of(this.context);
+                      final navigator = Navigator.of(context);
+
                       if (titleController.text.isEmpty ||
                           amountController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           const SnackBar(
                             content: Text('Please fill all fields'),
                           ),
@@ -674,28 +677,30 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                           'dueDate': selectedDate.toIso8601String(),
                           'notes': notesController.text,
                         });
-                        if (mounted) {
-                          Navigator.pop(context);
-                          _loadDashboardData();
-                          // Update energy balance after reminder is created
-                          final userProvider = Provider.of<UserProvider>(context, listen: false);
-                          await userProvider.refreshUser();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('✅ Reminder created'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        }
+                        
+                        if (!mounted) return;
+                        
+                        navigator.pop();
+                        _loadDashboardData();
+                        
+                        // Update energy balance after reminder is created
+                        final userProvider = Provider.of<UserProvider>(this.context, listen: false);
+                        await userProvider.refreshUser();
+                        
+                        messenger.showSnackBar(
+                          const SnackBar(
+                            content: Text('✅ Reminder created'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
                       } catch (e) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('❌ Error: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text('❌ Error: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
                       }
                     },
                     child: const Text('Add'),
@@ -851,9 +856,13 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                   const SizedBox(width: 8),
                   FilledButton(
                     onPressed: () async {
+                      // Capture parent context references before async operations
+                      final messenger = ScaffoldMessenger.of(this.context);
+                      final navigator = Navigator.of(context);
+
                       if (vendorController.text.isEmpty ||
                           amountController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           const SnackBar(
                             content: Text('Please fill all fields'),
                           ),
@@ -870,28 +879,30 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                           'date': selectedDate.toIso8601String(),
                           'description': descriptionController.text,
                         });
-                        if (mounted) {
-                          Navigator.pop(context);
-                          _loadDashboardData();
-                          // Update energy balance after expense is added
-                          final userProvider = Provider.of<UserProvider>(context, listen: false);
-                          await userProvider.refreshUser();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('✅ Expense added'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        }
+                        
+                        if (!mounted) return;
+                        
+                        navigator.pop();
+                        _loadDashboardData();
+                        
+                        // Update energy balance after expense is added
+                        final userProvider = Provider.of<UserProvider>(this.context, listen: false);
+                        await userProvider.refreshUser();
+                        
+                        messenger.showSnackBar(
+                          const SnackBar(
+                            content: Text('✅ Expense added'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
                       } catch (e) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('❌ Error: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text('❌ Error: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
                       }
                     },
                     child: const Text('Add'),

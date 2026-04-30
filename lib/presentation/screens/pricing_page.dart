@@ -9,6 +9,7 @@ import '/utils/constants.dart';
 import 'package:e_team/data/dtos/user_dto.dart';
 import 'package:provider/provider.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
+import 'package:e_team/data/services/payment_plan_metadata_service.dart';
 class PricingPage extends StatefulWidget {
   const PricingPage({super.key});
 
@@ -25,59 +26,20 @@ class _PricingPageState extends State<PricingPage> {
   String? _processingPackId;
 
   List<_Offer> _offers() {
-    return const [
-      _Offer(
-        sectionId: _OfferSectionId.subscriptions,
-        packId: 'free_trial',
-        price: r'$0',
-        credits: 50,
-        agents: 1,
-      ),
-      _Offer(
-        sectionId: _OfferSectionId.subscriptions,
-        packId: 'basic_plan',
-        price: r'$59',
-        credits: 250,
-        agents: 3,
-      ),
-      _Offer(
-        sectionId: _OfferSectionId.subscriptions,
-        packId: 'premium_plan',
-        price: r'$99',
-        credits: 500,
-        agents: 5,
-        isBestValue: true,
-      ),
-      _Offer(
-        sectionId: _OfferSectionId.energyTopups,
-        packId: 'energy_eco',
-        price: r'$10',
-        credits: 100,
-      ),
-      _Offer(
-        sectionId: _OfferSectionId.energyTopups,
-        packId: 'energy_boost',
-        price: r'$35',
-        credits: 500,
-      ),
-    ];
+    return PaymentPlanMetadataService.getPricingOffers().map((offerData) {
+      return _Offer(
+        sectionId: offerData['sectionId'],
+        packId: offerData['packId'],
+        price: offerData['price'],
+        credits: offerData['credits'],
+        agents: offerData['agents'] > 0 ? offerData['agents'] : null,
+        isBestValue: offerData['isBestValue'],
+      );
+    }).toList();
   }
 
   String _offerTitle(AppLocalizations l10n, String packId) {
-    switch (packId) {
-      case 'free_trial':
-        return l10n.pricingOfferFreeTrial;
-      case 'basic_plan':
-        return l10n.pricingOfferBasicPlan;
-      case 'premium_plan':
-        return l10n.pricingOfferPremiumPlan;
-      case 'energy_eco':
-        return l10n.pricingOfferEcoPack;
-      case 'energy_boost':
-        return l10n.pricingOfferBoostPack;
-      default:
-        return packId;
-    }
+    return PaymentPlanMetadataService.getLocalizedTitle(l10n, packId);
   }
 
   String _sectionTitleText(AppLocalizations l10n, String sectionId) {

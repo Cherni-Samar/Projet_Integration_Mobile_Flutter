@@ -8,6 +8,7 @@ import '/data/services/stripe_service.dart';
 import '/data/services/api_service.dart';
 import '/data/services/auth_service.dart';
 import '/utils/constants.dart';
+import '/data/services/payment_plan_metadata_service.dart';
 import '/l10n/app_localizations.dart';
 import 'package:e_team/data/dtos/user_dto.dart';
 import '../agent/my_agents_page.dart';
@@ -27,18 +28,7 @@ class _CartPageState extends State<CartPage> {
 
   String _packIdFromTotalPrice(double totalPrice) {
     final cents = (totalPrice * 100).round();
-    switch (cents) {
-      case 1000:
-        return 'energy_eco';
-      case 3500:
-        return 'energy_boost';
-      case 5900:
-        return 'basic_plan';
-      case 9900:
-        return 'premium_plan';
-      default:
-        throw Exception(totalPrice.toString());
-    }
+    return PaymentPlanMetadataService.getPlanIdFromCents(cents);
   }
 
   Future<void> _handleCheckout(CartProvider cart) async {
