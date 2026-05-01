@@ -1,4 +1,4 @@
-import '../services/api_config.dart';
+import '../data/services/api_config.dart';
 
 class ApiConstants {
   static String get baseUrl => '${ApiConfig.baseUrl}/api/auth';
@@ -21,7 +21,8 @@ class ApiConstants {
 
   // Payment (Stripe)
   static String get paymentBaseUrl => '${ApiConfig.baseUrl}/api/payment';
-  static String get createPaymentIntent => '$paymentBaseUrl/create-payment-intent';
+  static String get createPaymentIntent =>
+      '$paymentBaseUrl/create-payment-intent';
   static String get confirmPayment => '$paymentBaseUrl/confirm-payment';
 
   // Agents
@@ -32,4 +33,13 @@ class ApiConstants {
   static String get kashBaseUrl => '${ApiConfig.baseUrl}/api/kash';
   static String get kashAnalyze => '$kashBaseUrl/analyze';
   static String get kashAddExpense => '$kashBaseUrl/add';
+
+  //Predictions (Daily Challenge)
+  static String get predictionsBaseUrl =>
+      '${ApiConfig.baseUrl}/api/predictions';
+  static String get predictionsDaily => '$predictionsBaseUrl/daily';
+  static String get predictionsHistory => '$predictionsBaseUrl/history';
+  static String predictionsAnswer(String id) =>
+      '$predictionsBaseUrl/$id/answer';
+  static String get predictionsResetToday => '$predictionsBaseUrl/reset-today';
 }

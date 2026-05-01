@@ -102,7 +102,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get agentMarketplaceNavMarket => 'Market';
 
   @override
-  String get agentMarketplaceNavAgents => 'Agents';
+  String get agentMarketplaceNavAgents => ' My Agents';
 
   @override
   String get agentMarketplaceNavStats => 'Logs';
