@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'auth_service.dart'; // ou là où est ton AuthService
+import 'auth_service.dart';
+import 'api_config.dart';
+
 class ActivityService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api/activities';
+  static String get baseUrl => '${ApiConfig.baseUrl}/api/activities';
 
   /// Get mobile activity feed with pagination
   static Future<ActivityFeedResponse> getMobileFeed({
@@ -25,7 +27,7 @@ class ActivityService {
       final response = await http.get(
         uri,
         headers: {
-          'Authorization': 'Bearer $token',
+          'x-auth-token': token ?? '',
           'Content-Type': 'application/json',
         },
       );
@@ -51,7 +53,7 @@ class ActivityService {
       final response = await http.get(
         Uri.parse('$baseUrl/mobile/dashboard'),
         headers: {
-          'Authorization': 'Bearer $token',
+          'x-auth-token': token ?? '',
           'Content-Type': 'application/json',
         },
       );
@@ -80,7 +82,7 @@ class ActivityService {
       final response = await http.get(
         Uri.parse('$baseUrl/agent/$agentName?limit=$limit'),
         headers: {
-          'Authorization': 'Bearer $token',
+          'x-auth-token': token ?? '',
           'Content-Type': 'application/json',
         },
       );

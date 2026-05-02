@@ -4,25 +4,13 @@ import 'package:http/http.dart' as http;
 class ApiService {
   // ✅ Headers avec x-auth-token
   static Map<String, String> _getHeaders({String? token}) {
-    print('🔧 ========== BUILD HEADERS ==========');
-
     final headers = {
       'Content-Type': 'application/json',
     };
 
     if (token != null) {
       headers['x-auth-token'] = token;
-      print('🔧 Token ajouté aux headers:');
-      print('   - Longueur: ${token.length}');
-      print('   - Début: ${token.substring(0, 30)}');
-      print('   - Fin: ${token.substring(token.length - 30)}');
-      print('   - COMPLET: $token');
-    } else {
-      print('⚠️ AUCUN TOKEN à ajouter aux headers');
     }
-
-    print('🔧 Headers finaux: $headers');
-    print('🔧 ========== BUILD HEADERS END ==========');
 
     return headers;
   }
@@ -34,21 +22,14 @@ class ApiService {
     String? token,
   }) async {
     try {
-      print('📤 POST Request: $endpoint');
-      print('📤 Body: $body');
-
       final response = await http.post(
         Uri.parse(endpoint),
         headers: _getHeaders(token: token),
         body: jsonEncode(body),
       );
 
-      print('📥 Response Status: ${response.statusCode}');
-      print('📥 Response Body: ${response.body}');
-
       return _handleResponse(response);
     } catch (e) {
-      print('❌ POST Error: $e');
       if (e is Exception) throw e;
       throw Exception('Erreur de connexion: $e');
     }
@@ -61,21 +42,14 @@ class ApiService {
     String? token,
   }) async {
     try {
-      print('📤 PUT Request: $endpoint');
-      print('📤 Body: $body');
-
       final response = await http.put(
         Uri.parse(endpoint),
         headers: _getHeaders(token: token),
         body: jsonEncode(body),
       );
 
-      print('📥 Response Status: ${response.statusCode}');
-      print('📥 Response Body: ${response.body}');
-
       return _handleResponse(response);
     } catch (e) {
-      print('❌ PUT Error: $e');
       if (e is Exception) throw e;
       throw Exception('Erreur de connexion: $e');
     }
@@ -87,19 +61,13 @@ class ApiService {
     String? token,
   }) async {
     try {
-      print('📤 GET Request: $endpoint');
-
       final response = await http.get(
         Uri.parse(endpoint),
         headers: _getHeaders(token: token),
       );
 
-      print('📥 Response Status: ${response.statusCode}');
-      print('📥 Response Body: ${response.body}');
-
       return _handleResponse(response);
     } catch (e) {
-      print('❌ GET Error: $e');
       if (e is Exception) throw e;
       throw Exception('Erreur de connexion: $e');
     }
@@ -112,21 +80,8 @@ class ApiService {
     String? token,
   }) async {
     try {
-      print('📤 ========== PATCH REQUEST ==========');
-      print('📤 Endpoint: $endpoint');
-      print('📤 Token reçu:');
-      print('   - Existe: ${token != null}');
-      print('   - Longueur: ${token?.length ?? 0}');
-      if (token != null) {
-        print('   - Début: ${token.substring(0, 30)}');
-        print('   - Fin: ${token.substring(token.length - 30)}');
-        print('   - COMPLET: $token');
-      }
-      print('📤 Body: $body');
-
       final headers = _getHeaders(token: token);
 
-      print('📤 Envoi de la requête HTTP...');
       final response = await http.patch(
         Uri.parse(endpoint),
         headers: headers,
@@ -138,13 +93,8 @@ class ApiService {
         },
       );
 
-      print('📥 Response Status: ${response.statusCode}');
-      print('📥 Response Body: ${response.body}');
-      print('📤 ========== PATCH REQUEST END ==========');
-
       return _handleResponse(response);
     } catch (e) {
-      print('❌ PATCH Error: $e');
       if (e is Exception) throw e;
       throw Exception('$e');
     }
@@ -156,19 +106,13 @@ class ApiService {
     String? token,
   }) async {
     try {
-      print('📤 DELETE Request: $endpoint');
-
       final response = await http.delete(
         Uri.parse(endpoint),
         headers: _getHeaders(token: token),
       );
 
-      print('📥 Response Status: ${response.statusCode}');
-      print('📥 Response Body: ${response.body}');
-
       return _handleResponse(response);
     } catch (e) {
-      print('❌ DELETE Error: $e');
       if (e is Exception) throw e;
       throw Exception('Erreur de connexion: $e');
     }

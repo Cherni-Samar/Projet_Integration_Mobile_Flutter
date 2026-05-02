@@ -4,8 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../dtos/user_dto.dart'; // ✅ Import du DTO
 import '../../utils/constants.dart';
 import 'api_service.dart';
-import 'package:e_team/data/services/api_service.dart';
-import 'package:e_team/data/services/api_config.dart';
 import 'package:e_team/domain/models/user_model.dart';
 import 'package:e_team/data/mappers/user_mapper.dart';
 class AuthService {
@@ -239,9 +237,4 @@ class AuthService {
 
     return UserMapper.fromDTO(dto);
   }
-  Future<User?> getMeModel() async {
-    final dto = await getMe();
-    if (dto == null) return null;
-
-    return UserMapper.fromDTO(dto);
-  }}
+}

@@ -1,8 +1,9 @@
 import 'package:e_team/data/dtos/echo_dto.dart';
 import 'package:e_team/data/services/api_service.dart';
+import 'package:e_team/data/services/api_config.dart';
 
 class EchoService {
-  static const String _baseUrl = 'http://10.0.2.2:3000';
+  static String get _baseUrl => ApiConfig.baseUrl;
 
   static Future<EchoResponse> sendTextMessage({
     required String message,
@@ -10,25 +11,15 @@ class EchoService {
     String? token,
   }) async {
     try {
+      // Fixed: backend route is /analyser, not /echo. Backend only expects {message}.
       final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/echo',
-        body: {'message': message, 'sender': sender},
+        endpoint: '$_baseUrl/api/echo/analyser',
+        body: {'message': message},
         token: token,
       );
       return EchoResponse.fromJson(response);
     } catch (e) {
       return EchoResponse.error(e.toString());
-    }
-  }
-
-  static Future<Map<String, dynamic>> getSocialFeed({String? token}) async {
-    try {
-      return await ApiService.get(
-        endpoint: '$_baseUrl/api/echo/social-feed',
-        token: token,
-      );
-    } catch (e) {
-      return {'success': false, 'feed': [], 'error': e.toString()};
     }
   }
 
@@ -78,22 +69,6 @@ class EchoService {
       return response['success'] == true;
     } catch (_) {
       return false;
-    }
-  }
-
-  static Future<Map<String, dynamic>> replyToEmail({
-    required String emailId,
-    required String replyContent,
-    String? token,
-  }) async {
-    try {
-      return await ApiService.post(
-        endpoint: '$_baseUrl/api/emails/$emailId/reply',
-        body: {'replyContent': replyContent},
-        token: token,
-      );
-    } catch (e) {
-      return {'success': false, 'error': e.toString()};
     }
   }
 
@@ -167,22 +142,6 @@ class EchoService {
       return StatsResponse.fromJson(response);
     } catch (e) {
       return StatsResponse.error(e.toString());
-    }
-  }
-
-  static Future<DocumentClassificationResponse> classifyDocument({
-    required String content,
-    String? token,
-  }) async {
-    try {
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/classify-document',
-        body: {'content': content},
-        token: token,
-      );
-      return DocumentClassificationResponse.fromJson(response);
-    } catch (e) {
-      return DocumentClassificationResponse.error(e.toString());
     }
   }
 

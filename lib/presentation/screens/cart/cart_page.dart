@@ -5,9 +5,6 @@ import '../../providers/owned_agents_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/user_provider.dart';
 import '/data/services/stripe_service.dart';
-import '/data/services/api_service.dart';
-import '/data/services/auth_service.dart';
-import '/utils/constants.dart';
 import '/data/services/payment_plan_metadata_service.dart';
 import '/l10n/app_localizations.dart';
 import 'package:e_team/data/dtos/user_dto.dart';
@@ -24,7 +21,6 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   bool _isProcessing = false;
-  final _authService = AuthService();
 
   String _packIdFromTotalPrice(double totalPrice) {
     final cents = (totalPrice * 100).round();
@@ -59,59 +55,45 @@ class _CartPageState extends State<CartPage> {
       // Extract suggested agents from cart
       final suggestedAgents = cart.agents.map((item) => item.agentName.toLowerCase()).toList();
 
-      final success = await StripeService.makePayment(
+      final confirm = await StripeService.makePayment(
         packId: packId,
         suggestedAgents: suggestedAgents,
       );
 
       if (!mounted) return;
 
-      if (success) {
-        final paymentIntentId = StripeService.lastPaymentIntentId;
-        if (paymentIntentId == null) {
-          throw Exception(l10n.paymentMissingIntentId);
-        }
-
-        final token = await _authService.getToken();
-        if (token == null) {
-          throw Exception(l10n.authMustBeLoggedIn);
-        }
-
-        final confirm = await ApiService.post(
-          endpoint: ApiConstants.confirmPayment,
-          body: {'paymentIntentId': paymentIntentId},
-          token: token,
-        );
-
-        if (confirm['success'] == true) {
-          // Best-effort local cache update (if backend returns user)
-          final rawUser = confirm['data']?['user'] ?? confirm['user'];
-
-          if (rawUser is Map<String, dynamic>) {
-            final dto = UserDTO.fromJson(rawUser);
-            await context.read<UserProvider>().setUser(dto);
-          } else {
-            if (mounted) {
-              await context.read<UserProvider>().refreshFromApi();
-            }
-          }
-
-          // Check if this is onboarding payment
-          if (widget.isOnboardingPayment) {
-            _handleOnboardingPaymentSuccess(cart);
-          } else {
-            _showSuccessDialog(cart);
-          }
-        } else {
-          throw Exception('Payment confirmation failed');
-        }
-      } else {
+      if (confirm == null) {
+        // User cancelled the payment sheet
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.paymentCancelledSnack),
             backgroundColor: Colors.orange,
           ),
         );
+        return;
+      }
+
+      if (confirm['success'] == true) {
+        // Best-effort local cache update (if backend returns user)
+        final rawUser = confirm['data']?['user'] ?? confirm['user'];
+
+        if (rawUser is Map<String, dynamic>) {
+          final dto = UserDTO.fromJson(rawUser);
+          await context.read<UserProvider>().setUser(dto);
+        } else {
+          if (mounted) {
+            await context.read<UserProvider>().refreshFromApi();
+          }
+        }
+
+        // Check if this is onboarding payment
+        if (widget.isOnboardingPayment) {
+          _handleOnboardingPaymentSuccess(cart);
+        } else {
+          _showSuccessDialog(cart);
+        }
+      } else {
+        throw Exception('Payment confirmation failed');
       }
     } catch (e) {
       if (!mounted) return;
@@ -169,6 +151,8 @@ class _CartPageState extends State<CartPage> {
         purchasedAt: DateTime.now(),
       ));
     }
+    // Refresh energy from API once after purchase — not on every rebuild.
+    owned.refreshEnergy();
     cart.clearCart();
     showDialog(
       context: context,

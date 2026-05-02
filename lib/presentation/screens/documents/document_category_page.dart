@@ -25,8 +25,6 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
   final int _limit = 20;
 
   // Theme colors
-  static const Color primaryColor = Color(0xFF2196F3);
-  static const Color successColor = Color(0xFF4CAF50);
   static const Color errorColor = Color(0xFFE53E3E);
   static const Color warningColor = Color(0xFFFF9800);
 
@@ -51,7 +49,6 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
     try {
       final result = await DexoService.getDocumentsByCategory(
         category: widget.category,
-        userId: 'current_user', // Replace with actual user ID
         limit: _limit,
         offset: _currentOffset,
       );
@@ -79,23 +76,6 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
   }
 
   // Upload functionality removed
-
-  void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white, size: 20),
-            const SizedBox(width: 8),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: successColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
-  }
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -393,7 +373,6 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
     try {
       final result = await DexoService.getDocumentContent(
         documentId: document['id'],
-        userId: 'current_user', // Replace with actual user ID
       );
 
       // Close loading dialog

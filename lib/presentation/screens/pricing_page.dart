@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/l10n/app_localizations.dart';
-import '/domain/models/user_model.dart';
-import '/data/services/api_service.dart';
-import '/data/services/auth_service.dart';
 import '/data/services/stripe_service.dart';
-import '/utils/constants.dart';
 import 'package:e_team/data/dtos/user_dto.dart';
 import 'package:provider/provider.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
@@ -21,7 +17,6 @@ class PricingPage extends StatefulWidget {
 }
 
 class _PricingPageState extends State<PricingPage> {
-  final _authService = AuthService();
   bool _isProcessing = false;
   String? _processingPackId;
 
@@ -76,13 +71,14 @@ class _PricingPageState extends State<PricingPage> {
     });
 
     try {
-      final paid = await StripeService.makePayment(
+      final confirm = await StripeService.makePayment(
         packId: offer.packId,
         suggestedAgents: null, // No suggested agents from this flow
       );
       if (!mounted) return;
 
-      if (!paid) {
+      if (confirm == null) {
+        // User cancelled the payment sheet
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.paymentCancelledSnack),
@@ -93,26 +89,9 @@ class _PricingPageState extends State<PricingPage> {
         return;
       }
 
-      final paymentIntentId = StripeService.lastPaymentIntentId;
-      if (paymentIntentId == null) {
-        throw Exception(l10n.paymentMissingIntentId);
-      }
-
-      final token = await _authService.getToken();
-      if (token == null) {
-        throw Exception(l10n.authMustBeLoggedIn);
-      }
-
-      final confirm = await ApiService.post(
-        endpoint: ApiConstants.confirmPayment,
-        body: {'paymentIntentId': paymentIntentId},
-        token: token,
-      );
-
       final rawUser = confirm['data']?['user'] ?? confirm['user'];
       if (rawUser is Map<String, dynamic>) {
         final dto = UserDTO.fromJson(rawUser);
-
         await context.read<UserProvider>().setUser(dto);
       } else {
         await context.read<UserProvider>().refreshFromApi();

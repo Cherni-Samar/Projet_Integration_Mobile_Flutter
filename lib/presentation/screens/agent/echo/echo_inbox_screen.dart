@@ -132,17 +132,6 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
       return false;
     }).toList();
 
-    final urgentCount = _emails
-        .where(
-          (e) =>
-      e.isUrgent &&
-          !e.isRead &&
-          e.sender != 'echo@e-team.com',
-    )
-        .length;
-
-    final pendingCount = _pending.length;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       body: SafeArea(
@@ -499,13 +488,6 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
   }
 
 
-
-  String _getEmptySubMessage() {
-    if (_showOnlyUrgent) {
-      return 'Les nouveaux messages urgents apparaîtront ici';
-    }
-    return 'Les emails reçus apparaîtront ici';
-  }
 
   Widget _buildEmailCard(EmailItem email) {
     final isUnread = !email.isRead && !email.isSpam;

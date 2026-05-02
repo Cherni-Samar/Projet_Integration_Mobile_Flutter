@@ -1,15 +1,12 @@
-import 'package:intl/intl.dart';
 import 'api_config.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
 import '../../domain/models/kash/kash_expense_model.dart';
 import '../../domain/models/kash/kash_budget_model.dart';
 import '../../domain/models/kash/kash_reminder_model.dart';
-import '../../domain/models/kash/kash_staffing_analysis_model.dart';
 import '../dtos/kash/kash_expense_dto.dart';
 import '../dtos/kash/kash_budget_dto.dart';
 import '../dtos/kash/kash_reminder_dto.dart';
-import '../dtos/kash/kash_staffing_analysis_dto.dart';
 
 import '../mappers/kash/kash_mapper.dart';
 class KashService {
@@ -84,45 +81,6 @@ class KashService {
     return list
         .map((e) => KashMapper.toBudget(KashBudgetDTO.fromJson(e)))
         .toList();
-  }
-
-  /// Add or update a budget entry
-  /// POST /api/kash/budget
-  /// Body: { project, amount }
-  static Future<List<dynamic>> setBudget(
-      String project,
-      double amount,
-      ) async {
-    try {
-      final token = await _authService.getToken();
-      if (token == null) throw Exception('No authentication token found');
-
-      if (project.trim().isEmpty) {
-        throw Exception('Project name is required');
-      }
-
-      if (amount < 0) {
-        throw Exception('Amount must be greater than or equal to 0');
-      }
-
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/budget',
-        body: {
-          'project': project.trim(),
-          'amount': amount,
-        },
-        token: token,
-      );
-
-      if (response['success'] != true) {
-        throw Exception(response['message'] ?? 'Failed to set budget');
-      }
-
-      return response['data']['budget'] ?? [];
-    } catch (e) {
-      print('❌ KashService - setBudget error: $e');
-      rethrow;
-    }
   }
 
   /// Create a new budget entry

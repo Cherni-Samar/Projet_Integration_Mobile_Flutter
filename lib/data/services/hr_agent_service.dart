@@ -15,18 +15,26 @@ class HrAgentService {
       String endpoint,
       Map<String, dynamic> body,
       ) async {
+    final token = await AuthService().getToken();
     final response = await http.post(
       Uri.parse('$baseUrl$endpoint'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': token ?? '',
+      },
       body: jsonEncode(body),
     );
     return jsonDecode(response.body);
   }
 
   static Future<Map<String, dynamic>> _deleteRaw(String endpoint) async {
+    final token = await AuthService().getToken();
     final response = await http.delete(
       Uri.parse('$baseUrl$endpoint'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': token ?? '',
+      },
     );
     return jsonDecode(response.body);
   }
@@ -55,18 +63,6 @@ class HrAgentService {
     try {
       final json = await _getRaw('/admin/recent-actions?limit=$limit');
       return HeraActionsResponse.fromJson(json, key: 'recent_actions');
-    } catch (e) {
-      return HeraActionsResponse.error(e.toString());
-    }
-  }
-
-  static Future<HeraActionsResponse> getAllActionsTyped({
-    int page = 1,
-    int limit = 20,
-  }) async {
-    try {
-      final json = await _getRaw('/admin/all-actions?page=$page&limit=$limit');
-      return HeraActionsResponse.fromJson(json, key: 'actions');
     } catch (e) {
       return HeraActionsResponse.error(e.toString());
     }
@@ -125,7 +121,8 @@ class HrAgentService {
     required String employeeEmail,
     String? reason,
   }) {
-    return _postRaw('/leave-urgent', {
+    // Fixed: backend route is /urgent-leave, not /leave-urgent
+    return _postRaw('/urgent-leave', {
       'employee_id': employeeId,
       'employee_email': employeeEmail,
       'reason': reason ?? 'Urgence',
@@ -168,8 +165,10 @@ class HrAgentService {
 
   static Future<bool> requestDexoDoc(String employeeId, String docType) async {
     try {
+      // Fixed: route is /api/hera/request-doc (not /api/dexo/request-doc).
+      // Also removed hardcoded IP — uses ApiConfig.baseUrl via baseUrl getter.
       final response = await ApiService.post(
-        endpoint: 'http://10.0.2.2:3000/api/dexo/request-doc',
+        endpoint: '$baseUrl/request-doc',
         body: {
           'employeeId': employeeId,
           'docType': docType,
@@ -228,8 +227,10 @@ class HrAgentService {
     String? from,
   }) async {
     try {
+      // Fixed: was '/hera/send-to-echo' which produced double /hera in the URL.
+      // Correct backend route is POST /api/hera/send-to-echo.
       final response = await _postRaw(
-        '/hera/send-to-echo', // ⚠️ adapte si besoin
+        '/send-to-echo',
         {
           'subject': subject,
           'content': content,
@@ -274,11 +275,6 @@ class HrAgentService {
       },
     );
 
-    debugPrint('📡 GET $endpoint');
-    debugPrint('🔐 Token: $token');
-    debugPrint('📥 Status: ${response.statusCode}');
-    debugPrint('📥 Body: ${response.body}');
-
     return jsonDecode(response.body);
   }
 
@@ -286,8 +282,9 @@ class HrAgentService {
 
   static Future<Map<String, dynamic>> getOpportunities() async {
     try {
+      // Fixed: removed hardcoded IP, now uses ApiConfig.baseUrl via baseUrl getter.
       final response = await ApiService.get(
-        endpoint: 'http://10.0.2.2:3000/api/hera/admin/opportunities',
+        endpoint: '$baseUrl/admin/opportunities',
       );
       return response;
     } catch (e) {
@@ -297,8 +294,9 @@ class HrAgentService {
 
   static Future<bool> approveProject(String projectId) async {
     try {
+      // Fixed: removed hardcoded IP, now uses ApiConfig.baseUrl via baseUrl getter.
       final response = await ApiService.post(
-        endpoint: 'http://10.0.2.2:3000/api/hera/admin/approve-project',
+        endpoint: '$baseUrl/admin/approve-project',
         body: {'projectId': projectId},
       );
       return response['success'] == true;

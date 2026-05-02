@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:e_team/data/services/echo_service.dart';
+import 'package:e_team/data/services/api_config.dart';
 class ProductMarketingScreen extends StatefulWidget {
   final String? token;
   
@@ -415,7 +416,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
-                'http://10.0.2.2:3000/api/echo/image-proxy?url=${Uri.encodeComponent(images[0])}',
+                '${ApiConfig.baseUrl}/api/echo/image-proxy?url=${Uri.encodeComponent(images[0])}',
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -566,128 +567,6 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
             )),
           ],
         ],
-      ),
-    );
-  }
-
-  Widget _buildFrequencySelector() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: border, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.schedule, color: violet, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'Posting Frequency',
-                style: GoogleFonts.inter(
-                  color: textMain,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildFrequencyOption('daily', 'Every Day', 'Post daily'),
-          const SizedBox(height: 8),
-          _buildFrequencyOption('3days', 'Every 3 Days', 'Recommended', isRecommended: true),
-          const SizedBox(height: 8),
-          _buildFrequencyOption('weekly', 'Every Week', 'Post weekly'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFrequencyOption(String value, String title, String subtitle, {bool isRecommended = false}) {
-    final isSelected = _selectedFrequency == value;
-    
-    return GestureDetector(
-      onTap: () => setState(() => _selectedFrequency = value),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? violet.withOpacity(0.1) : bg,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? violet : border,
-            width: isSelected ? 1.5 : 0.5,
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isSelected ? violet : border,
-                  width: 2,
-                ),
-                color: isSelected ? violet : Colors.transparent,
-              ),
-              child: isSelected
-                  ? const Center(
-                      child: Icon(Icons.check, color: Colors.white, size: 12),
-                    )
-                  : null,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.inter(
-                      color: textMain,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: GoogleFonts.inter(
-                      color: textMuted,
-                      fontSize: 11,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isRecommended)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  'RECOMMENDED',
-                  style: GoogleFonts.inter(
-                    color: Colors.green,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-          ],
-        ),
       ),
     );
   }
@@ -894,7 +773,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    'http://10.0.2.2:3000/api/echo/image-proxy?url=${Uri.encodeComponent(productImage)}',
+                    '${ApiConfig.baseUrl}/api/echo/image-proxy?url=${Uri.encodeComponent(productImage)}',
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,

@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'package:provider/provider.dart';
 
 import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/data/services/agent_service.dart';
 import 'package:e_team/domain/models/user_model.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
 import 'package:e_team/presentation/providers/cart_provider.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/l10n/app_localizations.dart';
-import 'package:e_team/data/services/api_service.dart';
-import 'package:e_team/utils/constants.dart';
 import 'package:e_team/data/services/agent_metadata_service.dart';
 
 import 'agent_details_page.dart';
@@ -75,23 +73,16 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
           _currentUser = savedUser;
           _isLoading = false;
         });
-        context.read<UserProvider>().setUserModel(savedUser);
       } else {
-        final apiUser = await _authService.getMeModel();
         if (!mounted) return;
-        setState(() {
-          _currentUser = apiUser;
-          _isLoading = false;
-        });
-        if (apiUser != null) {
-          context.read<UserProvider>().setUserModel(apiUser);
-        }
+        setState(() => _isLoading = false);
       }
 
-      final fresh = await _authService.getMeModel();
-      if (fresh != null && mounted) {
-        setState(() => _currentUser = fresh);
-        context.read<UserProvider>().setUserModel(fresh);
+      // Single authoritative refresh from API — updates both local state
+      // and UserProvider in one call.
+      await context.read<UserProvider>().refreshFromApi();
+      if (mounted) {
+        setState(() => _currentUser = context.read<UserProvider>().user);
       }
     } catch (e) {
       debugPrint('Error loading user: $e');
@@ -117,29 +108,16 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         throw Exception('You must be logged in');
       }
 
-      final resp = await ApiService.post(
-        endpoint: ApiConstants.hireAgent,
-        body: {'agentId': agentId},
+      final resp = await AgentService.hireAgent(
+        agentId: agentId,
         token: token,
       );
 
       if (resp['success'] == true) {
-        final nextActive = (resp['activeAgents'] is List)
-            ? (resp['activeAgents'] as List).map((e) => e.toString()).toList()
-            : user.activeAgents;
-
-        final nextMax = (resp['maxAgentsAllowed'] is num)
-            ? (resp['maxAgentsAllowed'] as num).toInt()
-            : user.maxAgentsAllowed;
-
-        final updated = user.copyWith(
-          activeAgents: nextActive,
-          maxAgentsAllowed: nextMax,
-        );
-
         if (mounted) {
-          setState(() => _currentUser = updated);
-          context.read<UserProvider>().setUserModel(updated);
+          // Refresh from API to get the authoritative updated user state.
+          await context.read<UserProvider>().refreshFromApi();
+          setState(() => _currentUser = context.read<UserProvider>().user);
         }
       }
     } catch (e) {

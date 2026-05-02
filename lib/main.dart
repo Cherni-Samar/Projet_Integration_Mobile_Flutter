@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
-import 'package:vapi/vapi.dart';
 import 'l10n/app_localizations.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
@@ -14,6 +13,9 @@ import 'presentation/screens/agent/agent_details_page.dart';
 import 'presentation/screens/agent/onboarding_chatbot_screen.dart';
 import 'presentation/screens/agent/onboarding_welcome_screen.dart';
 import 'presentation/screens/cart/cart_page.dart';
+import 'presentation/screens/agent/my_agents_page.dart';
+import 'presentation/screens/settings/terms_and_conditions_screen.dart';
+import 'presentation/screens/settings/privacy_policy_screen.dart';
 import 'presentation/providers/owned_agents_provider.dart';
 import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/locale_provider.dart';
@@ -205,6 +207,10 @@ class MyApp extends StatelessWidget {
               final isOnboardingPayment = args?['isOnboardingPayment'] ?? false;
               return CartPage(isOnboardingPayment: isOnboardingPayment);
             },
+
+            '/my-agents': (_) => const MyAgentsPage(),
+            '/terms': (_) => const TermsAndConditionsScreen(),
+            '/privacy': (_) => const PrivacyPolicyScreen(),
 
           },
 

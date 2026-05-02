@@ -939,7 +939,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
 
       try {
         // 2. Appelle N8N
-        final response = await HrAgentService.hello(username: 'Samar');
+        await HrAgentService.hello(username: 'Samar');
 
         if (!context.mounted) return;
 

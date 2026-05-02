@@ -2,15 +2,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:e_team/presentation/screens/agent/agent_inter_flow_page.dart';
 import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/data/services/api_config.dart';
 
 class AgentInteractionService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api/hera';
+  static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
 
   static Future<Map<String, String>> _headers({String? token}) async {
     final savedToken = token ?? await AuthService().getToken();
-
-    print('🔐 TOKEN ACTIVITY EXISTS => ${savedToken != null && savedToken.isNotEmpty}');
-    print('🔐 TOKEN ACTIVITY VALUE => $savedToken');
 
     if (savedToken == null || savedToken.isEmpty) {
       return {
@@ -18,18 +16,18 @@ class AgentInteractionService {
       };
     }
 
+    // Fixed: backend authMiddleware expects 'x-auth-token', not 'Authorization: Bearer'.
     return {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $savedToken',
+      'x-auth-token': savedToken,
     };
   }
+
   static Future<List<AgentInteraction>> getAgentInteractions({
     String? token,
   }) async {
     try {
       final uri = Uri.parse('$baseUrl/admin/agent-interactions');
-
-      print('📡 Tentative de connexion à : $uri');
 
       final response = await http.get(
         uri,
@@ -40,13 +38,10 @@ class AgentInteractionService {
         final data = json.decode(response.body);
         final List<dynamic> list = data['interactions'] ?? data['logs'] ?? [];
 
-        print('✅ Données reçues : ${list.length} logs trouvés');
-
         return list.map((json) => AgentInteraction.fromJson(json)).toList();
       }
 
       print('❌ Erreur HTTP : ${response.statusCode}');
-      print('❌ Body : ${response.body}');
       return [];
     } catch (e) {
       print('❌ Erreur Service Interaction : $e');
@@ -82,7 +77,6 @@ class AgentInteractionService {
       }
 
       print('⚠️ Stats API Error: ${response.statusCode}');
-      print('⚠️ Stats Body: ${response.body}');
 
       return {
         'total': 0,

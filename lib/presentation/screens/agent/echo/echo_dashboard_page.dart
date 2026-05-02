@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:e_team/data/services/echo_service.dart';
+import 'package:e_team/data/services/api_config.dart';
 import 'package:e_team/domain/models/echo_models.dart';
 import 'echo_email_detail_screen.dart';
 import 'product_marketing_screen.dart';
@@ -63,10 +64,6 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
 
   // Document management
   final TextEditingController _documentController = TextEditingController();
-  DocumentClassification? _currentClassification;
-  bool _isClassifying = false;
-  bool _isSaving = false;
-
   // Cyber animations - SUPPRIMÉES pour stabilité
   Timer? _refreshTimer;
 
@@ -360,17 +357,6 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
     );
   }
 
-  Widget _buildStaticOnlineIndicator() {
-    return Container(
-      width: 6,
-      height: 6,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: EchoTheme.neon,
-      ),
-    );
-  }
-
   Widget _buildStaticStatusBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -559,159 +545,6 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
       ),
     );
   }
-  Widget _buildEchoMissionCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF7C3AED),
-            Color(0xFFA855F7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF7C3AED).withOpacity(0.18),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.18),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.white.withOpacity(0.25)),
-            ),
-            child: const Icon(
-              Icons.campaign_rounded,
-              color: Colors.white,
-              size: 30,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Communication layer online',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Echo handles urgent messages, spam filtering, recruitment alerts and social media publishing.',
-                  style: GoogleFonts.inter(
-                    color: Colors.white.withOpacity(0.84),
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w500,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  Widget _buildCleanStats() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            'MESSAGES\nPROCESSED',
-            '${_stats?['totalProcessed'] ?? 0}',
-            Icons.analytics_outlined,
-            EchoTheme.violet,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            'SPAM\nBLOCKED',
-            '${_stats?['spamBlocked'] ?? 0}',
-            Icons.shield_outlined,
-            Colors.redAccent,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: EchoTheme.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: EchoTheme.border, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: EchoTheme.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(height: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: GoogleFonts.inter(
-                  color: EchoTheme.textMain,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                title,
-                style: GoogleFonts.inter(
-                  color: EchoTheme.textMuted,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.2,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-
-
-
   Widget _buildRecentActivityCards() {
     if (_loadingEmails) {
       return const Center(
@@ -926,55 +759,6 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
   Widget _buildEmailControls() {
     return const SizedBox.shrink();
   }
-  Widget _buildFilterChip(String label, int count, bool isActive, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isActive ? color.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isActive ? color : EchoTheme.border,
-            width: 0.5,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                color: isActive ? color : EchoTheme.textMuted,
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
-            ),
-            if (count > 0) ...[
-              const SizedBox(width: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  count.toString(),
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildEmailSubTabs() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -1152,45 +936,6 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
 
 
 
-
-  // Helper methods pour le pipeline
-  String _extractDepartmentFromSubject(String subject) {
-    final lowerSubject = subject.toLowerCase();
-    if (lowerSubject.contains('tech') || lowerSubject.contains('développeur') || lowerSubject.contains('developer')) {
-      return 'Tech';
-    } else if (lowerSubject.contains('design') || lowerSubject.contains('ui') || lowerSubject.contains('ux')) {
-      return 'Design';
-    } else if (lowerSubject.contains('marketing') || lowerSubject.contains('commercial')) {
-      return 'Marketing';
-    } else if (lowerSubject.contains('rh') || lowerSubject.contains('recrutement') || lowerSubject.contains('hr')) {
-      return 'RH';
-    } else if (lowerSubject.contains('finance') || lowerSubject.contains('comptable')) {
-      return 'Finance';
-    }
-    return 'General';
-  }
-
-  Color _getDepartmentColor(String department) {
-    switch (department) {
-      case 'Tech': return Colors.blue;
-      case 'Design': return Colors.purple;
-      case 'Marketing': return Colors.orange;
-      case 'RH': return Colors.green;
-      case 'Finance': return Colors.teal;
-      default: return EchoTheme.violet;
-    }
-  }
-
-  IconData _getDepartmentIcon(String department) {
-    switch (department) {
-      case 'Tech': return Icons.code_outlined;
-      case 'Design': return Icons.palette_outlined;
-      case 'Marketing': return Icons.campaign_outlined;
-      case 'RH': return Icons.people_outline;
-      case 'Finance': return Icons.account_balance_outlined;
-      default: return Icons.work_outline;
-    }
-  }
 
   // 6. TASKS TAB - ANCIEN CODE SUPPRIMÉ
 
@@ -1557,8 +1302,7 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
     }
 
     // Construct full image URL
-    const String baseUrl = 'http://10.0.2.2:3000'; // Android emulator
-    final String imageUrl = '$baseUrl${post.image!.url}';
+    final String imageUrl = '${ApiConfig.baseUrl}${post.image!.url}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1761,27 +1505,4 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
     return colors[sender.length % colors.length];
   }
 
-  Color _getCategoryColor(String category) {
-    switch (category) {
-      case 'Commercial': return Colors.blueAccent;
-      case 'Finance': return EchoTheme.neon;
-      case 'Juridique': return Colors.redAccent;
-      case 'Marketing': return Colors.orangeAccent;
-      case 'RH': return EchoTheme.violet;
-      case 'Technique': return Colors.tealAccent;
-      default: return EchoTheme.textMuted;
-    }
-  }
-
-  IconData _getCategoryIcon(String category) {
-    switch (category) {
-      case 'Commercial': return Icons.business;
-      case 'Finance': return Icons.account_balance;
-      case 'Juridique': return Icons.gavel;
-      case 'Marketing': return Icons.campaign;
-      case 'RH': return Icons.people;
-      case 'Technique': return Icons.engineering;
-      default: return Icons.folder;
-    }
-  }
 }

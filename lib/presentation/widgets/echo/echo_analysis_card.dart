@@ -1,4 +1,4 @@
-// screens/agent/echo/echo_analysis_card.dart
+// presentation/widgets/echo/echo_analysis_card.dart
 import 'package:flutter/material.dart';
 import 'package:e_team/data/dtos/echo_dto.dart';
 class EchoAnalysisCard extends StatelessWidget {

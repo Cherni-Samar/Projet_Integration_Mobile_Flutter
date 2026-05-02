@@ -6,16 +6,17 @@ import '/utils/constants.dart';
 
 class StripeService {
   static final AuthService _authService = AuthService();
-  static String? _lastPaymentIntentId;
 
-  static String? get lastPaymentIntentId => _lastPaymentIntentId;
-
-  /// Creates a PaymentIntent on the backend and presents the Stripe PaymentSheet.
+  /// Creates a PaymentIntent, presents the Stripe PaymentSheet, and confirms
+  /// the payment with the backend in a single call.
+  ///
+  /// Returns the backend confirmation response map on success.
+  /// Returns null if the user cancelled.
+  /// Throws on any other error.
+  ///
   /// [packId] is a server-defined identifier (e.g. energy_eco, energy_boost, basic_plan).
   /// [suggestedAgents] is an optional list of agent names to auto-hire after payment.
-  /// Returns true on success, false on cancel.
-  /// Throws on error.
-  static Future<bool> makePayment({
+  static Future<Map<String, dynamic>?> makePayment({
     required String packId,
     List<String>? suggestedAgents,
   }) async {
@@ -25,6 +26,7 @@ class StripeService {
       throw Exception('You must be logged in to make a payment');
     }
 
+    // 2. Create PaymentIntent on the backend
     final response = await ApiService.post(
       endpoint: ApiConstants.createPaymentIntent,
       body: {
@@ -45,8 +47,6 @@ class StripeService {
       throw Exception('Missing paymentIntentId from backend response');
     }
 
-    _lastPaymentIntentId = paymentIntentId.toString();
-
     // 3. Initialize the PaymentSheet
     await Stripe.instance.initPaymentSheet(
       paymentSheetParameters: SetupPaymentSheetParameters(
@@ -59,21 +59,20 @@ class StripeService {
     // 4. Present the PaymentSheet
     try {
       await Stripe.instance.presentPaymentSheet();
-
-      // 5. ✅ Confirm on backend to actually credit energy/credits
-      final confirmRes = await ApiService.post(
-        endpoint: ApiConstants.confirmPayment,
-        body: {'paymentIntentId': paymentIntentId.toString()},
-        token: token,
-      );
-
-      return confirmRes['success'] == true;
     } on StripeException catch (e) {
       if (e.error.code == FailureCode.Canceled) {
-        _lastPaymentIntentId = null;
-        return false; // User cancelled
+        return null; // User cancelled — caller checks for null
       }
       rethrow;
     }
+
+    // 5. Confirm payment with backend and return the full response
+    final confirmRes = await ApiService.post(
+      endpoint: ApiConstants.confirmPayment,
+      body: {'paymentIntentId': paymentIntentId.toString()},
+      token: token,
+    );
+
+    return confirmRes;
   }
 }

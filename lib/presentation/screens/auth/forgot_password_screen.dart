@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '/l10n/app_localizations.dart';
+import '/data/services/auth_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -13,6 +14,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  final _authService = AuthService();
   bool _isLoading = false;
   bool _emailSent = false;
   bool _isEmailFocused = false;
@@ -38,11 +40,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   Future<void> _handleResetPassword() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      await Future.delayed(const Duration(seconds: 2));
-      setState(() {
-        _isLoading = false;
-        _emailSent = true;
-      });
+      try {
+        await _authService.forgotPassword(_emailController.text.trim());
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _emailSent = true;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.toString().replaceAll('Exception: ', '')),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
     }
   }
 

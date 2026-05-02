@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'api_config.dart'; // Assure-toi d'importer ton URL de base
+import 'api_config.dart';
 
 class TimoService {
-  static const String baseUrl = "http://10.0.2.2:3000/api/hera"; // URL Android Emulator
+  static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
 
   // ── LIRE L'INBOX ──
   static Future<Map<String, dynamic>> getTimoInbox() async {

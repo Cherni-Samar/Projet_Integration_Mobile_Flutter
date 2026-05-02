@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'api_service.dart';
+import 'api_config.dart';
 
 class AgentService {
-  static const String _baseUrl = 'http://10.0.2.2:3000';
+  static String get _baseUrl => ApiConfig.baseUrl;
 
   // ═══════════════════════════════════════════════════════════════
   // 🤖 AGENT MANAGEMENT METHODS
@@ -25,128 +25,15 @@ class AgentService {
     }
   }
 
-  static Future<AgentResponse> getAgent({
+  static Future<Map<String, dynamic>> hireAgent({
     required String agentId,
-    String? token,
+    required String token,
   }) async {
-    try {
-      final response = await ApiService.get(
-        endpoint: '$_baseUrl/api/agents/$agentId',
-        token: token,
-      );
-      return AgentResponse.fromJson(response);
-    } catch (e) {
-      print('❌ AgentService - getAgent error: $e');
-      return AgentResponse.error(e.toString());
-    }
-  }
-
-  static Future<Map<String, dynamic>> updateAgentEnergy({
-    required String agentId,
-    required int energy,
-    String? token,
-  }) async {
-    try {
-      final response = await ApiService.put(
-        endpoint: '$_baseUrl/api/agents/$agentId/energy',
-        body: {'energy': energy},
-        token: token,
-      );
-      return response;
-    } catch (e) {
-      print('❌ AgentService - updateAgentEnergy error: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
-
-  static Future<Map<String, dynamic>> distributeEnergy({
-    required List<EnergyDistribution> distributions,
-    String? token,
-  }) async {
-    try {
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/agents/distribute-energy',
-        body: {
-          'distributions': distributions.map((d) => d.toJson()).toList(),
-        },
-        token: token,
-      );
-      return response;
-    } catch (e) {
-      print('❌ AgentService - distributeEnergy error: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
-
-  static Future<Map<String, dynamic>> initializeAgents({String? token}) async {
-    try {
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/agents/initialize',
-        body: {},
-        token: token,
-      );
-      return response;
-    } catch (e) {
-      print('❌ AgentService - initializeAgents error: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // 💰 ENERGY PURCHASE & MANAGEMENT METHODS
-  // ═══════════════════════════════════════════════════════════════
-
-  static Future<Map<String, dynamic>> buyEnergy({
-    required int amount,
-    String paymentMethod = 'stripe',
-    String? token,
-  }) async {
-    try {
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/agents/buy-energy',
-        body: {
-          'amount': amount,
-          'paymentMethod': paymentMethod,
-        },
-        token: token,
-      );
-      return response;
-    } catch (e) {
-      print('❌ AgentService - buyEnergy error: $e');
-      return {'success': false, 'error': e.toString()};
-    }
-  }
-
-  static Future<EnergyBalanceResponse> getEnergyBalance({String? token}) async {
-    try {
-      final response = await ApiService.get(
-        endpoint: '$_baseUrl/api/agents/energy/balance',
-        token: token,
-      );
-      return EnergyBalanceResponse.fromJson(response);
-    } catch (e) {
-      print('❌ AgentService - getEnergyBalance error: $e');
-      return EnergyBalanceResponse.error(e.toString());
-    }
-  }
-
-  static Future<Map<String, dynamic>> powerAgents({
-    required List<EnergyDistribution> distributions,
-    String? token,
-  }) async {
-    try {
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/agents/power-agents',
-        body: {
-          'distributions': distributions.map((d) => d.toJson()).toList(),
-        },
-        token: token,
-      );
-      return response;
-    } catch (e) {
-      print('❌ AgentService - powerAgents error: $e');
-      return {'success': false, 'error': e.toString()};
-    }
+    return ApiService.post(
+      endpoint: '$_baseUrl/api/agents/hire',
+      body: {'agentId': agentId},
+      token: token,
+    );
   }
 }
 
@@ -242,23 +129,6 @@ class AgentStats {
   }
 }
 
-class EnergyDistribution {
-  final String agentId;
-  final int energy;
-
-  EnergyDistribution({
-    required this.agentId,
-    required this.energy,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'agentId': agentId,
-      'energy': energy,
-    };
-  }
-}
-
 class AgentsResponse {
   final bool success;
   final List<Agent> agents;
@@ -297,90 +167,6 @@ class AgentsResponse {
       agents: [],
       totalEnergy: 0,
       agentCount: 0,
-      error: message,
-    );
-  }
-}
-
-class AgentResponse {
-  final bool success;
-  final Agent? agent;
-  final String? error;
-
-  AgentResponse({
-    required this.success,
-    this.agent,
-    this.error,
-  });
-
-  factory AgentResponse.fromJson(Map<String, dynamic> json) {
-    return AgentResponse(
-      success: json['success'] ?? false,
-      agent: json['data'] != null ? Agent.fromJson(json['data']) : null,
-      error: null,
-    );
-  }
-
-  factory AgentResponse.error(String message) {
-    return AgentResponse(
-      success: false,
-      agent: null,
-      error: message,
-    );
-  }
-}
-
-class EnergyBalanceResponse {
-  final bool success;
-  final int userEnergyBalance;
-  final int totalEnergyPurchased;
-  final int totalAgentEnergy;
-  final int availableEnergy;
-  final DateTime? lastEnergyPurchase;
-  final List<Agent> agents;
-  final String? error;
-
-  EnergyBalanceResponse({
-    required this.success,
-    required this.userEnergyBalance,
-    required this.totalEnergyPurchased,
-    required this.totalAgentEnergy,
-    required this.availableEnergy,
-    this.lastEnergyPurchase,
-    required this.agents,
-    this.error,
-  });
-
-  factory EnergyBalanceResponse.fromJson(Map<String, dynamic> json) {
-    final agentsList = <Agent>[];
-    if (json['data'] != null && json['data']['agents'] != null) {
-      for (var item in json['data']['agents']) {
-        agentsList.add(Agent.fromJson(item));
-      }
-    }
-
-    return EnergyBalanceResponse(
-      success: json['success'] ?? false,
-      userEnergyBalance: json['data']?['userEnergyBalance'] ?? 0,
-      totalEnergyPurchased: json['data']?['totalEnergyPurchased'] ?? 0,
-      totalAgentEnergy: json['data']?['totalAgentEnergy'] ?? 0,
-      availableEnergy: json['data']?['availableEnergy'] ?? 0,
-      lastEnergyPurchase: json['data']?['lastEnergyPurchase'] != null
-          ? DateTime.tryParse(json['data']['lastEnergyPurchase'])
-          : null,
-      agents: agentsList,
-      error: null,
-    );
-  }
-
-  factory EnergyBalanceResponse.error(String message) {
-    return EnergyBalanceResponse(
-      success: false,
-      userEnergyBalance: 0,
-      totalEnergyPurchased: 0,
-      totalAgentEnergy: 0,
-      availableEnergy: 0,
-      agents: [],
       error: message,
     );
   }

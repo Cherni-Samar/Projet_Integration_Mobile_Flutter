@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
-import 'package:e_team/data/services/api_config.dart';
+import 'package:e_team/data/services/dexo_service.dart';
 import '../../providers/cart_provider.dart';
 import 'package:e_team/data/services/payment_plan_metadata_service.dart';
 
@@ -200,21 +198,9 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
   }
 
   Future<StrategicAdviceResult> _requestStrategicAdvice() async {
-    final uri = Uri.parse('${ApiConfig.baseUrl}/api/dexo/strategic-advice');
-
-    final response = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'messages': _aiMessages,
-      }),
-    );
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('HTTP ${response.statusCode}: ${response.body}');
-    }
-
-    final decoded = jsonDecode(response.body);
+    final decoded = await DexoService.getStrategicAdvice({
+      'messages': _aiMessages,
+    });
 
     if (decoded['success'] != true) {
       throw Exception(decoded['error'] ?? decoded['message'] ?? 'AI failed');
@@ -225,25 +211,13 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
   Future<void> _activateOrganizationVision(WorkforcePlan plan) async {
     try {
-      final uri = Uri.parse('${ApiConfig.baseUrl}/api/dexo/save-vision');
-
-      final response = await http.post(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': widget.email,
-          'vision': _vision,
-          'workforceSettings': plan.toApiList(),
-          'recommendedAgents':
-          plan.recommendedAgents.map((agent) => agent.toJson()).toList(),
-        }),
-      );
-
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception('HTTP ${response.statusCode}: ${response.body}');
-      }
-
-      final decoded = jsonDecode(response.body);
+      final decoded = await DexoService.saveVision({
+        'email': widget.email,
+        'vision': _vision,
+        'workforceSettings': plan.toApiList(),
+        'recommendedAgents':
+            plan.recommendedAgents.map((agent) => agent.toJson()).toList(),
+      });
 
       if (decoded['success'] != true) {
         throw Exception(decoded['error'] ?? decoded['message'] ?? 'Save failed');

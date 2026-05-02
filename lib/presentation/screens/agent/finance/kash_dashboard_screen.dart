@@ -40,11 +40,9 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
   double _totalSpent = 0.0;
   double _totalBudget = 0.0;
   int _pendingReminders = 0;
-  double _expensesThisMonth = 0.0;
   bool _loadingExpenses = false;
   bool _loadingBudgets = false;
   bool _loadingReminders = false;
-  String _errorMessage = '';
   int _selectedTab = 0; // 0 = Overview, 1 = Expenses, 2 = Budgets, 3 = Reminders
 
   late AnimationController _fadeController;
@@ -86,9 +84,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
 
   Future<void> _loadDashboardData() async {
     try {
-      setState(() {
-        _errorMessage = '';
-      });
+      setState(() {});
 
       await Future.wait([
         _loadExpenses(),
@@ -101,12 +97,10 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       // Update energy balance on refresh
       if (mounted) {
         final userProvider = Provider.of<UserProvider>(context, listen: false);
-        await userProvider.refreshUser();
+        await userProvider.refreshFromApi();
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = 'Error loading dashboard: $e';
-      });
+      setState(() {});
     }
   }
 
@@ -149,26 +143,6 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       print('Error loading reminders: $e');
     } finally {
       setState(() => _loadingReminders = false);
-    }
-  }
-  dynamic _readExpenseValue(dynamic expense, String key) {
-    if (expense is Map) {
-      return expense[key];
-    }
-
-    switch (key) {
-      case 'vendor':
-        return expense.vendor;
-      case 'amount':
-        return expense.amount;
-      case 'currency':
-        return expense.currency;
-      case 'category':
-        return expense.category;
-      case 'date':
-        return expense.date;
-      default:
-        return null;
     }
   }
   dynamic _readValue(dynamic item, String key) {
@@ -234,18 +208,6 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       _pendingReminders = _reminders
           .where((r) => _readValue(r, 'status') == 'pending')
           .length;
-
-      _expensesThisMonth = 0.0;
-      final now = DateTime.now();
-
-      for (final expense in _expenses) {
-        final date = _safeDate(_readValue(expense, 'date'));
-        if (date.year == now.year && date.month == now.month) {
-          final amount =
-              (_readValue(expense, 'amount') as num?)?.toDouble() ?? 0.0;
-          _expensesThisMonth += amount;
-        }
-      }
     });
   }
   /// Get combined list of categories: budget categories first, then standard categories
@@ -279,7 +241,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
         await _loadDashboardData();
 
         final userProvider = Provider.of<UserProvider>(context, listen: false);
-        await userProvider.refreshUser();
+        await userProvider.refreshFromApi();
       }
     } catch (e) {
       if (mounted) {
@@ -293,7 +255,6 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     }
   }
   void _showAddBudgetSheet() {
-    final categoryController = TextEditingController();
     final amountController = TextEditingController();
     String selectedCurrency = 'TND';
     String selectedCategory = 'Marketing';
@@ -489,7 +450,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                         await _loadDashboardData();
 
                         final userProvider = Provider.of<UserProvider>(this.context, listen: false);
-                        await userProvider.refreshUser();
+                        await userProvider.refreshFromApi();
 
                         // Show success message using captured messenger
                         messenger.showSnackBar(
@@ -685,7 +646,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                         
                         // Update energy balance after reminder is created
                         final userProvider = Provider.of<UserProvider>(this.context, listen: false);
-                        await userProvider.refreshUser();
+                        await userProvider.refreshFromApi();
                         
                         messenger.showSnackBar(
                           const SnackBar(
@@ -887,7 +848,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                         
                         // Update energy balance after expense is added
                         final userProvider = Provider.of<UserProvider>(this.context, listen: false);
-                        await userProvider.refreshUser();
+                        await userProvider.refreshFromApi();
                         
                         messenger.showSnackBar(
                           const SnackBar(

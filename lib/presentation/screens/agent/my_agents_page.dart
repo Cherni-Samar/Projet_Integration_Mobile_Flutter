@@ -24,9 +24,11 @@ class MyAgentsPage extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
 
-    // Sync owned agents with active agents from backend
+    // Sync owned agents list from backend activeAgents (synchronous, no HTTP).
+    // Then refresh energy values from the API once per page visit.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       owned.syncFromActiveAgents(activeAgents);
+      owned.refreshEnergy();
     });
 
     return Scaffold(
@@ -692,7 +694,7 @@ class MyAgentsPage extends StatelessWidget {
       );
       if (!rootContext.mounted) return;
 
-      if (success) {
+      if (success != null) {
         if (!rootContext.mounted) return;
 
         ScaffoldMessenger.of(rootContext).showSnackBar(

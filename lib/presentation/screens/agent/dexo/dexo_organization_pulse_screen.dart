@@ -5,10 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../../../providers/user_provider.dart';
-import '../../../../data/services/auth_service.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../../../../data/services/api_config.dart';
+import '../../../../data/services/dexo_service.dart';
 class DexoOrganizationPulseScreen extends StatefulWidget {
   const DexoOrganizationPulseScreen({super.key});
 
@@ -19,8 +16,6 @@ class DexoOrganizationPulseScreen extends StatefulWidget {
 
 class _DexoOrganizationPulseScreenState
     extends State<DexoOrganizationPulseScreen> {
-  final AuthService _authService = AuthService();
-
   bool _isLoading = true;
   bool _isSaving = false;
   Timer? _debounce;
@@ -97,33 +92,18 @@ class _DexoOrganizationPulseScreenState
     setState(() => _isSaving = true);
 
     try {
-      final token = await _authService.getToken();
+      final response = await DexoService.updateWorkforceSettings({
+        'workforceSettings': _departments.map((d) {
+          return {
+            'department': d.name,
+            'targetCount': d.targetCount,
+            'currentCount': d.currentCount,
+          };
+        }).toList(),
+      });
 
-      if (token == null) {
-        throw Exception('Token missing');
-      }
-
-      final uri = Uri.parse('${ApiConfig.baseUrl}/api/dexo/workforce-settings');
-
-      final response = await http.patch(
-        uri,
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': token,
-        },
-        body: jsonEncode({
-          'workforceSettings': _departments.map((d) {
-            return {
-              'department': d.name,
-              'targetCount': d.targetCount,
-              'currentCount': d.currentCount,
-            };
-          }).toList(),
-        }),
-      );
-
-      if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw Exception(response.body);
+      if (response['success'] != true) {
+        throw Exception(response['error'] ?? 'Save failed');
       }
 
       await context.read<UserProvider>().refreshFromApi();

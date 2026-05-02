@@ -329,7 +329,6 @@ class NeuralFluidPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
 
     // Cellules organiques flottantes
-    final random = math.Random(42);
     for (var i = 0; i < 20; i++) {
       final angle = (i / 20) * math.pi * 2 + time * math.pi;
       final distance = 100 + math.sin(time * math.pi * 2 + i) * 50;

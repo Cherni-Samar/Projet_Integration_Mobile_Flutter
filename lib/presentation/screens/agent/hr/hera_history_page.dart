@@ -71,7 +71,10 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
 
         setState(() {
           _actions.addAll(filtered);
-          _hasMore = _page < (result['total_pages'] ?? 1);
+          // Backward-compatible: new backend returns pagination.pages,
+          // old shape returned total_pages at the top level.
+          final totalPages = result['pagination']?['pages'] ?? result['total_pages'] ?? 1;
+          _hasMore = _page < totalPages;
           _loading = false;
           _loadingMore = false;
         });
