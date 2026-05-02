@@ -92,13 +92,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     setState(() => _isLoading = true);
 
     try {
-      print('🔵 Vérification du code...');
-      print('📧 Email: $_email');
-      print('🔢 Code: $code');
-
       final success = await _authService.verifyEmail(_email!, code);
-
-      print('✅ Résultat: $success');
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -122,8 +116,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
       }
     } catch (e) {
-      print('❌ Erreur: $e');
-
       if (mounted) {
         String errorMessage = e.toString();
 
@@ -168,8 +160,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     setState(() => _isResending = true);
 
     try {
-      print('🔵 Renvoi du code...');
-
       final success = await _authService.resendVerificationCode(_email!);
 
       if (success && mounted) {
@@ -189,8 +179,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         _startTimer();
       }
     } catch (e) {
-      print('❌ Erreur: $e');
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:e_team/data/services/echo_service.dart';
-import 'package:e_team/data/services/api_config.dart';
+import 'package:e_team/core/config/api_config.dart';
 import 'package:e_team/domain/models/echo_models.dart';
 import 'echo_email_detail_screen.dart';
 import 'product_marketing_screen.dart';

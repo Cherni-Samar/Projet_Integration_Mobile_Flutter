@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
-import '/utils/constants.dart';
+import 'package:e_team/core/utils/constants.dart';
 
 class StripeService {
   static final AuthService _authService = AuthService();

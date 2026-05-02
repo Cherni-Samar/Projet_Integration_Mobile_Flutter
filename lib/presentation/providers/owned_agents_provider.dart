@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:e_team/domain/models/owned_agent.dart';
 import '/data/services/agent_metadata_service.dart';
-import '/data/services/api_config.dart';
+import '/data/services/agent_service.dart';
 
 export 'package:e_team/domain/models/owned_agent.dart';
 
@@ -82,38 +80,13 @@ class OwnedAgentsProvider extends ChangeNotifier {
       if (newEnergy != null && agent.energy != newEnergy) {
         agent.energy = newEnergy;
         hasChanges = true;
-      }
-    }
-
-    if (hasChanges) {
-      notifyListeners();
-    }
-  }
-
-  /// Fetches agent energy values from /api/agents.
-  /// Returns a map of normalised agent name → energy.
-  /// Falls back to [AgentMetadataService] defaults on any error.
+  /// Delegates to [AgentService.fetchAgentEnergies].
+  /// Falls back to [AgentMetadataService] defaults if the service returns empty.
   Future<Map<String, int>> _fetchAgentEnergies() async {
-    try {
-      final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/api/agents'),
-        headers: {'Content-Type': 'application/json'},
-      );
+    final result = await AgentService.fetchAgentEnergies();
+    if (result.isNotEmpty) return result;
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body) as Map<String, dynamic>;
-        if (jsonData['success'] == true && jsonData['data'] != null) {
-          final agentsData = jsonData['data']['agents'] as List<dynamic>;
-          return {
-            for (final a in agentsData)
-              (a['name'] as String).toLowerCase(): a['energy'] as int,
-          };
-        }
-      }
-    } catch (_) {
-      // Network failure — fall through to defaults.
-    }
-
+    // Fallback to static defaults when network is unavailable.
     return {
       'dexo': AgentMetadataService.getDefaultEnergyForAgent('dexo'),
       'echo': AgentMetadataService.getDefaultEnergyForAgent('echo'),

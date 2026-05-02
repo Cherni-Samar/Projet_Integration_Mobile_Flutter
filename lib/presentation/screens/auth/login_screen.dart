@@ -64,10 +64,6 @@ class _LoginScreenState extends State<LoginScreen>
     setState(() => _isLoading = true);
 
     try {
-      print('🔵 Tentative de connexion...');
-      print('📧 Email: ${_emailController.text}');
-      print('💾 Remember Me: $_rememberMe');
-
       final UserDTO? user = await _authService.login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
@@ -80,8 +76,6 @@ class _LoginScreenState extends State<LoginScreen>
       } else {
         await _authService.clearSavedCredentials();
       }
-      print('✅ User: $user');
-
       if (user != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -104,8 +98,6 @@ class _LoginScreenState extends State<LoginScreen>
         }
       }
     } catch (e) {
-      print('❌ Erreur: $e');
-
       if (mounted) {
         String errorMessage = e.toString();
 

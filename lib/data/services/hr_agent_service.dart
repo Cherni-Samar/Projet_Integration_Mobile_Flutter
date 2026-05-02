@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import 'package:e_team/data/services/api_config.dart';
+import 'package:e_team/core/config/api_config.dart';
 import 'package:e_team/data/services/api_service.dart';
 import 'package:e_team/data/dtos/hera_dto.dart';
 import 'package:flutter/material.dart';

@@ -1,6 +1,6 @@
 import 'package:e_team/data/dtos/echo_dto.dart';
 import 'package:e_team/data/services/api_service.dart';
-import 'package:e_team/data/services/api_config.dart';
+import 'package:e_team/core/config/api_config.dart';
 
 class EchoService {
   static String get _baseUrl => ApiConfig.baseUrl;

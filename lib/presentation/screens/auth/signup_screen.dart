@@ -51,17 +51,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      print('🔵 Tentative d\'inscription...');
-      print('📧 Email: ${_emailController.text}');
-      print('👤 Name: ${_nameController.text}');
-
       final result = await _authService.signup(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         name: _nameController.text.trim(),
       );
-
-      print('✅ Réponse: $result');
 
       if (result['success'] == true && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -80,8 +74,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         );
       }
     } catch (e) {
-      print('❌ Erreur: $e');
-
       if (mounted) {
         String errorMessage = e.toString();
 

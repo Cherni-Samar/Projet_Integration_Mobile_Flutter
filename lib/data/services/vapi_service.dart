@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:vapi/vapi.dart';
+import 'package:e_team/core/config/app_secrets.dart';
 
 enum HeraVoiceStatus { idle, connecting, listening, speaking, ended, error }
 
 class VapiService extends ChangeNotifier {
-  static const String publicKey = '6c5ea938-c1c0-4a59-826e-143cbaa8de53';
-  static const String assistantId = '7c6ac6cf-c5b1-45a8-9b7b-9655735e78f4';
+  static String get _publicKey => AppSecrets.vapiPublicKey;
+  static String get _assistantId => AppSecrets.vapiAssistantId;
 
   late final VapiClient _client;
   VapiCall? _call;
@@ -35,7 +36,7 @@ class VapiService extends ChangeNotifier {
   Future<void> init() async {
     if (_initialized) return;
 
-    _client = VapiClient(publicKey);
+    _client = VapiClient(_publicKey);
     _initialized = true;
     notifyListeners();
   }
@@ -50,7 +51,7 @@ class VapiService extends ChangeNotifier {
       _errorMessage = '';
       notifyListeners();
 
-      _call = await _client.start(assistantId: assistantId);
+      _call = await _client.start(assistantId: _assistantId);
 
       await _eventSubscription?.cancel();
       _eventSubscription = _call!.onEvent.listen(_handleEvent);

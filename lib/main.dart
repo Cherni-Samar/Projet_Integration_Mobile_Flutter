@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
+import 'package:e_team/core/config/app_secrets.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'presentation/screens/auth/login_screen.dart';
 import 'presentation/screens/auth/signup_screen.dart';
@@ -28,8 +29,7 @@ void main() {
 
   // 💳 Initialize Stripe — replace with your publishable key from
   // https://dashboard.stripe.com/test/apikeys
-  Stripe.publishableKey =
-      'pk_test_51RIdV7QLtPq7s5k7xiLNgDPFR81G2fA4H8JxNWEK9Adrlm29M0FfWbBytw6astsugguURilr6OYtxzis36aTPhKc00b5eVc6Cm';
+  Stripe.publishableKey = AppSecrets.stripePublishableKey;
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

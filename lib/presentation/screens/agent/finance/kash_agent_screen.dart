@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import '../../../providers/user_provider.dart';
 import '/data/services/api_service.dart';
 import '/data/services/auth_service.dart';
-import '/utils/constants.dart';
+import 'package:e_team/core/utils/constants.dart';
 
 class KashAgentScreen extends StatefulWidget {
   const KashAgentScreen({super.key});

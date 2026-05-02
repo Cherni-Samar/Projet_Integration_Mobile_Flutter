@@ -1,6 +1,5 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'api_config.dart';
+import 'package:e_team/core/config/api_config.dart';
+import 'api_service.dart';
 import 'auth_service.dart';
 
 class DexoService {
@@ -23,24 +22,14 @@ class DexoService {
         'limit': limit.toString(),
         'offset': offset.toString(),
       };
+      if (userId != null) queryParams['userId'] = userId;
 
-      if (userId != null) {
-        queryParams['userId'] = userId;
-      }
-
-      final uri = Uri.parse('$baseUrl/documents-by-category')
-          .replace(queryParameters: queryParams);
       final token = await AuthService().getToken();
-      final response = await http.get(uri, headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': token ?? '',
-      });
+      final uri = Uri.parse('$baseUrl/documents-by-category')
+          .replace(queryParameters: queryParams)
+          .toString();
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Erreur récupération documents: ${response.statusCode}');
-      }
+      return await ApiService.get(endpoint: uri, token: token);
     } catch (e) {
       throw Exception('Erreur récupération documents par catégorie: $e');
     }
@@ -53,24 +42,14 @@ class DexoService {
   }) async {
     try {
       final queryParams = <String, String>{};
+      if (userId != null) queryParams['userId'] = userId;
 
-      if (userId != null) {
-        queryParams['userId'] = userId;
-      }
-
-      final uri = Uri.parse('$baseUrl/document-content/$documentId')
-          .replace(queryParameters: queryParams);
       final token = await AuthService().getToken();
-      final response = await http.get(uri, headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': token ?? '',
-      });
+      final uri = Uri.parse('$baseUrl/document-content/$documentId')
+          .replace(queryParameters: queryParams)
+          .toString();
 
-      if (response.statusCode == 200) {
-        return jsonDecode(response.body);
-      } else {
-        throw Exception('Erreur récupération contenu: ${response.statusCode}');
-      }
+      return await ApiService.get(endpoint: uri, token: token);
     } catch (e) {
       throw Exception('Erreur récupération contenu document: $e');
     }
@@ -80,37 +59,29 @@ class DexoService {
   static Future<Map<String, dynamic>> updateWorkforceSettings(
       Map<String, dynamic> data) async {
     final token = await AuthService().getToken();
-    final response = await http.patch(
-      Uri.parse('${ApiConfig.baseUrl}/api/dexo/workforce-settings'),
-      headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': token ?? '',
-      },
-      body: jsonEncode(data),
+    return ApiService.patch(
+      endpoint: '${ApiConfig.baseUrl}/api/dexo/workforce-settings',
+      body: data,
+      token: token,
     );
-    return jsonDecode(response.body);
   }
 
   // Obtenir des conseils stratégiques via l'IA Dexo
   static Future<Map<String, dynamic>> getStrategicAdvice(
       Map<String, dynamic> payload) async {
-    final response = await http.post(
-      Uri.parse('${ApiConfig.baseUrl}/api/dexo/strategic-advice'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(payload),
+    return ApiService.post(
+      endpoint: '${ApiConfig.baseUrl}/api/dexo/strategic-advice',
+      body: payload,
     );
-    return jsonDecode(response.body);
   }
 
   // Sauvegarder la vision organisationnelle
   static Future<Map<String, dynamic>> saveVision(
       Map<String, dynamic> payload) async {
-    final response = await http.post(
-      Uri.parse('${ApiConfig.baseUrl}/api/dexo/save-vision'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(payload),
+    return ApiService.post(
+      endpoint: '${ApiConfig.baseUrl}/api/dexo/save-vision',
+      body: payload,
     );
-    return jsonDecode(response.body);
   }
 
   // ═══════════════════════════════════════════════════════════════

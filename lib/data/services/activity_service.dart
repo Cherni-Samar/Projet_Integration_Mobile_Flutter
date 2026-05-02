@@ -1,110 +1,72 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:e_team/core/config/api_config.dart';
+import 'api_service.dart';
 import 'auth_service.dart';
-import 'api_config.dart';
 
 class ActivityService {
   static String get baseUrl => '${ApiConfig.baseUrl}/api/activities';
 
-  /// Get mobile activity feed with pagination
+  /// Get mobile activity feed with pagination.
   static Future<ActivityFeedResponse> getMobileFeed({
     int page = 1,
     int limit = 20,
     String? agentFilter,
   }) async {
-    try {
-      final queryParams = {
-        'page': page.toString(),
-        'limit': limit.toString(),
-        if (agentFilter != null && agentFilter != 'all')
-          'agentFilter': agentFilter,
-      };
+    final token = await AuthService().getToken();
 
-      final uri = Uri.parse('$baseUrl/mobile/feed')
-          .replace(queryParameters: queryParams);
+    final queryParams = {
+      'page': page.toString(),
+      'limit': limit.toString(),
+      if (agentFilter != null && agentFilter != 'all')
+        'agentFilter': agentFilter,
+    };
 
-      final token = await AuthService().getToken();
-      final response = await http.get(
-        uri,
-        headers: {
-          'x-auth-token': token ?? '',
-          'Content-Type': 'application/json',
-        },
-      );
+    final uri = Uri.parse('$baseUrl/mobile/feed')
+        .replace(queryParameters: queryParams)
+        .toString();
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        if (jsonData['success'] == true) {
-          return ActivityFeedResponse.fromJson(jsonData['data']);
-        }
-      }
+    final jsonData = await ApiService.get(endpoint: uri, token: token);
 
-      throw Exception('Failed to load activity feed: ${response.statusCode}');
-    } catch (e) {
-      print('❌ Error fetching activity feed: $e');
-      throw Exception('Network error: $e');
+    if (jsonData['success'] == true) {
+      return ActivityFeedResponse.fromJson(jsonData['data']);
     }
+    throw Exception('Failed to load activity feed');
   }
 
-  /// Get activity dashboard statistics
+  /// Get activity dashboard statistics.
   static Future<ActivityDashboard> getDashboard() async {
-    try {
-      final token = await AuthService().getToken();
-      final response = await http.get(
-        Uri.parse('$baseUrl/mobile/dashboard'),
-        headers: {
-          'x-auth-token': token ?? '',
-          'Content-Type': 'application/json',
-        },
-      );
+    final token = await AuthService().getToken();
+    final jsonData = await ApiService.get(
+      endpoint: '$baseUrl/mobile/dashboard',
+      token: token,
+    );
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        if (jsonData['success'] == true) {
-          return ActivityDashboard.fromJson(jsonData['data']);
-        }
-      }
-
-      throw Exception('Failed to load dashboard: ${response.statusCode}');
-    } catch (e) {
-      print('❌ Error fetching dashboard: $e');
-      throw Exception('Network error: $e');
+    if (jsonData['success'] == true) {
+      return ActivityDashboard.fromJson(jsonData['data']);
     }
+    throw Exception('Failed to load dashboard');
   }
 
-  /// Get activities by specific agent
+  /// Get activities by specific agent.
   static Future<List<ActivityItem>> getActivitiesByAgent(
-      String agentName, {
-        int limit = 50,
-      }) async {
-    try {
-      final token = await AuthService().getToken();
-      final response = await http.get(
-        Uri.parse('$baseUrl/agent/$agentName?limit=$limit'),
-        headers: {
-          'x-auth-token': token ?? '',
-          'Content-Type': 'application/json',
-        },
-      );
+    String agentName, {
+    int limit = 50,
+  }) async {
+    final token = await AuthService().getToken();
+    final jsonData = await ApiService.get(
+      endpoint: '$baseUrl/agent/$agentName?limit=$limit',
+      token: token,
+    );
 
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
-        if (jsonData['success'] == true) {
-          final activities = jsonData['activities'] as List;
-          return activities
-              .map((json) => ActivityItem.fromJson(json))
-              .toList();
-        }
-      }
-
-      throw Exception('Failed to load agent activities: ${response.statusCode}');
-    } catch (e) {
-      print('❌ Error fetching agent activities: $e');
-      throw Exception('Network error: $e');
+    if (jsonData['success'] == true) {
+      final activities = jsonData['activities'] as List;
+      return activities.map((json) => ActivityItem.fromJson(json)).toList();
     }
+    throw Exception('Failed to load agent activities');
   }
 }
-// Data Models
+
+// ─── Data Models ────────────────────────────────────────────────────────────
+
 class ActivityFeedResponse {
   final List<ActivityItem> activities;
   final ActivityPagination pagination;

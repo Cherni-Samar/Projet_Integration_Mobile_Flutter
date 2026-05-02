@@ -1,4 +1,4 @@
-import '../data/services/api_config.dart';
+import 'package:e_team/core/config/api_config.dart';
 
 class ApiConstants {
   static String get baseUrl => '${ApiConfig.baseUrl}/api/auth';

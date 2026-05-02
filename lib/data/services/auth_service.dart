@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../dtos/user_dto.dart'; // ✅ Import du DTO
-import '../../utils/constants.dart';
+import 'package:e_team/core/utils/constants.dart';
 import 'api_service.dart';
 import 'package:e_team/domain/models/user_model.dart';
 import 'package:e_team/data/mappers/user_mapper.dart';

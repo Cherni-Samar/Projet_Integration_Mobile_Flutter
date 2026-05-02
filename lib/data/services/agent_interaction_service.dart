@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:e_team/presentation/screens/agent/agent_inter_flow_page.dart';
 import 'package:e_team/data/services/auth_service.dart';
-import 'package:e_team/data/services/api_config.dart';
+import 'package:e_team/core/config/api_config.dart';
 
 class AgentInteractionService {
   static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';

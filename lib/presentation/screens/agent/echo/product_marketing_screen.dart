@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:e_team/data/services/echo_service.dart';
-import 'package:e_team/data/services/api_config.dart';
+import 'package:e_team/core/config/api_config.dart';
 class ProductMarketingScreen extends StatefulWidget {
   final String? token;
   
