@@ -11,23 +11,8 @@ import 'package:e_team/domain/models/hera_models.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
 import 'hera_history_page.dart';
 import 'hera_voice_page.dart';
-class HeraPalette {
-  static const bg = Colors.white;
-  static const card = Color(0xFFF7F7F9);
-  static const cardSoft = Color(0xFFEEEEF3);
-  static const border = Color(0xFFE4E4EC);
-  static const mauve = Color(0xFF904FF1);
-  static const lime = Color(0xFF8940FB);
-  static const violet = Color(0xFF6D28D9);
-  static const timo = Color(0xFFB845FF);
-  static const success = Color(0xFF10B981);
-  static const warning = Color(0xFFFFB74D);
-  static const danger = Color(0xFFEF4444);
-  static const textPrimary = Color(0xFF0D0D0D);
-  static const textMuted = Color(0xFF9CA3AF);
-  static const textSoft = Color(0xFFB0B0C0);
-}
-
+import 'hr_shared_widgets.dart';
+import 'tabs/hr_flux_tab.dart';
 class HrDashboardPage extends StatefulWidget {
   const HrDashboardPage({super.key});
 
@@ -216,68 +201,6 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     }).toList();
   }
 
-  String _timeAgo(DateTime date) {
-    final diff = DateTime.now().difference(date);
-    if (diff.inMinutes < 1) return 'À l\'instant';
-    if (diff.inMinutes < 60) return 'il y a ${diff.inMinutes}min';
-    if (diff.inHours < 24) return 'il y a ${diff.inHours}h';
-    if (diff.inDays < 7) return 'il y a ${diff.inDays}j';
-    return DateFormat('d MMM', 'fr_FR').format(date);
-  }
-
-  Map<String, dynamic> _actionConfig(Map<String, dynamic> action) {
-    final type = action['action_type']?.toString() ?? '';
-    final details = action['details'] is Map<String, dynamic>
-        ? action['details'] as Map<String, dynamic>
-        : <String, dynamic>{};
-
-    switch (type) {
-      case 'planning_confirmed':
-        if (details['agent'] == 'Timo') {
-          return {
-            'icon': Icons.event_available_rounded,
-            'color': HeraPalette.timo,
-            'label': 'Logistique · Planning validé',
-            'badge': 'TIMO IA',
-          };
-        }
-        return {
-          'icon': Icons.campaign_rounded,
-          'color': HeraPalette.warning,
-          'label': 'Alerte staffing · ${details['department'] ?? 'équipe'}',
-          'badge': 'AUTONOME',
-        };
-      case 'leave_approved':
-        return {
-          'icon': Icons.check_circle_outline_rounded,
-          'color': HeraPalette.success,
-          'label': 'Congé approuvé',
-          'badge': 'RH IA',
-        };
-      case 'leave_refused':
-        return {
-          'icon': Icons.event_busy_rounded,
-          'color': HeraPalette.danger,
-          'label': 'Congé refusé',
-          'badge': 'REFUSÉ',
-        };
-      case 'contract_renewal':
-        return {
-          'icon': Icons.description_rounded,
-          'color': Colors.blue,
-          'label': 'Contrat édité',
-          'badge': 'DOCS',
-        };
-      default:
-        return {
-          'icon': Icons.auto_awesome_rounded,
-          'color': HeraPalette.mauve,
-          'label': 'Action système IA',
-          'badge': 'INFO',
-        };
-    }
-  }
-
   void _openVoicePage() {
     Navigator.push(
       context,
@@ -346,7 +269,16 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                 child: IndexedStack(
                   index: _selectedTab,
                   children: [
-                    _buildFlux(),
+                    HrFluxTab(
+                      recentActions: _recentActions,
+                      loadingStats: _loadingStats,
+                      loadingActions: _loadingActions,
+                      stats: _stats,
+                      pulseCtrl: _pulseCtrl,
+                      onRefresh: _loadAll,
+                      onDeleteAction: _deleteAction,
+                      onShowDetail: _showActionDetail,
+                    ),
                     _buildAgenda(),
                     _buildTeam(),
                     _buildEnergyView(),
@@ -361,141 +293,9 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     );
   }
 
-  Widget _buildFlux() {
-    final hasTimoAction = _recentActions.isNotEmpty &&
-        _recentActions.first['details']?['agent'] == 'Timo';
-
-    return RefreshIndicator(
-      onRefresh: _loadAll,
-      color: HeraPalette.mauve,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-        children: [
-          if (_loadingStats)
-            const _ShimmerBox(height: 200)
-          else
-            _WorkforcePulse(stats: _stats, pulseCtrl: _pulseCtrl),
-          const SizedBox(height: 14),
-          if (hasTimoAction) ...[
-            const _TimoBanner(),
-            const SizedBox(height: 14),
-          ],
-          _SectionHeader(
-            label: 'Activité récente',
-            action: 'Voir tout',
-            onAction: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => HeraHistoryPage(
-                  actions: _recentActions,
-                  isDark: true,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (_loadingActions) ...[
-            const _ShimmerBox(height: 72),
-            const SizedBox(height: 8),
-            const _ShimmerBox(height: 72),
-          ] else if (_recentActions.isEmpty)
-            const _EmptyState(
-              icon: Icons.history_rounded,
-              title: 'Aucune activité',
-              sub: '...',
-            )
-          else
-            ..._recentActions.take(5).toList().asMap().entries.map(
-                  (entry) => _buildActionCard(entry.value, entry.key),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionCard(Map<String, dynamic> action, int index) {
-    final cfg = _actionConfig(action);
-    final color = cfg['color'] as Color;
-    final name = action['employee_name'] as String? ?? 'Employé';
-    final createdAt = action['created_at'] != null
-        ? DateTime.tryParse(action['created_at'].toString())
-        : null;
-
-    return Dismissible(
-      key: Key('act_${_extractId(action['_id'])}_$index'),
-      direction: DismissDirection.startToEnd,
-      onDismissed: (_) => _deleteAction(index, _extractId(action['_id'])),
-      background: const _DismissBackground(),
-      child: GestureDetector(
-        onTap: () => _showActionDetail(action),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: HeraPalette.card,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: HeraPalette.border),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: Icon(cfg['icon'] as IconData, color: color, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        color: HeraPalette.textPrimary,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      cfg['label'] as String,
-                      style: const TextStyle(
-                        color: HeraPalette.textMuted,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  _Badge(label: cfg['badge'] as String, color: color),
-                  if (createdAt != null) ...[
-                    const SizedBox(height: 5),
-                    Text(
-                      _timeAgo(createdAt),
-                      style: const TextStyle(
-                        color: HeraPalette.textMuted,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _deleteAction(int index, String? id) async {
+  Future<void> _deleteAction(Map<String, dynamic> action, int index) async {
     if (index >= _recentActions.length) return;
+    final id = _extractId(action['_id']);
 
     final removed = _recentActions[index];
     setState(() => _recentActions.removeAt(index));
@@ -611,7 +411,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
         children: [
-          const _SectionHeader(label: 'Absences & Congés'),
+          const HrSectionHeader(label: 'Absences & Congés'),
           const SizedBox(height: 4),
           const Text(
             'Sélectionnez une date pour voir les absences approuvées.',
@@ -1958,288 +1758,6 @@ class _PillTabBar extends StatelessWidget {
   }
 }
 
-class _WorkforcePulse extends StatelessWidget {
-  final HeraStats? stats;
-  final AnimationController pulseCtrl;
-
-  const _WorkforcePulse({required this.stats, required this.pulseCtrl});
-
-  @override
-  Widget build(BuildContext context) {
-    final total = stats?.totalEmployees ?? 0;
-    final onLeave = stats?.onLeaveToday ?? 0;
-    final active = total - onLeave;
-    final monthly = stats?.monthlyLeaveDays ?? 0;
-
-    return AnimatedBuilder(
-      animation: pulseCtrl,
-      builder: (_, child) => Container(
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF7C3AED).withOpacity(
-                0.13 + 0.04 * pulseCtrl.value,
-              ),
-              const Color(0xFFB57BFF).withOpacity(0.07),
-              HeraPalette.bg,
-            ],
-          ),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: const Color(0xFF7C3AED).withOpacity(
-              0.45 + 0.1 * pulseCtrl.value,
-            ),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF7C3AED).withOpacity(
-                0.10 + 0.04 * pulseCtrl.value,
-              ),
-              blurRadius: 24,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        child: child,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Text(
-                'WORKFORCE PULSE',
-                style: TextStyle(
-                  color: Color(0xFF7C3AED),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.8,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF7C3AED).withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  'LIVE',
-                  style: TextStyle(
-                    color: Color(0xFF7C3AED),
-                    fontSize: 9,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: _PulseItem(
-                  value: '$total',
-                  label: 'Effectif total',
-                  icon: Icons.groups_2_rounded,
-                  color: HeraPalette.mauve,
-                ),
-              ),
-              const _VertDivider(),
-              Expanded(
-                child: _PulseItem(
-                  value: '$active',
-                  label: 'Actifs',
-                  icon: Icons.person_rounded,
-                  color: HeraPalette.success,
-                ),
-              ),
-              const _VertDivider(),
-              Expanded(
-                child: _PulseItem(
-                  value: '$onLeave',
-                  label: 'En congé',
-                  icon: Icons.beach_access_rounded,
-                  color: HeraPalette.warning,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: HeraPalette.cardSoft,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.calendar_month_rounded,
-                  size: 14,
-                  color: HeraPalette.textMuted,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '$monthly jours de congé ce mois',
-                  style: const TextStyle(
-                    color: HeraPalette.textSoft,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PulseItem extends StatelessWidget {
-  final String value;
-  final String label;
-  final IconData icon;
-  final Color color;
-
-  const _PulseItem({
-    required this.value,
-    required this.label,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: const TextStyle(
-            color: HeraPalette.textPrimary,
-            fontSize: 28,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -1,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: HeraPalette.textMuted, fontSize: 10),
-        ),
-      ],
-    );
-  }
-}
-
-class _VertDivider extends StatelessWidget {
-  const _VertDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(height: 60, width: 1, color: HeraPalette.border);
-  }
-}
-
-class _TimoBanner extends StatelessWidget {
-  const _TimoBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: HeraPalette.timo.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: HeraPalette.timo.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.bolt, color: HeraPalette.timo, size: 18),
-          const SizedBox(width: 10),
-          const Expanded(
-            child: Text(
-              'L\'agent Timo a confirmé un planning — calendrier mis à jour.',
-              style: TextStyle(
-                color: HeraPalette.timo,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          Icon(
-            Icons.check_circle,
-            color: HeraPalette.timo.withOpacity(0.5),
-            size: 16,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  final String label;
-  final String? action;
-  final VoidCallback? onAction;
-
-  const _SectionHeader({required this.label, this.action, this.onAction});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: HeraPalette.textPrimary,
-            fontSize: 17,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.3,
-          ),
-        ),
-        const Spacer(),
-        if (action != null)
-          GestureDetector(
-            onTap: onAction,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: HeraPalette.mauve.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                action!,
-                style: const TextStyle(
-                  color: HeraPalette.mauve,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
 class _SubTabPill extends StatelessWidget {
   final String label;
   final int count;
@@ -2620,55 +2138,6 @@ class _LegendChip extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _DismissBackground extends StatelessWidget {
-  const _DismissBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: HeraPalette.danger.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      alignment: Alignment.centerLeft,
-      padding: const EdgeInsets.only(left: 20),
-      child: const Row(
-        children: [
-          Icon(Icons.delete_outline_rounded, color: HeraPalette.danger, size: 20),
-          SizedBox(width: 6),
-          Text(
-            'Supprimer',
-            style: TextStyle(
-              color: HeraPalette.danger,
-              fontWeight: FontWeight.w700,
-              fontSize: 13,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ShimmerBox extends StatelessWidget {
-  final double height;
-
-  const _ShimmerBox({required this.height});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: HeraPalette.card,
-        borderRadius: BorderRadius.circular(18),
-      ),
     );
   }
 }
