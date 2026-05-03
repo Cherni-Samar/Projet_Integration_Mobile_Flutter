@@ -1,47 +1,30 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+/// HeraService — business logic layer for the Hera agent.
+///
+/// Responsibilities:
+///   - Orchestrate calls to HeraRepository
+///   - Parse DTOs and return typed responses
+///   - Wrap errors into safe fallback values
+///   - NO direct HTTP calls
+///   - NO BuildContext / UI code
+///
+/// All public method signatures are IDENTICAL to the previous implementation
+/// so every existing caller continues to work without modification.
+library;
 
-import 'package:e_team/core/config/api_config.dart';
-import 'package:e_team/data/services/api_service.dart';
 import 'package:e_team/data/dtos/hera_dto.dart';
-import 'package:flutter/material.dart';
-import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/data/repositories/hera_repository.dart';
+
 class HeraService {
-  static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
+  // ─── Repository ───────────────────────────────────────────────────────────
+  static final _repo = HeraRepository.instance;
 
-
-
-  static Future<Map<String, dynamic>> _postRaw(
-      String endpoint,
-      Map<String, dynamic> body,
-      ) async {
-    final token = await AuthService().getToken();
-    final response = await http.post(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': token ?? '',
-      },
-      body: jsonEncode(body),
-    );
-    return jsonDecode(response.body);
-  }
-
-  static Future<Map<String, dynamic>> _deleteRaw(String endpoint) async {
-    final token = await AuthService().getToken();
-    final response = await http.delete(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': token ?? '',
-      },
-    );
-    return jsonDecode(response.body);
-  }
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TYPED RESPONSES  (used by Hera screens)
+  // ═══════════════════════════════════════════════════════════════════════════
 
   static Future<HeraStatsResponse> getAdminStatsTyped() async {
     try {
-      final json = await _getRaw('/admin/stats');
+      final json = await _repo.getAdminStats();
       return HeraStatsResponse.fromJson(json);
     } catch (e) {
       return HeraStatsResponse.error(e.toString());
@@ -50,7 +33,7 @@ class HeraService {
 
   static Future<HeraEmployeesResponse> getAllEmployeesTyped() async {
     try {
-      final json = await _getRaw('/admin/employees');
+      final json = await _repo.getEmployees();
       return HeraEmployeesResponse.fromJson(json);
     } catch (e) {
       return HeraEmployeesResponse.error(e.toString());
@@ -61,7 +44,7 @@ class HeraService {
     int limit = 20,
   }) async {
     try {
-      final json = await _getRaw('/admin/recent-actions?limit=$limit');
+      final json = await _repo.getRecentActions(limit: limit);
       return HeraActionsResponse.fromJson(json, key: 'recent_actions');
     } catch (e) {
       return HeraActionsResponse.error(e.toString());
@@ -74,7 +57,7 @@ class HeraService {
     String employeeRole = '',
   }) async {
     try {
-      final json = await _getRaw('/leaves/$employeeId');
+      final json = await _repo.getLeaves(employeeId);
       return HeraLeavesResponse.fromJson(
         json,
         employeeName: employeeName,
@@ -87,15 +70,23 @@ class HeraService {
 
   static Future<HeraCandidatesResponse> getAllCandidatesTyped() async {
     try {
-      final json = await _getRaw('/candidates');
+      final json = await _repo.getCandidates();
       return HeraCandidatesResponse.fromJson(json);
     } catch (e) {
       return HeraCandidatesResponse.error(e.toString());
     }
   }
 
-  static Future<Map<String, dynamic>> deleteAction(String actionId) {
-    return _deleteRaw('/admin/action/$actionId');
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RAW MAP RESPONSES  (used by various screens)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  static Future<Map<String, dynamic>> deleteAction(String actionId) async {
+    try {
+      return await _repo.deleteAction(actionId);
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
   }
 
   static Future<Map<String, dynamic>> requestLeave({
@@ -105,28 +96,35 @@ class HeraService {
     required String startDate,
     required String endDate,
     String? reason,
-  }) {
-    return _postRaw('/leave-request', {
-      'employee_id': employeeId,
-      'employee_email': employeeEmail,
-      'type': type,
-      'start_date': startDate,
-      'end_date': endDate,
-      'reason': reason ?? '',
-    });
+  }) async {
+    try {
+      return await _repo.requestLeave(
+        employeeId: employeeId,
+        employeeEmail: employeeEmail,
+        type: type,
+        startDate: startDate,
+        endDate: endDate,
+        reason: reason ?? '',
+      );
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
   }
 
   static Future<Map<String, dynamic>> urgentLeave({
     required String employeeId,
     required String employeeEmail,
     String? reason,
-  }) {
-    // Fixed: backend route is /urgent-leave, not /leave-urgent
-    return _postRaw('/urgent-leave', {
-      'employee_id': employeeId,
-      'employee_email': employeeEmail,
-      'reason': reason ?? 'Urgence',
-    });
+  }) async {
+    try {
+      return await _repo.urgentLeave(
+        employeeId: employeeId,
+        employeeEmail: employeeEmail,
+        reason: reason ?? 'Urgence',
+      );
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
   }
 
   static Future<Map<String, dynamic>> onboarding({
@@ -136,43 +134,53 @@ class HeraService {
     String? department,
     String? contractType,
     String? managerEmail,
-  }) {
-    return _postRaw('/onboarding', {
-      'name': name,
-      'email': email,
-      'role': role,
-      'department': department ?? '',
-      'contract_type': contractType ?? 'CDI',
-      'manager_email': managerEmail ?? '',
-    });
+  }) async {
+    try {
+      return await _repo.onboarding(
+        name: name,
+        email: email,
+        role: role,
+        department: department ?? '',
+        contractType: contractType ?? 'CDI',
+        managerEmail: managerEmail ?? '',
+      );
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
   }
 
   static Future<Map<String, dynamic>> generateHeraDoc({
     required String employeeId,
     required String docType,
-  }) {
-    return _postRaw('/generate-doc', {
-      'employee_id': employeeId,
-      'doc_type': docType,
-    });
+  }) async {
+    try {
+      return await _repo.generateDoc(
+        employeeId: employeeId,
+        docType: docType,
+      );
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
   }
 
   static Future<Map<String, dynamic>> getHistory({
     required String employeeId,
-  }) {
-    return _getRaw('/history/$employeeId');
+  }) async {
+    try {
+      return await _repo.getHistory(employeeId);
+    } catch (e) {
+      return {'success': false, 'error': e.toString()};
+    }
   }
 
-  static Future<bool> requestDexoDoc(String employeeId, String docType) async {
+  static Future<bool> requestDexoDoc(
+    String employeeId,
+    String docType,
+  ) async {
     try {
-      // Fixed: route is /api/hera/request-doc (not /api/dexo/request-doc).
-      // Also removed hardcoded IP — uses ApiConfig.baseUrl via baseUrl getter.
-      final response = await ApiService.post(
-        endpoint: '$baseUrl/request-doc',
-        body: {
-          'employeeId': employeeId,
-          'docType': docType,
-        },
+      final response = await _repo.requestDexoDoc(
+        employeeId: employeeId,
+        docType: docType,
       );
       return response['success'] == true;
     } catch (_) {
@@ -180,9 +188,11 @@ class HeraService {
     }
   }
 
-  static Future<Map<String, dynamic>> getRecentActions({int limit = 20}) async {
+  static Future<Map<String, dynamic>> getRecentActions({
+    int limit = 20,
+  }) async {
     try {
-      return await _getRaw('/admin/recent-actions?limit=$limit');
+      return await _repo.getRecentActions(limit: limit);
     } catch (e) {
       return {
         'success': false,
@@ -191,28 +201,26 @@ class HeraService {
       };
     }
   }
+
   static Future<Map<String, dynamic>> getAllActions({
     int page = 1,
     int limit = 20,
   }) async {
     try {
-      final response = await _getRaw(
-        '/admin/actions?page=$page&limit=$limit',
-      );
-
-      return response;
+      return await _repo.getAllActions(page: page, limit: limit);
     } catch (e) {
-      print('❌ getAllActions error: $e');
       return {
         'success': false,
         'actions': [],
         'total_pages': 1,
+        'error': e.toString(),
       };
     }
   }
+
   static Future<Map<String, dynamic>> getDexoCheckup() async {
     try {
-      return await _getRaw('/admin/dexo-checkup');
+      return await _repo.getDexoCheckup();
     } catch (e) {
       return {
         'success': false,
@@ -221,72 +229,36 @@ class HeraService {
       };
     }
   }
+
   static Future<Map<String, dynamic>> sendEmailToEcho({
     required String subject,
     required String content,
     String? from,
   }) async {
     try {
-      // Fixed: was '/hera/send-to-echo' which produced double /hera in the URL.
-      // Correct backend route is POST /api/hera/send-to-echo.
-      final response = await _postRaw(
-        '/send-to-echo',
-        {
-          'subject': subject,
-          'content': content,
-          'from': from ?? 'hera@e-team.com',
-        },
+      return await _repo.sendEmailToEcho(
+        subject: subject,
+        content: content,
+        from: from ?? 'hera@e-team.com',
       );
-
-      return response;
     } catch (e) {
-      print('❌ sendEmailToEcho error: $e');
-      return {
-        'success': false,
-        'error': e.toString(),
-      };
+      return {'success': false, 'error': e.toString()};
     }
   }
+
   static Future<Map<String, dynamic>> hello({
     required String username,
   }) async {
     try {
-      return await _postRaw('/chat', {
-        'username': username,
-        'intent': 'hello',
-        'message': 'hello',
-      });
+      return await _repo.hello(username);
     } catch (e) {
-      return {
-        'success': false,
-        'error': e.toString(),
-      };
+      return {'success': false, 'error': e.toString()};
     }
   }
 
-  static Future<Map<String, dynamic>> _getRaw(String endpoint) async {
-    final token = await AuthService().getToken();
-
-    final response = await http.get(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: {
-        'Content-Type': 'application/json',
-        'x-auth-token': token ?? '',
-      },
-    );
-
-    return jsonDecode(response.body);
-  }
-
-  // Dans lib/data/services/hera_service.dart
-
   static Future<Map<String, dynamic>> getOpportunities() async {
     try {
-      // Fixed: removed hardcoded IP, now uses ApiConfig.baseUrl via baseUrl getter.
-      final response = await ApiService.get(
-        endpoint: '$baseUrl/admin/opportunities',
-      );
-      return response;
+      return await _repo.getOpportunities();
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
@@ -294,21 +266,19 @@ class HeraService {
 
   static Future<bool> approveProject(String projectId) async {
     try {
-      // Fixed: removed hardcoded IP, now uses ApiConfig.baseUrl via baseUrl getter.
-      final response = await ApiService.post(
-        endpoint: '$baseUrl/admin/approve-project',
-        body: {'projectId': projectId},
-      );
+      final response = await _repo.approveProject(projectId);
       return response['success'] == true;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }
-  static Future<Map<String, dynamic>> getDocumentActions({int limit = 20}) async {
+
+  static Future<Map<String, dynamic>> getDocumentActions({
+    int limit = 20,
+  }) async {
     try {
-      return await _getRaw('/admin/document-actions?limit=$limit');
+      return await _repo.getDocumentActions(limit: limit);
     } catch (e) {
-      debugPrint('❌ getDocumentActions error: $e');
       return {
         'success': false,
         'actions': [],

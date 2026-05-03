@@ -6,17 +6,83 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
+import 'package:e_team/core/errors/app_error.dart';
 import 'package:e_team/data/services/hera_service.dart';
 import 'package:e_team/domain/models/hera_models.dart';
+import 'package:e_team/presentation/providers/hera_provider.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/presentation/screens/hera/hera_history_page.dart';
 import 'package:e_team/presentation/screens/hera/hera_voice_page.dart';
+import 'package:e_team/presentation/widgets/common/app_error_snack_bar.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 import 'package:e_team/presentation/screens/hera/tabs/hera_flux_tab.dart';
 import 'package:e_team/presentation/screens/hera/tabs/hera_agenda_tab.dart';
 import 'package:e_team/presentation/screens/hera/tabs/hera_team_tab.dart';
 import 'package:e_team/presentation/screens/hera/tabs/hera_energy_tab.dart';
 import 'package:e_team/presentation/screens/hera/tabs/hera_vision_tab.dart';
+
+// ─── Selector value objects ──────────────────────────────────────────────────
+// Each bundles exactly the fields one tab needs.
+// Equality is value-based so Selector skips rebuilds when nothing changed.
+
+@immutable
+class _FluxData {
+  final List<Map<String, dynamic>> recentActions;
+  final bool loadingStats;
+  final bool loadingActions;
+  final HeraStats? stats;
+
+  const _FluxData({
+    required this.recentActions,
+    required this.loadingStats,
+    required this.loadingActions,
+    required this.stats,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _FluxData &&
+          recentActions == other.recentActions &&
+          loadingStats == other.loadingStats &&
+          loadingActions == other.loadingActions &&
+          stats == other.stats;
+
+  @override
+  int get hashCode => Object.hash(
+        recentActions,
+        loadingStats,
+        loadingActions,
+        stats,
+      );
+}
+
+@immutable
+class _TeamData {
+  final List<HeraEmployee> employees;
+  final List<HeraCandidate> candidates;
+  final bool loadingEmployees;
+
+  const _TeamData({
+    required this.employees,
+    required this.candidates,
+    required this.loadingEmployees,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _TeamData &&
+          employees == other.employees &&
+          candidates == other.candidates &&
+          loadingEmployees == other.loadingEmployees;
+
+  @override
+  int get hashCode => Object.hash(employees, candidates, loadingEmployees);
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
+
 class HeraDashboardPage extends StatefulWidget {
   const HeraDashboardPage({super.key});
 
@@ -26,23 +92,15 @@ class HeraDashboardPage extends StatefulWidget {
 
 class _HeraDashboardPageState extends State<HeraDashboardPage>
     with TickerProviderStateMixin {
+  // ─── Pure UI state ────────────────────────────────────────────────────────
   int _selectedTab = 0;
   int _employeeSubTab = 0;
-
-  HeraStats? _stats;
-  List<Map<String, dynamic>> _recentActions = [];
-  List<HeraEmployee> _employees = [];
-  List<HeraLeave> _allLeaves = [];
-  List<HeraCandidate> _candidates = [];
-
-  bool _loadingStats = true;
-  bool _loadingActions = true;
-  bool _loadingEmployees = true;
 
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   CalendarFormat _calendarFormat = CalendarFormat.month;
 
+  // ─── Animation controllers ────────────────────────────────────────────────
   late AnimationController _pulseCtrl;
   late AnimationController _fadeCtrl;
   late AnimationController _glowCtrl;
@@ -74,113 +132,31 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    _loadAll();
+    // Trigger initial data load via provider — unchanged from Phase 8
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<HeraProvider>();
+
+      // ── Error listener ────────────────────────────────────────────────────
+      // Reacts to provider errors as a side effect (SnackBar).
+      // Does NOT cause any widget rebuild — Selector optimization is preserved.
+      provider.addListener(_onProviderError);
+
+      provider.loadDashboardData();
+    });
   }
 
   @override
   void dispose() {
+    // Remove the error listener before disposing to avoid calling setState
+    // on a dead widget.
+    context.read<HeraProvider>().removeListener(_onProviderError);
     _pulseCtrl.dispose();
     _fadeCtrl.dispose();
     _glowCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _loadAll() async {
-    await Future.wait([
-      _loadStats(),
-      _loadRecentActions(),
-      _loadEmployees(),
-      _loadCandidates(),
-    ]);
-  }
-
-  Future<void> _loadStats() async {
-    if (mounted) setState(() => _loadingStats = true);
-
-    try {
-      final response = await HeraService.getAdminStatsTyped();
-      if (!mounted) return;
-      setState(() {
-        _stats = response.stats;
-        _loadingStats = false;
-      });
-    } catch (_) {
-      if (mounted) setState(() => _loadingStats = false);
-    }
-  }
-
-  Future<void> _loadRecentActions() async {
-    if (mounted) setState(() => _loadingActions = true);
-
-    try {
-      final response = await HeraService.getRecentActions(limit: 20);
-
-      if (!mounted) return;
-
-      setState(() {
-        _recentActions = List<Map<String, dynamic>>.from(
-          response['recent_actions'] ?? [],
-        );
-        _loadingActions = false;
-      });
-    } catch (_) {
-      if (mounted) setState(() => _loadingActions = false);
-    }
-  }
-  Future<void> _loadEmployees() async {
-    if (mounted) setState(() => _loadingEmployees = true);
-
-    try {
-      final response = await HeraService.getAllEmployeesTyped();
-      if (!mounted) return;
-
-      setState(() {
-        _employees = response.employees;
-        _loadingEmployees = false;
-      });
-
-      await _loadAllLeaves();
-    } catch (_) {
-      if (mounted) setState(() => _loadingEmployees = false);
-    }
-  }
-
-  Future<void> _loadCandidates() async {
-    try {
-      final response = await HeraService.getAllCandidatesTyped();
-      if (!mounted) return;
-      setState(() => _candidates = response.candidates);
-    } catch (e) {
-      debugPrint('❌ Erreur chargement candidats : $e');
-    }
-  }
-
-  Future<void> _loadAllLeaves() async {
-    try {
-      final leaves = <HeraLeave>[];
-
-      for (final emp in _employees) {
-        final response = await HeraService.getLeavesTyped(
-          employeeId: emp.id,
-          employeeName: emp.name,
-          employeeRole: emp.role,
-        );
-
-        if (response.success) {
-          leaves.addAll(response.leaves);
-        }
-      }
-
-      if (mounted) setState(() => _allLeaves = leaves);
-    } catch (_) {}
-  }
-
-  String? _extractId(dynamic id) {
-    if (id == null) return null;
-    if (id is String) return id;
-    if (id is Map) return id[r'$oid']?.toString() ?? id['_id']?.toString();
-    return id.toString();
-  }
+  // ─── UI helpers ───────────────────────────────────────────────────────────
 
   void _openVoicePage() {
     Navigator.push(
@@ -189,6 +165,31 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
     );
   }
 
+  /// Called by the provider listener whenever [HeraProvider.error] changes.
+  /// Shows a SnackBar with a retry action for recoverable errors.
+  /// Clears the error from the provider after displaying it so it doesn't
+  /// re-fire on the next unrelated notifyListeners() call.
+  void _onProviderError() {
+    if (!mounted) return;
+    final provider = context.read<HeraProvider>();
+    final error = provider.error;
+    if (error == null) return;
+
+    AppErrorSnackBar.show(
+      context,
+      error,
+      onRetry: () {
+        provider.clearError();
+        provider.refresh();
+      },
+    );
+
+    // Clear after scheduling the SnackBar so the listener doesn't re-fire
+    // for the same error on the next unrelated notifyListeners() call.
+    provider.clearError();
+  }
+
+  /// Generic success / info toast (non-error messages).
   void _toast(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -200,127 +201,183 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
     );
   }
 
+  // ─── Action handlers ──────────────────────────────────────────────────────
+
+  Future<void> _deleteAction(
+    Map<String, dynamic> action,
+    int index,
+  ) async {
+    final error =
+        await context.read<HeraProvider>().deleteAction(action, index);
+    if (!mounted) return;
+    if (error != null) {
+      AppErrorSnackBar.show(context, error);
+    } else {
+      _toast('Action supprimée');
+    }
+  }
+
+  // ─── Build ────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
+    // The Scaffold itself has NO provider subscription.
+    // Each section subscribes only to the slice it needs via Selector.
     return Theme(
       data: ThemeData.light().copyWith(
         scaffoldBackgroundColor: HeraPalette.bg,
         textTheme: ThemeData.light().textTheme.apply(
-          bodyColor: HeraPalette.textPrimary,
-          displayColor: HeraPalette.textPrimary,
-        ),
+              bodyColor: HeraPalette.textPrimary,
+              displayColor: HeraPalette.textPrimary,
+            ),
       ),
-      child: _buildScaffold(),
-    );
-  }
-
-  Widget _buildScaffold() {
-    return Scaffold(
-      backgroundColor: HeraPalette.bg,
-      body: FadeTransition(
-        opacity: _fadeCtrl,
-        child: SafeArea(
-          child: Column(
-            children: [
-              HeraHeader(
-                energy: context.watch<UserProvider>().energyBalance,
-                pulseCtrl: _pulseCtrl,
-                glowCtrl: _glowCtrl,
-                onBack: () => Navigator.pop(context),
-                onSpeak: _openVoicePage,
-                onVision: () => setState(() => _selectedTab = 4),
-                onHistory: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => HeraHistoryPage(
-                      actions: _recentActions,
-                      isDark: false,
+      child: Scaffold(
+        backgroundColor: HeraPalette.bg,
+        body: FadeTransition(
+          opacity: _fadeCtrl,
+          child: SafeArea(
+            child: Column(
+              children: [
+                // ── Header: only re-renders when recentActions changes ──────
+                // (needed for the history button to pass the latest list)
+                Selector<HeraProvider, List<Map<String, dynamic>>>(
+                  selector: (_, p) => p.recentActions,
+                  builder: (_, recentActions, __) => HeraHeader(
+                    energy: context.watch<UserProvider>().energyBalance,
+                    pulseCtrl: _pulseCtrl,
+                    glowCtrl: _glowCtrl,
+                    onBack: () => Navigator.pop(context),
+                    onSpeak: _openVoicePage,
+                    onVision: () => setState(() => _selectedTab = 4),
+                    onHistory: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => HeraHistoryPage(
+                          actions: recentActions.toList(),
+                          isDark: false,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              HeraPillTabBar(
-                tabs: _tabs,
-                selected: _selectedTab,
-                onSelect: (i) => setState(() => _selectedTab = i),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: IndexedStack(
-                  index: _selectedTab,
-                  children: [
-                    HeraFluxTab(
-                      recentActions: _recentActions,
-                      loadingStats: _loadingStats,
-                      loadingActions: _loadingActions,
-                      stats: _stats,
-                      pulseCtrl: _pulseCtrl,
-                      onRefresh: _loadAll,
-                      onDeleteAction: _deleteAction,
-                      onShowDetail: _showActionDetail,
-                    ),
-                    HeraAgendaTab(
-                      selectedDay: _selectedDay,
-                      focusedDay: _focusedDay,
-                      calendarFormat: _calendarFormat,
-                      allLeaves: _allLeaves,
-                      onRefresh: _loadAll,
-                      onDaySelected: (selected, focused) => setState(() {
-                        _selectedDay = selected;
-                        _focusedDay = focused;
-                      }),
-                      onFormatChanged: (format) =>
-                          setState(() => _calendarFormat = format),
-                      onPageChanged: (focused) => _focusedDay = focused,
-                    ),
-                    HeraTeamTab(
-                      employees: _employees,
-                      candidates: _candidates,
-                      loadingEmployees: _loadingEmployees,
-                      employeeSubTab: _employeeSubTab,
-                      onRefresh: _loadAll,
-                      onSubTabChanged: (i) =>
-                          setState(() => _employeeSubTab = i),
-                      onEmployeeTap: _showEmployeeDocuments,
-                    ),
-                    HeraEnergyTab(
-                      energyBalance:
-                          context.read<UserProvider>().energyBalance,
-                    ),
-                    HeraVisionTab(
-                      employees: _employees,
-                    ),
-                  ],
+
+                const SizedBox(height: 10),
+
+                // ── Tab bar: pure UI state, no provider needed ──────────────
+                HeraPillTabBar(
+                  tabs: _tabs,
+                  selected: _selectedTab,
+                  onSelect: (i) => setState(() => _selectedTab = i),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 10),
+
+                // ── Tab content: each tab has its own targeted Selector ─────
+                Expanded(
+                  child: IndexedStack(
+                    index: _selectedTab,
+                    children: [
+                      // Tab 0 — Flux
+                      // Rebuilds only when: recentActions, loadingStats,
+                      // loadingActions, or stats change.
+                      Selector<HeraProvider, _FluxData>(
+                        selector: (_, p) => _FluxData(
+                          recentActions: p.recentActions,
+                          loadingStats: p.loadingStats,
+                          loadingActions: p.loadingActions,
+                          stats: p.stats,
+                        ),
+                        builder: (_, data, __) => HeraFluxTab(
+                          recentActions: data.recentActions.toList(),
+                          loadingStats: data.loadingStats,
+                          loadingActions: data.loadingActions,
+                          stats: data.stats,
+                          pulseCtrl: _pulseCtrl,
+                          onRefresh:
+                              context.read<HeraProvider>().refresh,
+                          onDeleteAction: _deleteAction,
+                          onShowDetail: _showActionDetail,
+                        ),
+                      ),
+
+                      // Tab 1 — Agenda
+                      // Rebuilds only when allLeaves changes.
+                      // Calendar UI state (_selectedDay, _focusedDay,
+                      // _calendarFormat) is local setState — handled by the
+                      // outer StatefulWidget rebuild, not the Selector.
+                      Selector<HeraProvider, List<HeraLeave>>(
+                        selector: (_, p) => p.allLeaves,
+                        builder: (_, allLeaves, __) => HeraAgendaTab(
+                          selectedDay: _selectedDay,
+                          focusedDay: _focusedDay,
+                          calendarFormat: _calendarFormat,
+                          allLeaves: allLeaves.toList(),
+                          onRefresh:
+                              context.read<HeraProvider>().refresh,
+                          onDaySelected: (selected, focused) => setState(() {
+                            _selectedDay = selected;
+                            _focusedDay = focused;
+                          }),
+                          onFormatChanged: (format) =>
+                              setState(() => _calendarFormat = format),
+                          onPageChanged: (focused) =>
+                              _focusedDay = focused,
+                        ),
+                      ),
+
+                      // Tab 2 — Team
+                      // Rebuilds only when employees, candidates, or
+                      // loadingEmployees change.
+                      Selector<HeraProvider, _TeamData>(
+                        selector: (_, p) => _TeamData(
+                          employees: p.employees,
+                          candidates: p.candidates,
+                          loadingEmployees: p.loadingEmployees,
+                        ),
+                        builder: (_, data, __) => HeraTeamTab(
+                          employees: data.employees.toList(),
+                          candidates: data.candidates.toList(),
+                          loadingEmployees: data.loadingEmployees,
+                          employeeSubTab: _employeeSubTab,
+                          onRefresh:
+                              context.read<HeraProvider>().refresh,
+                          onSubTabChanged: (i) =>
+                              setState(() => _employeeSubTab = i),
+                          onEmployeeTap: _showEmployeeDocuments,
+                        ),
+                      ),
+
+                      // Tab 3 — Energy
+                      // No HeraProvider data needed — only UserProvider.
+                      // Selector on UserProvider.energyBalance so it only
+                      // rebuilds when the balance actually changes.
+                      Selector<UserProvider, int>(
+                        selector: (_, p) => p.energyBalance,
+                        builder: (_, energyBalance, __) => HeraEnergyTab(
+                          energyBalance: energyBalance,
+                        ),
+                      ),
+
+                      // Tab 4 — Vision
+                      // Rebuilds only when employees list changes.
+                      Selector<HeraProvider, List<HeraEmployee>>(
+                        selector: (_, p) => p.employees,
+                        builder: (_, employees, __) => HeraVisionTab(
+                          employees: employees.toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Future<void> _deleteAction(Map<String, dynamic> action, int index) async {
-    if (index >= _recentActions.length) return;
-    final id = _extractId(action['_id']);
-
-    final removed = _recentActions[index];
-    setState(() => _recentActions.removeAt(index));
-
-    if (id != null) {
-      try {
-        await HeraService.deleteAction(id);
-      } catch (_) {
-        if (!mounted) return;
-        setState(() => _recentActions.insert(index, removed));
-        _toast('Erreur suppression');
-        return;
-      }
-    }
-
-    if (mounted) _toast('Action supprimée');
-  }
+  // ─── UI-only dialogs / sheets ─────────────────────────────────────────────
 
   void _showActionDetail(Map<String, dynamic> action) {
     final details = action['details'] is Map<String, dynamic>
@@ -329,7 +386,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
 
     final date = action['created_at'] != null
         ? DateFormat('dd MMMM yyyy · HH:mm', 'fr_FR')
-        .format(DateTime.parse(action['created_at']))
+            .format(DateTime.parse(action['created_at']))
         : 'Date inconnue';
 
     showDialog(
@@ -370,7 +427,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
               ),
               const Divider(color: HeraPalette.border, height: 24),
               ...details.entries.map(
-                    (entry) => Padding(
+                (entry) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: RichText(
                     text: TextSpan(
@@ -556,7 +613,8 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
   void _viewDocument(Map<String, dynamic> doc) {
     final isContract = doc['action_type'] == 'contract_renewal';
     final title = isContract ? 'Contrat de Travail' : 'Bulletin de Paie';
-    final content = doc['details']?['content'] as String? ?? 'Contenu indisponible';
+    final content =
+        doc['details']?['content'] as String? ?? 'Contenu indisponible';
 
     showModalBottomSheet(
       context: context,
@@ -702,5 +760,3 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
     );
   }
 }
-
-

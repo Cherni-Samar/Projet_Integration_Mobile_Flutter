@@ -22,6 +22,7 @@ import 'presentation/providers/theme_provider.dart';
 import 'presentation/providers/locale_provider.dart';
 import 'presentation/providers/user_provider.dart';
 import 'presentation/providers/cart_provider.dart';
+import 'presentation/providers/hera_provider.dart';
 
 
 void main() {
@@ -42,6 +43,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => HeraProvider()),
         ChangeNotifierProxyProvider<UserProvider, OwnedAgentsProvider>(
           create: (_) => OwnedAgentsProvider(),
           update: (_, userProvider, owned) {
