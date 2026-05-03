@@ -5,7 +5,7 @@ import '../../providers/theme_provider.dart';
 import '../../providers/user_provider.dart';
 import '/data/services/stripe_service.dart';
 import 'agent_chat_page.dart';
-import 'hr/hr_dashboard_page.dart';
+import 'package:e_team/presentation/screens/hera/hera_dashboard_page.dart';
 import 'echo/echo_dashboard_page.dart';
 import 'finance/kash_dashboard_screen.dart';
 import 'timo/timo_dashboard_page.dart';
@@ -371,7 +371,7 @@ class MyAgentsPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const HrDashboardPage(),
+                          builder: (_) => const HeraDashboardPage(),
                         ),
                       );
                       return;

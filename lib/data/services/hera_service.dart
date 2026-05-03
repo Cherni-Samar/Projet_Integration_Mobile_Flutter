@@ -6,7 +6,7 @@ import 'package:e_team/data/services/api_service.dart';
 import 'package:e_team/data/dtos/hera_dto.dart';
 import 'package:flutter/material.dart';
 import 'package:e_team/data/services/auth_service.dart';
-class HrAgentService {
+class HeraService {
   static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
 
 
@@ -278,7 +278,7 @@ class HrAgentService {
     return jsonDecode(response.body);
   }
 
-  // Dans lib/data/services/hr_agent_service.dart
+  // Dans lib/data/services/hera_service.dart
 
   static Future<Map<String, dynamic>> getOpportunities() async {
     try {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../data/services/hr_agent_service.dart';
+import 'package:e_team/data/services/hera_service.dart';
 import 'dexo_production_screen.dart';
 import 'dexo_organization_pulse_screen.dart';
 
@@ -45,7 +45,7 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
     });
 
     try {
-      final result = await HrAgentService.getDexoCheckup();
+      final result = await HeraService.getDexoCheckup();
 
       if (!mounted) return;
 

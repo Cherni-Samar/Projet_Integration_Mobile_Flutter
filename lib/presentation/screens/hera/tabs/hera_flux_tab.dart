@@ -6,8 +6,8 @@ import '../hera_history_page.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Flux tab — recent activity feed and workforce pulse.
-/// All state lives in [_HrDashboardPageState]; this widget is pure UI.
-class HrFluxTab extends StatelessWidget {
+/// All state lives in [_HeraDashboardPageState]; this widget is pure UI.
+class HeraFluxTab extends StatelessWidget {
   final List<Map<String, dynamic>> recentActions;
   final bool loadingStats;
   final bool loadingActions;
@@ -17,7 +17,7 @@ class HrFluxTab extends StatelessWidget {
   final void Function(Map<String, dynamic> action, int index) onDeleteAction;
   final void Function(Map<String, dynamic> action) onShowDetail;
 
-  const HrFluxTab({
+  const HeraFluxTab({
     super.key,
     required this.recentActions,
     required this.loadingStats,
@@ -41,15 +41,15 @@ class HrFluxTab extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
         children: [
           if (loadingStats)
-            const HrShimmerBox(height: 200)
+            const HeraShimmerBox(height: 200)
           else
-            HrWorkforcePulse(stats: stats, pulseCtrl: pulseCtrl),
+            HeraWorkforcePulse(stats: stats, pulseCtrl: pulseCtrl),
           const SizedBox(height: 14),
           if (hasTimoAction) ...[
-            const HrTimoBanner(),
+            const HeraTimoBanner(),
             const SizedBox(height: 14),
           ],
-          HrSectionHeader(
+          HeraSectionHeader(
             label: 'Activité récente',
             action: 'Voir tout',
             onAction: () => Navigator.push(
@@ -64,11 +64,11 @@ class HrFluxTab extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           if (loadingActions) ...[
-            const HrShimmerBox(height: 72),
+            const HeraShimmerBox(height: 72),
             const SizedBox(height: 8),
-            const HrShimmerBox(height: 72),
+            const HeraShimmerBox(height: 72),
           ] else if (recentActions.isEmpty)
-            const HrEmptyState(
+            const HeraEmptyState(
               icon: Icons.history_rounded,
               title: 'Aucune activité',
               sub: '...',
@@ -185,7 +185,7 @@ class _ActionCard extends StatelessWidget {
       key: Key('act_${_extractId(action['_id'])}_$index'),
       direction: DismissDirection.startToEnd,
       onDismissed: (_) => onDelete(action, index),
-      background: const HrDismissBackground(),
+      background: const HeraDismissBackground(),
       child: GestureDetector(
         onTap: () => onTap(action),
         child: Container(
@@ -234,7 +234,7 @@ class _ActionCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  HrBadge(label: cfg['badge'] as String, color: color),
+                  HeraBadge(label: cfg['badge'] as String, color: color),
                   if (createdAt != null) ...[
                     const SizedBox(height: 5),
                     Text(

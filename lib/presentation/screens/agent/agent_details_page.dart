@@ -5,8 +5,8 @@ import '/../l10n/app_localizations.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/user_provider.dart';
-import '/data/services/hr_agent_service.dart';
-import 'hr/hr_dashboard_page.dart';
+import 'package:e_team/data/services/hera_service.dart';
+import 'package:e_team/presentation/screens/hera/hera_dashboard_page.dart';
 import '../../widgets/agent/agent_stat_card.dart';
 import '../../widgets/agent/agent_skill_chip.dart';
 import '../../widgets/agent/agent_energy_cost_item.dart';
@@ -852,7 +852,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const HrDashboardPage(),
+                  builder: (_) => const HeraDashboardPage(),
                 ),
               );
               return;
@@ -939,18 +939,18 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
 
       try {
         // 2. Appelle N8N
-        await HrAgentService.hello(username: 'Samar');
+        await HeraService.hello(username: 'Samar');
 
         if (!context.mounted) return;
 
         // 3. Ferme loading
         Navigator.pop(context);
 
-        // 4. ✅ Navigate vers HrDashboardPage
+        // 4. ✅ Navigate vers HeraDashboardPage
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const HrDashboardPage(),
+            builder: (_) => const HeraDashboardPage(),
           ),
         );
       } catch (e) {

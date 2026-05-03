@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '/data/services/echo_service.dart';
-import '/data/services/hr_agent_service.dart';
+import 'package:e_team/data/services/hera_service.dart';
 
 class AgentCommunicationScreen extends StatefulWidget {
   final String? token;
@@ -45,7 +45,7 @@ class _AgentCommunicationScreenState extends State<AgentCommunicationScreen> {
         token: widget.token,
       );
     } else {
-      response = await HrAgentService.sendEmailToEcho(
+      response = await HeraService.sendEmailToEcho(
         subject: _subjectController.text,
         content: _contentController.text,
         from: 'hera@e-team.com',

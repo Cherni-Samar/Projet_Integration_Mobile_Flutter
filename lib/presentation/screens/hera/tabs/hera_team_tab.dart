@@ -4,8 +4,8 @@ import 'package:e_team/domain/models/hera_models.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Team tab — active employees, onboarding, and candidates.
-/// All state and API calls live in [_HrDashboardPageState].
-class HrTeamTab extends StatelessWidget {
+/// All state and API calls live in [_HeraDashboardPageState].
+class HeraTeamTab extends StatelessWidget {
   final List<HeraEmployee> employees;
   final List<HeraCandidate> candidates;
   final bool loadingEmployees;
@@ -14,7 +14,7 @@ class HrTeamTab extends StatelessWidget {
   final void Function(int index) onSubTabChanged;
   final void Function(HeraEmployee emp) onEmployeeTap;
 
-  const HrTeamTab({
+  const HeraTeamTab({
     super.key,
     required this.employees,
     required this.candidates,
@@ -181,7 +181,7 @@ class _ActiveList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (employees.isEmpty) {
-      return const HrEmptyState(
+      return const HeraEmptyState(
         icon: Icons.people_outline,
         title: 'Aucun employé actif',
         sub: 'Votre équipe est vide.',
@@ -192,7 +192,7 @@ class _ActiveList extends StatelessWidget {
       itemCount: employees.length,
       itemBuilder: (_, i) => GestureDetector(
         onTap: () => onEmployeeTap(employees[i]),
-        child: HrActiveCard(employee: employees[i]),
+        child: HeraActiveCard(employee: employees[i]),
       ),
     );
   }
@@ -206,7 +206,7 @@ class _OnboardingList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (employees.isEmpty) {
-      return const HrEmptyState(
+      return const HeraEmptyState(
         icon: Icons.celebration,
         title: 'Aucun nouvel arrivant',
         sub: 'Tout le monde est déjà actif.',
@@ -215,7 +215,7 @@ class _OnboardingList extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
       itemCount: employees.length,
-      itemBuilder: (_, i) => HrOnboardingCard(employee: employees[i]),
+      itemBuilder: (_, i) => HeraOnboardingCard(employee: employees[i]),
     );
   }
 }
@@ -228,7 +228,7 @@ class _CandidateList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (candidates.isEmpty) {
-      return const HrEmptyState(
+      return const HeraEmptyState(
         icon: Icons.person_add_alt_1,
         title: 'Aucun candidat',
         sub: 'Hera attend des candidatures...',

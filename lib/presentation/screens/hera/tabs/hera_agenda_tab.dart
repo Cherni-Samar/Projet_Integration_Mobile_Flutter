@@ -6,8 +6,8 @@ import 'package:e_team/domain/models/hera_models.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Agenda tab — calendar view of approved leaves.
-/// All state lives in [_HrDashboardPageState]; this widget is pure UI.
-class HrAgendaTab extends StatelessWidget {
+/// All state lives in [_HeraDashboardPageState]; this widget is pure UI.
+class HeraAgendaTab extends StatelessWidget {
   final DateTime? selectedDay;
   final DateTime focusedDay;
   final CalendarFormat calendarFormat;
@@ -23,7 +23,7 @@ class HrAgendaTab extends StatelessWidget {
   /// Called when the calendar page changes (month swipe).
   final void Function(DateTime focused) onPageChanged;
 
-  const HrAgendaTab({
+  const HeraAgendaTab({
     super.key,
     required this.selectedDay,
     required this.focusedDay,
@@ -55,7 +55,7 @@ class HrAgendaTab extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
         children: [
-          const HrSectionHeader(label: 'Absences & Congés'),
+          const HeraSectionHeader(label: 'Absences & Congés'),
           const SizedBox(height: 4),
           const Text(
             'Sélectionnez une date pour voir les absences approuvées.',
@@ -86,7 +86,7 @@ class HrAgendaTab extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           if (leaves.isEmpty)
-            const HrEmptyState(
+            const HeraEmptyState(
               icon: Icons.event_available_rounded,
               title: 'Aucun congé',
               sub: 'Pas d\'absence ce jour-là',
@@ -110,9 +110,9 @@ class HrAgendaTab extends StatelessWidget {
         spacing: 20,
         runSpacing: 8,
         children: [
-          HrLegendChip(label: 'Congé annuel', color: HeraPalette.mauve),
-          HrLegendChip(label: 'Maladie', color: HeraPalette.warning),
-          HrLegendChip(label: 'Urgent', color: HeraPalette.danger),
+          HeraLegendChip(label: 'Congé annuel', color: HeraPalette.mauve),
+          HeraLegendChip(label: 'Maladie', color: HeraPalette.warning),
+          HeraLegendChip(label: 'Urgent', color: HeraPalette.danger),
         ],
       ),
     );

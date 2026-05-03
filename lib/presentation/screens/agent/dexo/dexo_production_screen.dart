@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../data/services/hr_agent_service.dart';
+import 'package:e_team/data/services/hera_service.dart';
 
 class DexoProductionScreen extends StatefulWidget {
   const DexoProductionScreen({super.key});
@@ -36,7 +36,7 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final docs = await HrAgentService.getDocumentActions(limit: 50);
+      final docs = await HeraService.getDocumentActions(limit: 50);
 
       if (!mounted) return;
 

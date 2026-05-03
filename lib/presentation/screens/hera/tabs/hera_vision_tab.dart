@@ -4,11 +4,11 @@ import 'package:e_team/domain/models/hera_models.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Vision tab — department density radar / staffing analysis.
-/// All state lives in [_HrDashboardPageState]; this widget is pure UI.
-class HrVisionTab extends StatelessWidget {
+/// All state lives in [_HeraDashboardPageState]; this widget is pure UI.
+class HeraVisionTab extends StatelessWidget {
   final List<HeraEmployee> employees;
 
-  const HrVisionTab({super.key, required this.employees});
+  const HeraVisionTab({super.key, required this.employees});
 
   // Static config — department capacity targets.
   static const Map<String, int> _deptMax = {

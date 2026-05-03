@@ -1,5 +1,5 @@
-/// Shared widgets and palette used across all HR dashboard tab files.
-/// Extracted from hr_dashboard_page.dart to allow import by tab files.
+/// Shared widgets and palette used across all Hera dashboard tab files.
+/// Extracted from hera_dashboard_page.dart to allow import by tab files.
 library;
 
 import 'package:flutter/material.dart';
@@ -28,11 +28,11 @@ class HeraPalette {
 
 // ─── Shared small widgets ────────────────────────────────────────────────────
 
-class HrBadge extends StatelessWidget {
+class HeraBadge extends StatelessWidget {
   final String label;
   final Color color;
 
-  const HrBadge({super.key, required this.label, required this.color});
+  const HeraBadge({super.key, required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +55,10 @@ class HrBadge extends StatelessWidget {
   }
 }
 
-class HrShimmerBox extends StatelessWidget {
+class HeraShimmerBox extends StatelessWidget {
   final double height;
 
-  const HrShimmerBox({super.key, required this.height});
+  const HeraShimmerBox({super.key, required this.height});
 
   @override
   Widget build(BuildContext context) {
@@ -73,12 +73,12 @@ class HrShimmerBox extends StatelessWidget {
   }
 }
 
-class HrEmptyState extends StatelessWidget {
+class HeraEmptyState extends StatelessWidget {
   final IconData icon;
   final String title;
   final String sub;
 
-  const HrEmptyState({
+  const HeraEmptyState({
     super.key,
     required this.icon,
     required this.title,
@@ -132,12 +132,12 @@ class HrEmptyState extends StatelessWidget {
   }
 }
 
-class HrSectionHeader extends StatelessWidget {
+class HeraSectionHeader extends StatelessWidget {
   final String label;
   final String? action;
   final VoidCallback? onAction;
 
-  const HrSectionHeader({
+  const HeraSectionHeader({
     super.key,
     required this.label,
     this.action,
@@ -182,8 +182,8 @@ class HrSectionHeader extends StatelessWidget {
   }
 }
 
-class HrDismissBackground extends StatelessWidget {
-  const HrDismissBackground({super.key});
+class HeraDismissBackground extends StatelessWidget {
+  const HeraDismissBackground({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -217,8 +217,8 @@ class HrDismissBackground extends StatelessWidget {
   }
 }
 
-class HrTimoBanner extends StatelessWidget {
-  const HrTimoBanner({super.key});
+class HeraTimoBanner extends StatelessWidget {
+  const HeraTimoBanner({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -254,11 +254,11 @@ class HrTimoBanner extends StatelessWidget {
   }
 }
 
-class HrLegendChip extends StatelessWidget {
+class HeraLegendChip extends StatelessWidget {
   final String label;
   final Color color;
 
-  const HrLegendChip({super.key, required this.label, required this.color});
+  const HeraLegendChip({super.key, required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -288,11 +288,11 @@ class HrLegendChip extends StatelessWidget {
   }
 }
 
-class HrWorkforcePulse extends StatelessWidget {
+class HeraWorkforcePulse extends StatelessWidget {
   final HeraStats? stats;
   final AnimationController pulseCtrl;
 
-  const HrWorkforcePulse({
+  const HeraWorkforcePulse({
     super.key,
     required this.stats,
     required this.pulseCtrl,
@@ -493,12 +493,12 @@ class _VertDivider extends StatelessWidget {
   }
 }
 
-// ─── Employee card widgets (used by HrTeamTab) ───────────────────────────────
+// ─── Employee card widgets (used by HeraTeamTab) ───────────────────────────────
 
-class HrActiveCard extends StatelessWidget {
+class HeraActiveCard extends StatelessWidget {
   final HeraEmployee employee;
 
-  const HrActiveCard({super.key, required this.employee});
+  const HeraActiveCard({super.key, required this.employee});
 
   @override
   Widget build(BuildContext context) {
@@ -608,10 +608,10 @@ class _MiniBadge extends StatelessWidget {
   }
 }
 
-class HrOnboardingCard extends StatelessWidget {
+class HeraOnboardingCard extends StatelessWidget {
   final HeraEmployee employee;
 
-  const HrOnboardingCard({super.key, required this.employee});
+  const HeraOnboardingCard({super.key, required this.employee});
 
   @override
   Widget build(BuildContext context) {
@@ -693,7 +693,7 @@ class HrOnboardingCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const HrBadge(label: 'NOUVEAU', color: HeraPalette.mauve),
+              const HeraBadge(label: 'NOUVEAU', color: HeraPalette.mauve),
             ],
           ),
           const SizedBox(height: 12),
@@ -757,9 +757,9 @@ class HrOnboardingCard extends StatelessWidget {
   }
 }
 
-// ─── Scaffold-level widgets (used by HrDashboardPage._buildScaffold) ─────────
+// ─── Scaffold-level widgets (used by HeraDashboardPage._buildScaffold) ─────────
 
-class HrHeader extends StatelessWidget {
+class HeraHeader extends StatelessWidget {
   final int energy;
   final AnimationController pulseCtrl;
   final AnimationController glowCtrl;
@@ -768,7 +768,7 @@ class HrHeader extends StatelessWidget {
   final VoidCallback onVision;
   final VoidCallback onHistory;
 
-  const HrHeader({
+  const HeraHeader({
     super.key,
     required this.energy,
     required this.pulseCtrl,
@@ -793,7 +793,7 @@ class HrHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              HrCircleBtn(
+              HeraCircleBtn(
                 icon: Icons.arrow_back_ios_new_rounded,
                 onTap: onBack,
               ),
@@ -894,7 +894,7 @@ class HrHeader extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: HrQuickBtn(
+                child: HeraQuickBtn(
                   icon: Icons.graphic_eq_rounded,
                   label: 'PARLER',
                   isPrimary: true,
@@ -903,7 +903,7 @@ class HrHeader extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: HrQuickBtn(
+                child: HeraQuickBtn(
                   icon: Icons.history_rounded,
                   label: 'Historique',
                   isPrimary: false,
@@ -912,7 +912,7 @@ class HrHeader extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: HrQuickBtn(
+                child: HeraQuickBtn(
                   icon: Icons.radar_rounded,
                   label: 'Vision IA',
                   isPrimary: false,
@@ -927,11 +927,11 @@ class HrHeader extends StatelessWidget {
   }
 }
 
-class HrCircleBtn extends StatelessWidget {
+class HeraCircleBtn extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const HrCircleBtn({super.key, required this.icon, required this.onTap});
+  const HeraCircleBtn({super.key, required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -949,13 +949,13 @@ class HrCircleBtn extends StatelessWidget {
   }
 }
 
-class HrQuickBtn extends StatelessWidget {
+class HeraQuickBtn extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isPrimary;
   final VoidCallback onTap;
 
-  const HrQuickBtn({
+  const HeraQuickBtn({
     super.key,
     required this.icon,
     required this.label,
@@ -997,12 +997,12 @@ class HrQuickBtn extends StatelessWidget {
   }
 }
 
-class HrPillTabBar extends StatelessWidget {
+class HeraPillTabBar extends StatelessWidget {
   final List<(IconData, String)> tabs;
   final int selected;
   final ValueChanged<int> onSelect;
 
-  const HrPillTabBar({
+  const HeraPillTabBar({
     super.key,
     required this.tabs,
     required this.selected,

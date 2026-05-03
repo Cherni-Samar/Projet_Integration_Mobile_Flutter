@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '/data/services/hr_agent_service.dart';
+import 'package:e_team/data/services/hera_service.dart';
 
 class HeraHistoryPage extends StatefulWidget {
   final bool isDark;
@@ -59,7 +59,7 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
       _loadingMore = true;
     });
     try {
-      final result = await HrAgentService.getAllActions(page: _page, limit: 20);
+      final result = await HeraService.getAllActions(page: _page, limit: 20);
       if (result['success'] == true) {
         final newActions = List<Map<String, dynamic>>.from(result['actions'] ?? []);
 
@@ -99,7 +99,7 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
 
     if (actionId != null && actionId.isNotEmpty) {
       try {
-        await HrAgentService.deleteAction(actionId);
+        await HeraService.deleteAction(actionId);
       } catch (e) {
         // ✅ En cas d'erreur API, on annule la suppression locale ET on retire de _deletedIds
         if (mounted) {

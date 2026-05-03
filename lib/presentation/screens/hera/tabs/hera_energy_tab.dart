@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Energy tab — shows AI task costs vs current energy balance.
-/// All state lives in [_HrDashboardPageState]; this widget is pure UI.
-class HrEnergyTab extends StatelessWidget {
+/// All state lives in [_HeraDashboardPageState]; this widget is pure UI.
+class HeraEnergyTab extends StatelessWidget {
   final int energyBalance;
 
-  const HrEnergyTab({super.key, required this.energyBalance});
+  const HeraEnergyTab({super.key, required this.energyBalance});
 
   static const _tasks = [
     ('Demande de congé',       10, Icons.event_note_rounded,       HeraPalette.violet),
@@ -84,12 +84,12 @@ class HrEnergyTab extends StatelessWidget {
                   ),
                 ),
                 if (!canAfford)
-                  const HrBadge(
+                  const HeraBadge(
                     label: 'INSUFFISANT',
                     color: HeraPalette.danger,
                   )
                 else
-                  HrBadge(
+                  HeraBadge(
                     label: '${energyBalance - cost} restants',
                     color: taskColor,
                   ),

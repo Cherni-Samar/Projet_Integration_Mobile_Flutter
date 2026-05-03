@@ -6,25 +6,25 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-import 'package:e_team/data/services/hr_agent_service.dart';
+import 'package:e_team/data/services/hera_service.dart';
 import 'package:e_team/domain/models/hera_models.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
-import 'hera_history_page.dart';
-import 'hera_voice_page.dart';
+import 'package:e_team/presentation/screens/hera/hera_history_page.dart';
+import 'package:e_team/presentation/screens/hera/hera_voice_page.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
-import 'tabs/hr_flux_tab.dart';
-import 'tabs/hr_agenda_tab.dart';
-import 'tabs/hr_team_tab.dart';
-import 'tabs/hr_energy_tab.dart';
-import 'tabs/hr_vision_tab.dart';
-class HrDashboardPage extends StatefulWidget {
-  const HrDashboardPage({super.key});
+import 'package:e_team/presentation/screens/hera/tabs/hera_flux_tab.dart';
+import 'package:e_team/presentation/screens/hera/tabs/hera_agenda_tab.dart';
+import 'package:e_team/presentation/screens/hera/tabs/hera_team_tab.dart';
+import 'package:e_team/presentation/screens/hera/tabs/hera_energy_tab.dart';
+import 'package:e_team/presentation/screens/hera/tabs/hera_vision_tab.dart';
+class HeraDashboardPage extends StatefulWidget {
+  const HeraDashboardPage({super.key});
 
   @override
-  State<HrDashboardPage> createState() => _HrDashboardPageState();
+  State<HeraDashboardPage> createState() => _HeraDashboardPageState();
 }
 
-class _HrDashboardPageState extends State<HrDashboardPage>
+class _HeraDashboardPageState extends State<HeraDashboardPage>
     with TickerProviderStateMixin {
   int _selectedTab = 0;
   int _employeeSubTab = 0;
@@ -98,7 +98,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     if (mounted) setState(() => _loadingStats = true);
 
     try {
-      final response = await HrAgentService.getAdminStatsTyped();
+      final response = await HeraService.getAdminStatsTyped();
       if (!mounted) return;
       setState(() {
         _stats = response.stats;
@@ -113,7 +113,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     if (mounted) setState(() => _loadingActions = true);
 
     try {
-      final response = await HrAgentService.getRecentActions(limit: 20);
+      final response = await HeraService.getRecentActions(limit: 20);
 
       if (!mounted) return;
 
@@ -131,7 +131,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
     if (mounted) setState(() => _loadingEmployees = true);
 
     try {
-      final response = await HrAgentService.getAllEmployeesTyped();
+      final response = await HeraService.getAllEmployeesTyped();
       if (!mounted) return;
 
       setState(() {
@@ -147,7 +147,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
 
   Future<void> _loadCandidates() async {
     try {
-      final response = await HrAgentService.getAllCandidatesTyped();
+      final response = await HeraService.getAllCandidatesTyped();
       if (!mounted) return;
       setState(() => _candidates = response.candidates);
     } catch (e) {
@@ -160,7 +160,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
       final leaves = <HeraLeave>[];
 
       for (final emp in _employees) {
-        final response = await HrAgentService.getLeavesTyped(
+        final response = await HeraService.getLeavesTyped(
           employeeId: emp.id,
           employeeName: emp.name,
           employeeRole: emp.role,
@@ -222,7 +222,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
         child: SafeArea(
           child: Column(
             children: [
-              HrHeader(
+              HeraHeader(
                 energy: context.watch<UserProvider>().energyBalance,
                 pulseCtrl: _pulseCtrl,
                 glowCtrl: _glowCtrl,
@@ -240,7 +240,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                 ),
               ),
               const SizedBox(height: 10),
-              HrPillTabBar(
+              HeraPillTabBar(
                 tabs: _tabs,
                 selected: _selectedTab,
                 onSelect: (i) => setState(() => _selectedTab = i),
@@ -250,7 +250,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                 child: IndexedStack(
                   index: _selectedTab,
                   children: [
-                    HrFluxTab(
+                    HeraFluxTab(
                       recentActions: _recentActions,
                       loadingStats: _loadingStats,
                       loadingActions: _loadingActions,
@@ -260,7 +260,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                       onDeleteAction: _deleteAction,
                       onShowDetail: _showActionDetail,
                     ),
-                    HrAgendaTab(
+                    HeraAgendaTab(
                       selectedDay: _selectedDay,
                       focusedDay: _focusedDay,
                       calendarFormat: _calendarFormat,
@@ -274,7 +274,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                           setState(() => _calendarFormat = format),
                       onPageChanged: (focused) => _focusedDay = focused,
                     ),
-                    HrTeamTab(
+                    HeraTeamTab(
                       employees: _employees,
                       candidates: _candidates,
                       loadingEmployees: _loadingEmployees,
@@ -284,11 +284,11 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                           setState(() => _employeeSubTab = i),
                       onEmployeeTap: _showEmployeeDocuments,
                     ),
-                    HrEnergyTab(
+                    HeraEnergyTab(
                       energyBalance:
                           context.read<UserProvider>().energyBalance,
                     ),
-                    HrVisionTab(
+                    HeraVisionTab(
                       employees: _employees,
                     ),
                   ],
@@ -310,7 +310,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
 
     if (id != null) {
       try {
-        await HrAgentService.deleteAction(id);
+        await HeraService.deleteAction(id);
       } catch (_) {
         if (!mounted) return;
         setState(() => _recentActions.insert(index, removed));
@@ -442,7 +442,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
               const Divider(color: HeraPalette.border, height: 24),
               Expanded(
                 child: FutureBuilder<Map<String, dynamic>>(
-                  future: HrAgentService.getHistory(employeeId: emp.id),
+                  future: HeraService.getHistory(employeeId: emp.id),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -465,7 +465,7 @@ class _HrDashboardPageState extends State<HrDashboardPage>
                       return Center(
                         child: ElevatedButton(
                           onPressed: () async {
-                            await HrAgentService.generateHeraDoc(
+                            await HeraService.generateHeraDoc(
                               employeeId: emp.id,
                               docType: 'contract',
                             );
