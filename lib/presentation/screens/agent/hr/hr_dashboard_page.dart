@@ -11,7 +11,7 @@ import 'package:e_team/domain/models/hera_models.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
 import 'hera_history_page.dart';
 import 'hera_voice_page.dart';
-import 'hr_shared_widgets.dart';
+import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 import 'tabs/hr_flux_tab.dart';
 import 'tabs/hr_agenda_tab.dart';
 import 'tabs/hr_team_tab.dart';

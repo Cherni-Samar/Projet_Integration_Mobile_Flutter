@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:e_team/domain/models/hera_models.dart';
-import '../hr_shared_widgets.dart';
+import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Vision tab — department density radar / staffing analysis.
 /// All state lives in [_HrDashboardPageState]; this widget is pure UI.

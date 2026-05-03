@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:e_team/domain/models/hera_models.dart';
-import '../hr_shared_widgets.dart';
+import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Team tab — active employees, onboarding, and candidates.
 /// All state and API calls live in [_HrDashboardPageState].

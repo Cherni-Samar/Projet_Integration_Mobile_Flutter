@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../hr_shared_widgets.dart';
+import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Energy tab — shows AI task costs vs current energy balance.
 /// All state lives in [_HrDashboardPageState]; this widget is pure UI.

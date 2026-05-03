@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 import 'package:e_team/domain/models/hera_models.dart';
 import '../hera_history_page.dart';
-import '../hr_shared_widgets.dart';
+import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Flux tab — recent activity feed and workforce pulse.
 /// All state lives in [_HrDashboardPageState]; this widget is pure UI.

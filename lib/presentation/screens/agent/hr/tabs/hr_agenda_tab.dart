@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'package:e_team/domain/models/hera_models.dart';
-import '../hr_shared_widgets.dart';
+import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Agenda tab — calendar view of approved leaves.
 /// All state lives in [_HrDashboardPageState]; this widget is pure UI.
