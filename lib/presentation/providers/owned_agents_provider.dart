@@ -12,8 +12,7 @@ class OwnedAgentsProvider extends ChangeNotifier {
 
   int get count => _agents.length;
 
-  int get totalEnergy =>
-      _agents.fold(0, (sum, a) => sum + a.energy);
+  int get totalEnergy => _agents.fold(0, (sum, a) => sum + a.energy);
 
   String _norm(String v) => v.trim().toLowerCase();
 
@@ -26,8 +25,10 @@ class OwnedAgentsProvider extends ChangeNotifier {
   /// [activeAgentNames] list. Uses only [AgentMetadataService] for defaults —
   /// no HTTP calls, safe to call from ProxyProvider.update().
   void syncFromActiveAgents(List<String> activeAgentNames) {
-    final desired =
-        activeAgentNames.map(_norm).where((e) => e.isNotEmpty).toList();
+    final desired = activeAgentNames
+        .map(_norm)
+        .where((e) => e.isNotEmpty)
+        .toList();
 
     // Build index of existing agents so we preserve customName / energy.
     final existingById = <String, OwnedAgent>{
@@ -57,8 +58,8 @@ class OwnedAgentsProvider extends ChangeNotifier {
     }
 
     // Only notify if the list actually changed.
-    final changed = next.length != _agents.length ||
-        !_sameAgentOrder(next, _agents);
+    final changed =
+        next.length != _agents.length || !_sameAgentOrder(next, _agents);
 
     if (!changed) return;
 
@@ -80,6 +81,14 @@ class OwnedAgentsProvider extends ChangeNotifier {
       if (newEnergy != null && agent.energy != newEnergy) {
         agent.energy = newEnergy;
         hasChanges = true;
+      }
+    }
+
+    if (hasChanges) {
+      notifyListeners();
+    }
+  }
+
   /// Delegates to [AgentService.fetchAgentEnergies].
   /// Falls back to [AgentMetadataService] defaults if the service returns empty.
   Future<Map<String, int>> _fetchAgentEnergies() async {
