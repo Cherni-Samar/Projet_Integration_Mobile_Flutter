@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:characters/characters.dart';
-import 'package:e_team/data/dtos/echo_dto.dart';
+import 'package:e_team/domain/models/echo_analysis_model.dart';
 
 class EchoFormatters {
   static String humanReadableAutoReplyBody(String raw) {
@@ -148,33 +148,33 @@ class EchoFormatters {
     return true;
   }
 
-  static String echoFormattedText(EchoResponse response) {
+  static String echoFormattedText(EchoAnalysis analysis, {String? error}) {
     String text = '';
 
-    if (response.summary != null) {
-      text += '📝 Resume\n${response.summary}\n\n';
+    if (analysis.summary != null) {
+      text += '📝 Resume\n${analysis.summary}\n\n';
     }
 
-    if (response.transcribedText != null) {
-      text += '🎤 Message transcrit\n${response.transcribedText}\n\n';
+    if (analysis.transcribedText != null) {
+      text += '🎤 Message transcrit\n${analysis.transcribedText}\n\n';
     }
 
-    text += '⚠️ Urgent : ${response.isUrgent ? 'OUI' : 'NON'}\n';
-    text += '⭐ Priorite : ${_priorityIcon(response.priority)}\n\n';
+    text += '⚠️ Urgent : ${analysis.isUrgent ? 'OUI' : 'NON'}\n';
+    text += '⭐ Priorite : ${_priorityIcon(analysis.priority)}\n\n';
 
-    if (response.actions.isNotEmpty) {
+    if (analysis.actions.isNotEmpty) {
       text += '✅ Actions a faire\n';
-      for (final action in response.actions) {
+      for (final action in analysis.actions) {
         text += '   • $action\n';
       }
     }
 
-    if (response.category != null) {
-      text += '\n📂 Categorie : ${response.category}';
+    if (analysis.category != null) {
+      text += '\n📂 Categorie : ${analysis.category}';
     }
 
-    if (response.error != null) {
-      text += '❌ Erreur : ${response.error}';
+    if (error != null) {
+      text += '❌ Erreur : $error';
     }
 
     return text;
