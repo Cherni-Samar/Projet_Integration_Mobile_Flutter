@@ -32,7 +32,7 @@ class EchoDashboardNavigation extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFB57BFF).withOpacity(0.15),
+            color: Color(0xFFB57BFF).withValues(alpha: 0.15),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -53,12 +53,12 @@ class EchoDashboardNavigation extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 2),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? Colors.white.withOpacity(0.25)
+                        ? Colors.white.withValues(alpha: 0.25)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                     border: isSelected
                         ? Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 0.5,
                           )
                         : null,
@@ -88,7 +88,7 @@ class EchoDashboardNavigation extends StatelessWidget {
                           height: 2,
                           width: 20,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Colors.white.withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(1),
                           ),
                         ),

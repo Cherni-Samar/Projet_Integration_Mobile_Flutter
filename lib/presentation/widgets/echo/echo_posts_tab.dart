@@ -51,7 +51,7 @@ class EchoPostsTab extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF7C3AED).withOpacity(0.22),
+            color: const Color(0xFF7C3AED).withValues(alpha: 0.22),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -65,9 +65,11 @@ class EchoPostsTab extends StatelessWidget {
                 width: 54,
                 height: 54,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.18),
+                  color: Colors.white.withValues(alpha: 0.18),
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: Colors.white.withOpacity(0.25)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.25),
+                  ),
                 ),
                 child: const Icon(
                   Icons.auto_awesome_rounded,
@@ -93,7 +95,7 @@ class EchoPostsTab extends StatelessWidget {
                     Text(
                       'AI-generated posts, campaigns and engagement tracking',
                       style: GoogleFonts.inter(
-                        color: Colors.white.withOpacity(0.82),
+                        color: Colors.white.withValues(alpha: 0.82),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                         height: 1.35,
@@ -108,9 +110,11 @@ class EchoPostsTab extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.16),
+                  color: Colors.white.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: Colors.white.withOpacity(0.22)),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.22),
+                  ),
                 ),
                 child: Text(
                   '${posts.length} POSTS',
@@ -202,8 +206,8 @@ class EchoPostsTab extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  EchoTheme.violet.withOpacity(0.14),
-                  EchoTheme.violet.withOpacity(0.06),
+                  EchoTheme.violet.withValues(alpha: 0.14),
+                  EchoTheme.violet.withValues(alpha: 0.06),
                 ],
               ),
               shape: BoxShape.circle,
@@ -211,7 +215,7 @@ class EchoPostsTab extends StatelessWidget {
             child: Icon(
               Icons.auto_awesome_rounded,
               size: 44,
-              color: EchoTheme.violet.withOpacity(0.75),
+              color: EchoTheme.violet.withValues(alpha: 0.75),
             ),
           ),
           const SizedBox(height: 18),
@@ -246,12 +250,12 @@ class EchoPostsTab extends StatelessWidget {
         color: EchoTheme.card,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: EchoTheme.border.withOpacity(0.75),
+          color: EchoTheme.border.withValues(alpha: 0.75),
           width: 0.7,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.035),
+            color: Colors.black.withValues(alpha: 0.035),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -310,7 +314,7 @@ class EchoPostsTab extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: EchoTheme.violet.withOpacity(0.1),
+                    color: EchoTheme.violet.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
@@ -362,7 +366,7 @@ class EchoPostsTab extends StatelessWidget {
                 bottom: Radius.circular(24),
               ),
               border: Border(
-                top: BorderSide(color: EchoTheme.border.withOpacity(0.7)),
+                top: BorderSide(color: EchoTheme.border.withValues(alpha: 0.7)),
               ),
             ),
             child: Row(
@@ -437,7 +441,7 @@ class EchoPostsTab extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.purple.withOpacity(0.1),
+              color: Colors.purple.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(
@@ -470,8 +474,8 @@ class EchoPostsTab extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: platform.name == 'mastodon'
-                  ? Colors.purple.withOpacity(0.1)
-                  : Colors.blue.withOpacity(0.1),
+                  ? Colors.purple.withValues(alpha: 0.1)
+                  : Colors.blue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: platform.name == 'mastodon'

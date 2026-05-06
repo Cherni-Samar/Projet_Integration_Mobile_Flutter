@@ -83,8 +83,8 @@ class EchoDashboardHeader extends StatelessWidget {
                               width: 8,
                               height: 8,
                               decoration: BoxDecoration(
-                                color: Color(0xFFFF00DD).withOpacity(
-                                  0.4 + 0.6 * pulseController.value,
+                                color: Color(0xFFFF00DD).withValues(
+                                  alpha: 0.4 + 0.6 * pulseController.value,
                                 ),
                                 shape: BoxShape.circle,
                               ),
@@ -142,7 +142,7 @@ class EchoDashboardHeader extends StatelessWidget {
             return Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: EchoTheme.violet.withOpacity(0.1),
+                color: EchoTheme.violet.withValues(alpha: 0.1),
               ),
               child: Icon(Icons.psychology, color: EchoTheme.violet, size: 24),
             );

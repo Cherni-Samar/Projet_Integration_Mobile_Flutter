@@ -180,7 +180,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
             indicatorColor: Colors.white,
             indicatorWeight: 3,
             labelColor: Colors.white,
-            unselectedLabelColor: Colors.white.withOpacity(0.6),
+            unselectedLabelColor: Colors.white.withValues(alpha: 0.6),
             labelStyle: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -223,7 +223,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [violet, violet.withOpacity(0.8)],
+          colors: [violet, violet.withValues(alpha: 0.8)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -234,7 +234,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -260,7 +260,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
                 Text(
                   'Generate posts every 3 days automatically',
                   style: GoogleFonts.inter(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -282,7 +282,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
         border: Border.all(color: border, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -396,7 +396,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
         border: Border.all(color: border, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -504,7 +504,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: violet.withOpacity(0.1),
+                  color: violet.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -653,13 +653,13 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: violet.withOpacity(0.1),
+                  color: violet.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.history,
                   size: 48,
-                  color: violet.withOpacity(0.5),
+                  color: violet.withValues(alpha: 0.5),
                 ),
               ),
               const SizedBox(height: 16),
@@ -740,7 +740,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
         border: Border.all(color: border, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -768,7 +768,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(

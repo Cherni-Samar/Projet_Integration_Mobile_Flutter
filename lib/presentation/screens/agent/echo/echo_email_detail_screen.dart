@@ -147,7 +147,7 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.red.withOpacity(0.1),
+              color: Colors.red.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -170,7 +170,7 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFF8FAFF),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _violet.withOpacity(0.1)),
+        border: Border.all(color: _violet.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,7 +262,7 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
           style: GoogleFonts.inter(
             fontSize: 15,
             height: 1.7,
-            color: _textMain.withOpacity(0.9),
+            color: _textMain.withValues(alpha: 0.9),
           ),
         ),
       ],

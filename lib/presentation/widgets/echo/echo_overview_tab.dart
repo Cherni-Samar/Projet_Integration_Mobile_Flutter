@@ -83,10 +83,13 @@ class EchoOverviewTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: EchoTheme.card,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: accentColor.withOpacity(0.22), width: 0.8),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.22),
+          width: 0.8,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.035),
+            color: Colors.black.withValues(alpha: 0.035),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -98,7 +101,7 @@ class EchoOverviewTab extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.12),
+              color: accentColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Icon(icon, color: accentColor, size: 24),
@@ -153,7 +156,7 @@ class EchoOverviewTab extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                 decoration: BoxDecoration(
-                  color: accentColor.withOpacity(0.11),
+                  color: accentColor.withValues(alpha: 0.11),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(

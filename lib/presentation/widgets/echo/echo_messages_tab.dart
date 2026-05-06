@@ -195,9 +195,9 @@ class EchoMessagesTab extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isFromHera
-                ? EchoTheme.violet.withOpacity(0.3)
+                ? EchoTheme.violet.withValues(alpha: 0.3)
                 : (email.isUrgent
-                      ? Colors.redAccent.withOpacity(0.3)
+                      ? Colors.redAccent.withValues(alpha: 0.3)
                       : EchoTheme.border),
             width: isFromHera ? 1 : 0.5,
           ),
@@ -242,7 +242,7 @@ class EchoMessagesTab extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: EchoTheme.violet.withOpacity(0.1),
+                      color: EchoTheme.violet.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
