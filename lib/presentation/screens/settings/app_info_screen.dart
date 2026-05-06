@@ -4,7 +4,7 @@ import 'package:e_team/presentation/providers/theme_provider.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 
 class AppInfoScreen extends StatelessWidget {
-  const AppInfoScreen({Key? key}) : super(key: key);
+  const AppInfoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -532,7 +532,7 @@ class AppInfoScreen extends StatelessWidget {
                 ],
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 /// Multi-Agent Collaboration Test UI
 /// Demonstrates the "Employee Performance Drop + Contract Renewal + Sensitive Document Update" scenario
 class MultiAgentScenarioTest extends StatefulWidget {
+  const MultiAgentScenarioTest({super.key});
+
   @override
-  _MultiAgentScenarioTestState createState() => _MultiAgentScenarioTestState();
+  State<MultiAgentScenarioTest> createState() => _MultiAgentScenarioTestState();
 }
 
 class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
   bool _isRunning = false;
-  List<ScenarioStep> _steps = [];
-  Map<String, List<AgentAction>> _agentActions = {
+  final List<ScenarioStep> _steps = [];
+  final Map<String, List<AgentAction>> _agentActions = {
     'echo': [],
     'hera': [],
     'dexo': [],
@@ -90,12 +90,30 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDetailItem('👤 Employee', 'Sara Johnson - Contract expires in 30 days'),
-              _buildDetailItem('📉 Performance', 'Score dropped from 4.2 to 2.5 (-40%)'),
-              _buildDetailItem('📧 Trigger', 'Manager requests contract renewal'),
-              _buildDetailItem('📄 Document', 'New performance evaluation uploaded'),
-              _buildDetailItem('🚨 Challenge', 'Performance decline requires HR escalation'),
-              _buildDetailItem('🎯 Outcome', 'Coordinated renewal with improvement plan'),
+              _buildDetailItem(
+                '👤 Employee',
+                'Sara Johnson - Contract expires in 30 days',
+              ),
+              _buildDetailItem(
+                '📉 Performance',
+                'Score dropped from 4.2 to 2.5 (-40%)',
+              ),
+              _buildDetailItem(
+                '📧 Trigger',
+                'Manager requests contract renewal',
+              ),
+              _buildDetailItem(
+                '📄 Document',
+                'New performance evaluation uploaded',
+              ),
+              _buildDetailItem(
+                '🚨 Challenge',
+                'Performance decline requires HR escalation',
+              ),
+              _buildDetailItem(
+                '🎯 Outcome',
+                'Coordinated renewal with improvement plan',
+              ),
             ],
           ),
         ),
@@ -109,7 +127,10 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 100, child: Text(label, style: TextStyle(fontWeight: FontWeight.w600))),
+          SizedBox(
+            width: 100,
+            child: Text(label, style: TextStyle(fontWeight: FontWeight.w600)),
+          ),
           Expanded(child: Text(value)),
         ],
       ),
@@ -127,10 +148,18 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: _isRunning ? null : _runScenario,
-                    icon: _isRunning 
-                      ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                      : Icon(Icons.play_arrow),
-                    label: Text(_isRunning ? 'Running Scenario...' : 'Run Multi-Agent Scenario'),
+                    icon: _isRunning
+                        ? SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Icon(Icons.play_arrow),
+                    label: Text(
+                      _isRunning
+                          ? 'Running Scenario...'
+                          : 'Run Multi-Agent Scenario',
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       padding: EdgeInsets.symmetric(vertical: 12),
@@ -153,7 +182,10 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
               SizedBox(height: 16),
               LinearProgressIndicator(),
               SizedBox(height: 8),
-              Text('Agents are collaborating...', style: TextStyle(color: Colors.grey[600])),
+              Text(
+                'Agents are collaborating...',
+                style: TextStyle(color: Colors.grey[600]),
+              ),
             ],
           ],
         ),
@@ -173,7 +205,7 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            ..._steps.map((step) => _buildStepItem(step)).toList(),
+            ..._steps.map((step) => _buildStepItem(step)),
           ],
         ),
       ),
@@ -196,7 +228,10 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
             child: Center(
               child: Text(
                 step.stepNumber.toString(),
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -205,10 +240,7 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  step.title,
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
+                Text(step.title, style: TextStyle(fontWeight: FontWeight.w600)),
                 if (step.description.isNotEmpty) ...[
                   SizedBox(height: 4),
                   Text(
@@ -220,13 +252,18 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
                   SizedBox(height: 4),
                   Wrap(
                     spacing: 4,
-                    children: step.agentsInvolved.map((agent) => 
-                      Chip(
-                        label: Text(agent.toUpperCase()),
-                        backgroundColor: _getAgentColor(agent),
-                        labelStyle: TextStyle(color: Colors.white, fontSize: 10),
-                      )
-                    ).toList(),
+                    children: step.agentsInvolved
+                        .map(
+                          (agent) => Chip(
+                            label: Text(agent.toUpperCase()),
+                            backgroundColor: _getAgentColor(agent),
+                            labelStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
+                          ),
+                        )
+                        .toList(),
                   ),
                 ],
               ],
@@ -257,9 +294,9 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            ..._agentActions.entries.map((entry) => 
-              _buildAgentSummary(entry.key, entry.value)
-            ).toList(),
+            ..._agentActions.entries.map(
+              (entry) => _buildAgentSummary(entry.key, entry.value),
+            ),
           ],
         ),
       ),
@@ -284,18 +321,23 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         subtitle: Text('${actions.length} actions performed'),
-        children: actions.map((action) => 
-          ListTile(
-            dense: true,
-            leading: Icon(Icons.arrow_right, color: _getAgentColor(agentName)),
-            title: Text(action.actionType),
-            subtitle: Text(action.description),
-            trailing: Text(
-              _formatTime(action.timestamp),
-              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-            ),
-          )
-        ).toList(),
+        children: actions
+            .map(
+              (action) => ListTile(
+                dense: true,
+                leading: Icon(
+                  Icons.arrow_right,
+                  color: _getAgentColor(agentName),
+                ),
+                title: Text(action.actionType),
+                subtitle: Text(action.description),
+                trailing: Text(
+                  _formatTime(action.timestamp),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ),
+            )
+            .toList(),
       ),
     );
   }
@@ -346,13 +388,15 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
 
   Future<void> _simulateStep1() async {
     setState(() {
-      _steps.add(ScenarioStep(
-        stepNumber: 1,
-        title: 'Manager sends contract renewal message',
-        description: 'Echo analyzes message and extracts priority tasks',
-        agentsInvolved: ['echo'],
-        inProgress: true,
-      ));
+      _steps.add(
+        ScenarioStep(
+          stepNumber: 1,
+          title: 'Manager sends contract renewal message',
+          description: 'Echo analyzes message and extracts priority tasks',
+          agentsInvolved: ['echo'],
+          inProgress: true,
+        ),
+      );
     });
 
     await Future.delayed(Duration(seconds: 2));
@@ -360,23 +404,28 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
     setState(() {
       _steps.last.completed = true;
       _steps.last.inProgress = false;
-      _agentActions['echo']!.add(AgentAction(
-        actionType: 'analyze_message',
-        description: 'Detected high priority contract renewal request',
-        timestamp: DateTime.now(),
-      ));
+      _agentActions['echo']!.add(
+        AgentAction(
+          actionType: 'analyze_message',
+          description: 'Detected high priority contract renewal request',
+          timestamp: DateTime.now(),
+        ),
+      );
     });
   }
 
   Future<void> _simulateStep2() async {
     setState(() {
-      _steps.add(ScenarioStep(
-        stepNumber: 2,
-        title: 'Hera processes contract renewal task',
-        description: 'Checks contract status and performance, applies HR rules',
-        agentsInvolved: ['hera'],
-        inProgress: true,
-      ));
+      _steps.add(
+        ScenarioStep(
+          stepNumber: 2,
+          title: 'Hera processes contract renewal task',
+          description:
+              'Checks contract status and performance, applies HR rules',
+          agentsInvolved: ['hera'],
+          inProgress: true,
+        ),
+      );
     });
 
     await Future.delayed(Duration(seconds: 3));
@@ -384,23 +433,28 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
     setState(() {
       _steps.last.completed = true;
       _steps.last.inProgress = false;
-      _agentActions['hera']!.add(AgentAction(
-        actionType: 'process_contract_renewal',
-        description: 'Identified performance decline, requested manager justification',
-        timestamp: DateTime.now(),
-      ));
+      _agentActions['hera']!.add(
+        AgentAction(
+          actionType: 'process_contract_renewal',
+          description:
+              'Identified performance decline, requested manager justification',
+          timestamp: DateTime.now(),
+        ),
+      );
     });
   }
 
   Future<void> _simulateStep3() async {
     setState(() {
-      _steps.add(ScenarioStep(
-        stepNumber: 3,
-        title: 'Manager uploads performance evaluation',
-        description: 'Dexo classifies document, Echo extracts tasks',
-        agentsInvolved: ['dexo', 'echo'],
-        inProgress: true,
-      ));
+      _steps.add(
+        ScenarioStep(
+          stepNumber: 3,
+          title: 'Manager uploads performance evaluation',
+          description: 'Dexo classifies document, Echo extracts tasks',
+          agentsInvolved: ['dexo', 'echo'],
+          inProgress: true,
+        ),
+      );
     });
 
     await Future.delayed(Duration(seconds: 2));
@@ -408,28 +462,36 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
     setState(() {
       _steps.last.completed = true;
       _steps.last.inProgress = false;
-      _agentActions['dexo']!.add(AgentAction(
-        actionType: 'classify_document',
-        description: 'Classified as confidential HR document, applied access controls',
-        timestamp: DateTime.now(),
-      ));
-      _agentActions['echo']!.add(AgentAction(
-        actionType: 'extract_tasks',
-        description: 'Extracted performance review and improvement plan tasks',
-        timestamp: DateTime.now(),
-      ));
+      _agentActions['dexo']!.add(
+        AgentAction(
+          actionType: 'classify_document',
+          description:
+              'Classified as confidential HR document, applied access controls',
+          timestamp: DateTime.now(),
+        ),
+      );
+      _agentActions['echo']!.add(
+        AgentAction(
+          actionType: 'extract_tasks',
+          description:
+              'Extracted performance review and improvement plan tasks',
+          timestamp: DateTime.now(),
+        ),
+      );
     });
   }
 
   Future<void> _simulateStep4() async {
     setState(() {
-      _steps.add(ScenarioStep(
-        stepNumber: 4,
-        title: 'Hera re-evaluates with new document',
-        description: 'Assesses burnout risk and escalates to HR manager',
-        agentsInvolved: ['hera'],
-        inProgress: true,
-      ));
+      _steps.add(
+        ScenarioStep(
+          stepNumber: 4,
+          title: 'Hera re-evaluates with new document',
+          description: 'Assesses burnout risk and escalates to HR manager',
+          agentsInvolved: ['hera'],
+          inProgress: true,
+        ),
+      );
     });
 
     await Future.delayed(Duration(seconds: 2));
@@ -437,23 +499,27 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
     setState(() {
       _steps.last.completed = true;
       _steps.last.inProgress = false;
-      _agentActions['hera']!.add(AgentAction(
-        actionType: 'assess_burnout_risk',
-        description: 'Flagged high burnout risk, recommended intervention',
-        timestamp: DateTime.now(),
-      ));
+      _agentActions['hera']!.add(
+        AgentAction(
+          actionType: 'assess_burnout_risk',
+          description: 'Flagged high burnout risk, recommended intervention',
+          timestamp: DateTime.now(),
+        ),
+      );
     });
   }
 
   Future<void> _simulateStep5() async {
     setState(() {
-      _steps.add(ScenarioStep(
-        stepNumber: 5,
-        title: 'Manager provides justification',
-        description: 'Echo summarizes, Hera validates and approves renewal',
-        agentsInvolved: ['echo', 'hera'],
-        inProgress: true,
-      ));
+      _steps.add(
+        ScenarioStep(
+          stepNumber: 5,
+          title: 'Manager provides justification',
+          description: 'Echo summarizes, Hera validates and approves renewal',
+          agentsInvolved: ['echo', 'hera'],
+          inProgress: true,
+        ),
+      );
     });
 
     await Future.delayed(Duration(seconds: 2));
@@ -461,28 +527,35 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
     setState(() {
       _steps.last.completed = true;
       _steps.last.inProgress = false;
-      _agentActions['echo']!.add(AgentAction(
-        actionType: 'summarize_justification',
-        description: 'Summarized manager justification for renewal',
-        timestamp: DateTime.now(),
-      ));
-      _agentActions['hera']!.add(AgentAction(
-        actionType: 'approve_renewal',
-        description: 'Approved renewal with performance improvement conditions',
-        timestamp: DateTime.now(),
-      ));
+      _agentActions['echo']!.add(
+        AgentAction(
+          actionType: 'summarize_justification',
+          description: 'Summarized manager justification for renewal',
+          timestamp: DateTime.now(),
+        ),
+      );
+      _agentActions['hera']!.add(
+        AgentAction(
+          actionType: 'approve_renewal',
+          description:
+              'Approved renewal with performance improvement conditions',
+          timestamp: DateTime.now(),
+        ),
+      );
     });
   }
 
   Future<void> _simulateStep6() async {
     setState(() {
-      _steps.add(ScenarioStep(
-        stepNumber: 6,
-        title: 'Dexo generates new contract',
-        description: 'Auto-generates contract with security and versioning',
-        agentsInvolved: ['dexo'],
-        inProgress: true,
-      ));
+      _steps.add(
+        ScenarioStep(
+          stepNumber: 6,
+          title: 'Dexo generates new contract',
+          description: 'Auto-generates contract with security and versioning',
+          agentsInvolved: ['dexo'],
+          inProgress: true,
+        ),
+      );
     });
 
     await Future.delayed(Duration(seconds: 3));
@@ -490,23 +563,27 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
     setState(() {
       _steps.last.completed = true;
       _steps.last.inProgress = false;
-      _agentActions['dexo']!.add(AgentAction(
-        actionType: 'generate_contract',
-        description: 'Generated Contract_Sara_Johnson_2026_Renewal_v3.pdf',
-        timestamp: DateTime.now(),
-      ));
+      _agentActions['dexo']!.add(
+        AgentAction(
+          actionType: 'generate_contract',
+          description: 'Generated Contract_Sara_Johnson_2026_Renewal_v3.pdf',
+          timestamp: DateTime.now(),
+        ),
+      );
     });
   }
 
   Future<void> _simulateStep7() async {
     setState(() {
-      _steps.add(ScenarioStep(
-        stepNumber: 7,
-        title: 'Echo sends final communications',
-        description: 'Notifies all parties and creates communication digest',
-        agentsInvolved: ['echo'],
-        inProgress: true,
-      ));
+      _steps.add(
+        ScenarioStep(
+          stepNumber: 7,
+          title: 'Echo sends final communications',
+          description: 'Notifies all parties and creates communication digest',
+          agentsInvolved: ['echo'],
+          inProgress: true,
+        ),
+      );
     });
 
     await Future.delayed(Duration(seconds: 2));
@@ -514,11 +591,13 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
     setState(() {
       _steps.last.completed = true;
       _steps.last.inProgress = false;
-      _agentActions['echo']!.add(AgentAction(
-        actionType: 'send_notifications',
-        description: 'Sent notifications to employee, HR, and manager',
-        timestamp: DateTime.now(),
-      ));
+      _agentActions['echo']!.add(
+        AgentAction(
+          actionType: 'send_notifications',
+          description: 'Sent notifications to employee, HR, and manager',
+          timestamp: DateTime.now(),
+        ),
+      );
     });
   }
 
@@ -546,7 +625,10 @@ class _MultiAgentScenarioTestState extends State<MultiAgentScenarioTest> {
           children: [
             Text('🎉 Multi-agent collaboration successful!'),
             SizedBox(height: 12),
-            Text('Key outcomes:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              'Key outcomes:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             Text('• Contract renewal approved with conditions'),
             Text('• Performance improvement plan activated'),
             Text('• Burnout risk identified and escalated'),

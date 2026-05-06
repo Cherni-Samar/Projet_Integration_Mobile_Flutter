@@ -4,7 +4,7 @@ import 'package:e_team/data/services/activity_service.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
 
 class ActivityLogsScreen extends StatefulWidget {
-  const ActivityLogsScreen({Key? key}) : super(key: key);
+  const ActivityLogsScreen({super.key});
 
   @override
   State<ActivityLogsScreen> createState() => _ActivityLogsScreenState();

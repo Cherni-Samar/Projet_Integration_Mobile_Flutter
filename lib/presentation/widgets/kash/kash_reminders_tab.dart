@@ -15,7 +15,7 @@ class KashRemindersTab extends StatelessWidget {
   final Future<void> Function(String reminderId) onMarkReminderPaid;
 
   const KashRemindersTab({
-    Key? key,
+    super.key,
     required this.isDark,
     required this.loadingReminders,
     required this.reminders,
@@ -24,12 +24,13 @@ class KashRemindersTab extends StatelessWidget {
     required this.readValue,
     required this.safeDate,
     required this.onMarkReminderPaid,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (loadingReminders)
+    if (loadingReminders) {
       return const Center(child: CircularProgressIndicator());
+    }
 
     return Column(
       children: [

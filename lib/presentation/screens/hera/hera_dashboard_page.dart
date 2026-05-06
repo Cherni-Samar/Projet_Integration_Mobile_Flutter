@@ -6,7 +6,6 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-import 'package:e_team/core/errors/app_error.dart';
 import 'package:e_team/data/services/hera_service.dart';
 import 'package:e_team/domain/models/hera_models.dart';
 import 'package:e_team/presentation/providers/hera_provider.dart';
@@ -237,7 +236,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                 // (needed for the history button to pass the latest list)
                 Selector<HeraProvider, List<Map<String, dynamic>>>(
                   selector: (_, p) => p.recentActions,
-                  builder: (_, recentActions, __) => HeraHeader(
+                  builder: (_, recentActions, _) => HeraHeader(
                     energy: context.watch<UserProvider>().energyBalance,
                     pulseCtrl: _pulseCtrl,
                     glowCtrl: _glowCtrl,
@@ -282,7 +281,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                           loadingActions: p.loadingActions,
                           stats: p.stats,
                         ),
-                        builder: (_, data, __) => HeraFluxTab(
+                        builder: (_, data, _) => HeraFluxTab(
                           recentActions: data.recentActions.toList(),
                           loadingStats: data.loadingStats,
                           loadingActions: data.loadingActions,
@@ -301,7 +300,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                       // outer StatefulWidget rebuild, not the Selector.
                       Selector<HeraProvider, List<HeraLeave>>(
                         selector: (_, p) => p.allLeaves,
-                        builder: (_, allLeaves, __) => HeraAgendaTab(
+                        builder: (_, allLeaves, _) => HeraAgendaTab(
                           selectedDay: _selectedDay,
                           focusedDay: _focusedDay,
                           calendarFormat: _calendarFormat,
@@ -326,7 +325,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                           candidates: p.candidates,
                           loadingEmployees: p.loadingEmployees,
                         ),
-                        builder: (_, data, __) => HeraTeamTab(
+                        builder: (_, data, _) => HeraTeamTab(
                           employees: data.employees.toList(),
                           candidates: data.candidates.toList(),
                           loadingEmployees: data.loadingEmployees,
@@ -344,7 +343,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                       // rebuilds when the balance actually changes.
                       Selector<UserProvider, int>(
                         selector: (_, p) => p.energyBalance,
-                        builder: (_, energyBalance, __) =>
+                        builder: (_, energyBalance, _) =>
                             HeraEnergyTab(energyBalance: energyBalance),
                       ),
 
@@ -352,7 +351,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                       // Rebuilds only when employees list changes.
                       Selector<HeraProvider, List<HeraEmployee>>(
                         selector: (_, p) => p.employees,
-                        builder: (_, employees, __) =>
+                        builder: (_, employees, _) =>
                             HeraVisionTab(employees: employees.toList()),
                       ),
                     ],

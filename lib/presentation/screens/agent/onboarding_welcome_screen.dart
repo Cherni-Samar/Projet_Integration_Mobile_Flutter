@@ -5,8 +5,7 @@ import 'package:e_team/l10n/app_localizations.dart';
 class OnboardingWelcomeScreen extends StatefulWidget {
   final String email;
 
-  const OnboardingWelcomeScreen({Key? key, required this.email})
-    : super(key: key);
+  const OnboardingWelcomeScreen({super.key, required this.email});
 
   @override
   State<OnboardingWelcomeScreen> createState() =>

@@ -4,8 +4,7 @@ class AgentSkillChip extends StatelessWidget {
   final String label;
   final bool isDark;
 
-  const AgentSkillChip({Key? key, required this.label, required this.isDark})
-    : super(key: key);
+  const AgentSkillChip({super.key, required this.label, required this.isDark});
 
   @override
   Widget build(BuildContext context) {

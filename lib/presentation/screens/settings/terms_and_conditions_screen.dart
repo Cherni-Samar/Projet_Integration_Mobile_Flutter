@@ -4,7 +4,7 @@ import 'package:e_team/presentation/providers/theme_provider.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 
 class TermsAndConditionsScreen extends StatefulWidget {
-  const TermsAndConditionsScreen({Key? key}) : super(key: key);
+  const TermsAndConditionsScreen({super.key});
 
   @override
   State<TermsAndConditionsScreen> createState() =>

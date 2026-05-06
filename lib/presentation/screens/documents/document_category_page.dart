@@ -7,11 +7,11 @@ class DocumentCategoryPage extends StatefulWidget {
   final IconData categoryIcon;
 
   const DocumentCategoryPage({
-    Key? key,
+    super.key,
     required this.category,
     required this.categoryColor,
     required this.categoryIcon,
-  }) : super(key: key);
+  });
 
   @override
   State<DocumentCategoryPage> createState() => _DocumentCategoryPageState();
@@ -376,8 +376,10 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
   }
 
   void _viewDocumentContent(Map<String, dynamic> document) async {
+    final navigator = Navigator.of(context);
+
     // Close the details dialog first
-    Navigator.of(context).pop();
+    navigator.pop();
 
     // Show loading dialog
     showDialog(
@@ -392,7 +394,8 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
       );
 
       // Close loading dialog
-      Navigator.of(context).pop();
+      if (!mounted) return;
+      navigator.pop();
 
       if (result['success'] == true) {
         _showDocumentContentDialog(document, result['content']);
@@ -403,7 +406,8 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
       }
     } catch (e) {
       // Close loading dialog
-      Navigator.of(context).pop();
+      if (!mounted) return;
+      navigator.pop();
       _showErrorSnackBar('Error loading document content: $e');
     }
   }

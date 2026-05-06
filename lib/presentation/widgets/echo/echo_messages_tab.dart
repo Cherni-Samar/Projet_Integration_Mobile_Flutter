@@ -19,7 +19,7 @@ class EchoMessagesTab extends StatelessWidget {
   final String? token;
 
   const EchoMessagesTab({
-    Key? key,
+    super.key,
     required this.loadingEmails,
     required this.emails,
     required this.showOnlyUrgent,
@@ -31,7 +31,7 @@ class EchoMessagesTab extends StatelessWidget {
     required this.onAfterReply,
     required this.buildEmptyState,
     this.token,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -130,8 +130,9 @@ class EchoMessagesTab extends StatelessWidget {
         return false;
       }
       if (email.category == 'auto_reply' ||
-          email.category == 'auto_reply_pending')
+          email.category == 'auto_reply_pending') {
         return false;
+      }
       if (email.sender == 'echo@e-team.com') return false;
       return true;
     }).toList();
@@ -139,8 +140,9 @@ class EchoMessagesTab extends StatelessWidget {
     final sentEmails = emails.where((email) {
       if (email.sender == 'echo@e-team.com') return true;
       if (email.category == 'auto_reply' ||
-          email.category == 'auto_reply_pending')
+          email.category == 'auto_reply_pending') {
         return true;
+      }
       return false;
     }).toList();
 

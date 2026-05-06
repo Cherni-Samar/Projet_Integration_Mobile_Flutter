@@ -42,8 +42,8 @@ class _EchoDashboardPageState extends State<EchoDashboardPage>
 
   // Email management from inbox
   List<EmailItem> _emails = [];
-  bool _showOnlyUrgent = false;
-  bool _showOnlySpam = false;
+  final bool _showOnlyUrgent = false;
+  final bool _showOnlySpam = false;
   int _emailSubTab = 0; // 0 = Recus, 1 = Envoyes
 
   // Document management

@@ -13,7 +13,7 @@ import 'package:e_team/presentation/screens/agent/timo/timo_dashboard_page.dart'
 import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 
 class MyAgentsPage extends StatelessWidget {
-  const MyAgentsPage({Key? key}) : super(key: key);
+  const MyAgentsPage({super.key});
 
   static const Color _volt = Color(0xFFCDFF00);
 
@@ -127,7 +127,7 @@ class MyAgentsPage extends StatelessWidget {
                 child: Image.asset(
                   agent.agentIllustration,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
+                  errorBuilder: (_, _, _) =>
                       Icon(Icons.smart_toy, color: agent.agentColor, size: 20),
                 ),
               ),
@@ -451,7 +451,7 @@ class MyAgentsPage extends StatelessWidget {
                           child: Image.asset(
                             agent.agentIllustration,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Icon(
+                            errorBuilder: (_, _, _) => Icon(
                               Icons.smart_toy,
                               color: agent.agentColor,
                               size: 30,

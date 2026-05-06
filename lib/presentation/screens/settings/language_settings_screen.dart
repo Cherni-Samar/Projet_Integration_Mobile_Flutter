@@ -5,7 +5,7 @@ import 'package:e_team/presentation/providers/locale_provider.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 
 class LanguageSettingsScreen extends StatefulWidget {
-  const LanguageSettingsScreen({Key? key}) : super(key: key);
+  const LanguageSettingsScreen({super.key});
 
   @override
   State<LanguageSettingsScreen> createState() => _LanguageSettingsScreenState();
@@ -488,13 +488,16 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               context,
               listen: false,
             );
+            final navigator = Navigator.of(context);
+            final messenger = ScaffoldMessenger.of(context);
             await localeProvider.setLocale(Locale(_selectedLanguage));
+            if (!context.mounted) return;
 
-            Navigator.pop(context); // Fermer dialog
-            Navigator.pop(context); // Retour à settings
+            navigator.pop(); // Fermer dialog
+            navigator.pop(); // Retour à settings
 
             // Afficher confirmation
-            ScaffoldMessenger.of(context).showSnackBar(
+            messenger.showSnackBar(
               SnackBar(
                 content: Row(
                   children: [

@@ -91,6 +91,7 @@ class _DexoOrganizationPulseScreenState
     if (_isSaving) return;
 
     setState(() => _isSaving = true);
+    final userProvider = context.read<UserProvider>();
 
     try {
       final response = await DexoService.updateWorkforceSettings({
@@ -107,7 +108,7 @@ class _DexoOrganizationPulseScreenState
         throw Exception(response['error'] ?? 'Save failed');
       }
 
-      await context.read<UserProvider>().refreshFromApi();
+      await userProvider.refreshFromApi();
     } catch (_) {
     } finally {
       if (mounted) {

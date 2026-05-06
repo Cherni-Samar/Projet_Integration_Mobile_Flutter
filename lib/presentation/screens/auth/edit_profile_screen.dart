@@ -8,7 +8,7 @@ import 'package:e_team/l10n/app_localizations.dart';
 class EditProfileScreen extends StatefulWidget {
   final User user;
 
-  const EditProfileScreen({Key? key, required this.user}) : super(key: key);
+  const EditProfileScreen({super.key, required this.user});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -254,7 +254,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       onChanged: (value) {
                         setState(() => _showPasswordFields = value);
                       },
-                      activeColor: const Color(0xFFCDFF00),
+                      activeThumbColor: const Color(0xFFCDFF00),
                     ),
                   ],
                 ),

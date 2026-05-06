@@ -11,12 +11,12 @@ class EchoOverviewTab extends StatelessWidget {
   final String Function(DateTime time) formatTime;
 
   const EchoOverviewTab({
-    Key? key,
+    super.key,
     required this.loadingEmails,
     required this.recentEmails,
     required this.buildEmptyState,
     required this.formatTime,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

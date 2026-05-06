@@ -16,14 +16,14 @@ class EchoPostsTab extends StatelessWidget {
   final VoidCallback onLaunchCampaign;
 
   const EchoPostsTab({
-    Key? key,
+    super.key,
     required this.loadingSocial,
     required this.posts,
     this.token,
     required this.formatTime,
     required this.onLoadSocialPosts,
     required this.onLaunchCampaign,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -411,7 +411,7 @@ class EchoPostsTab extends StatelessWidget {
             fit: BoxFit.cover,
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
-              return Container(
+              return SizedBox(
                 height: 200,
                 child: Center(
                   child: CircularProgressIndicator(
@@ -529,11 +529,13 @@ class EchoPostsTab extends StatelessWidget {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Could not open post URL')),
         );
       }
     } catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error opening URL: $e')));

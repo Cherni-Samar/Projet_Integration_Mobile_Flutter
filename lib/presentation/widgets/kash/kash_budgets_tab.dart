@@ -12,14 +12,14 @@ class KashBudgetsTab extends StatelessWidget {
   final dynamic Function(dynamic item, String key) readValue;
 
   const KashBudgetsTab({
-    Key? key,
+    super.key,
     required this.isDark,
     required this.loadingBudgets,
     required this.budgets,
     required this.onAddBudget,
     required this.buildEmptyState,
     required this.readValue,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

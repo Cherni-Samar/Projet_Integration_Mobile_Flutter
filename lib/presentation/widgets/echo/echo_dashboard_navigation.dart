@@ -7,10 +7,10 @@ class EchoDashboardNavigation extends StatelessWidget {
   final Function(int) onTabSelected;
 
   const EchoDashboardNavigation({
-    Key? key,
+    super.key,
     required this.selectedTab,
     required this.onTabSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

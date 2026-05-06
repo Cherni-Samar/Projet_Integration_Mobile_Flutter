@@ -14,8 +14,7 @@ import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 class CartPage extends StatefulWidget {
   final bool isOnboardingPayment;
 
-  const CartPage({Key? key, this.isOnboardingPayment = false})
-    : super(key: key);
+  const CartPage({super.key, this.isOnboardingPayment = false});
 
   @override
   State<CartPage> createState() => _CartPageState();
@@ -356,7 +355,7 @@ class _CartPageState extends State<CartPage> {
                                             child: Image.asset(
                                               item.agentIllustration,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (_, __, ___) =>
+                                              errorBuilder: (_, _, _) =>
                                                   Icon(
                                                     Icons.person,
                                                     color: item.agentColor,
@@ -420,7 +419,7 @@ class _CartPageState extends State<CartPage> {
                                                     ),
                                                     const SizedBox(width: 2),
                                                     Text(
-                                                      '${_fmtEnergy(item.energy)}',
+                                                      _fmtEnergy(item.energy),
                                                       style: TextStyle(
                                                         color: isDark
                                                             ? Colors.grey[400]
@@ -450,7 +449,7 @@ class _CartPageState extends State<CartPage> {
                                     ),
                                   ),
                                 )
-                                .toList(),
+                                ,
                             const SizedBox(height: 24),
                           ],
 
@@ -595,7 +594,7 @@ class _CartPageState extends State<CartPage> {
                                     ),
                                   ),
                                 )
-                                .toList(),
+                                ,
                           ],
                         ],
                       ),
@@ -644,7 +643,7 @@ class _CartPageState extends State<CartPage> {
                                 ],
                               ),
                               Text(
-                                '${_fmtEnergy(cart.totalEnergy)}',
+                                _fmtEnergy(cart.totalEnergy),
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,

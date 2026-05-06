@@ -28,7 +28,7 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      if (e is Exception) throw e;
+      if (e is Exception) rethrow;
       throw Exception('Erreur de connexion: $e');
     }
   }
@@ -48,7 +48,7 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      if (e is Exception) throw e;
+      if (e is Exception) rethrow;
       throw Exception('Erreur de connexion: $e');
     }
   }
@@ -66,7 +66,7 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      if (e is Exception) throw e;
+      if (e is Exception) rethrow;
       throw Exception('Erreur de connexion: $e');
     }
   }
@@ -91,7 +91,7 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      if (e is Exception) throw e;
+      if (e is Exception) rethrow;
       throw Exception('$e');
     }
   }
@@ -109,7 +109,7 @@ class ApiService {
 
       return _handleResponse(response);
     } catch (e) {
-      if (e is Exception) throw e;
+      if (e is Exception) rethrow;
       throw Exception('Erreur de connexion: $e');
     }
   }
@@ -161,7 +161,7 @@ class ApiService {
           : (normalized.isEmpty
                 ? 'Une erreur est survenue'
                 : (normalized.length > 200
-                      ? normalized.substring(0, 200) + '…'
+                      ? '${normalized.substring(0, 200)}…'
                       : normalized));
     }
 

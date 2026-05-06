@@ -12,7 +12,7 @@ import 'package:e_team/l10n/app_localizations.dart';
 class UserProfilePage extends StatefulWidget {
   final User? user;
 
-  const UserProfilePage({Key? key, this.user}) : super(key: key);
+  const UserProfilePage({super.key, this.user});
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();
@@ -301,7 +301,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       trailing: Switch(
                         value: isDark,
                         onChanged: (value) => themeProvider.toggleTheme(),
-                        activeColor: const Color(0xFFCDFF00),
+                        activeThumbColor: const Color(0xFFCDFF00),
                         activeTrackColor: const Color(
                           0xFFCDFF00,
                         ).withValues(alpha: 0.3),
@@ -334,6 +334,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
                       if (result == true && mounted) {
                         await _loadUserData();
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Row(

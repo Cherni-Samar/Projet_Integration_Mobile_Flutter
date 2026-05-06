@@ -15,7 +15,7 @@ class KashOverviewTab extends StatelessWidget {
   buildEmptyState;
 
   const KashOverviewTab({
-    Key? key,
+    super.key,
     required this.isDark,
     required this.loadingExpenses,
     required this.totalSpent,
@@ -25,7 +25,7 @@ class KashOverviewTab extends StatelessWidget {
     required this.onAddExpense,
     required this.buildExpenseCard,
     required this.buildEmptyState,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -155,10 +155,12 @@ class KashOverviewTab extends StatelessWidget {
       );
 
   Widget _buildRecentExpenses() {
-    if (loadingExpenses)
+    if (loadingExpenses) {
       return const Center(child: CircularProgressIndicator());
-    if (expenses.isEmpty)
+    }
+    if (expenses.isEmpty) {
       return buildEmptyState('Aucune dépense', Icons.inbox_rounded, isDark);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

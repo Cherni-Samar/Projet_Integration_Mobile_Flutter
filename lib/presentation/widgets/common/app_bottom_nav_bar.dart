@@ -10,14 +10,14 @@ class AppBottomNavBar extends StatelessWidget {
   final VoidCallback onSettingsTap;
 
   const AppBottomNavBar({
-    Key? key,
+    super.key,
     required this.isDark,
     required this.onMarketTap,
     required this.onAgentsTap,
     required this.onActivityTap,
     required this.onStatsTap,
     required this.onSettingsTap,
-  }) : super(key: key);
+  });
 
   Widget _buildNavItem(
     IconData icon,

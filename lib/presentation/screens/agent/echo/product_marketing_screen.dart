@@ -21,7 +21,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
   bool _isLoadingHistory = false;
 
   Map<String, dynamic>? _productData;
-  String _selectedFrequency = '3days';
+  final String _selectedFrequency = '3days';
   List<Map<String, dynamic>> _campaignHistory = [];
 
   // Theme colors

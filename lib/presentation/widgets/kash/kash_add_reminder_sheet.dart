@@ -62,7 +62,7 @@ Future<void> showKashAddReminderSheet({
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: selectedCurrency,
+              initialValue: selectedCurrency,
               decoration: InputDecoration(
                 labelText: 'Currency',
                 border: OutlineInputBorder(

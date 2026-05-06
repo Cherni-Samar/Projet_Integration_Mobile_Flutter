@@ -5,7 +5,7 @@ import 'package:e_team/presentation/providers/theme_provider.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 
 class HelpSupportScreen extends StatelessWidget {
-  const HelpSupportScreen({Key? key}) : super(key: key);
+  const HelpSupportScreen({super.key});
 
   void _copyToClipboard(BuildContext context, String text, String label) {
     final l10n = AppLocalizations.of(context)!;

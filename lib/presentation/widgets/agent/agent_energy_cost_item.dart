@@ -7,12 +7,12 @@ class AgentEnergyCostItem extends StatelessWidget {
   final bool isLast;
 
   const AgentEnergyCostItem({
-    Key? key,
+    super.key,
     required this.task,
     required this.color,
     required this.isDark,
     required this.isLast,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

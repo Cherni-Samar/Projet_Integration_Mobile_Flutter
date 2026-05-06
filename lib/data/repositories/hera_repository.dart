@@ -3,7 +3,7 @@
 /// Responsibilities:
 ///   - Build full endpoint URLs
 ///   - Call ApiService (GET / POST / DELETE)
-///   - Return raw Map<String, dynamic> responses
+///   - Return raw `Map<String, dynamic>` responses
 ///   - NO business logic, NO DTO parsing, NO error-wrapping beyond rethrow
 ///
 /// Callers: HeraService only.

@@ -6,7 +6,7 @@ import 'package:e_team/presentation/screens/settings/privacy_policy_screen.dart'
 import 'package:e_team/l10n/app_localizations.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+  const SignUpScreen({super.key});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -287,7 +287,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         onChanged: (value) {
                           setState(() => _acceptTerms = value ?? false);
                         },
-                        activeColor: const Color(0xFFA855F7),
+                        fillColor: WidgetStateProperty.resolveWith((states) {
+                          if (states.contains(WidgetState.selected)) {
+                            return const Color(0xFFA855F7);
+                          }
+                          return null;
+                        }),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4),
                         ),

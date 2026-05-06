@@ -843,7 +843,7 @@ class HeraHeader extends StatelessWidget {
                       children: [
                         AnimatedBuilder(
                           animation: pulseCtrl,
-                          builder: (_, __) => Container(
+                          builder: (_, _) => Container(
                             width: 7,
                             height: 7,
                             decoration: BoxDecoration(

@@ -4,7 +4,7 @@ import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/data/services/auth_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  const ForgotPasswordScreen({super.key});
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
@@ -506,7 +506,7 @@ class NeuralCorePainter extends CustomPainter {
 }
 
 class ForgotPasswordScreenPreview extends StatelessWidget {
-  const ForgotPasswordScreenPreview({Key? key}) : super(key: key);
+  const ForgotPasswordScreenPreview({super.key});
 
   @override
   Widget build(BuildContext context) {

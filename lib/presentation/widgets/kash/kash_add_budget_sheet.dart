@@ -53,7 +53,7 @@ Future<void> showKashAddBudgetSheet({
             ),
             const SizedBox(height: 6),
             DropdownButtonFormField<String>(
-              value: selectedCategory,
+              initialValue: selectedCategory,
               decoration: InputDecoration(
                 labelText: 'Sélectionner une catégorie',
                 border: OutlineInputBorder(
@@ -118,7 +118,7 @@ Future<void> showKashAddBudgetSheet({
             ),
             const SizedBox(height: 6),
             DropdownButtonFormField<String>(
-              value: selectedCurrency,
+              initialValue: selectedCurrency,
               decoration: InputDecoration(
                 labelText: 'Sélectionner une devise',
                 border: OutlineInputBorder(

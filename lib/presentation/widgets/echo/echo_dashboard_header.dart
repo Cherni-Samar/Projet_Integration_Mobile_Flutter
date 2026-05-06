@@ -11,13 +11,13 @@ class EchoDashboardHeader extends StatelessWidget {
   final VoidCallback onBackPressed;
 
   const EchoDashboardHeader({
-    Key? key,
+    super.key,
     required this.pulseController,
     required this.totalProcessed,
     required this.alertsCount,
     required this.postsCount,
     required this.onBackPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

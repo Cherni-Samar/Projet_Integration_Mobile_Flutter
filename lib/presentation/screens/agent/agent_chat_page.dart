@@ -6,7 +6,7 @@ import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 
 class AgentChatPage extends StatefulWidget {
   final OwnedAgent agent;
-  const AgentChatPage({Key? key, required this.agent}) : super(key: key);
+  const AgentChatPage({super.key, required this.agent});
 
   @override
   State<AgentChatPage> createState() => _AgentChatPageState();
@@ -294,7 +294,7 @@ class _AgentChatPageState extends State<AgentChatPage> {
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: actions.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 10),
+                        separatorBuilder: (_, _) => const SizedBox(width: 10),
                         itemBuilder: (_, i) {
                           final a = actions[i];
                           return _actionPill(
@@ -426,7 +426,7 @@ class _AgentChatPageState extends State<AgentChatPage> {
         child: Image.asset(
           agent.agentIllustration,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Icon(Icons.smart_toy, color: accent),
+          errorBuilder: (_, _, _) => Icon(Icons.smart_toy, color: accent),
         ),
       ),
     );
@@ -455,7 +455,7 @@ class _AgentChatPageState extends State<AgentChatPage> {
             child: Image.asset(
               agent.agentIllustration,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
+              errorBuilder: (_, _, _) =>
                   Center(child: Icon(Icons.smart_toy, size: 60, color: accent)),
             ),
           ),

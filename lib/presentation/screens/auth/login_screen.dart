@@ -7,7 +7,7 @@ import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/data/dtos/user_dto.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -318,8 +318,15 @@ class _LoginScreenState extends State<LoginScreen>
                                 onChanged: (value) {
                                   setState(() => _rememberMe = value ?? false);
                                 },
-                                // ✅ Tick toujours violet
-                                activeColor: const Color(0xFF8B5CF6),
+                                // Selected box stays violet.
+                                fillColor: WidgetStateProperty.resolveWith((
+                                  states,
+                                ) {
+                                  if (states.contains(WidgetState.selected)) {
+                                    return const Color(0xFF8B5CF6);
+                                  }
+                                  return null;
+                                }),
                                 checkColor: Colors.white,
                                 side: BorderSide(
                                   color: isDark

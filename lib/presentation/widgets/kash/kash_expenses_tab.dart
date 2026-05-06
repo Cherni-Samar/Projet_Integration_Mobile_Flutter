@@ -12,19 +12,20 @@ class KashExpensesTab extends StatelessWidget {
   buildEmptyState;
 
   const KashExpensesTab({
-    Key? key,
+    super.key,
     required this.isDark,
     required this.loadingExpenses,
     required this.expenses,
     required this.onAddExpense,
     required this.buildExpenseCard,
     required this.buildEmptyState,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (loadingExpenses)
+    if (loadingExpenses) {
       return const Center(child: CircularProgressIndicator());
+    }
 
     return Column(
       children: [

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 
 class AgentMarketplaceCard extends StatelessWidget {
@@ -12,14 +11,14 @@ class AgentMarketplaceCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const AgentMarketplaceCard({
-    Key? key,
+    super.key,
     required this.agent,
     required this.index,
     required this.pageController,
     required this.currentPage,
     required this.isDark,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   /// Get agent-specific stats based on agent name
   List<Map<String, dynamic>> _getAgentStats(String agentName) {
@@ -65,7 +64,6 @@ class AgentMarketplaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final agentColor = colorFromValue(agent['color']);
 
     return AnimatedBuilder(

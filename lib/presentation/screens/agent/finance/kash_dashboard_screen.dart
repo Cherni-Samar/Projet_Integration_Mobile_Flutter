@@ -13,7 +13,7 @@ import 'package:e_team/presentation/widgets/kash/kash_budgets_tab.dart';
 import 'package:e_team/presentation/widgets/kash/kash_reminders_tab.dart';
 
 class KashDashboardScreen extends StatefulWidget {
-  const KashDashboardScreen({Key? key}) : super(key: key);
+  const KashDashboardScreen({super.key});
 
   @override
   State<KashDashboardScreen> createState() => _KashDashboardScreenState();
@@ -221,6 +221,8 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
   }
 
   Future<void> _markReminderPaid(String reminderId) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
     try {
       await KashService.markReminderPaid(reminderId);
 
@@ -234,7 +236,6 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
 
         await _loadDashboardData();
 
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
         await userProvider.refreshFromApi();
       }
     } catch (e) {
@@ -380,7 +381,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                 width: 46,
                 height: 46,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => CircleAvatar(
+                errorBuilder: (_, _, _) => CircleAvatar(
                   backgroundColor: KP.primary,
                   child: const Icon(
                     Icons.account_balance_wallet,
@@ -408,7 +409,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                   children: [
                     AnimatedBuilder(
                       animation: _pulseController,
-                      builder: (_, __) => Container(
+                      builder: (_, _) => Container(
                         width: 7,
                         height: 7,
                         decoration: BoxDecoration(

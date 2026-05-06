@@ -355,7 +355,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
         children: [
           AnimatedBuilder(
             animation: _pulseController,
-            builder: (_, __) {
+            builder: (_, _) {
               return Container(
                 width: 8,
                 height: 8,

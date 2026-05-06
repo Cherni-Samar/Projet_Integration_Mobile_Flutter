@@ -21,7 +21,7 @@ import 'package:e_team/presentation/widgets/common/app_bottom_nav_bar.dart';
 import 'package:e_team/presentation/widgets/common/round_icon_button.dart';
 
 class AgentMarketplacePage extends StatefulWidget {
-  const AgentMarketplacePage({Key? key}) : super(key: key);
+  const AgentMarketplacePage({super.key});
 
   @override
   State<AgentMarketplacePage> createState() => _AgentMarketplacePageState();

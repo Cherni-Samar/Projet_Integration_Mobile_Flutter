@@ -149,7 +149,7 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
               child: Image.asset(
                 'assets/images/dexo.png',
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(
+                errorBuilder: (_, _, _) => const Icon(
                   Icons.psychology_rounded,
                   color: _dexoBlue,
                   size: 28,

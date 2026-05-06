@@ -45,38 +45,33 @@ class AppError {
   // ─── Named constructors ───────────────────────────────────────────────────
 
   /// Network / connectivity failure.
-  const AppError.network({Object? source})
+  const AppError.network({this.source})
     : message = 'Connexion impossible. Vérifiez votre réseau.',
-      type = ErrorType.network,
-      source = source;
+      type = ErrorType.network;
 
   /// Generic server-side failure with an optional backend message.
-  AppError.server(String? detail, {Object? source})
+  AppError.server(String? detail, {this.source})
     : message = (detail != null && detail.isNotEmpty)
           ? detail
           : 'Une erreur serveur est survenue.',
-      type = ErrorType.server,
-      source = source;
+      type = ErrorType.server;
 
   /// Auth / session failure.
-  const AppError.auth({Object? source})
+  const AppError.auth({this.source})
     : message = 'Session expirée. Veuillez vous reconnecter.',
-      type = ErrorType.auth,
-      source = source;
+      type = ErrorType.auth;
 
   /// Mutation failure (delete, update, create).
-  AppError.mutation(String? detail, {Object? source})
+  AppError.mutation(String? detail, {this.source})
     : message = (detail != null && detail.isNotEmpty)
           ? detail
           : "L'opération a échoué. Réessayez.",
-      type = ErrorType.mutation,
-      source = source;
+      type = ErrorType.mutation;
 
   /// Unknown / unexpected failure.
-  AppError.unknown(Object? source)
+  const AppError.unknown(this.source)
     : message = 'Une erreur inattendue est survenue.',
-      type = ErrorType.unknown,
-      source = source;
+      type = ErrorType.unknown;
 
   /// Inspect [e] and return the most appropriate [AppError].
   factory AppError.from(Object e) {

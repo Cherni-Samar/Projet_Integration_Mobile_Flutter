@@ -185,7 +185,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
     setState(() => _isLoading = true);
     try {
       final r = await TimoService.getTimoTasks();
-      if (mounted)
+      if (mounted) {
         setState(() {
           _tasks = List<Map<String, dynamic>>.from(
             r['tasks'] ?? [],
@@ -201,6 +201,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
 
           _isLoading = false;
         });
+      }
     } catch (_) {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -475,12 +476,13 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
   //  TAB 0 — JOURNAL IA - WHITE SAAS DESIGN
   // ════════════════════════════════════════════════════════════
   Widget _buildJournal() {
-    if (_tasks.isEmpty)
+    if (_tasks.isEmpty) {
       return _emptyState(
         Icons.article_outlined,
         'Aucune tâche planifiée',
         'Hera n\'a encore rien envoyé à Timo.',
       );
+    }
 
     return RefreshIndicator(
       onRefresh: _loadData,
