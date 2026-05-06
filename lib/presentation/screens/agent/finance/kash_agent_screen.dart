@@ -10,6 +10,9 @@ import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/data/services/api_service.dart';
 import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/core/utils/constants.dart';
+import 'package:e_team/presentation/models/kash/kash_agent_models.dart';
+import 'package:e_team/presentation/widgets/kash/agent/kash_agent_chat_widgets.dart';
+import 'package:e_team/presentation/widgets/kash/agent/kash_agent_shell_widgets.dart';
 
 class KashAgentScreen extends StatefulWidget {
   const KashAgentScreen({super.key});
@@ -21,7 +24,6 @@ class KashAgentScreen extends StatefulWidget {
 class _KashAgentScreenState extends State<KashAgentScreen>
     with SingleTickerProviderStateMixin {
   static const _volt = Color(0xFFCDFF00);
-  static const _gold = Color(0xFFFFD54F);
 
   final _auth = AuthService();
   final _picker = ImagePicker();
@@ -31,10 +33,10 @@ class _KashAgentScreenState extends State<KashAgentScreen>
 
   late final AnimationController _shimmerController;
 
-  final List<_KashMsg> _messages = <_KashMsg>[];
+  final List<KashMessage> _messages = <KashMessage>[];
 
   bool _isAnalyzing = false;
-  _ExtractedExpense? _pendingExtraction;
+  ExtractedExpense? _pendingExtraction;
   Uint8List? _pendingReceiptBytes;
 
   int _selectedTab = 0; // 0 = Chat, 1 = Expenses (placeholder)
@@ -48,7 +50,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
     )..repeat();
 
     _messages.add(
-      const _KashMsg(
+      const KashMessage(
         fromUser: false,
         text: "Je suis Kash. Envoie-moi un reçu pour l'analyser.",
       ),
@@ -64,18 +66,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
   }
 
   Widget _buildFloatingActionButton(int energy) {
-    return FloatingActionButton.extended(
-      onPressed: _isAnalyzing ? null : () => _pickReceipt(),
-      backgroundColor: _volt,
-      foregroundColor: Colors.black,
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      icon: const Icon(Icons.camera_alt, size: 20),
-      label: const Text(
-        'Scanner facture',
-        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
-      ),
-    );
+    return KashScanFab(isBusy: _isAnalyzing, onPressed: _pickReceipt);
   }
 
   Future<void> _scrollToBottom() async {
@@ -138,7 +129,11 @@ class _KashAgentScreenState extends State<KashAgentScreen>
       _pendingExtraction = null;
       _pendingReceiptBytes = bytes;
       _messages.add(
-        _KashMsg(fromUser: true, text: 'Reçu sélectionné', imageBytes: bytes),
+        KashMessage(
+          fromUser: true,
+          text: 'Reçu sélectionné',
+          imageBytes: bytes,
+        ),
       );
       _isAnalyzing = true;
     });
@@ -165,12 +160,12 @@ class _KashAgentScreenState extends State<KashAgentScreen>
         throw Exception("Réponse invalide: champ 'extracted' manquant");
       }
 
-      final extracted = _ExtractedExpense.fromJson(extractedJson);
+      final extracted = ExtractedExpense.fromJson(extractedJson);
 
       setState(() {
         _pendingExtraction = extracted;
         _messages.add(
-          _KashMsg(
+          KashMessage(
             fromUser: false,
             text:
                 'Analyse terminée.\nMontant: ${extracted.amount} ${extracted.currency}\nFournisseur: ${extracted.vendor}\nCatégorie: ${extracted.category}',
@@ -181,7 +176,10 @@ class _KashAgentScreenState extends State<KashAgentScreen>
     } catch (e) {
       setState(() {
         _messages.add(
-          _KashMsg(fromUser: false, text: "Erreur d'analyse: ${e.toString()}"),
+          KashMessage(
+            fromUser: false,
+            text: "Erreur d'analyse: ${e.toString()}",
+          ),
         );
       });
       await _scrollToBottom();
@@ -205,9 +203,9 @@ class _KashAgentScreenState extends State<KashAgentScreen>
     if (text.isEmpty) return;
 
     setState(() {
-      _messages.add(_KashMsg(fromUser: true, text: text));
+      _messages.add(KashMessage(fromUser: true, text: text));
       _messages.add(
-        const _KashMsg(
+        const KashMessage(
           fromUser: false,
           text:
               "Pour analyser une dépense, appuie sur l'icône Photo et sélectionne un reçu.",
@@ -247,7 +245,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
 
       setState(() {
         _messages.add(
-          const _KashMsg(
+          const KashMessage(
             fromUser: false,
             text: 'Dépense enregistrée avec succès.',
           ),
@@ -286,251 +284,16 @@ class _KashAgentScreenState extends State<KashAgentScreen>
   }
 
   Widget _buildProfileHeader(int energy) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            _volt.withValues(alpha: 0.15),
-            _gold.withValues(alpha: 0.15),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _volt.withValues(alpha: 0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: _volt.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(56, 10, 20, 20),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Kash Avatar
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: _volt.withValues(alpha: 0.3),
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Image.asset(
-                      'assets/images/kash.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                _volt.withValues(alpha: 0.6),
-                                _gold.withValues(alpha: 0.6),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: const Icon(
-                            Icons.trending_up,
-                            color: Colors.black,
-                            size: 30,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-
-                // Kash Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Kash Dashboard',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Financial Analysis Agent',
-                        style: TextStyle(color: Colors.white70, fontSize: 13),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _volt.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.circle,
-                                  color: Colors.greenAccent,
-                                  size: 8,
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  'Active',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _gold.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.bolt, size: 14, color: _gold),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '$energy',
-                                  style: const TextStyle(
-                                    color: _volt,
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Verified Icon
-                const Icon(Icons.verified_rounded, color: _volt, size: 24),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 10,
-            left: 10,
-            child: SafeArea(
-              top: false,
-              bottom: false,
-              left: false,
-              right: false,
-              child: CircleAvatar(
-                radius: 18,
-                backgroundColor: Colors.black26,
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(
-                    minWidth: 36,
-                    minHeight: 36,
-                  ),
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
-                  tooltip: 'Retour',
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return KashProfileHeader(
+      energy: energy,
+      onBack: () => Navigator.of(context).pop(),
     );
   }
 
   Widget _buildTabNavigation() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF111511),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          _buildTabButton('💬 Discussion', 0),
-          _buildTabButton('💰 Statistiques', 1),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabButton(String title, int index) {
-    final isSelected = _selectedTab == index;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedTab = index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? _volt.withValues(alpha: 0.2)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected ? _volt : Colors.white70,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              fontSize: 13,
-            ),
-          ),
-        ),
-      ),
+    return KashTabNavigation(
+      selectedTab: _selectedTab,
+      onSelect: (index) => setState(() => _selectedTab = index),
     );
   }
 
@@ -552,7 +315,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                   if (isLoadingRow) {
                     return Align(
                       alignment: Alignment.centerLeft,
-                      child: _ShimmerBubble(
+                      child: KashShimmerBubble(
                         controller: _shimmerController,
                         child: const Text(
                           "Kash analyse votre document...",
@@ -566,7 +329,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                   }
 
                   final msg = _messages[index];
-                  return _MessageBubble(msg: msg);
+                  return KashMessageBubble(msg: msg);
                 },
               ),
             ),
@@ -574,14 +337,14 @@ class _KashAgentScreenState extends State<KashAgentScreen>
             if (_pendingExtraction != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
-                child: _ExtractionCard(
+                child: KashExtractionCard(
                   extracted: _pendingExtraction!,
                   receiptBytes: _pendingReceiptBytes,
                   onConfirm: _confirmAndSave,
                 ),
               ),
 
-            _Composer(
+            KashComposer(
               controller: _textController,
               isBusy: _isAnalyzing,
               onSend: _sendText,
@@ -597,497 +360,9 @@ class _KashAgentScreenState extends State<KashAgentScreen>
   }
 
   Widget _buildStatisticsTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Statistiques financières',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 24),
-          _buildEmptyStateCard(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyStateCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF111511),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: _volt.withValues(alpha: 0.15)),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            _volt.withValues(alpha: 0.05),
-            _gold.withValues(alpha: 0.03),
-          ],
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Wallet Icon Container
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [
-                  _volt.withValues(alpha: 0.3),
-                  _gold.withValues(alpha: 0.2),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              border: Border.all(color: _volt.withValues(alpha: 0.2), width: 2),
-            ),
-            child: Center(
-              child: Icon(
-                Icons.account_balance_wallet_outlined,
-                color: _volt,
-                size: 48,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Empty State Text
-          const Text(
-            'Aucune dépense enregistrée',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Commencez à scanner vos factures pour\nanalyser et catégoriser vos dépenses.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
-              fontSize: 14,
-              height: 1.6,
-            ),
-          ),
-          const SizedBox(height: 32),
-
-          // Main CTA Button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _volt,
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 8,
-              ),
-              onPressed: _isAnalyzing ? null : () => _pickReceipt(),
-              icon: const Icon(Icons.camera_alt, size: 20),
-              label: const Text(
-                'Scanner ma première facture',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Alternative Text
-          Text(
-            'Appuyez sur le bouton flottant pour commencer',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.5),
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Composer extends StatelessWidget {
-  static const _volt = Color(0xFFCDFF00);
-
-  final TextEditingController controller;
-  final bool isBusy;
-  final VoidCallback onSend;
-  final VoidCallback onPickPhoto;
-
-  const _Composer({
-    required this.controller,
-    required this.isBusy,
-    required this.onSend,
-    required this.onPickPhoto,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        left: 14,
-        right: 14,
-        top: 10,
-        bottom: 10 + MediaQuery.of(context).padding.bottom,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F130F),
-        border: Border(
-          top: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: controller,
-              enabled: !isBusy,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: 'Message…',
-                hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                ),
-                filled: true,
-                fillColor: const Color(0xFF111511),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.06),
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.06),
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: _volt, width: 1.2),
-                ),
-              ),
-              onSubmitted: (_) => onSend(),
-            ),
-          ),
-          const SizedBox(width: 10),
-          InkWell(
-            onTap: isBusy ? null : onSend,
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: _volt,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Icon(Icons.send, color: Colors.black),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MessageBubble extends StatelessWidget {
-  static const _volt = Color(0xFFCDFF00);
-  static const _gold = Color(0xFFFFD54F);
-
-  final _KashMsg msg;
-
-  const _MessageBubble({required this.msg});
-
-  @override
-  Widget build(BuildContext context) {
-    final fromUser = msg.fromUser;
-    final bg = fromUser ? const Color(0xFF121A12) : const Color(0xFF111511);
-    final border = fromUser
-        ? _volt.withValues(alpha: 0.25)
-        : Colors.white.withValues(alpha: 0.06);
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Align(
-        alignment: fromUser ? Alignment.centerRight : Alignment.centerLeft,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 340),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: border),
-            ),
-            child: Column(
-              crossAxisAlignment: fromUser
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
-              children: [
-                Text(
-                  msg.text,
-                  style: TextStyle(
-                    color: fromUser ? Colors.white : Colors.white70,
-                    fontWeight: FontWeight.w700,
-                    height: 1.2,
-                  ),
-                ),
-                if (msg.imageBytes != null) ...[
-                  const SizedBox(height: 10),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: _gold.withValues(alpha: 0.25),
-                        ),
-                      ),
-                      child: Image.memory(
-                        msg.imageBytes!,
-                        width: 180,
-                        height: 120,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ExtractionCard extends StatelessWidget {
-  static const _volt = Color(0xFFCDFF00);
-  static const _gold = Color(0xFFFFD54F);
-
-  final _ExtractedExpense extracted;
-  final Uint8List? receiptBytes;
-  final VoidCallback onConfirm;
-
-  const _ExtractionCard({
-    required this.extracted,
-    required this.receiptBytes,
-    required this.onConfirm,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF111511),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _volt.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.receipt_long, color: _gold),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  'Données extraites',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-              Text(
-                '${extracted.amount} ${extracted.currency}',
-                style: const TextStyle(
-                  color: _volt,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          if (receiptBytes != null)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: Image.memory(
-                receiptBytes!,
-                height: 120,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
-          if (receiptBytes != null) const SizedBox(height: 10),
-          _kv('Fournisseur', extracted.vendor),
-          _kv('Catégorie', extracted.category),
-          _kv('Date', extracted.dateIso),
-          if (extracted.description.isNotEmpty)
-            _kv('Description', extracted.description),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _volt,
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              onPressed: onConfirm,
-              child: const Text(
-                'Confirmer et Enregistrer',
-                style: TextStyle(fontWeight: FontWeight.w900),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _kv(String k, String v) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 92,
-            child: Text(
-              k,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.6),
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              v,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontWeight: FontWeight.w800,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ShimmerBubble extends StatelessWidget {
-  final AnimationController controller;
-  final Widget child;
-
-  const _ShimmerBubble({required this.controller, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: AnimatedBuilder(
-        animation: controller,
-        builder: (context, _) {
-          final t = controller.value;
-          return Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFF111511),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-            ),
-            child: ShaderMask(
-              shaderCallback: (rect) {
-                final dx = rect.width * (t * 2 - 0.5);
-                return LinearGradient(
-                  begin: Alignment(-1 + (dx / rect.width), 0),
-                  end: Alignment(1 + (dx / rect.width), 0),
-                  colors: [
-                    Colors.white.withValues(alpha: 0.15),
-                    Colors.white.withValues(alpha: 0.65),
-                    Colors.white.withValues(alpha: 0.15),
-                  ],
-                  stops: const [0.0, 0.5, 1.0],
-                ).createShader(rect);
-              },
-              blendMode: BlendMode.srcATop,
-              child: child,
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _KashMsg {
-  final bool fromUser;
-  final String text;
-  final Uint8List? imageBytes;
-
-  const _KashMsg({required this.fromUser, required this.text, this.imageBytes});
-}
-
-class _ExtractedExpense {
-  final double amount;
-  final String currency;
-  final String vendor;
-  final String category;
-  final String dateIso;
-  final String description;
-
-  const _ExtractedExpense({
-    required this.amount,
-    required this.currency,
-    required this.vendor,
-    required this.category,
-    required this.dateIso,
-    required this.description,
-  });
-
-  factory _ExtractedExpense.fromJson(Map<String, dynamic> json) {
-    final amountRaw = json['amount'];
-    final amount = (amountRaw is num)
-        ? amountRaw.toDouble()
-        : double.parse('$amountRaw');
-
-    return _ExtractedExpense(
-      amount: amount,
-      currency: (json['currency'] ?? '').toString(),
-      vendor: (json['vendor'] ?? '').toString(),
-      category: (json['category'] ?? '').toString(),
-      dateIso: (json['date'] ?? '').toString(),
-      description: (json['description'] ?? '').toString(),
+    return KashStatisticsTab(
+      isAnalyzing: _isAnalyzing,
+      onPickReceipt: _pickReceipt,
     );
   }
 }
