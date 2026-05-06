@@ -19,13 +19,13 @@ class RoundIconButton extends StatelessWidget {
       height: 48,
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withOpacity(0.08)
-            : Colors.black.withOpacity(0.05),
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.black.withValues(alpha: 0.05),
         shape: BoxShape.circle,
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.15)
-              : Colors.black.withOpacity(0.1),
+              ? Colors.white.withValues(alpha: 0.15)
+              : Colors.black.withValues(alpha: 0.1),
           width: 1.5,
         ),
       ),

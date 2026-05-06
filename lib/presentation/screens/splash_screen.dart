@@ -101,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen>
                       border: Border.all(
                         color: const Color(
                           0xFFCCFF00,
-                        ).withOpacity((1 - waveProgress) * 0.3),
+                        ).withValues(alpha: (1 - waveProgress) * 0.3),
                         width: 1.5,
                       ),
                     ),
@@ -128,10 +128,12 @@ class _SplashScreenState extends State<SplashScreen>
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          const Color(0xFFCCFF00).withOpacity(glowIntensity),
                           const Color(
                             0xFFCCFF00,
-                          ).withOpacity(glowIntensity * 0.3),
+                          ).withValues(alpha: glowIntensity),
+                          const Color(
+                            0xFFCCFF00,
+                          ).withValues(alpha: glowIntensity * 0.3),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.4, 1.0],
@@ -140,7 +142,7 @@ class _SplashScreenState extends State<SplashScreen>
                         BoxShadow(
                           color: const Color(
                             0xFFCCFF00,
-                          ).withOpacity(glowIntensity * 0.6),
+                          ).withValues(alpha: glowIntensity * 0.6),
                           blurRadius: 60,
                           spreadRadius: 20,
                         ),
@@ -218,7 +220,9 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: const Color(0xFFCCFF00).withOpacity(0.3),
+                            color: const Color(
+                              0xFFCCFF00,
+                            ).withValues(alpha: 0.3),
                             width: 1,
                           ),
                           borderRadius: BorderRadius.circular(20),
@@ -244,7 +248,9 @@ class _SplashScreenState extends State<SplashScreen>
                           builder: (context, child) {
                             return LinearProgressIndicator(
                               value: (_waveController.value * 2) % 1.0,
-                              backgroundColor: Colors.white.withOpacity(0.1),
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.1,
+                              ),
                               valueColor: const AlwaysStoppedAnimation<Color>(
                                 Color(0xFFCCFF00),
                               ),
@@ -285,7 +291,7 @@ class NeuralCorePainter extends CustomPainter {
 
     // Points orbitaux et connexions
     final linePaint = Paint()
-      ..color = const Color(0xFFCCFF00).withOpacity(0.6)
+      ..color = const Color(0xFFCCFF00).withValues(alpha: 0.6)
       ..strokeWidth = 1.5
       ..strokeCap = StrokeCap.round;
 
@@ -305,7 +311,8 @@ class NeuralCorePainter extends CustomPainter {
       canvas.drawLine(
         Offset(x, y),
         center,
-        linePaint..color = const Color(0xFFCCFF00).withOpacity(lineOpacity),
+        linePaint
+          ..color = const Color(0xFFCCFF00).withValues(alpha: lineOpacity),
       );
 
       // Point orbital avec pulse
@@ -315,7 +322,7 @@ class NeuralCorePainter extends CustomPainter {
 
     // Cercle externe subtil qui pulse
     final outerPaint = Paint()
-      ..color = const Color(0xFFCCFF00).withOpacity(0.2 + progress * 0.2)
+      ..color = const Color(0xFFCCFF00).withValues(alpha: 0.2 + progress * 0.2)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
@@ -346,7 +353,10 @@ class NeuralFluidPainter extends CustomPainter {
       final radius = 30 + math.sin(progress * math.pi + i) * 20;
 
       final gradient = RadialGradient(
-        colors: [const Color(0xFFCCFF00).withOpacity(0.1), Colors.transparent],
+        colors: [
+          const Color(0xFFCCFF00).withValues(alpha: 0.1),
+          Colors.transparent,
+        ],
       );
 
       final paint = Paint()
@@ -360,7 +370,7 @@ class NeuralFluidPainter extends CustomPainter {
 
     // Lignes de connexion style réseau neural
     final linePaint = Paint()
-      ..color = const Color(0xFFCCFF00).withOpacity(0.05)
+      ..color = const Color(0xFFCCFF00).withValues(alpha: 0.05)
       ..strokeWidth = 0.5;
 
     for (var i = 0; i < 8; i++) {

@@ -47,7 +47,7 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                       ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
+                    color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -62,13 +62,13 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                       height: 40,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.black.withOpacity(0.05),
+                            ? Colors.white.withValues(alpha: 0.1)
+                            : Colors.black.withValues(alpha: 0.05),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.black.withOpacity(0.1),
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Icon(
@@ -96,8 +96,8 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                           l10n.termsSubtitle,
                           style: TextStyle(
                             color: isDark
-                                ? Colors.white.withOpacity(0.5)
-                                : Colors.black.withOpacity(0.5),
+                                ? Colors.white.withValues(alpha: 0.5)
+                                : Colors.black.withValues(alpha: 0.5),
                             fontSize: 12,
                           ),
                         ),
@@ -127,19 +127,29 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                           gradient: LinearGradient(
                             colors: isDark
                                 ? [
-                                    const Color(0xFFCDFF00).withOpacity(0.2),
-                                    const Color(0xFFA855F7).withOpacity(0.2),
+                                    const Color(
+                                      0xFFCDFF00,
+                                    ).withValues(alpha: 0.2),
+                                    const Color(
+                                      0xFFA855F7,
+                                    ).withValues(alpha: 0.2),
                                   ]
                                 : [
-                                    const Color(0xFFCDFF00).withOpacity(0.3),
-                                    const Color(0xFFA855F7).withOpacity(0.2),
+                                    const Color(
+                                      0xFFCDFF00,
+                                    ).withValues(alpha: 0.3),
+                                    const Color(
+                                      0xFFA855F7,
+                                    ).withValues(alpha: 0.2),
                                   ],
                           ),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: isDark
-                                ? const Color(0xFFCDFF00).withOpacity(0.3)
-                                : const Color(0xFFCDFF00).withOpacity(0.5),
+                                ? const Color(0xFFCDFF00).withValues(alpha: 0.3)
+                                : const Color(
+                                    0xFFCDFF00,
+                                  ).withValues(alpha: 0.5),
                           ),
                         ),
                         child: Row(
@@ -224,8 +234,8 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                         boxShadow: [
                           BoxShadow(
                             color: isDark
-                                ? const Color(0xFFCDFF00).withOpacity(0.3)
-                                : Colors.black.withOpacity(0.1),
+                                ? const Color(0xFFCDFF00).withValues(alpha: 0.3)
+                                : Colors.black.withValues(alpha: 0.1),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -298,24 +308,24 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
           color: isDark
               ? isExpanded
                     ? const Color(0xFF1E1E1E)
-                    : Colors.white.withOpacity(0.05)
+                    : Colors.white.withValues(alpha: 0.05)
               : isExpanded
               ? Colors.white
-              : Colors.white.withOpacity(0.7),
+              : Colors.white.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isExpanded
-                ? iconColor.withOpacity(0.5)
+                ? iconColor.withValues(alpha: 0.5)
                 : isDark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.black.withOpacity(0.1),
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.1),
             width: isExpanded ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
               color: isExpanded
-                  ? iconColor.withOpacity(isDark ? 0.2 : 0.1)
-                  : Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                  ? iconColor.withValues(alpha: isDark ? 0.2 : 0.1)
+                  : Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
               blurRadius: isExpanded ? 20 : 10,
               offset: const Offset(0, 4),
             ),
@@ -342,9 +352,11 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: iconColor.withOpacity(0.1),
+                          color: iconColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: iconColor.withOpacity(0.3)),
+                          border: Border.all(
+                            color: iconColor.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Icon(icon, color: iconColor, size: 22),
                       ),
@@ -367,8 +379,8 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                               summary,
                               style: TextStyle(
                                 color: isDark
-                                    ? Colors.white.withOpacity(0.6)
-                                    : Colors.black.withOpacity(0.6),
+                                    ? Colors.white.withValues(alpha: 0.6)
+                                    : Colors.black.withValues(alpha: 0.6),
                                 fontSize: 13,
                               ),
                             ),
@@ -382,8 +394,8 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                         child: Icon(
                           Icons.keyboard_arrow_down,
                           color: isDark
-                              ? Colors.white.withOpacity(0.5)
-                              : Colors.black.withOpacity(0.5),
+                              ? Colors.white.withValues(alpha: 0.5)
+                              : Colors.black.withValues(alpha: 0.5),
                         ),
                       ),
                     ],
@@ -397,8 +409,8 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                         content,
                         style: TextStyle(
                           color: isDark
-                              ? Colors.white.withOpacity(0.8)
-                              : Colors.black.withOpacity(0.7),
+                              ? Colors.white.withValues(alpha: 0.8)
+                              : Colors.black.withValues(alpha: 0.7),
                           fontSize: 14,
                           height: 1.6,
                         ),

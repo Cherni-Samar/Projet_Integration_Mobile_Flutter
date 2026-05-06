@@ -138,7 +138,7 @@ class _SubTabPill extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
                   color: selected
-                      ? Colors.white.withOpacity(0.2)
+                      ? Colors.white.withValues(alpha: 0.2)
                       : HeraPalette.cardSoft,
                   borderRadius: BorderRadius.circular(20),
                 ),
@@ -240,7 +240,7 @@ class _CandidateList extends StatelessWidget {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundColor: HeraPalette.mauve.withOpacity(0.1),
+                backgroundColor: HeraPalette.mauve.withValues(alpha: 0.1),
                 child: const Icon(
                   Icons.person_outline,
                   color: HeraPalette.mauve,
@@ -269,8 +269,8 @@ class _CandidateList extends StatelessWidget {
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: score >= 80
-                      ? Colors.green.withOpacity(0.1)
-                      : Colors.orange.withOpacity(0.1),
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(

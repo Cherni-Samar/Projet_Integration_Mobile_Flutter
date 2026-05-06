@@ -60,7 +60,7 @@ class HelpSupportScreen extends StatelessWidget {
                       ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
+                    color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -75,13 +75,13 @@ class HelpSupportScreen extends StatelessWidget {
                       height: 40,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.black.withOpacity(0.05),
+                            ? Colors.white.withValues(alpha: 0.1)
+                            : Colors.black.withValues(alpha: 0.05),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.black.withOpacity(0.1),
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Icon(
@@ -109,8 +109,8 @@ class HelpSupportScreen extends StatelessWidget {
                           l10n.helpSupportSubtitle,
                           style: TextStyle(
                             color: isDark
-                                ? Colors.white.withOpacity(0.5)
-                                : Colors.black.withOpacity(0.5),
+                                ? Colors.white.withValues(alpha: 0.5)
+                                : Colors.black.withValues(alpha: 0.5),
                             fontSize: 12,
                           ),
                         ),
@@ -143,14 +143,14 @@ class HelpSupportScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
                           color: isDark
-                              ? const Color(0xFFCDFF00).withOpacity(0.3)
-                              : Colors.black.withOpacity(0.1),
+                              ? const Color(0xFFCDFF00).withValues(alpha: 0.3)
+                              : Colors.black.withValues(alpha: 0.1),
                         ),
                         boxShadow: [
                           BoxShadow(
                             color: isDark
-                                ? const Color(0xFFCDFF00).withOpacity(0.1)
-                                : Colors.black.withOpacity(0.05),
+                                ? const Color(0xFFCDFF00).withValues(alpha: 0.1)
+                                : Colors.black.withValues(alpha: 0.05),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -173,7 +173,7 @@ class HelpSupportScreen extends StatelessWidget {
                                 BoxShadow(
                                   color: const Color(
                                     0xFFCDFF00,
-                                  ).withOpacity(0.4),
+                                  ).withValues(alpha: 0.4),
                                   blurRadius: 20,
                                   offset: const Offset(0, 8),
                                 ),
@@ -200,8 +200,8 @@ class HelpSupportScreen extends StatelessWidget {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: isDark
-                                  ? Colors.white.withOpacity(0.7)
-                                  : Colors.black.withOpacity(0.6),
+                                  ? Colors.white.withValues(alpha: 0.7)
+                                  : Colors.black.withValues(alpha: 0.6),
                               fontSize: 14,
                               height: 1.5,
                             ),
@@ -307,12 +307,12 @@ class HelpSupportScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.black.withOpacity(0.1),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -330,7 +330,7 @@ class HelpSupportScreen extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: const Color(0xFFCDFF00).withOpacity(0.2),
+              color: const Color(0xFFCDFF00).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -354,8 +354,8 @@ class HelpSupportScreen extends StatelessWidget {
                 answer,
                 style: TextStyle(
                   color: isDark
-                      ? Colors.white.withOpacity(0.7)
-                      : Colors.black.withOpacity(0.7),
+                      ? Colors.white.withValues(alpha: 0.7)
+                      : Colors.black.withValues(alpha: 0.7),
                   fontSize: 14,
                   height: 1.5,
                 ),
@@ -384,12 +384,12 @@ class HelpSupportScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.black.withOpacity(0.1),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -402,9 +402,9 @@ class HelpSupportScreen extends StatelessWidget {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
+            color: iconColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: iconColor.withOpacity(0.3)),
+            border: Border.all(color: iconColor.withValues(alpha: 0.3)),
           ),
           child: Icon(icon, color: iconColor, size: 24),
         ),
@@ -433,8 +433,8 @@ class HelpSupportScreen extends StatelessWidget {
               description,
               style: TextStyle(
                 color: isDark
-                    ? Colors.white.withOpacity(0.5)
-                    : Colors.black.withOpacity(0.5),
+                    ? Colors.white.withValues(alpha: 0.5)
+                    : Colors.black.withValues(alpha: 0.5),
                 fontSize: 12,
               ),
             ),
@@ -443,8 +443,8 @@ class HelpSupportScreen extends StatelessWidget {
         trailing: Icon(
           Icons.copy,
           color: isDark
-              ? Colors.white.withOpacity(0.3)
-              : Colors.black.withOpacity(0.3),
+              ? Colors.white.withValues(alpha: 0.3)
+              : Colors.black.withValues(alpha: 0.3),
           size: 20,
         ),
       ),

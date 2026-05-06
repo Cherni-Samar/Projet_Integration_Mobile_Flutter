@@ -220,7 +220,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFCDFF00).withOpacity(0.2),
+                  color: const Color(0xFFCDFF00).withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(

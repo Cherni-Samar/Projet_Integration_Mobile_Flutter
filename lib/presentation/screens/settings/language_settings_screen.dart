@@ -71,7 +71,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                       ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
+                    color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -86,13 +86,13 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                       height: 40,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.black.withOpacity(0.05),
+                            ? Colors.white.withValues(alpha: 0.1)
+                            : Colors.black.withValues(alpha: 0.05),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.black.withOpacity(0.1),
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Icon(
@@ -120,8 +120,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                           l10n.languageSubtitle,
                           style: TextStyle(
                             color: isDark
-                                ? Colors.white.withOpacity(0.5)
-                                : Colors.black.withOpacity(0.5),
+                                ? Colors.white.withValues(alpha: 0.5)
+                                : Colors.black.withValues(alpha: 0.5),
                             fontSize: 12,
                           ),
                         ),
@@ -144,17 +144,17 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                   gradient: LinearGradient(
                     colors: isDark
                         ? [
-                            const Color(0xFFCDFF00).withOpacity(0.15),
-                            const Color(0xFFAADD00).withOpacity(0.1),
+                            const Color(0xFFCDFF00).withValues(alpha: 0.15),
+                            const Color(0xFFAADD00).withValues(alpha: 0.1),
                           ]
                         : [
-                            const Color(0xFFCDFF00).withOpacity(0.2),
-                            const Color(0xFFAADD00).withOpacity(0.15),
+                            const Color(0xFFCDFF00).withValues(alpha: 0.2),
+                            const Color(0xFFAADD00).withValues(alpha: 0.15),
                           ],
                   ),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFFCDFF00).withOpacity(0.3),
+                    color: const Color(0xFFCDFF00).withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -163,7 +163,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFCDFF00).withOpacity(0.2),
+                        color: const Color(0xFFCDFF00).withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
@@ -224,8 +224,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                   boxShadow: [
                     BoxShadow(
                       color: isDark
-                          ? const Color(0xFFCDFF00).withOpacity(0.3)
-                          : Colors.black.withOpacity(0.1),
+                          ? const Color(0xFFCDFF00).withValues(alpha: 0.3)
+                          : Colors.black.withValues(alpha: 0.1),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -292,12 +292,12 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             ? LinearGradient(
                 colors: isDark
                     ? [
-                        const Color(0xFFCDFF00).withOpacity(0.15),
-                        const Color(0xFFAADD00).withOpacity(0.1),
+                        const Color(0xFFCDFF00).withValues(alpha: 0.15),
+                        const Color(0xFFAADD00).withValues(alpha: 0.1),
                       ]
                     : [
-                        const Color(0xFFCDFF00).withOpacity(0.2),
-                        const Color(0xFFAADD00).withOpacity(0.15),
+                        const Color(0xFFCDFF00).withValues(alpha: 0.2),
+                        const Color(0xFFAADD00).withValues(alpha: 0.15),
                       ],
               )
             : null,
@@ -311,15 +311,15 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
           color: isSelected
               ? const Color(0xFFCDFF00)
               : isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.black.withOpacity(0.1),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.1),
           width: isSelected ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isSelected
-                ? const Color(0xFFCDFF00).withOpacity(0.2)
-                : Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                ? const Color(0xFFCDFF00).withValues(alpha: 0.2)
+                : Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: isSelected ? 20 : 10,
             offset: const Offset(0, 4),
           ),
@@ -340,8 +340,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                   height: 56,
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.white.withOpacity(0.05)
-                        : Colors.black.withOpacity(0.03),
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : Colors.black.withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isSelected
@@ -380,8 +380,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                         language['name'],
                         style: TextStyle(
                           color: isDark
-                              ? Colors.white.withOpacity(0.5)
-                              : Colors.black.withOpacity(0.5),
+                              ? Colors.white.withValues(alpha: 0.5)
+                              : Colors.black.withValues(alpha: 0.5),
                           fontSize: 14,
                         ),
                       ),
@@ -403,7 +403,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFCDFF00).withOpacity(0.4),
+                          color: const Color(0xFFCDFF00).withValues(alpha: 0.4),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -417,13 +417,13 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                     height: 32,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? Colors.white.withOpacity(0.1)
-                          : Colors.black.withOpacity(0.05),
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.black.withValues(alpha: 0.05),
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isDark
-                            ? Colors.white.withOpacity(0.2)
-                            : Colors.black.withOpacity(0.2),
+                            ? Colors.white.withValues(alpha: 0.2)
+                            : Colors.black.withValues(alpha: 0.2),
                       ),
                     ),
                   ),
@@ -465,8 +465,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         l10n.languageChangeDialogMessage(selectedLang['nativeName']),
         style: TextStyle(
           color: isDark
-              ? Colors.white.withOpacity(0.7)
-              : Colors.black.withOpacity(0.7),
+              ? Colors.white.withValues(alpha: 0.7)
+              : Colors.black.withValues(alpha: 0.7),
           fontSize: 15,
         ),
       ),
@@ -477,8 +477,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
             l10n.commonCancel,
             style: TextStyle(
               color: isDark
-                  ? Colors.white.withOpacity(0.5)
-                  : Colors.black.withOpacity(0.5),
+                  ? Colors.white.withValues(alpha: 0.5)
+                  : Colors.black.withValues(alpha: 0.5),
             ),
           ),
         ),

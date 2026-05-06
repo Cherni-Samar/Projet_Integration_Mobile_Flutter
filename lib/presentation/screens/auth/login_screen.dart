@@ -170,8 +170,10 @@ class _LoginScreenState extends State<LoginScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFFCDFF00).withOpacity(
-                          isDark ? 0.15 : 0.08 + _glowController.value * 0.04,
+                        const Color(0xFFCDFF00).withValues(
+                          alpha: isDark
+                              ? 0.15
+                              : 0.08 + _glowController.value * 0.04,
                         ),
                         Colors.transparent,
                       ],
@@ -213,8 +215,10 @@ class _LoginScreenState extends State<LoginScreen>
                           boxShadow: [
                             BoxShadow(
                               color: isDark
-                                  ? const Color(0xFFCDFF00).withOpacity(0.3)
-                                  : Colors.black.withOpacity(0.1),
+                                  ? const Color(
+                                      0xFFCDFF00,
+                                    ).withValues(alpha: 0.3)
+                                  : Colors.black.withValues(alpha: 0.1),
                               blurRadius: 30,
                               spreadRadius: 0,
                               offset: const Offset(0, 10),
@@ -319,8 +323,8 @@ class _LoginScreenState extends State<LoginScreen>
                                 checkColor: Colors.white,
                                 side: BorderSide(
                                   color: isDark
-                                      ? Colors.white.withOpacity(0.3)
-                                      : Colors.black.withOpacity(0.3),
+                                      ? Colors.white.withValues(alpha: 0.3)
+                                      : Colors.black.withValues(alpha: 0.3),
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4),
@@ -332,8 +336,8 @@ class _LoginScreenState extends State<LoginScreen>
                               l10n.authRememberMe,
                               style: TextStyle(
                                 color: isDark
-                                    ? Colors.white.withOpacity(0.7)
-                                    : Colors.black.withOpacity(0.7),
+                                    ? Colors.white.withValues(alpha: 0.7)
+                                    : Colors.black.withValues(alpha: 0.7),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -381,7 +385,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                           elevation: isDark ? 8 : 0,
                           shadowColor: isDark
-                              ? const Color(0xFFCDFF00).withOpacity(0.5)
+                              ? const Color(0xFFCDFF00).withValues(alpha: 0.5)
                               : null,
                         ),
                         child: _isLoading
@@ -418,8 +422,8 @@ class _LoginScreenState extends State<LoginScreen>
                           l10n.authNewHere,
                           style: TextStyle(
                             color: isDark
-                                ? Colors.white.withOpacity(0.6)
-                                : Colors.black.withOpacity(0.5),
+                                ? Colors.white.withValues(alpha: 0.6)
+                                : Colors.black.withValues(alpha: 0.5),
                             fontSize: 15,
                           ),
                         ),
@@ -432,8 +436,12 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? const Color(0xFFCDFF00).withOpacity(0.2)
-                                  : const Color(0xFFCDFF00).withOpacity(0.15),
+                                  ? const Color(
+                                      0xFFCDFF00,
+                                    ).withValues(alpha: 0.2)
+                                  : const Color(
+                                      0xFFCDFF00,
+                                    ).withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -481,25 +489,27 @@ class _LoginScreenState extends State<LoginScreen>
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isFocused
                 ? (isDark
                       ? const Color(0xFFCDFF00)
-                      : Colors.black.withOpacity(0.3))
-                : (isDark ? Colors.white.withOpacity(0.1) : Colors.transparent),
+                      : Colors.black.withValues(alpha: 0.3))
+                : (isDark
+                      ? Colors.white.withValues(alpha: 0.1)
+                      : Colors.transparent),
             width: isFocused ? 2 : 1.5,
           ),
           boxShadow: [
             BoxShadow(
               color: isFocused
                   ? (isDark
-                        ? const Color(0xFFCDFF00).withOpacity(0.2)
-                        : Colors.black.withOpacity(0.06))
+                        ? const Color(0xFFCDFF00).withValues(alpha: 0.2)
+                        : Colors.black.withValues(alpha: 0.06))
                   : (isDark
                         ? Colors.transparent
-                        : Colors.black.withOpacity(0.03)),
+                        : Colors.black.withValues(alpha: 0.03)),
               blurRadius: isFocused ? 15 : 10,
               spreadRadius: 0,
               offset: const Offset(0, 4),
@@ -522,18 +532,18 @@ class _LoginScreenState extends State<LoginScreen>
             hintText: hint,
             hintStyle: TextStyle(
               color: isDark
-                  ? Colors.white.withOpacity(0.3)
-                  : Colors.black.withOpacity(0.3),
+                  ? Colors.white.withValues(alpha: 0.3)
+                  : Colors.black.withValues(alpha: 0.3),
               fontWeight: FontWeight.w400,
             ),
             labelStyle: TextStyle(
               color: isFocused
                   ? (isDark
                         ? const Color(0xFFCDFF00)
-                        : Colors.black.withOpacity(0.7))
+                        : Colors.black.withValues(alpha: 0.7))
                   : (isDark
-                        ? Colors.white.withOpacity(0.5)
-                        : Colors.black.withOpacity(0.4)),
+                        ? Colors.white.withValues(alpha: 0.5)
+                        : Colors.black.withValues(alpha: 0.4)),
               fontWeight: FontWeight.w500,
             ),
             floatingLabelStyle: TextStyle(
@@ -545,10 +555,10 @@ class _LoginScreenState extends State<LoginScreen>
               color: isFocused
                   ? (isDark
                         ? const Color(0xFFCDFF00)
-                        : Colors.black.withOpacity(0.6))
+                        : Colors.black.withValues(alpha: 0.6))
                   : (isDark
-                        ? Colors.white.withOpacity(0.4)
-                        : Colors.black.withOpacity(0.3)),
+                        ? Colors.white.withValues(alpha: 0.4)
+                        : Colors.black.withValues(alpha: 0.3)),
               size: 22,
             ),
             suffixIcon: isPassword
@@ -558,8 +568,8 @@ class _LoginScreenState extends State<LoginScreen>
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
                       color: isDark
-                          ? Colors.white.withOpacity(0.4)
-                          : Colors.black.withOpacity(0.3),
+                          ? Colors.white.withValues(alpha: 0.4)
+                          : Colors.black.withValues(alpha: 0.3),
                       size: 22,
                     ),
                     onPressed: () =>
@@ -597,8 +607,8 @@ class NeuralCorePainter extends CustomPainter {
 
     final linePaint = Paint()
       ..color = isDark
-          ? Colors.black.withOpacity(0.6)
-          : const Color(0xFFCDFF00).withOpacity(0.6)
+          ? Colors.black.withValues(alpha: 0.6)
+          : const Color(0xFFCDFF00).withValues(alpha: 0.6)
       ..strokeWidth = 1.5
       ..strokeCap = StrokeCap.round;
 
@@ -619,8 +629,8 @@ class NeuralCorePainter extends CustomPainter {
         center,
         linePaint
           ..color = isDark
-              ? Colors.black.withOpacity(lineOpacity)
-              : const Color(0xFFCDFF00).withOpacity(lineOpacity),
+              ? Colors.black.withValues(alpha: lineOpacity)
+              : const Color(0xFFCDFF00).withValues(alpha: lineOpacity),
       );
 
       final nodeSize = 2.5 + math.sin(progress * math.pi * 2 + i * 0.5) * 0.8;
@@ -629,8 +639,8 @@ class NeuralCorePainter extends CustomPainter {
 
     final outerPaint = Paint()
       ..color = isDark
-          ? Colors.black.withOpacity(0.2 + progress * 0.2)
-          : const Color(0xFFCDFF00).withOpacity(0.2 + progress * 0.2)
+          ? Colors.black.withValues(alpha: 0.2 + progress * 0.2)
+          : const Color(0xFFCDFF00).withValues(alpha: 0.2 + progress * 0.2)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 

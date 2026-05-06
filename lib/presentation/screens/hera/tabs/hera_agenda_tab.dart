@@ -173,9 +173,9 @@ class _CalendarCard extends StatelessWidget {
             return Container(
               margin: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
+                color: color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: color.withOpacity(0.5)),
+                border: Border.all(color: color.withValues(alpha: 0.5)),
               ),
               child: Center(
                 child: Text(
@@ -247,7 +247,7 @@ class _CalendarCard extends StatelessWidget {
           titleCentered: true,
           formatButtonShowsNext: false,
           formatButtonDecoration: BoxDecoration(
-            color: HeraPalette.mauve.withOpacity(0.15),
+            color: HeraPalette.mauve.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10),
           ),
           formatButtonTextStyle: const TextStyle(
@@ -323,7 +323,7 @@ class _LeaveDetailCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(13),
                 ),
                 child: Icon(icon, color: color, size: 20),

@@ -281,8 +281,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                           color: isDark
-                              ? Colors.white.withOpacity(0.5)
-                              : Colors.black.withOpacity(0.5),
+                              ? Colors.white.withValues(alpha: 0.5)
+                              : Colors.black.withValues(alpha: 0.5),
                         ),
                         onPressed: () {
                           setState(
@@ -322,8 +322,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                           color: isDark
-                              ? Colors.white.withOpacity(0.5)
-                              : Colors.black.withOpacity(0.5),
+                              ? Colors.white.withValues(alpha: 0.5)
+                              : Colors.black.withValues(alpha: 0.5),
                         ),
                         onPressed: () {
                           setState(
@@ -362,8 +362,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ? Icons.visibility_off
                               : Icons.visibility,
                           color: isDark
-                              ? Colors.white.withOpacity(0.5)
-                              : Colors.black.withOpacity(0.5),
+                              ? Colors.white.withValues(alpha: 0.5)
+                              : Colors.black.withValues(alpha: 0.5),
                         ),
                         onPressed: () {
                           setState(
@@ -446,8 +446,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       hintText: hintText,
       hintStyle: TextStyle(
         color: isDark
-            ? Colors.white.withOpacity(0.3)
-            : Colors.black.withOpacity(0.3),
+            ? Colors.white.withValues(alpha: 0.3)
+            : Colors.black.withValues(alpha: 0.3),
       ),
       filled: true,
       fillColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
@@ -458,8 +458,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       prefixIcon: Icon(
         icon,
         color: isDark
-            ? Colors.white.withOpacity(0.5)
-            : Colors.black.withOpacity(0.5),
+            ? Colors.white.withValues(alpha: 0.5)
+            : Colors.black.withValues(alpha: 0.5),
       ),
       suffixIcon: suffixIcon,
     );

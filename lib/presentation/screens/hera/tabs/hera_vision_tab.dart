@@ -39,7 +39,7 @@ class HeraVisionTab extends StatelessWidget {
           decoration: BoxDecoration(
             color: HeraPalette.card,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: HeraPalette.mauve.withOpacity(0.2)),
+            border: Border.all(color: HeraPalette.mauve.withValues(alpha: 0.2)),
           ),
           child: Row(
             children: [
@@ -47,7 +47,7 @@ class HeraVisionTab extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: HeraPalette.mauve.withOpacity(0.10),
+                  color: HeraPalette.mauve.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Icon(
@@ -138,7 +138,7 @@ class HeraVisionTab extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: pct,
                     minHeight: 8,
-                    backgroundColor: color.withOpacity(0.12),
+                    backgroundColor: color.withValues(alpha: 0.12),
                     valueColor: AlwaysStoppedAnimation(color),
                   ),
                 ),

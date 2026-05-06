@@ -83,9 +83,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(
-                          0xFF8B5CF6,
-                        ).withOpacity(0.08 + _animationController.value * 0.04),
+                        const Color(0xFF8B5CF6).withValues(
+                          alpha: 0.08 + _animationController.value * 0.04,
+                        ),
                         Colors.transparent,
                       ],
                     ),
@@ -116,7 +116,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       spreadRadius: 0,
                     ),
@@ -124,7 +124,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                 ),
                 child: Icon(
                   Icons.arrow_back_ios_new,
-                  color: Colors.black.withOpacity(0.7),
+                  color: Colors.black.withValues(alpha: 0.7),
                   size: 18,
                 ),
               ),
@@ -154,7 +154,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.2),
                     blurRadius: 30,
                     spreadRadius: 0,
                     offset: const Offset(0, 10),
@@ -192,7 +192,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
             l10n.authForgotPasswordSubtitle,
             style: TextStyle(
               fontSize: 16,
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               fontWeight: FontWeight.w400,
               height: 1.5,
             ),
@@ -211,15 +211,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: _isEmailFocused
-                      ? Colors.black.withOpacity(0.3)
+                      ? Colors.black.withValues(alpha: 0.3)
                       : Colors.transparent,
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
                     color: _isEmailFocused
-                        ? Colors.black.withOpacity(0.06)
-                        : Colors.black.withOpacity(0.03),
+                        ? Colors.black.withValues(alpha: 0.06)
+                        : Colors.black.withValues(alpha: 0.03),
                     blurRadius: _isEmailFocused ? 15 : 10,
                     spreadRadius: 0,
                     offset: const Offset(0, 4),
@@ -238,13 +238,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                   labelText: l10n.authEmailLabel,
                   hintText: l10n.authEmailHint,
                   hintStyle: TextStyle(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withValues(alpha: 0.3),
                     fontWeight: FontWeight.w400,
                   ),
                   labelStyle: TextStyle(
                     color: _isEmailFocused
-                        ? Colors.black.withOpacity(0.7)
-                        : Colors.black.withOpacity(0.4),
+                        ? Colors.black.withValues(alpha: 0.7)
+                        : Colors.black.withValues(alpha: 0.4),
                     fontWeight: FontWeight.w500,
                   ),
                   floatingLabelStyle: const TextStyle(
@@ -254,8 +254,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                   prefixIcon: Icon(
                     Icons.alternate_email,
                     color: _isEmailFocused
-                        ? Colors.black.withOpacity(0.6)
-                        : Colors.black.withOpacity(0.3),
+                        ? Colors.black.withValues(alpha: 0.6)
+                        : Colors.black.withValues(alpha: 0.3),
                     size: 22,
                   ),
                   border: InputBorder.none,
@@ -324,7 +324,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
               Icon(
                 Icons.arrow_back,
                 size: 16,
-                color: Colors.black.withOpacity(0.4),
+                color: Colors.black.withValues(alpha: 0.4),
               ),
               const SizedBox(width: 8),
               GestureDetector(
@@ -357,7 +357,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
             width: 110,
             height: 110,
             decoration: BoxDecoration(
-              color: const Color(0xFFCCFF00).withOpacity(0.15),
+              color: const Color(0xFFCCFF00).withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(32),
             ),
             child: const Icon(
@@ -392,7 +392,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
             l10n.authResetLinkSentTo(_emailController.text),
             style: TextStyle(
               fontSize: 16,
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               fontWeight: FontWeight.w400,
               height: 1.6,
             ),
@@ -467,7 +467,7 @@ class NeuralCorePainter extends CustomPainter {
     canvas.drawCircle(center, 6, centerPaint);
 
     final linePaint = Paint()
-      ..color = color.withOpacity(0.6)
+      ..color = color.withValues(alpha: 0.6)
       ..strokeWidth = 1.5
       ..strokeCap = StrokeCap.round;
 
@@ -486,7 +486,7 @@ class NeuralCorePainter extends CustomPainter {
       canvas.drawLine(
         Offset(x, y),
         center,
-        linePaint..color = color.withOpacity(lineOpacity),
+        linePaint..color = color.withValues(alpha: lineOpacity),
       );
 
       final nodeSize = 2.5 + math.sin(progress * math.pi * 2 + i * 0.5) * 0.8;
@@ -494,7 +494,7 @@ class NeuralCorePainter extends CustomPainter {
     }
 
     final outerPaint = Paint()
-      ..color = color.withOpacity(0.2 + progress * 0.2)
+      ..color = color.withValues(alpha: 0.2 + progress * 0.2)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 

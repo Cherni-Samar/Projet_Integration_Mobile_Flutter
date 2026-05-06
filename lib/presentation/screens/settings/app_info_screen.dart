@@ -39,7 +39,7 @@ class AppInfoScreen extends StatelessWidget {
                       ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
+                    color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -54,13 +54,13 @@ class AppInfoScreen extends StatelessWidget {
                       height: 40,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.black.withOpacity(0.05),
+                            ? Colors.white.withValues(alpha: 0.1)
+                            : Colors.black.withValues(alpha: 0.05),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.black.withOpacity(0.1),
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Icon(
@@ -88,8 +88,8 @@ class AppInfoScreen extends StatelessWidget {
                           l10n.appInfoSubtitle,
                           style: TextStyle(
                             color: isDark
-                                ? Colors.white.withOpacity(0.5)
-                                : Colors.black.withOpacity(0.5),
+                                ? Colors.white.withValues(alpha: 0.5)
+                                : Colors.black.withValues(alpha: 0.5),
                             fontSize: 12,
                           ),
                         ),
@@ -123,7 +123,9 @@ class AppInfoScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(32),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFCDFF00).withOpacity(0.4),
+                            color: const Color(
+                              0xFFCDFF00,
+                            ).withValues(alpha: 0.4),
                             blurRadius: 30,
                             offset: const Offset(0, 15),
                           ),
@@ -154,8 +156,8 @@ class AppInfoScreen extends StatelessWidget {
                       l10n.appInfoTagline,
                       style: TextStyle(
                         color: isDark
-                            ? Colors.white.withOpacity(0.6)
-                            : Colors.black.withOpacity(0.6),
+                            ? Colors.white.withValues(alpha: 0.6)
+                            : Colors.black.withValues(alpha: 0.6),
                         fontSize: 16,
                       ),
                     ),
@@ -172,17 +174,25 @@ class AppInfoScreen extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: isDark
                               ? [
-                                  const Color(0xFFCDFF00).withOpacity(0.2),
-                                  const Color(0xFFAADD00).withOpacity(0.15),
+                                  const Color(
+                                    0xFFCDFF00,
+                                  ).withValues(alpha: 0.2),
+                                  const Color(
+                                    0xFFAADD00,
+                                  ).withValues(alpha: 0.15),
                                 ]
                               : [
-                                  const Color(0xFFCDFF00).withOpacity(0.3),
-                                  const Color(0xFFAADD00).withOpacity(0.2),
+                                  const Color(
+                                    0xFFCDFF00,
+                                  ).withValues(alpha: 0.3),
+                                  const Color(
+                                    0xFFAADD00,
+                                  ).withValues(alpha: 0.2),
                                 ],
                         ),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: const Color(0xFFCDFF00).withOpacity(0.5),
+                          color: const Color(0xFFCDFF00).withValues(alpha: 0.5),
                         ),
                       ),
                       child: Text(
@@ -207,13 +217,13 @@ class AppInfoScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.black.withOpacity(0.1),
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.1),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(
-                              isDark ? 0.3 : 0.05,
+                            color: Colors.black.withValues(
+                              alpha: isDark ? 0.3 : 0.05,
                             ),
                             blurRadius: 15,
                             offset: const Offset(0, 4),
@@ -259,8 +269,8 @@ class AppInfoScreen extends StatelessWidget {
                             l10n.appInfoAboutDescription,
                             style: TextStyle(
                               color: isDark
-                                  ? Colors.white.withOpacity(0.7)
-                                  : Colors.black.withOpacity(0.7),
+                                  ? Colors.white.withValues(alpha: 0.7)
+                                  : Colors.black.withValues(alpha: 0.7),
                               fontSize: 15,
                               height: 1.6,
                             ),
@@ -353,8 +363,8 @@ class AppInfoScreen extends StatelessWidget {
                           '•',
                           style: TextStyle(
                             color: isDark
-                                ? Colors.white.withOpacity(0.3)
-                                : Colors.black.withOpacity(0.3),
+                                ? Colors.white.withValues(alpha: 0.3)
+                                : Colors.black.withValues(alpha: 0.3),
                           ),
                         ),
                         _buildLegalLink(
@@ -366,8 +376,8 @@ class AppInfoScreen extends StatelessWidget {
                           '•',
                           style: TextStyle(
                             color: isDark
-                                ? Colors.white.withOpacity(0.3)
-                                : Colors.black.withOpacity(0.3),
+                                ? Colors.white.withValues(alpha: 0.3)
+                                : Colors.black.withValues(alpha: 0.3),
                           ),
                         ),
                         _buildLegalLink(
@@ -390,8 +400,8 @@ class AppInfoScreen extends StatelessWidget {
                       l10n.appInfoCopyright,
                       style: TextStyle(
                         color: isDark
-                            ? Colors.white.withOpacity(0.5)
-                            : Colors.black.withOpacity(0.5),
+                            ? Colors.white.withValues(alpha: 0.5)
+                            : Colors.black.withValues(alpha: 0.5),
                         fontSize: 13,
                       ),
                       textAlign: TextAlign.center,
@@ -403,8 +413,8 @@ class AppInfoScreen extends StatelessWidget {
                       l10n.appInfoMadeWith,
                       style: TextStyle(
                         color: isDark
-                            ? Colors.white.withOpacity(0.5)
-                            : Colors.black.withOpacity(0.5),
+                            ? Colors.white.withValues(alpha: 0.5)
+                            : Colors.black.withValues(alpha: 0.5),
                         fontSize: 13,
                       ),
                       textAlign: TextAlign.center,
@@ -436,12 +446,12 @@ class AppInfoScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.black.withOpacity(0.1),
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.1),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -456,9 +466,9 @@ class AppInfoScreen extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.15),
+                  color: iconColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: iconColor.withOpacity(0.3)),
+                  border: Border.all(color: iconColor.withValues(alpha: 0.3)),
                 ),
                 child: Icon(icon, color: iconColor, size: 22),
               ),
@@ -480,8 +490,8 @@ class AppInfoScreen extends StatelessWidget {
                       subtitle,
                       style: TextStyle(
                         color: isDark
-                            ? Colors.white.withOpacity(0.5)
-                            : Colors.black.withOpacity(0.5),
+                            ? Colors.white.withValues(alpha: 0.5)
+                            : Colors.black.withValues(alpha: 0.5),
                         fontSize: 12,
                       ),
                     ),
@@ -512,8 +522,8 @@ class AppInfoScreen extends StatelessWidget {
                       item,
                       style: TextStyle(
                         color: isDark
-                            ? Colors.white.withOpacity(0.8)
-                            : Colors.black.withOpacity(0.8),
+                            ? Colors.white.withValues(alpha: 0.8)
+                            : Colors.black.withValues(alpha: 0.8),
                         fontSize: 14,
                         height: 1.5,
                       ),
@@ -543,9 +553,9 @@ class AppInfoScreen extends StatelessWidget {
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: color.withOpacity(0.3), width: 2),
+              border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
             ),
             child: Icon(icon, color: color, size: 28),
           ),
@@ -554,8 +564,8 @@ class AppInfoScreen extends StatelessWidget {
             label,
             style: TextStyle(
               color: isDark
-                  ? Colors.white.withOpacity(0.7)
-                  : Colors.black.withOpacity(0.7),
+                  ? Colors.white.withValues(alpha: 0.7)
+                  : Colors.black.withValues(alpha: 0.7),
               fontSize: 11,
               fontWeight: FontWeight.w600,
             ),

@@ -168,7 +168,7 @@ class _CartPageState extends State<CartPage> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.green.withOpacity(0.1),
+                color: Colors.green.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -320,15 +320,15 @@ class _CartPageState extends State<CartPage> {
                                           : Colors.white,
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
-                                        color: item.agentColor.withOpacity(
-                                          0.25,
+                                        color: item.agentColor.withValues(
+                                          alpha: 0.25,
                                         ),
                                         width: 1.5,
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: item.agentColor.withOpacity(
-                                            isDark ? 0.1 : 0.06,
+                                          color: item.agentColor.withValues(
+                                            alpha: isDark ? 0.1 : 0.06,
                                           ),
                                           blurRadius: 16,
                                           offset: const Offset(0, 6),
@@ -342,8 +342,8 @@ class _CartPageState extends State<CartPage> {
                                           width: 56,
                                           height: 56,
                                           decoration: BoxDecoration(
-                                            color: item.agentColor.withOpacity(
-                                              0.1,
+                                            color: item.agentColor.withValues(
+                                              alpha: 0.1,
                                             ),
                                             borderRadius: BorderRadius.circular(
                                               14,
@@ -392,7 +392,9 @@ class _CartPageState extends State<CartPage> {
                                                         ),
                                                     decoration: BoxDecoration(
                                                       color: Colors.green
-                                                          .withOpacity(0.12),
+                                                          .withValues(
+                                                            alpha: 0.12,
+                                                          ),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             6,
@@ -474,15 +476,15 @@ class _CartPageState extends State<CartPage> {
                                           : Colors.white,
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
-                                        color: item.agentColor.withOpacity(
-                                          0.25,
+                                        color: item.agentColor.withValues(
+                                          alpha: 0.25,
                                         ),
                                         width: 1.5,
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: item.agentColor.withOpacity(
-                                            isDark ? 0.1 : 0.06,
+                                          color: item.agentColor.withValues(
+                                            alpha: isDark ? 0.1 : 0.06,
                                           ),
                                           blurRadius: 16,
                                           offset: const Offset(0, 6),
@@ -496,8 +498,8 @@ class _CartPageState extends State<CartPage> {
                                           width: 56,
                                           height: 56,
                                           decoration: BoxDecoration(
-                                            color: item.agentColor.withOpacity(
-                                              0.1,
+                                            color: item.agentColor.withValues(
+                                              alpha: 0.1,
                                             ),
                                             borderRadius: BorderRadius.circular(
                                               14,
@@ -537,7 +539,9 @@ class _CartPageState extends State<CartPage> {
                                                         ),
                                                     decoration: BoxDecoration(
                                                       color: item.agentColor
-                                                          .withOpacity(0.12),
+                                                          .withValues(
+                                                            alpha: 0.12,
+                                                          ),
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                             6,
@@ -606,8 +610,8 @@ class _CartPageState extends State<CartPage> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(
-                              isDark ? 0.3 : 0.05,
+                            color: Colors.black.withValues(
+                              alpha: isDark ? 0.3 : 0.05,
                             ),
                             blurRadius: 10,
                             offset: const Offset(0, -4),
@@ -709,8 +713,10 @@ class _CartPageState extends State<CartPage> {
                                     ? Colors.black
                                     : Colors.white,
                                 disabledBackgroundColor: isDark
-                                    ? const Color(0xFFCDFF00).withOpacity(0.5)
-                                    : Colors.black.withOpacity(0.5),
+                                    ? const Color(
+                                        0xFFCDFF00,
+                                      ).withValues(alpha: 0.5)
+                                    : Colors.black.withValues(alpha: 0.5),
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 18,
                                 ),

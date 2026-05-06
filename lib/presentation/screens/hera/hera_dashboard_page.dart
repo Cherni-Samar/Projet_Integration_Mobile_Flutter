@@ -545,7 +545,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                             color: HeraPalette.cardSoft,
                             borderRadius: BorderRadius.circular(18),
                             border: Border.all(
-                              color: HeraPalette.mauve.withOpacity(0.2),
+                              color: HeraPalette.mauve.withValues(alpha: 0.2),
                             ),
                           ),
                           child: Row(

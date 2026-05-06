@@ -156,7 +156,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -174,7 +174,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: widget.categoryColor.withOpacity(0.1),
+                  color: widget.categoryColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
@@ -209,7 +209,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: securityColor.withOpacity(0.1),
+                            color: securityColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -580,7 +580,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: widget.categoryColor.withOpacity(0.1),
+                      color: widget.categoryColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -677,7 +677,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: widget.categoryColor.withOpacity(0.1),
+              color: widget.categoryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(40),
             ),
             child: Icon(

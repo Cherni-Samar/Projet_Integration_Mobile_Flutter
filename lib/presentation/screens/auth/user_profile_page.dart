@@ -74,7 +74,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             l10n.logoutDialogMessage,
             style: TextStyle(
               color: isDark
-                  ? Colors.white.withOpacity(0.7)
+                  ? Colors.white.withValues(alpha: 0.7)
                   : const Color(0xFF6B7280),
             ),
           ),
@@ -85,7 +85,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 l10n.commonCancel,
                 style: TextStyle(
                   color: isDark
-                      ? Colors.white.withOpacity(0.5)
+                      ? Colors.white.withValues(alpha: 0.5)
                       : const Color(0xFF6B7280),
                 ),
               ),
@@ -156,13 +156,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       height: 40,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withOpacity(0.05)
+                            ? Colors.white.withValues(alpha: 0.05)
                             : Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(
-                              isDark ? 0.2 : 0.05,
+                            color: Colors.black.withValues(
+                              alpha: isDark ? 0.2 : 0.05,
                             ),
                             blurRadius: 10,
                           ),
@@ -204,7 +204,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFA855F7).withOpacity(0.3),
+                    color: const Color(0xFFA855F7).withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -243,8 +243,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
               _currentUser?.email ?? l10n.commonEmailPlaceholder,
               style: TextStyle(
                 color: isDark
-                    ? Colors.white.withOpacity(0.5)
-                    : Colors.black.withOpacity(0.5),
+                    ? Colors.white.withValues(alpha: 0.5)
+                    : Colors.black.withValues(alpha: 0.5),
                 fontSize: 15,
               ),
             ),
@@ -264,7 +264,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                          color: Colors.black.withValues(
+                            alpha: isDark ? 0.2 : 0.05,
+                          ),
                           blurRadius: 10,
                           offset: const Offset(0, 2),
                         ),
@@ -276,8 +278,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         height: 44,
                         decoration: BoxDecoration(
                           color: isDark
-                              ? const Color(0xFFCDFF00).withOpacity(0.2)
-                              : Colors.black.withOpacity(0.05),
+                              ? const Color(0xFFCDFF00).withValues(alpha: 0.2)
+                              : Colors.black.withValues(alpha: 0.05),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -302,7 +304,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         activeColor: const Color(0xFFCDFF00),
                         activeTrackColor: const Color(
                           0xFFCDFF00,
-                        ).withOpacity(0.3),
+                        ).withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -437,7 +439,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -450,10 +452,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
           height: 44,
           decoration: BoxDecoration(
             color: isDestructive
-                ? Colors.red.withOpacity(0.1)
+                ? Colors.red.withValues(alpha: 0.1)
                 : isDark
-                ? Colors.white.withOpacity(0.05)
-                : Colors.black.withOpacity(0.05),
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.black.withValues(alpha: 0.05),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -481,10 +483,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
         trailing: Icon(
           Icons.arrow_forward_ios,
           color: isDestructive
-              ? Colors.red.withOpacity(0.5)
+              ? Colors.red.withValues(alpha: 0.5)
               : isDark
-              ? Colors.white.withOpacity(0.3)
-              : Colors.black.withOpacity(0.3),
+              ? Colors.white.withValues(alpha: 0.3)
+              : Colors.black.withValues(alpha: 0.3),
           size: 18,
         ),
       ),

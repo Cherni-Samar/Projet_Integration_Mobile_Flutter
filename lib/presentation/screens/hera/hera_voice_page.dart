@@ -194,7 +194,7 @@ class _HeraVoicePageState extends State<HeraVoicePage>
     const bg = Color(0xFF050505);
     const accent = Color(0xFFB57BFF); // Mauve Hera
     const textPrimary = Colors.white;
-    final textSecondary = Colors.white.withOpacity(0.65);
+    final textSecondary = Colors.white.withValues(alpha: 0.65);
     final isActive = _vapiService.isActive;
 
     return Scaffold(
@@ -222,7 +222,7 @@ class _HeraVoicePageState extends State<HeraVoicePage>
                               vertical: 7,
                             ),
                             decoration: BoxDecoration(
-                              color: accent.withOpacity(0.95),
+                              color: accent.withValues(alpha: 0.95),
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: const Text(
@@ -296,10 +296,12 @@ class _HeraVoicePageState extends State<HeraVoicePage>
                               : Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.06),
+                                    color: Colors.white.withValues(alpha: 0.06),
                                     borderRadius: BorderRadius.circular(22),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.05),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.05,
+                                      ),
                                     ),
                                   ),
                                   child: ListView.builder(
@@ -324,8 +326,8 @@ class _HeraVoicePageState extends State<HeraVoicePage>
                                           decoration: BoxDecoration(
                                             color: msg.isUser
                                                 ? accent
-                                                : Colors.white.withOpacity(
-                                                    0.08,
+                                                : Colors.white.withValues(
+                                                    alpha: 0.08,
                                                   ),
                                             borderRadius: BorderRadius.circular(
                                               18,
@@ -373,12 +375,14 @@ class _HeraVoicePageState extends State<HeraVoicePage>
                                       border: Border.all(
                                         color: const Color(
                                           0xFFB57BFF,
-                                        ).withOpacity(0.4),
+                                        ).withValues(alpha: 0.4),
                                         width: 1,
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.4),
+                                          color: Colors.black.withValues(
+                                            alpha: 0.4,
+                                          ),
                                           blurRadius: 10,
                                         ),
                                       ],
@@ -422,7 +426,7 @@ class _HeraVoicePageState extends State<HeraVoicePage>
                                                     'Écrire un message à Hera...',
                                                 hintStyle: TextStyle(
                                                   color: Colors.white
-                                                      .withOpacity(0.38),
+                                                      .withValues(alpha: 0.38),
                                                 ),
                                               ),
                                               onSubmitted: (_) => _sendText(),
@@ -476,8 +480,8 @@ class _HeraVoicePageState extends State<HeraVoicePage>
                                   color: accent,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: accent.withOpacity(
-                                        isActive ? 0.55 : 0.30,
+                                      color: accent.withValues(
+                                        alpha: isActive ? 0.55 : 0.30,
                                       ),
                                       blurRadius: isActive ? 34 : 22,
                                       spreadRadius: isActive ? 4 : 0,
@@ -522,9 +526,9 @@ class _HeraVoicePageState extends State<HeraVoicePage>
         width: 46,
         height: 46,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: Colors.white.withValues(alpha: 0.08),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Icon(icon, color: Colors.white70, size: 22),
       ),
@@ -541,9 +545,9 @@ class _HeraVoicePageState extends State<HeraVoicePage>
         width: 52,
         height: 52,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.08),
+          color: Colors.white.withValues(alpha: 0.08),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Icon(icon, color: Colors.white70, size: 22),
       ),
@@ -577,7 +581,7 @@ class _HeraOrb extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFB57BFF).withOpacity(0.18),
+                  color: const Color(0xFFB57BFF).withValues(alpha: 0.18),
                   blurRadius: 60,
                   spreadRadius: 8,
                 ),
@@ -611,8 +615,8 @@ class _HeraOrb extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  Colors.white.withOpacity(0.35),
-                  const Color(0xFFB57BFF).withOpacity(0.50),
+                  Colors.white.withValues(alpha: 0.35),
+                  const Color(0xFFB57BFF).withValues(alpha: 0.50),
                   const Color(0xFF080808),
                 ],
                 stops: const [0.0, 0.38, 1.0],
@@ -627,8 +631,8 @@ class _HeraOrb extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  const Color(0xFFB57BFF).withOpacity(0.80),
-                  const Color(0xFF6B3FA0).withOpacity(0.60),
+                  const Color(0xFFB57BFF).withValues(alpha: 0.80),
+                  const Color(0xFF6B3FA0).withValues(alpha: 0.60),
                   Colors.black,
                 ],
                 stops: const [0.0, 0.45, 1.0],
@@ -654,7 +658,7 @@ class _LinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFB57BFF).withOpacity(0.06)
+      ..color = const Color(0xFFB57BFF).withValues(alpha: 0.06)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 

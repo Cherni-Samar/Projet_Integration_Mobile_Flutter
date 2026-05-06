@@ -55,7 +55,7 @@ class HeraEnergyTab extends StatelessWidget {
               border: Border.all(
                 color: canAfford
                     ? HeraPalette.border
-                    : HeraPalette.danger.withOpacity(0.3),
+                    : HeraPalette.danger.withValues(alpha: 0.3),
               ),
             ),
             child: Row(
@@ -64,7 +64,7 @@ class HeraEnergyTab extends StatelessWidget {
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    color: taskColor.withOpacity(0.10),
+                    color: taskColor.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(icon, color: taskColor, size: 22),

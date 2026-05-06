@@ -66,7 +66,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         width: 1,
                       ),
                       borderRadius: BorderRadius.circular(20),
@@ -145,7 +145,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
                       BoxShadow(
                         color: const Color(
                           0xFFCDFF00,
-                        ).withOpacity(0.3 * _pulseController.value),
+                        ).withValues(alpha: 0.3 * _pulseController.value),
                         blurRadius: 60,
                         spreadRadius: 20,
                       ),
@@ -163,7 +163,9 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: const Color(0xFFCDFF00).withOpacity(0.3),
+                              color: const Color(
+                                0xFFCDFF00,
+                              ).withValues(alpha: 0.3),
                               width: 2,
                             ),
                           ),
@@ -177,7 +179,9 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFFCDFF00).withOpacity(0.5),
+                            color: const Color(
+                              0xFFCDFF00,
+                            ).withValues(alpha: 0.5),
                             width: 1,
                           ),
                         ),
@@ -269,7 +273,7 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0.2),
+                                Colors.white.withValues(alpha: 0.2),
                                 Colors.transparent,
                               ],
                             ),
@@ -316,7 +320,9 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFCDFF00).withOpacity(0.5),
+                                color: const Color(
+                                  0xFFCDFF00,
+                                ).withValues(alpha: 0.5),
                                 blurRadius: 20,
                                 spreadRadius: 2,
                               ),

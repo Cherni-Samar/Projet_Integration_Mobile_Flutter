@@ -110,13 +110,15 @@ class AgentMarketplaceCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(32),
                     border: Border.all(
                       color: isCenter
-                          ? agentColor.withOpacity(0.3)
+                          ? agentColor.withValues(alpha: 0.3)
                           : Colors.transparent,
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: agentColor.withOpacity(isCenter ? 0.25 : 0.12),
+                        color: agentColor.withValues(
+                          alpha: isCenter ? 0.25 : 0.12,
+                        ),
                         blurRadius: isCenter ? 30 : 15,
                         offset: const Offset(0, 10),
                       ),
@@ -142,8 +144,8 @@ class AgentMarketplaceCard extends StatelessWidget {
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    agentColor.withOpacity(0.2),
-                                    agentColor.withOpacity(0.05),
+                                    agentColor.withValues(alpha: 0.2),
+                                    agentColor.withValues(alpha: 0.05),
                                   ],
                                 ),
                                 shape: BoxShape.circle,
@@ -153,7 +155,7 @@ class AgentMarketplaceCard extends StatelessWidget {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: agentColor.withOpacity(0.3),
+                                    color: agentColor.withValues(alpha: 0.3),
                                     blurRadius: 18,
                                     spreadRadius: 1,
                                   ),
@@ -195,13 +197,13 @@ class AgentMarketplaceCard extends StatelessWidget {
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    agentColor.withOpacity(0.15),
-                                    agentColor.withOpacity(0.08),
+                                    agentColor.withValues(alpha: 0.15),
+                                    agentColor.withValues(alpha: 0.08),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: agentColor.withOpacity(0.4),
+                                  color: agentColor.withValues(alpha: 0.4),
                                   width: 1.5,
                                 ),
                               ),
@@ -223,8 +225,8 @@ class AgentMarketplaceCard extends StatelessWidget {
                               agent['description'],
                               style: TextStyle(
                                 color: isDark
-                                    ? Colors.white.withOpacity(0.6)
-                                    : Colors.black.withOpacity(0.6),
+                                    ? Colors.white.withValues(alpha: 0.6)
+                                    : Colors.black.withValues(alpha: 0.6),
                                 fontSize: 11, // Reduced from 12
                                 fontWeight: FontWeight.w500,
                                 height: 1.3, // Reduced from 1.4
@@ -241,13 +243,13 @@ class AgentMarketplaceCard extends StatelessWidget {
                               ), // Reduced from 12
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? Colors.white.withOpacity(0.05)
-                                    : Colors.black.withOpacity(0.03),
+                                    ? Colors.white.withValues(alpha: 0.05)
+                                    : Colors.black.withValues(alpha: 0.03),
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
                                   color: isDark
-                                      ? Colors.white.withOpacity(0.1)
-                                      : Colors.black.withOpacity(0.08),
+                                      ? Colors.white.withValues(alpha: 0.1)
+                                      : Colors.black.withValues(alpha: 0.08),
                                   width: 1,
                                 ),
                               ),
@@ -258,8 +260,8 @@ class AgentMarketplaceCard extends StatelessWidget {
                                     'Activity Today',
                                     style: TextStyle(
                                       color: isDark
-                                          ? Colors.white.withOpacity(0.5)
-                                          : Colors.black.withOpacity(0.5),
+                                          ? Colors.white.withValues(alpha: 0.5)
+                                          : Colors.black.withValues(alpha: 0.5),
                                       fontSize: 9, // Reduced from 10
                                       fontWeight: FontWeight.w600,
                                       letterSpacing: 0.5,
@@ -293,15 +295,19 @@ class AgentMarketplaceCard extends StatelessWidget {
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    const Color(0xFF10B981).withOpacity(0.15),
-                                    const Color(0xFF10B981).withOpacity(0.08),
+                                    const Color(
+                                      0xFF10B981,
+                                    ).withValues(alpha: 0.15),
+                                    const Color(
+                                      0xFF10B981,
+                                    ).withValues(alpha: 0.08),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(18),
                                 border: Border.all(
                                   color: const Color(
                                     0xFF10B981,
-                                  ).withOpacity(0.4),
+                                  ).withValues(alpha: 0.4),
                                   width: 1.5,
                                 ),
                               ),
@@ -318,7 +324,7 @@ class AgentMarketplaceCard extends StatelessWidget {
                                         BoxShadow(
                                           color: const Color(
                                             0xFF10B981,
-                                          ).withOpacity(0.6),
+                                          ).withValues(alpha: 0.6),
                                           blurRadius: 6,
                                           spreadRadius: 1,
                                         ),
@@ -359,7 +365,7 @@ class AgentMarketplaceCard extends StatelessWidget {
         children: [
           Icon(
             icon,
-            color: colorFromValue(agent['color']).withOpacity(0.7),
+            color: colorFromValue(agent['color']).withValues(alpha: 0.7),
             size: 16, // Reduced from 18
           ),
           const SizedBox(height: 3), // Reduced from 4
@@ -378,8 +384,8 @@ class AgentMarketplaceCard extends StatelessWidget {
             label,
             style: TextStyle(
               color: isDark
-                  ? Colors.white.withOpacity(0.5)
-                  : Colors.black.withOpacity(0.5),
+                  ? Colors.white.withValues(alpha: 0.5)
+                  : Colors.black.withValues(alpha: 0.5),
               fontSize: 8, // Reduced from 9
               fontWeight: FontWeight.w600,
             ),

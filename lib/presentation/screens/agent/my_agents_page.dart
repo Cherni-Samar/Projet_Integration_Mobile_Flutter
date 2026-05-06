@@ -119,7 +119,7 @@ class MyAgentsPage extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: agent.agentColor.withOpacity(0.12),
+                color: agent.agentColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: ClipRRect(
@@ -238,12 +238,12 @@ class MyAgentsPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isDark
-                  ? Colors.white.withOpacity(0.08)
-                  : Colors.black.withOpacity(0.06),
+                  ? Colors.white.withValues(alpha: 0.08)
+                  : Colors.black.withValues(alpha: 0.06),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -255,7 +255,7 @@ class MyAgentsPage extends StatelessWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF59E0B).withOpacity(0.15),
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
@@ -352,12 +352,14 @@ class MyAgentsPage extends StatelessWidget {
                   color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: agent.agentColor.withOpacity(0.25),
+                    color: agent.agentColor.withValues(alpha: 0.25),
                     width: 1.5,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: agent.agentColor.withOpacity(isDark ? 0.1 : 0.06),
+                      color: agent.agentColor.withValues(
+                        alpha: isDark ? 0.1 : 0.06,
+                      ),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
@@ -441,7 +443,7 @@ class MyAgentsPage extends StatelessWidget {
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: agent.agentColor.withOpacity(0.1),
+                          color: agent.agentColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: ClipRRect(
@@ -527,7 +529,9 @@ class MyAgentsPage extends StatelessWidget {
                                     vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: agent.agentColor.withOpacity(0.12),
+                                    color: agent.agentColor.withValues(
+                                      alpha: 0.12,
+                                    ),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
@@ -569,7 +573,9 @@ class MyAgentsPage extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withOpacity(0.12),
+                          color: const Color(
+                            0xFF10B981,
+                          ).withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(

@@ -360,11 +360,13 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: _green.withOpacity(0.4 + 0.6 * _pulseController.value),
+                  color: _green.withValues(
+                    alpha: 0.4 + 0.6 * _pulseController.value,
+                  ),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: _green.withOpacity(0.25),
+                      color: _green.withValues(alpha: 0.25),
                       blurRadius: 10,
                       spreadRadius: 2,
                     ),
@@ -431,7 +433,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
             border: isBot ? Border.all(color: _border, width: 0.5) : null,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.025),
+                color: Colors.black.withValues(alpha: 0.025),
                 blurRadius: 14,
                 offset: const Offset(0, 6),
               ),
@@ -541,7 +543,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: _dark.withOpacity(0.18),
+                    color: _dark.withValues(alpha: 0.18),
                     blurRadius: 18,
                     offset: const Offset(0, 8),
                   ),

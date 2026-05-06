@@ -46,7 +46,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                       ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
+                    color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
@@ -61,13 +61,13 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                       height: 40,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.black.withOpacity(0.05),
+                            ? Colors.white.withValues(alpha: 0.1)
+                            : Colors.black.withValues(alpha: 0.05),
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: isDark
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.black.withOpacity(0.1),
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Icon(
@@ -95,8 +95,8 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                           l10n.privacySubtitle,
                           style: TextStyle(
                             color: isDark
-                                ? Colors.white.withOpacity(0.5)
-                                : Colors.black.withOpacity(0.5),
+                                ? Colors.white.withValues(alpha: 0.5)
+                                : Colors.black.withValues(alpha: 0.5),
                             fontSize: 12,
                           ),
                         ),
@@ -126,17 +126,27 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                           gradient: LinearGradient(
                             colors: isDark
                                 ? [
-                                    const Color(0xFF8B5CF6).withOpacity(0.2),
-                                    const Color(0xFFEC4899).withOpacity(0.2),
+                                    const Color(
+                                      0xFF8B5CF6,
+                                    ).withValues(alpha: 0.2),
+                                    const Color(
+                                      0xFFEC4899,
+                                    ).withValues(alpha: 0.2),
                                   ]
                                 : [
-                                    const Color(0xFF8B5CF6).withOpacity(0.2),
-                                    const Color(0xFFEC4899).withOpacity(0.2),
+                                    const Color(
+                                      0xFF8B5CF6,
+                                    ).withValues(alpha: 0.2),
+                                    const Color(
+                                      0xFFEC4899,
+                                    ).withValues(alpha: 0.2),
                                   ],
                           ),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: const Color(0xFF8B5CF6).withOpacity(0.5),
+                            color: const Color(
+                              0xFF8B5CF6,
+                            ).withValues(alpha: 0.5),
                           ),
                         ),
                         child: Row(
@@ -173,8 +183,8 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isDark
-                              ? const Color(0xFF8B5CF6).withOpacity(0.3)
-                              : const Color(0xFF8B5CF6).withOpacity(0.2),
+                              ? const Color(0xFF8B5CF6).withValues(alpha: 0.3)
+                              : const Color(0xFF8B5CF6).withValues(alpha: 0.2),
                         ),
                       ),
                       child: Row(
@@ -269,8 +279,8 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                         boxShadow: [
                           BoxShadow(
                             color: isDark
-                                ? const Color(0xFF8B5CF6).withOpacity(0.3)
-                                : Colors.black.withOpacity(0.1),
+                                ? const Color(0xFF8B5CF6).withValues(alpha: 0.3)
+                                : Colors.black.withValues(alpha: 0.1),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -332,8 +342,8 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                         boxShadow: [
                           BoxShadow(
                             color: isDark
-                                ? const Color(0xFFCDFF00).withOpacity(0.3)
-                                : Colors.black.withOpacity(0.1),
+                                ? const Color(0xFFCDFF00).withValues(alpha: 0.3)
+                                : Colors.black.withValues(alpha: 0.1),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -405,24 +415,24 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
           color: isDark
               ? isExpanded
                     ? const Color(0xFF1E1E1E)
-                    : Colors.white.withOpacity(0.05)
+                    : Colors.white.withValues(alpha: 0.05)
               : isExpanded
               ? Colors.white
-              : Colors.white.withOpacity(0.7),
+              : Colors.white.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isExpanded
-                ? iconColor.withOpacity(0.5)
+                ? iconColor.withValues(alpha: 0.5)
                 : isDark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.black.withOpacity(0.1),
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.1),
             width: isExpanded ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
               color: isExpanded
-                  ? iconColor.withOpacity(isDark ? 0.2 : 0.1)
-                  : Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                  ? iconColor.withValues(alpha: isDark ? 0.2 : 0.1)
+                  : Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
               blurRadius: isExpanded ? 20 : 10,
               offset: const Offset(0, 4),
             ),
@@ -448,9 +458,11 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: iconColor.withOpacity(0.1),
+                          color: iconColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: iconColor.withOpacity(0.3)),
+                          border: Border.all(
+                            color: iconColor.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Icon(icon, color: iconColor, size: 22),
                       ),
@@ -472,8 +484,8 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                               summary,
                               style: TextStyle(
                                 color: isDark
-                                    ? Colors.white.withOpacity(0.6)
-                                    : Colors.black.withOpacity(0.6),
+                                    ? Colors.white.withValues(alpha: 0.6)
+                                    : Colors.black.withValues(alpha: 0.6),
                                 fontSize: 13,
                               ),
                             ),
@@ -486,8 +498,8 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                         child: Icon(
                           Icons.keyboard_arrow_down,
                           color: isDark
-                              ? Colors.white.withOpacity(0.5)
-                              : Colors.black.withOpacity(0.5),
+                              ? Colors.white.withValues(alpha: 0.5)
+                              : Colors.black.withValues(alpha: 0.5),
                         ),
                       ),
                     ],
@@ -500,8 +512,8 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                         content,
                         style: TextStyle(
                           color: isDark
-                              ? Colors.white.withOpacity(0.8)
-                              : Colors.black.withOpacity(0.7),
+                              ? Colors.white.withValues(alpha: 0.8)
+                              : Colors.black.withValues(alpha: 0.7),
                           fontSize: 14,
                           height: 1.6,
                         ),

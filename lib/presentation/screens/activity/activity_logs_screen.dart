@@ -219,14 +219,14 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.purple.withOpacity(0.3)
-              : Colors.grey.withOpacity(0.3),
+              ? Colors.purple.withValues(alpha: 0.3)
+              : Colors.grey.withValues(alpha: 0.3),
         ),
         boxShadow: isDark
             ? null
             : [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   spreadRadius: 1,
                   blurRadius: 3,
                   offset: const Offset(0, 1),
@@ -305,9 +305,9 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -409,14 +409,14 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.grey.withOpacity(0.2)
-              : Colors.grey.withOpacity(0.3),
+              ? Colors.grey.withValues(alpha: 0.2)
+              : Colors.grey.withValues(alpha: 0.3),
         ),
         boxShadow: isDark
             ? null
             : [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
+                  color: Colors.grey.withValues(alpha: 0.1),
                   spreadRadius: 1,
                   blurRadius: 3,
                   offset: const Offset(0, 1),
@@ -481,9 +481,9 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.2),
+                  color: statusColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: statusColor.withOpacity(0.5)),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.5)),
                 ),
                 child: Text(
                   activity.status.toUpperCase(),
@@ -501,9 +501,11 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: priorityColor.withOpacity(0.2),
+                  color: priorityColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: priorityColor.withOpacity(0.5)),
+                  border: Border.all(
+                    color: priorityColor.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Text(
                   activity.priority.toUpperCase(),
