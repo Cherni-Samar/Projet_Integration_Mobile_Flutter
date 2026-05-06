@@ -1,4 +1,5 @@
 import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/domain/models/echo_analysis_model.dart';
 import 'package:e_team/data/mappers/echo_mapper.dart';
 
 class EchoResponse {
@@ -45,6 +46,17 @@ class EchoResponse {
       priority: 'low',
       actions: const [],
       error: message,
+    );
+  }
+
+  EchoAnalysis toAnalysis() {
+    return EchoAnalysis(
+      summary: summary,
+      isUrgent: isUrgent,
+      priority: priority,
+      actions: actions,
+      category: category,
+      transcribedText: transcribedText,
     );
   }
 }

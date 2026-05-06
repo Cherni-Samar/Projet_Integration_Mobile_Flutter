@@ -1,9 +1,9 @@
 // presentation/widgets/echo/echo_analysis_card.dart
 import 'package:flutter/material.dart';
-import 'package:e_team/data/dtos/echo_dto.dart';
+import 'package:e_team/domain/models/echo_analysis_model.dart';
 
 class EchoAnalysisCard extends StatelessWidget {
-  final EchoResponse analysis;
+  final EchoAnalysis analysis;
 
   const EchoAnalysisCard({super.key, required this.analysis});
 
