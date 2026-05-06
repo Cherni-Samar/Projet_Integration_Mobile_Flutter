@@ -55,7 +55,7 @@ class KashRemindersTab extends StatelessWidget {
                     vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: KP.primary.withOpacity(0.12),
+                    color: KP.primary.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -118,7 +118,9 @@ class KashRemindersTab extends StatelessWidget {
         color: KP.card(isDark),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isOverdue ? KP.danger.withOpacity(0.3) : KP.border(isDark),
+          color: isOverdue
+              ? KP.danger.withValues(alpha: 0.3)
+              : KP.border(isDark),
         ),
       ),
       child: Column(
@@ -130,8 +132,8 @@ class KashRemindersTab extends StatelessWidget {
                 height: 46,
                 decoration: BoxDecoration(
                   color: isOverdue
-                      ? KP.danger.withOpacity(0.12)
-                      : KP.warning.withOpacity(0.12),
+                      ? KP.danger.withValues(alpha: 0.12)
+                      : KP.warning.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
@@ -201,8 +203,8 @@ class KashRemindersTab extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: isOverdue
-                            ? KP.danger.withOpacity(0.12)
-                            : KP.warning.withOpacity(0.12),
+                            ? KP.danger.withValues(alpha: 0.12)
+                            : KP.warning.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
@@ -221,7 +223,7 @@ class KashRemindersTab extends StatelessWidget {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: KP.success.withOpacity(0.12),
+                        color: KP.success.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Text(

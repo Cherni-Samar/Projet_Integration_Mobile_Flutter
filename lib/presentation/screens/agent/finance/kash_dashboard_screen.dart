@@ -345,8 +345,8 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: d
-                    ? Colors.white.withOpacity(0.08)
-                    : Colors.black.withOpacity(0.07),
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.07),
               ),
               child: Icon(
                 Icons.arrow_back_ios_new_rounded,
@@ -364,8 +364,8 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: KP.primary.withOpacity(
-                      0.25 + 0.2 * _glowController.value,
+                    color: KP.primary.withValues(
+                      alpha: 0.25 + 0.2 * _glowController.value,
                     ),
                     blurRadius: 14 + 8 * _glowController.value,
                   ),
@@ -413,8 +413,8 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                         height: 7,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: KP.primary.withOpacity(
-                            0.6 + 0.4 * _pulseController.value,
+                          color: KP.primary.withValues(
+                            alpha: 0.6 + 0.4 * _pulseController.value,
                           ),
                         ),
                       ),
@@ -439,8 +439,8 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
             decoration: BoxDecoration(
               color: d
-                  ? Colors.white.withOpacity(0.07)
-                  : Colors.black.withOpacity(0.05),
+                  ? Colors.white.withValues(alpha: 0.07)
+                  : Colors.black.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -575,7 +575,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: _getCategoryColor(category).withOpacity(0.12),
+              color: _getCategoryColor(category).withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(

@@ -50,7 +50,7 @@ class KashExpensesTab extends StatelessWidget {
                     vertical: 7,
                   ),
                   decoration: BoxDecoration(
-                    color: KP.primary.withOpacity(0.12),
+                    color: KP.primary.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(

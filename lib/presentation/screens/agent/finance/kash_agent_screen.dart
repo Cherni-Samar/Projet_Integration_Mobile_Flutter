@@ -290,15 +290,18 @@ class _KashAgentScreenState extends State<KashAgentScreen>
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [_volt.withOpacity(0.15), _gold.withOpacity(0.15)],
+          colors: [
+            _volt.withValues(alpha: 0.15),
+            _gold.withValues(alpha: 0.15),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _volt.withOpacity(0.2)),
+        border: Border.all(color: _volt.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: _volt.withOpacity(0.1),
+            color: _volt.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -317,10 +320,13 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                   height: 60,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: _volt.withOpacity(0.3), width: 2),
+                    border: Border.all(
+                      color: _volt.withValues(alpha: 0.3),
+                      width: 2,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -336,8 +342,8 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                _volt.withOpacity(0.6),
-                                _gold.withOpacity(0.6),
+                                _volt.withValues(alpha: 0.6),
+                                _gold.withValues(alpha: 0.6),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
@@ -384,7 +390,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: _volt.withOpacity(0.2),
+                              color: _volt.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: const Row(
@@ -414,7 +420,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: _gold.withOpacity(0.2),
+                              color: _gold.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -485,7 +491,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -509,7 +515,9 @@ class _KashAgentScreenState extends State<KashAgentScreen>
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected ? _volt.withOpacity(0.2) : Colors.transparent,
+            color: isSelected
+                ? _volt.withValues(alpha: 0.2)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
@@ -616,11 +624,14 @@ class _KashAgentScreenState extends State<KashAgentScreen>
       decoration: BoxDecoration(
         color: const Color(0xFF111511),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: _volt.withOpacity(0.15)),
+        border: Border.all(color: _volt.withValues(alpha: 0.15)),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [_volt.withOpacity(0.05), _gold.withOpacity(0.03)],
+          colors: [
+            _volt.withValues(alpha: 0.05),
+            _gold.withValues(alpha: 0.03),
+          ],
         ),
       ),
       child: Column(
@@ -633,11 +644,14 @@ class _KashAgentScreenState extends State<KashAgentScreen>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: [_volt.withOpacity(0.3), _gold.withOpacity(0.2)],
+                colors: [
+                  _volt.withValues(alpha: 0.3),
+                  _gold.withValues(alpha: 0.2),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              border: Border.all(color: _volt.withOpacity(0.2), width: 2),
+              border: Border.all(color: _volt.withValues(alpha: 0.2), width: 2),
             ),
             child: Center(
               child: Icon(
@@ -665,7 +679,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
             'Commencez à scanner vos factures pour\nanalyser et catégoriser vos dépenses.',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontSize: 14,
               height: 1.6,
             ),
@@ -700,7 +714,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
             'Appuyez sur le bouton flottant pour commencer',
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               fontSize: 12,
             ),
           ),
@@ -736,7 +750,9 @@ class _Composer extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: const Color(0xFF0F130F),
-        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.06))),
+        border: Border(
+          top: BorderSide(color: Colors.white.withValues(alpha: 0.06)),
+        ),
       ),
       child: Row(
         children: [
@@ -747,7 +763,9 @@ class _Composer extends StatelessWidget {
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Message…',
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+                hintStyle: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.5),
+                ),
                 filled: true,
                 fillColor: const Color(0xFF111511),
                 contentPadding: const EdgeInsets.symmetric(
@@ -756,11 +774,15 @@ class _Composer extends StatelessWidget {
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.06)),
+                  borderSide: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.06),
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: Colors.white.withOpacity(0.06)),
+                  borderSide: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.06),
+                  ),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -803,8 +825,8 @@ class _MessageBubble extends StatelessWidget {
     final fromUser = msg.fromUser;
     final bg = fromUser ? const Color(0xFF121A12) : const Color(0xFF111511);
     final border = fromUser
-        ? _volt.withOpacity(0.25)
-        : Colors.white.withOpacity(0.06);
+        ? _volt.withValues(alpha: 0.25)
+        : Colors.white.withValues(alpha: 0.06);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -838,7 +860,9 @@ class _MessageBubble extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: _gold.withOpacity(0.25)),
+                        border: Border.all(
+                          color: _gold.withValues(alpha: 0.25),
+                        ),
                       ),
                       child: Image.memory(
                         msg.imageBytes!,
@@ -879,7 +903,7 @@ class _ExtractionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF111511),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _volt.withOpacity(0.2)),
+        border: Border.all(color: _volt.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -959,7 +983,7 @@ class _ExtractionCard extends StatelessWidget {
             child: Text(
               k,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w700,
                 fontSize: 12,
               ),
@@ -1000,7 +1024,7 @@ class _ShimmerBubble extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF111511),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.06)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
             ),
             child: ShaderMask(
               shaderCallback: (rect) {
@@ -1009,9 +1033,9 @@ class _ShimmerBubble extends StatelessWidget {
                   begin: Alignment(-1 + (dx / rect.width), 0),
                   end: Alignment(1 + (dx / rect.width), 0),
                   colors: [
-                    Colors.white.withOpacity(0.15),
-                    Colors.white.withOpacity(0.65),
-                    Colors.white.withOpacity(0.15),
+                    Colors.white.withValues(alpha: 0.15),
+                    Colors.white.withValues(alpha: 0.65),
+                    Colors.white.withValues(alpha: 0.15),
                   ],
                   stops: const [0.0, 0.5, 1.0],
                 ).createShader(rect);
