@@ -315,7 +315,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                   return Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: TimoDesignSystem.other.withOpacity(0.1),
+                      color: TimoDesignSystem.other.withValues(alpha: 0.1),
                     ),
                     child: Icon(
                       Icons.timer_rounded,
@@ -353,8 +353,8 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: TimoDesignSystem.neonGreen.withOpacity(
-                              0.4 + 0.6 * _pulseController.value,
+                            color: TimoDesignSystem.neonGreen.withValues(
+                              alpha: 0.4 + 0.6 * _pulseController.value,
                             ),
                             shape: BoxShape.circle,
                           ),
@@ -400,7 +400,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: TimoDesignSystem.other.withOpacity(0.15),
+            color: TimoDesignSystem.other.withValues(alpha: 0.15),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -421,12 +421,12 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                   margin: const EdgeInsets.symmetric(horizontal: 2),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? Colors.white.withOpacity(0.25)
+                        ? Colors.white.withValues(alpha: 0.25)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                     border: isSelected
                         ? Border.all(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Colors.white.withValues(alpha: 0.3),
                             width: 0.5,
                           )
                         : null,
@@ -456,7 +456,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                           height: 2,
                           width: 20,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Colors.white.withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(1),
                           ),
                         ),
@@ -613,7 +613,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 18),
@@ -694,8 +694,8 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: task.isDone
-              ? TimoDesignSystem.success.withOpacity(0.25)
-              : task.color.withOpacity(0.2),
+              ? TimoDesignSystem.success.withValues(alpha: 0.25)
+              : task.color.withValues(alpha: 0.2),
           width: 0.5,
         ),
         boxShadow: [
@@ -714,8 +714,8 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
             height: 46,
             decoration: BoxDecoration(
               color: task.isDone
-                  ? TimoDesignSystem.success.withOpacity(0.12)
-                  : task.color.withOpacity(0.12),
+                  ? TimoDesignSystem.success.withValues(alpha: 0.12)
+                  : task.color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
@@ -778,7 +778,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
-                  color: task.color.withOpacity(0.12),
+                  color: task.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -880,7 +880,9 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                             vertical: 7,
                           ),
                           decoration: BoxDecoration(
-                            color: TimoDesignSystem.other.withOpacity(0.12),
+                            color: TimoDesignSystem.other.withValues(
+                              alpha: 0.12,
+                            ),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
@@ -931,10 +933,12 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                       return Container(
                         margin: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: TimoDesignSystem.other.withOpacity(0.15),
+                          color: TimoDesignSystem.other.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: TimoDesignSystem.other.withOpacity(0.45),
+                            color: TimoDesignSystem.other.withValues(
+                              alpha: 0.45,
+                            ),
                           ),
                         ),
                         child: Center(
@@ -973,7 +977,9 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
-                            color: TimoDesignSystem.other.withOpacity(0.5),
+                            color: TimoDesignSystem.other.withValues(
+                              alpha: 0.5,
+                            ),
                             blurRadius: 8,
                           ),
                         ],
@@ -1029,7 +1035,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                       fontSize: 13,
                     ),
                     outsideTextStyle: GoogleFonts.plusJakartaSans(
-                      color: TimoDesignSystem.textMuted.withOpacity(0.35),
+                      color: TimoDesignSystem.textMuted.withValues(alpha: 0.35),
                     ),
                   ),
                   headerStyle: HeaderStyle(
@@ -1058,7 +1064,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                       fontSize: 11,
                     ),
                     weekendStyle: GoogleFonts.plusJakartaSans(
-                      color: TimoDesignSystem.other.withOpacity(0.7),
+                      color: TimoDesignSystem.other.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w700,
                       fontSize: 11,
                     ),
@@ -1110,7 +1116,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                     vertical: 5,
                   ),
                   decoration: BoxDecoration(
-                    color: TimoDesignSystem.other.withOpacity(0.12),
+                    color: TimoDesignSystem.other.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -1149,7 +1155,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
         width: 10,
         height: 10,
         decoration: BoxDecoration(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(3),
           border: Border.all(color: color, width: 1.5),
         ),
@@ -1188,7 +1194,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: TimoDesignSystem.other.withOpacity(0.12),
+              color: TimoDesignSystem.other.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(18),
             ),
             child: Icon(icon, color: TimoDesignSystem.other, size: 28),
