@@ -39,7 +39,7 @@ class HeraBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -102,7 +102,7 @@ class HeraEmptyState extends StatelessWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: HeraPalette.mauve.withOpacity(0.12),
+                color: HeraPalette.mauve.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Icon(icon, color: HeraPalette.mauve, size: 28),
@@ -164,7 +164,7 @@ class HeraSectionHeader extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: HeraPalette.mauve.withOpacity(0.12),
+                color: HeraPalette.mauve.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -190,7 +190,7 @@ class HeraDismissBackground extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: HeraPalette.danger.withOpacity(0.1),
+        color: HeraPalette.danger.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(18),
       ),
       alignment: Alignment.centerLeft,
@@ -225,9 +225,9 @@ class HeraTimoBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: HeraPalette.timo.withOpacity(0.08),
+        color: HeraPalette.timo.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: HeraPalette.timo.withOpacity(0.3)),
+        border: Border.all(color: HeraPalette.timo.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -245,7 +245,7 @@ class HeraTimoBanner extends StatelessWidget {
           ),
           Icon(
             Icons.check_circle,
-            color: HeraPalette.timo.withOpacity(0.5),
+            color: HeraPalette.timo.withValues(alpha: 0.5),
             size: 16,
           ),
         ],
@@ -269,7 +269,7 @@ class HeraLegendChip extends StatelessWidget {
           width: 12,
           height: 12,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.2),
+            color: color.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(4),
             border: Border.all(color: color, width: 1.5),
           ),
@@ -316,8 +316,8 @@ class HeraWorkforcePulse extends StatelessWidget {
             colors: [
               const Color(
                 0xFF7C3AED,
-              ).withOpacity(0.13 + 0.04 * pulseCtrl.value),
-              const Color(0xFFB57BFF).withOpacity(0.07),
+              ).withValues(alpha: 0.13 + 0.04 * pulseCtrl.value),
+              const Color(0xFFB57BFF).withValues(alpha: 0.07),
               HeraPalette.bg,
             ],
           ),
@@ -325,14 +325,14 @@ class HeraWorkforcePulse extends StatelessWidget {
           border: Border.all(
             color: const Color(
               0xFF7C3AED,
-            ).withOpacity(0.45 + 0.1 * pulseCtrl.value),
+            ).withValues(alpha: 0.45 + 0.1 * pulseCtrl.value),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
               color: const Color(
                 0xFF7C3AED,
-              ).withOpacity(0.10 + 0.04 * pulseCtrl.value),
+              ).withValues(alpha: 0.10 + 0.04 * pulseCtrl.value),
               blurRadius: 24,
               spreadRadius: 2,
             ),
@@ -361,7 +361,7 @@ class HeraWorkforcePulse extends StatelessWidget {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF7C3AED).withOpacity(0.12),
+                  color: const Color(0xFF7C3AED).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
@@ -460,7 +460,7 @@ class _PulseItem extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.15),
+            color: color.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: color, size: 20),
@@ -521,7 +521,7 @@ class HeraActiveCard extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: HeraPalette.mauve.withOpacity(0.15),
+            backgroundColor: HeraPalette.mauve.withValues(alpha: 0.15),
             child: Text(
               employee.name.isNotEmpty ? employee.name[0] : '?',
               style: const TextStyle(
@@ -654,14 +654,14 @@ class HeraOnboardingCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: HeraPalette.card,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: HeraPalette.mauve.withOpacity(0.2)),
+        border: Border.all(color: HeraPalette.mauve.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
           Row(
             children: [
               CircleAvatar(
-                backgroundColor: HeraPalette.mauve.withOpacity(0.1),
+                backgroundColor: HeraPalette.mauve.withValues(alpha: 0.1),
                 child: Text(
                   employee.name.isNotEmpty
                       ? employee.name[0].toUpperCase()
@@ -735,7 +735,7 @@ class HeraOnboardingCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: HeraPalette.mauve.withOpacity(0.1),
+                      color: HeraPalette.mauve.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
@@ -806,8 +806,8 @@ class HeraHeader extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: HeraPalette.mauve.withOpacity(
-                          0.3 + 0.2 * glowCtrl.value,
+                        color: HeraPalette.mauve.withValues(
+                          alpha: 0.3 + 0.2 * glowCtrl.value,
                         ),
                         blurRadius: 14 + 8 * glowCtrl.value,
                         spreadRadius: 2,
@@ -848,8 +848,8 @@ class HeraHeader extends StatelessWidget {
                             height: 7,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: HeraPalette.lime.withOpacity(
-                                0.6 + 0.4 * pulseCtrl.value,
+                              color: HeraPalette.lime.withValues(
+                                alpha: 0.6 + 0.4 * pulseCtrl.value,
                               ),
                             ),
                           ),
