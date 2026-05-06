@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'dart:math';
 import '/data/services/agent_interaction_service.dart';
+import '/domain/models/agent_interaction_model.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 🎨 AGENT INTER-FLOW - WHITE SAAS PREMIUM DESIGN
@@ -37,75 +38,7 @@ class AgentInterFlowDesignSystem {
   static const Color shadowLight = Color(0x08000000);  // Ombre ultra-légère
 }
 
-// ═══════════════════════════════════════════════════════════════
-// 📊 AGENT INTERACTION MODEL
-// ═══════════════════════════════════════════════════════════════
-
-enum AgentType { hera, echo, timo, dexo, kash }
-enum InteractionStatus { encrypted, success, pending, failed }
-
-class AgentInteraction {
-  final String id;
-  final AgentType sender;
-  final AgentType receiver;
-  final String actionType;
-  final String summary;
-  final DateTime timestamp;
-  final InteractionStatus status;
-
-  AgentInteraction({
-    required this.id,
-    required this.sender,
-    required this.receiver,
-    required this.actionType,
-    required this.summary,
-    required this.timestamp,
-    required this.status,
-  });
-
-  // ✅ FACTORY POUR DONNÉES DYNAMIQUES DEPUIS LE BACKEND
-  factory AgentInteraction.fromJson(Map<String, dynamic> json) {
-    return AgentInteraction(
-      id: json['id']?.toString() ?? '',
-      sender: _parseAgentType(json['sender']),
-      receiver: _parseAgentType(json['receiver']),
-      actionType: json['actionType']?.toString() ?? 'Unknown Action',
-      summary: json['summary']?.toString() ?? 'No description available',
-      timestamp: json['timestamp'] != null 
-          ? DateTime.parse(json['timestamp'].toString())
-          : DateTime.now(),
-      status: _parseInteractionStatus(json['status']),
-    );
-  }
-
-  // Helper pour parser le type d'agent
-  static AgentType _parseAgentType(dynamic agentString) {
-    if (agentString == null) return AgentType.hera;
-    
-    switch (agentString.toString().toLowerCase()) {
-      case 'hera': return AgentType.hera;
-      case 'echo': return AgentType.echo;
-      case 'timo': return AgentType.timo;
-      case 'dexo': return AgentType.dexo;
-      case 'kash': return AgentType.kash;
-      default: return AgentType.hera;
-    }
-  }
-
-  // Helper pour parser le statut d'interaction
-  static InteractionStatus _parseInteractionStatus(dynamic statusString) {
-    if (statusString == null) return InteractionStatus.success;
-    
-    switch (statusString.toString().toLowerCase()) {
-      case 'success': return InteractionStatus.success;
-      case 'encrypted': return InteractionStatus.encrypted;
-      case 'pending': return InteractionStatus.pending;
-      case 'failed': return InteractionStatus.failed;
-      default: return InteractionStatus.success;
-    }
-  }
-
-  // Agent configuration
+class AgentInteractionUi {
   static Map<AgentType, Map<String, dynamic>> get agentConfig => {
     AgentType.hera: {
       'name': 'HERA',
@@ -138,15 +71,9 @@ class AgentInteraction {
       'iconColor': AgentInterFlowDesignSystem.kashTealIcon,
     },
   };
+}
 
-  String get timeAgo {
-    final diff = DateTime.now().difference(timestamp);
-    if (diff.inDays > 0) return 'Il y a ${diff.inDays}j';
-    if (diff.inHours > 0) return 'Il y a ${diff.inHours}h';
-    if (diff.inMinutes > 0) return 'Il y a ${diff.inMinutes} min';
-    return 'À l\'instant';
-  }
-
+extension AgentInteractionUiX on AgentInteraction {
   Color get statusColor {
     switch (status) {
       case InteractionStatus.success:
@@ -157,19 +84,6 @@ class AgentInteraction {
         return AgentInterFlowDesignSystem.textMuted;
       case InteractionStatus.failed:
         return Colors.red;
-    }
-  }
-
-  String get statusLabel {
-    switch (status) {
-      case InteractionStatus.success:
-        return 'SUCCESS';
-      case InteractionStatus.encrypted:
-        return 'ENCRYPTED';
-      case InteractionStatus.pending:
-        return 'PENDING';
-      case InteractionStatus.failed:
-        return 'FAILED';
     }
   }
 }
@@ -575,8 +489,8 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
   }
 
   Widget _buildInteractionCard(AgentInteraction interaction, int index) {
-    final senderConfig = AgentInteraction.agentConfig[interaction.sender]!;
-    final receiverConfig = AgentInteraction.agentConfig[interaction.receiver]!;
+    final senderConfig = AgentInteractionUi.agentConfig[interaction.sender]!;
+    final receiverConfig = AgentInteractionUi.agentConfig[interaction.receiver]!;
     
     return TweenAnimationBuilder<double>(
       duration: Duration(milliseconds: 300 + (index * 50)),

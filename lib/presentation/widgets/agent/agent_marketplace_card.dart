@@ -20,6 +20,48 @@ class AgentMarketplaceCard extends StatelessWidget {
     required this.onTap,
   }) : super(key: key);
 
+  /// Get agent-specific stats based on agent name
+  List<Map<String, dynamic>> _getAgentStats(String agentName) {
+    switch (agentName.toLowerCase()) {
+      case 'hera':
+        return [
+          {'label': 'HR Requests', 'value': '12', 'icon': Icons.person_add},
+          {'label': 'Interviews', 'value': '4', 'icon': Icons.event},
+          {'label': 'Pending', 'value': '3', 'icon': Icons.pending_actions},
+        ];
+      case 'kash':
+        return [
+          {'label': 'Budgets', 'value': '8', 'icon': Icons.account_balance},
+          {'label': 'Approved', 'value': '15', 'icon': Icons.check_circle},
+          {'label': 'Rejected', 'value': '2', 'icon': Icons.cancel},
+        ];
+      case 'echo':
+        return [
+          {'label': 'Posts', 'value': '6', 'icon': Icons.campaign},
+          {'label': 'Campaigns', 'value': '3', 'icon': Icons.trending_up},
+          {'label': 'Reach', 'value': '2.4k', 'icon': Icons.visibility},
+        ];
+      case 'dexo':
+        return [
+          {'label': 'Reports', 'value': '5', 'icon': Icons.description},
+          {'label': 'Documents', 'value': '28', 'icon': Icons.folder},
+          {'label': 'Briefings', 'value': '1', 'icon': Icons.summarize},
+        ];
+      case 'timo':
+        return [
+          {'label': 'Meetings', 'value': '9', 'icon': Icons.event_note},
+          {'label': 'Reminders', 'value': '14', 'icon': Icons.notifications},
+          {'label': 'Tasks', 'value': '22', 'icon': Icons.task_alt},
+        ];
+      default:
+        return [
+          {'label': 'Tasks', 'value': '0', 'icon': Icons.task},
+          {'label': 'Active', 'value': '0', 'icon': Icons.check},
+          {'label': 'Pending', 'value': '0', 'icon': Icons.pending},
+        ];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -49,7 +91,7 @@ class AgentMarketplaceCard extends StatelessWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 12,
-                    vertical: 24,
+                    vertical: 16,
                   ),
                   decoration: BoxDecoration(
                     gradient: isDark
@@ -66,168 +108,235 @@ class AgentMarketplaceCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(32),
                     border: Border.all(
                       color: isCenter
-                          ? (agent['color'] as Color).withOpacity(0.5)
+                          ? (agent['color'] as Color).withOpacity(0.3)
                           : Colors.transparent,
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
                         color: (agent['color'] as Color).withOpacity(
-                          isCenter ? 0.35 : 0.15,
+                          isCenter ? 0.25 : 0.12,
                         ),
-                        blurRadius: isCenter ? 40 : 20,
-                        offset: const Offset(0, 15),
+                        blurRadius: isCenter ? 30 : 15,
+                        offset: const Offset(0, 10),
                       ),
                     ],
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 110,
-                        height: 110,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              (agent['color'] as Color).withOpacity(0.25),
-                              (agent['color'] as Color).withOpacity(0.08),
-                            ],
-                          ),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: agent['color'] as Color,
-                            width: 3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: (agent['color'] as Color).withOpacity(0.4),
-                              blurRadius: 25,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(55),
-                            child: Image.asset(
-                              agent['icon'],
-                              width: 110,
-                              height: 110,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          agent['name'],
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                          ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: Padding(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 6,
+                          horizontal: 18,
+                          vertical: 20,
                         ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              (agent['color'] as Color).withOpacity(0.15),
-                              (agent['color'] as Color).withOpacity(0.08),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: (agent['color'] as Color).withOpacity(0.5),
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Text(
-                          agent['role'],
-                          style: TextStyle(
-                            color: agent['color'] as Color,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ...List.generate(5, (i) {
-                            return Icon(
-                              i < (agent['rating'] as double).floor()
-                                  ? Icons.star
-                                  : Icons.star_border,
-                              color: const Color(0xFFFBBF24),
-                              size: 18,
-                            );
-                          }),
-                          const SizedBox(width: 6),
-                          Text(
-                            '${agent['rating']}',
-                            style: TextStyle(
-                              color: isDark ? Colors.white : Colors.black,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 14),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: isDark
-                              ? const LinearGradient(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Avatar - Reduced from 90 to 75
+                            Container(
+                              width: 75,
+                              height: 75,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
                                   colors: [
-                                    Color(0xFFCDFF00),
-                                    Color(0xFFAADD00),
+                                    (agent['color'] as Color).withOpacity(0.2),
+                                    (agent['color'] as Color).withOpacity(0.05),
                                   ],
-                                )
-                              : const LinearGradient(
-                                  colors: [Colors.black, Color(0xFF1A1A1A)],
                                 ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: isDark
-                                  ? const Color(0xFFCDFF00).withOpacity(0.4)
-                                  : Colors.black.withOpacity(0.2),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: agent['color'] as Color,
+                                  width: 2.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: (agent['color'] as Color).withOpacity(0.3),
+                                    blurRadius: 18,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(37.5),
+                                  child: Image.asset(
+                                    agent['icon'],
+                                    width: 75,
+                                    height: 75,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12), // Reduced from 16
+                            
+                            // Agent Name
+                            Text(
+                              agent['name'],
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontSize: 22, // Reduced from 24
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.5,
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 6), // Reduced from 8
+                            
+                            // Role Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10, // Reduced from 12
+                                vertical: 4, // Reduced from 5
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    (agent['color'] as Color).withOpacity(0.15),
+                                    (agent['color'] as Color).withOpacity(0.08),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: (agent['color'] as Color).withOpacity(0.4),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Text(
+                                agent['role'],
+                                style: TextStyle(
+                                  color: agent['color'] as Color,
+                                  fontSize: 9, // Reduced from 10
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.8,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(height: 10), // Reduced from 12
+                            
+                            // Description
+                            Text(
+                              agent['description'],
+                              style: TextStyle(
+                                color: isDark
+                                    ? Colors.white.withOpacity(0.6)
+                                    : Colors.black.withOpacity(0.6),
+                                fontSize: 11, // Reduced from 12
+                                fontWeight: FontWeight.w500,
+                                height: 1.3, // Reduced from 1.4
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 12), // Reduced from 16
+                            
+                            // Stats Section
+                            Container(
+                              padding: const EdgeInsets.all(10), // Reduced from 12
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? Colors.white.withOpacity(0.05)
+                                    : Colors.black.withOpacity(0.03),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isDark
+                                      ? Colors.white.withOpacity(0.1)
+                                      : Colors.black.withOpacity(0.08),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Activity Today',
+                                    style: TextStyle(
+                                      color: isDark
+                                          ? Colors.white.withOpacity(0.5)
+                                          : Colors.black.withOpacity(0.5),
+                                      fontSize: 9, // Reduced from 10
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8), // Reduced from 10
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: _getAgentStats(agent['name'] as String)
+                                        .map((stat) => _buildStatItem(
+                                              stat['label'] as String,
+                                              stat['value'] as String,
+                                              stat['icon'] as IconData,
+                                            ))
+                                        .toList(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10), // Reduced from 14
+                            
+                            // Active Badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14, // Reduced from 16
+                                vertical: 6, // Reduced from 8
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(0xFF10B981).withOpacity(0.15),
+                                    const Color(0xFF10B981).withOpacity(0.08),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: const Color(0xFF10B981).withOpacity(0.4),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 7, // Reduced from 8
+                                    height: 7, // Reduced from 8
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF10B981),
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF10B981).withOpacity(0.6),
+                                          blurRadius: 6,
+                                          spreadRadius: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6), // Reduced from 8
+                                  Text(
+                                    'Active',
+                                    style: TextStyle(
+                                      color: const Color(0xFF10B981),
+                                      fontSize: 11, // Reduced from 12
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                        child: Text(
-                          l10n.agentMarketplacePriceFrom(agent['price']),
-                          style: TextStyle(
-                            color: isDark
-                                ? Colors.black
-                                : const Color(0xFFCDFF00),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -235,6 +344,46 @@ class AgentMarketplaceCard extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildStatItem(String label, String value, IconData icon) {
+    return Flexible(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: (agent['color'] as Color).withOpacity(0.7),
+            size: 16, // Reduced from 18
+          ),
+          const SizedBox(height: 3), // Reduced from 4
+          Text(
+            value,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black,
+              fontSize: 14, // Reduced from 16
+              fontWeight: FontWeight.w800,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 1), // Reduced from 2
+          Text(
+            label,
+            style: TextStyle(
+              color: isDark
+                  ? Colors.white.withOpacity(0.5)
+                  : Colors.black.withOpacity(0.5),
+              fontSize: 8, // Reduced from 9
+              fontWeight: FontWeight.w600,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

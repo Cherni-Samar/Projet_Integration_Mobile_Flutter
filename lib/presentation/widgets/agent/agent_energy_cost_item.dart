@@ -35,16 +35,21 @@ class AgentEnergyCostItem extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            task['task'] as String,
-            style: TextStyle(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.8)
-                  : Colors.black87,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              task['task'] as String,
+              style: TextStyle(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.8)
+                    : Colors.black87,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          const SizedBox(width: 12),
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 10,
