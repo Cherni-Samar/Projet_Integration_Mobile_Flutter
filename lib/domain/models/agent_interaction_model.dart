@@ -1,17 +1,6 @@
-enum AgentType {
-  hera,
-  echo,
-  timo,
-  dexo,
-  kash,
-}
+enum AgentType { hera, echo, timo, dexo, kash }
 
-enum InteractionStatus {
-  encrypted,
-  success,
-  pending,
-  failed,
-}
+enum InteractionStatus { encrypted, success, pending, failed }
 
 class AgentInteraction {
   final String id;

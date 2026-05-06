@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../data/services/kash_service.dart';
+import 'package:e_team/data/services/kash_service.dart';
 
 /// Shows a modal bottom sheet to add a new expense
 Future<void> showKashAddExpenseSheet({
@@ -66,10 +66,7 @@ Future<void> showKashAddExpenseSheet({
                 ),
               ),
               items: ['TND', 'USD', 'EUR'].map((cur) {
-                return DropdownMenuItem(
-                  value: cur,
-                  child: Text(cur),
-                );
+                return DropdownMenuItem(value: cur, child: Text(cur));
               }).toList(),
               onChanged: (value) {
                 if (value != null) {
@@ -87,10 +84,7 @@ Future<void> showKashAddExpenseSheet({
                 ),
               ),
               items: categories.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
-                );
+                return DropdownMenuItem(value: category, child: Text(category));
               }).toList(),
               onChanged: (value) {
                 if (value != null) {
@@ -113,7 +107,9 @@ Future<void> showKashAddExpenseSheet({
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 16),
+                  horizontal: 12,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(12),
@@ -156,9 +152,7 @@ Future<void> showKashAddExpenseSheet({
                     if (vendorController.text.isEmpty ||
                         amountController.text.isEmpty) {
                       messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('Please fill all fields'),
-                        ),
+                        const SnackBar(content: Text('Please fill all fields')),
                       );
                       return;
                     }
@@ -172,12 +166,12 @@ Future<void> showKashAddExpenseSheet({
                         'date': selectedDate.toIso8601String(),
                         'description': descriptionController.text,
                       });
-                      
+
                       if (!sheetContext.mounted) return;
-                      
+
                       navigator.pop();
                       onExpenseCreated();
-                      
+
                       messenger.showSnackBar(
                         const SnackBar(
                           content: Text('✅ Expense added'),

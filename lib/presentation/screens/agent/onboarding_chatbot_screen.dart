@@ -3,20 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
 import 'package:e_team/data/services/dexo_service.dart';
-import '../../providers/cart_provider.dart';
 import 'package:e_team/data/services/payment_plan_metadata_service.dart';
 import 'package:e_team/domain/models/dexo/dexo_onboarding_models.dart';
+import 'package:e_team/presentation/providers/cart_provider.dart';
+import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 import 'package:e_team/presentation/widgets/dexo/organization_blueprint_card.dart';
 
 class OnboardingChatbotScreen extends StatefulWidget {
   final String email;
 
-  const OnboardingChatbotScreen({
-    super.key,
-    required this.email,
-  });
+  const OnboardingChatbotScreen({super.key, required this.email});
 
   @override
   State<OnboardingChatbotScreen> createState() =>
@@ -112,10 +109,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
       setState(() {
         _messages.add(ChatMessage.bot(text));
-        _aiMessages.add({
-          'role': 'assistant',
-          'content': text,
-        });
+        _aiMessages.add({'role': 'assistant', 'content': text});
         _isTyping = false;
       });
 
@@ -132,10 +126,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
     setState(() {
       _messages.add(ChatMessage.user(text));
-      _aiMessages.add({
-        'role': 'user',
-        'content': text,
-      });
+      _aiMessages.add({'role': 'user', 'content': text});
       _inputController.clear();
       _isTyping = true;
     });
@@ -154,10 +145,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
         setState(() {
           _messages.add(ChatMessage.bot(question));
-          _aiMessages.add({
-            'role': 'assistant',
-            'content': question,
-          });
+          _aiMessages.add({'role': 'assistant', 'content': question});
           _isTyping = false;
         });
 
@@ -174,14 +162,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
           ),
         );
 
-        _messages.add(
-          ChatMessage.blueprint(
-            OrganizationBlueprintCard(
-              initialPlan: plan,
-              onConfirm: _activateOrganizationVision,
-            ),
-          ),
-        );
+        _messages.add(ChatMessage.blueprint(plan));
 
         _hasBlueprint = true;
         _isTyping = false;
@@ -217,12 +198,15 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
         'email': widget.email,
         'vision': _vision,
         'workforceSettings': plan.toApiList(),
-        'recommendedAgents':
-            plan.recommendedAgents.map((agent) => agent.toJson()).toList(),
+        'recommendedAgents': plan.recommendedAgents
+            .map((agent) => agent.toJson())
+            .toList(),
       });
 
       if (decoded['success'] != true) {
-        throw Exception(decoded['error'] ?? decoded['message'] ?? 'Save failed');
+        throw Exception(
+          decoded['error'] ?? decoded['message'] ?? 'Save failed',
+        );
       }
 
       _addRecommendedAgentsToCart(plan.recommendedAgents);
@@ -252,8 +236,9 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
     final cart = Provider.of<CartProvider>(context, listen: false);
 
     // Get plan data from service
-    final planData =
-        PaymentPlanMetadataService.getOnboardingPlanData(agents.length);
+    final planData = PaymentPlanMetadataService.getOnboardingPlanData(
+      agents.length,
+    );
 
     final packId = planData['packId'] as String;
     final packTitle = planData['packTitle'] as String;
@@ -268,7 +253,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
       id: 'plan-$packId',
       agentName: packTitle,
       agentIllustration: 'assets/images/plan_icon.png',
-      agentColor: const Color(0xFF6366F1),
+      agentColorValue: 0xFF6366F1,
       packTitle: 'Pack $agentsAllowed agents',
       energy: energyCredits,
       price: price,
@@ -288,7 +273,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
         id: 'agent-$agentName',
         agentName: agentName,
         agentIllustration: data['illustration'] as String,
-        agentColor: data['color'] as Color,
+        agentColorValue: colorToValue(data['color'] as Color),
         packTitle: 'Included',
         energy: 0,
         price: 0.0,
@@ -409,11 +394,17 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
   Widget _buildMessage(ChatMessage message) {
     if (message.type == ChatMessageType.blueprint) {
+      final plan = message.blueprintPlan;
+      if (plan == null) return const SizedBox.shrink();
+
       return Padding(
         padding: const EdgeInsets.only(bottom: 24),
         child: Align(
           alignment: Alignment.centerLeft,
-          child: message.widget!,
+          child: OrganizationBlueprintCard(
+            initialPlan: plan,
+            onConfirm: _activateOrganizationVision,
+          ),
         ),
       );
     }
@@ -574,9 +565,7 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 class _DotDelay extends StatefulWidget {
   final int delay;
 
-  const _DotDelay({
-    required this.delay,
-  });
+  const _DotDelay({required this.delay});
 
   @override
   State<_DotDelay> createState() => _DotDelayState();

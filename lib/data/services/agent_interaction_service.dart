@@ -11,16 +11,11 @@ class AgentInteractionService {
     final savedToken = token ?? await AuthService().getToken();
 
     if (savedToken == null || savedToken.isEmpty) {
-      return {
-        'Content-Type': 'application/json',
-      };
+      return {'Content-Type': 'application/json'};
     }
 
     // Fixed: backend authMiddleware expects 'x-auth-token', not 'Authorization: Bearer'.
-    return {
-      'Content-Type': 'application/json',
-      'x-auth-token': savedToken,
-    };
+    return {'Content-Type': 'application/json', 'x-auth-token': savedToken};
   }
 
   static Future<List<AgentInteraction>> getAgentInteractions({
@@ -41,17 +36,13 @@ class AgentInteractionService {
         return list.map((json) => AgentInteraction.fromJson(json)).toList();
       }
 
-      print('❌ Erreur HTTP : ${response.statusCode}');
       return [];
-    } catch (e) {
-      print('❌ Erreur Service Interaction : $e');
+    } catch (_) {
       return [];
     }
   }
 
-  static Future<Map<String, int>> getInteractionStats({
-    String? token,
-  }) async {
+  static Future<Map<String, int>> getInteractionStats({String? token}) async {
     try {
       final uri = Uri.parse('$baseUrl/admin/agent-interactions/stats');
 
@@ -76,8 +67,6 @@ class AgentInteractionService {
         }
       }
 
-      print('⚠️ Stats API Error: ${response.statusCode}');
-
       return {
         'total': 0,
         'successful': 0,
@@ -85,9 +74,7 @@ class AgentInteractionService {
         'pending': 0,
         'failed': 0,
       };
-    } catch (e) {
-      print('❌ AgentInteractionService - Stats Exception: $e');
-
+    } catch (_) {
       return {
         'total': 0,
         'successful': 0,

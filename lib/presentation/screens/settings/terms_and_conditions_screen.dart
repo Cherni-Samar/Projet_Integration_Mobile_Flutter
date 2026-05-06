@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/theme_provider.dart';
-import '/l10n/app_localizations.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/l10n/app_localizations.dart';
 
 class TermsAndConditionsScreen extends StatefulWidget {
   const TermsAndConditionsScreen({Key? key}) : super(key: key);
 
   @override
-  State<TermsAndConditionsScreen> createState() => _TermsAndConditionsScreenState();
+  State<TermsAndConditionsScreen> createState() =>
+      _TermsAndConditionsScreenState();
 }
 
 class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
@@ -20,7 +21,9 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFFAFAFA),
       body: SafeArea(
         child: Column(
           children: [
@@ -30,21 +33,18 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
               decoration: BoxDecoration(
                 gradient: isDark
                     ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF1E1E1E),
-                    const Color(0xFF2A2A2A),
-                  ],
-                )
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFF1E1E1E),
+                          const Color(0xFF2A2A2A),
+                        ],
+                      )
                     : LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    const Color(0xFFF9FAFB),
-                  ],
-                ),
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.white, const Color(0xFFF9FAFB)],
+                      ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
@@ -119,18 +119,21 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                     // Last updated badge
                     Center(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: isDark
                                 ? [
-                              const Color(0xFFCDFF00).withOpacity(0.2),
-                              const Color(0xFFA855F7).withOpacity(0.2),
-                            ]
+                                    const Color(0xFFCDFF00).withOpacity(0.2),
+                                    const Color(0xFFA855F7).withOpacity(0.2),
+                                  ]
                                 : [
-                              const Color(0xFFCDFF00).withOpacity(0.3),
-                              const Color(0xFFA855F7).withOpacity(0.2),
-                            ],
+                                    const Color(0xFFCDFF00).withOpacity(0.3),
+                                    const Color(0xFFA855F7).withOpacity(0.2),
+                                  ],
                           ),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
@@ -145,13 +148,17 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                             Icon(
                               Icons.schedule,
                               size: 16,
-                              color: isDark ? const Color(0xFFCDFF00) : Colors.black,
+                              color: isDark
+                                  ? const Color(0xFFCDFF00)
+                                  : Colors.black,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               l10n.termsBadge,
                               style: TextStyle(
-                                color: isDark ? const Color(0xFFCDFF00) : Colors.black,
+                                color: isDark
+                                    ? const Color(0xFFCDFF00)
+                                    : Colors.black,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -164,7 +171,6 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                     const SizedBox(height: 24),
 
                     // ✅ Sections minimisées - Gardez seulement celles-ci :
-
                     _buildExpandableSection(
                       isDark: isDark,
                       icon: Icons.check_circle_outline,
@@ -234,7 +240,9 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                             backgroundColor: isDark
                                 ? const Color(0xFFCDFF00)
                                 : Colors.black,
-                            foregroundColor: isDark ? Colors.black : const Color(0xFFCDFF00),
+                            foregroundColor: isDark
+                                ? Colors.black
+                                : const Color(0xFFCDFF00),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -243,10 +251,7 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                Icons.check_circle,
-                                size: 24,
-                              ),
+                              Icon(Icons.check_circle, size: 24),
                               const SizedBox(width: 12),
                               Text(
                                 l10n.termsAcceptButton,
@@ -292,8 +297,8 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
         decoration: BoxDecoration(
           color: isDark
               ? isExpanded
-              ? const Color(0xFF1E1E1E)
-              : Colors.white.withOpacity(0.05)
+                    ? const Color(0xFF1E1E1E)
+                    : Colors.white.withOpacity(0.05)
               : isExpanded
               ? Colors.white
               : Colors.white.withOpacity(0.7),
@@ -339,15 +344,9 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                         decoration: BoxDecoration(
                           color: iconColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: iconColor.withOpacity(0.3),
-                          ),
+                          border: Border.all(color: iconColor.withOpacity(0.3)),
                         ),
-                        child: Icon(
-                          icon,
-                          color: iconColor,
-                          size: 22,
-                        ),
+                        child: Icon(icon, color: iconColor, size: 22),
                       ),
                       const SizedBox(width: 12),
                       // Titre et résumé

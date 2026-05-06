@@ -8,10 +8,7 @@ import 'dexo_organization_pulse_screen.dart';
 class DexoDashboardPage extends StatefulWidget {
   final String? token;
 
-  const DexoDashboardPage({
-    super.key,
-    this.token,
-  });
+  const DexoDashboardPage({super.key, this.token});
 
   @override
   State<DexoDashboardPage> createState() => _DexoDashboardPageState();
@@ -92,15 +89,14 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
                       context,
                       title: 'Organization Pulse',
                       subtitle:
-                      'Adjust workforce targets and detect staffing gaps.',
+                          'Adjust workforce targets and detect staffing gaps.',
                       icon: Icons.account_tree_rounded,
                       isPrimary: true,
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                            const DexoOrganizationPulseScreen(),
+                            builder: (_) => const DexoOrganizationPulseScreen(),
                           ),
                         );
                       },
@@ -109,7 +105,7 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
                       context,
                       title: 'Production Hub',
                       subtitle:
-                      'Documents, generated outputs and execution logs.',
+                          'Documents, generated outputs and execution logs.',
                       icon: Icons.factory_rounded,
                       onTap: () {
                         Navigator.push(
@@ -146,7 +142,7 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
             decoration: BoxDecoration(
               color: _blueSurface,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: _dexoBlue.withOpacity(0.18)),
+              border: Border.all(color: _dexoBlue.withValues(alpha: 0.18)),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(18),
@@ -218,7 +214,7 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: _dexoBlue.withOpacity(0.24),
+            color: _dexoBlue.withValues(alpha: 0.24),
             blurRadius: 28,
             offset: const Offset(0, 14),
           ),
@@ -230,9 +226,9 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
             width: 58,
             height: 58,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.16),
+              color: Colors.white.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.18)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
             ),
             child: const Icon(
               Icons.psychology_alt_rounded,
@@ -258,7 +254,7 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
                 Text(
                   "Dexo monitors your organization, detects workforce drift and supervises execution.",
                   style: GoogleFonts.plusJakartaSans(
-                    color: Colors.white.withOpacity(0.78),
+                    color: Colors.white.withValues(alpha: 0.78),
                     fontSize: 12,
                     height: 1.45,
                     fontWeight: FontWeight.w500,
@@ -281,7 +277,7 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
         border: Border.all(color: _border, width: 0.8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.035),
+            color: Colors.black.withValues(alpha: 0.035),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -342,13 +338,13 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
   }
 
   Widget _menuCard(
-      BuildContext context, {
-        required String title,
-        required String subtitle,
-        required IconData icon,
-        required VoidCallback onTap,
-        bool isPrimary = false,
-      }) {
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required VoidCallback onTap,
+    bool isPrimary = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Material(
@@ -367,8 +363,9 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
               ),
               boxShadow: [
                 BoxShadow(
-                  color: (isPrimary ? _dexoBlue : Colors.black)
-                      .withOpacity(isPrimary ? 0.08 : 0.035),
+                  color: (isPrimary ? _dexoBlue : Colors.black).withValues(
+                    alpha: isPrimary ? 0.08 : 0.035,
+                  ),
                   blurRadius: 18,
                   offset: const Offset(0, 8),
                 ),
@@ -440,10 +437,7 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
     );
   }
 
-  Widget _roundButton({
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
+  Widget _roundButton({required IconData icon, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -455,7 +449,7 @@ class _DexoDashboardPageState extends State<DexoDashboardPage> {
           border: Border.all(color: _border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.025),
+              color: Colors.black.withValues(alpha: 0.025),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),

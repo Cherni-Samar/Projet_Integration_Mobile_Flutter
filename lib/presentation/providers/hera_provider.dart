@@ -84,10 +84,7 @@ class HeraProvider extends ChangeNotifier {
   /// Optimistically remove an action from the list, then call the API.
   /// Returns an [AppError] on failure (caller shows it), null on success.
   /// Rolls back the optimistic update on failure.
-  Future<AppError?> deleteAction(
-    Map<String, dynamic> action,
-    int index,
-  ) async {
+  Future<AppError?> deleteAction(Map<String, dynamic> action, int index) async {
     if (index >= _recentActions.length) return null;
 
     final id = _extractId(action['_id']);
@@ -104,7 +101,10 @@ class HeraProvider extends ChangeNotifier {
         // Roll back
         _recentActions = List.from(_recentActions)..insert(index, removed);
         notifyListeners();
-        return AppError.mutation("Impossible de supprimer l'action.", source: e);
+        return AppError.mutation(
+          "Impossible de supprimer l'action.",
+          source: e,
+        );
       }
     }
 

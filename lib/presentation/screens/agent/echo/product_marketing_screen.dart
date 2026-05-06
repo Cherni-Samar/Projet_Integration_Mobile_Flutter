@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:e_team/data/services/echo_service.dart';
 import 'package:e_team/core/config/api_config.dart';
+
 class ProductMarketingScreen extends StatefulWidget {
   final String? token;
-  
+
   const ProductMarketingScreen({super.key, this.token});
 
   @override
@@ -13,16 +14,16 @@ class ProductMarketingScreen extends StatefulWidget {
 
 class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
   final TextEditingController _urlController = TextEditingController();
-  
+
   bool _isLoading = false;
   bool _isScraped = false;
   bool _isStartingCampaign = false;
   bool _isLoadingHistory = false;
-  
+
   Map<String, dynamic>? _productData;
   String _selectedFrequency = '3days';
   List<Map<String, dynamic>> _campaignHistory = [];
-  
+
   // Theme colors
   static const violet = Color(0xFF9C27B0);
   static const bg = Color(0xFFFFFFFF);
@@ -45,7 +46,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
 
   Future<void> _loadCampaignHistory() async {
     setState(() => _isLoadingHistory = true);
-    
+
     try {
       final response = await EchoService.getCampaignHistory(
         limit: 50,
@@ -54,15 +55,16 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
 
       if (response['success'] == true && response['campaigns'] != null) {
         setState(() {
-          _campaignHistory = List<Map<String, dynamic>>.from(response['campaigns']);
+          _campaignHistory = List<Map<String, dynamic>>.from(
+            response['campaigns'],
+          );
           _isLoadingHistory = false;
         });
       } else {
         setState(() => _isLoadingHistory = false);
       }
-    } catch (e) {
+    } catch (_) {
       setState(() => _isLoadingHistory = false);
-      print('Error loading campaign history: $e');
     }
   }
 
@@ -93,7 +95,10 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
         _showSnackBar('Product analyzed successfully!');
       } else {
         setState(() => _isLoading = false);
-        _showSnackBar(response['error'] ?? 'Failed to analyze product', isError: true);
+        _showSnackBar(
+          response['error'] ?? 'Failed to analyze product',
+          isError: true,
+        );
       }
     } catch (e) {
       setState(() => _isLoading = false);
@@ -125,7 +130,10 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
         await Future.delayed(const Duration(seconds: 2));
         if (mounted) Navigator.pop(context, true);
       } else {
-        _showSnackBar(response['error'] ?? 'Failed to start campaign', isError: true);
+        _showSnackBar(
+          response['error'] ?? 'Failed to start campaign',
+          isError: true,
+        );
       }
     } catch (e) {
       setState(() => _isStartingCampaign = false);
@@ -153,7 +161,11 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
           backgroundColor: violet,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.white,
+              size: 20,
+            ),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
@@ -180,10 +192,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
           ),
         ),
         body: TabBarView(
-          children: [
-            _buildNewCampaignTab(),
-            _buildHistoryTab(),
-          ],
+          children: [_buildNewCampaignTab(), _buildHistoryTab()],
         ),
       ),
     );
@@ -228,7 +237,11 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
               color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.shopping_bag_outlined, color: Colors.white, size: 28),
+            child: const Icon(
+              Icons.shopping_bag_outlined,
+              color: Colors.white,
+              size: 28,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -297,10 +310,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
             controller: _urlController,
             decoration: InputDecoration(
               hintText: 'https://www.amazon.com/product...',
-              hintStyle: GoogleFonts.inter(
-                color: textMuted,
-                fontSize: 13,
-              ),
+              hintStyle: GoogleFonts.inter(color: textMuted, fontSize: 13),
               filled: true,
               fillColor: bg,
               border: OutlineInputBorder(
@@ -315,12 +325,12 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: violet, width: 1),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 14,
+              ),
             ),
-            style: GoogleFonts.inter(
-              color: textMain,
-              fontSize: 13,
-            ),
+            style: GoogleFonts.inter(color: textMain, fontSize: 13),
             maxLines: 3,
             minLines: 1,
           ),
@@ -410,7 +420,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Product Image
           if (images.isNotEmpty)
             ClipRRect(
@@ -432,7 +442,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
                       child: CircularProgressIndicator(
                         value: loadingProgress.expectedTotalBytes != null
                             ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
+                                  loadingProgress.expectedTotalBytes!
                             : null,
                         color: violet,
                       ),
@@ -440,8 +450,6 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
                   );
                 },
                 errorBuilder: (context, error, stackTrace) {
-                  print('❌ Image load error: $error');
-                  print('Image URL: ${images[0]}');
                   return Container(
                     height: 200,
                     decoration: BoxDecoration(
@@ -451,7 +459,11 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.image_not_supported, size: 48, color: textMuted),
+                        const Icon(
+                          Icons.image_not_supported,
+                          size: 48,
+                          color: textMuted,
+                        ),
                         const SizedBox(height: 8),
                         Text(
                           'Image not available',
@@ -466,9 +478,9 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
                 },
               ),
             ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Product Title
           Text(
             title,
@@ -480,14 +492,17 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           // Price and Category
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: violet.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -503,7 +518,10 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: border,
                   borderRadius: BorderRadius.circular(8),
@@ -519,7 +537,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
               ),
             ],
           ),
-          
+
           if (description.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
@@ -533,7 +551,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
               overflow: TextOverflow.ellipsis,
             ),
           ],
-          
+
           if (features.isNotEmpty) ...[
             const SizedBox(height: 12),
             Text(
@@ -545,26 +563,30 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            ...features.take(3).map((feature) => Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('• ', style: TextStyle(color: violet)),
-                  Expanded(
-                    child: Text(
-                      feature.toString(),
-                      style: GoogleFonts.inter(
-                        color: textMuted,
-                        fontSize: 11,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+            ...features
+                .take(3)
+                .map(
+                  (feature) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('• ', style: TextStyle(color: violet)),
+                        Expanded(
+                          child: Text(
+                            feature.toString(),
+                            style: GoogleFonts.inter(
+                              color: textMuted,
+                              fontSize: 11,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            )),
+                ),
           ],
         ],
       ),
@@ -618,9 +640,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
 
   Widget _buildHistoryTab() {
     if (_isLoadingHistory) {
-      return const Center(
-        child: CircularProgressIndicator(color: violet),
-      );
+      return const Center(child: CircularProgressIndicator(color: violet));
     }
 
     if (_campaignHistory.isEmpty) {
@@ -785,7 +805,11 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
                           color: border,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(Icons.image_not_supported, size: 24, color: textMuted),
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          size: 24,
+                          color: textMuted,
+                        ),
                       );
                     },
                   ),
@@ -856,10 +880,7 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
                 const SizedBox(width: 4),
                 Text(
                   'Created ${_formatDate(createdAt)}',
-                  style: GoogleFonts.inter(
-                    color: textMuted,
-                    fontSize: 10,
-                  ),
+                  style: GoogleFonts.inter(color: textMuted, fontSize: 10),
                 ),
               ],
             ),
@@ -929,5 +950,4 @@ class _ProductMarketingScreenState extends State<ProductMarketingScreen> {
       return '$months ${months == 1 ? 'month' : 'months'} ago';
     }
   }
-
 }

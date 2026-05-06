@@ -81,18 +81,13 @@ class HeraTeamTab extends StatelessWidget {
             color: HeraPalette.mauve,
             child: loadingEmployees
                 ? const Center(
-                    child: CircularProgressIndicator(
-                      color: HeraPalette.mauve,
-                    ),
+                    child: CircularProgressIndicator(color: HeraPalette.mauve),
                   )
                 : employeeSubTab == 0
-                    ? _ActiveList(
-                        employees: _active,
-                        onEmployeeTap: onEmployeeTap,
-                      )
-                    : employeeSubTab == 1
-                        ? _OnboardingList(employees: _onboarding)
-                        : _CandidateList(candidates: candidates),
+                ? _ActiveList(employees: _active, onEmployeeTap: onEmployeeTap)
+                : employeeSubTab == 1
+                ? _OnboardingList(employees: _onboarding)
+                : _CandidateList(candidates: candidates),
           ),
         ),
       ],
@@ -133,16 +128,14 @@ class _SubTabPill extends StatelessWidget {
               label,
               style: TextStyle(
                 color: selected ? Colors.white : HeraPalette.textMuted,
-                fontWeight:
-                    selected ? FontWeight.w800 : FontWeight.w500,
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
                 fontSize: 13,
               ),
             ),
             if (count > 0) ...[
               const SizedBox(width: 6),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
                   color: selected
                       ? Colors.white.withOpacity(0.2)
@@ -152,8 +145,7 @@ class _SubTabPill extends StatelessWidget {
                 child: Text(
                   '$count',
                   style: TextStyle(
-                    color:
-                        selected ? Colors.white : HeraPalette.textPrimary,
+                    color: selected ? Colors.white : HeraPalette.textPrimary,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                   ),
@@ -173,10 +165,7 @@ class _ActiveList extends StatelessWidget {
   final List<HeraEmployee> employees;
   final void Function(HeraEmployee) onEmployeeTap;
 
-  const _ActiveList({
-    required this.employees,
-    required this.onEmployeeTap,
-  });
+  const _ActiveList({required this.employees, required this.onEmployeeTap});
 
   @override
   Widget build(BuildContext context) {
@@ -271,10 +260,7 @@ class _CandidateList extends StatelessWidget {
                     ),
                     Text(
                       candidate.department,
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 11,
-                      ),
+                      style: const TextStyle(color: Colors.grey, fontSize: 11),
                     ),
                   ],
                 ),

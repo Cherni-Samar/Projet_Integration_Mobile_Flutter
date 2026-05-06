@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../../../providers/user_provider.dart';
-import '/data/services/api_service.dart';
-import '/data/services/auth_service.dart';
+import 'package:e_team/presentation/providers/user_provider.dart';
+import 'package:e_team/data/services/api_service.dart';
+import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/core/utils/constants.dart';
 
 class KashAgentScreen extends StatefulWidget {
@@ -69,16 +69,11 @@ class _KashAgentScreenState extends State<KashAgentScreen>
       backgroundColor: _volt,
       foregroundColor: Colors.black,
       elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       icon: const Icon(Icons.camera_alt, size: 20),
       label: const Text(
         'Scanner facture',
-        style: TextStyle(
-          fontWeight: FontWeight.w900,
-          fontSize: 14,
-        ),
+        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
       ),
     );
   }
@@ -122,8 +117,10 @@ class _KashAgentScreenState extends State<KashAgentScreen>
 
     final energy = context.read<UserProvider>().energyBalance;
     if (energy < 10) {
-      await _showAlert('Énergie insuffisante',
-          "Vous avez $energy d'énergie. L'analyse coûte 10 unités.");
+      await _showAlert(
+        'Énergie insuffisante',
+        "Vous avez $energy d'énergie. L'analyse coûte 10 unités.",
+      );
       return;
     }
 
@@ -141,11 +138,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
       _pendingExtraction = null;
       _pendingReceiptBytes = bytes;
       _messages.add(
-        _KashMsg(
-          fromUser: true,
-          text: 'Reçu sélectionné',
-          imageBytes: bytes,
-        ),
+        _KashMsg(fromUser: true, text: 'Reçu sélectionné', imageBytes: bytes),
       );
       _isAnalyzing = true;
     });
@@ -157,13 +150,11 @@ class _KashAgentScreenState extends State<KashAgentScreen>
       final response = await ApiService.post(
         endpoint: ApiConstants.kashAnalyze,
         token: token,
-        body: {
-          'imageBase64': base64Image,
-        },
+        body: {'imageBase64': base64Image},
       );
 
-      final extractedJson =
-      (response['data']?['extracted'] as Map?)?.cast<String, dynamic>();
+      final extractedJson = (response['data']?['extracted'] as Map?)
+          ?.cast<String, dynamic>();
       final newBalance = response['data']?['energyBalance'];
 
       if (newBalance is num) {
@@ -182,7 +173,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
           _KashMsg(
             fromUser: false,
             text:
-            'Analyse terminée.\nMontant: ${extracted.amount} ${extracted.currency}\nFournisseur: ${extracted.vendor}\nCatégorie: ${extracted.category}',
+                'Analyse terminée.\nMontant: ${extracted.amount} ${extracted.currency}\nFournisseur: ${extracted.vendor}\nCatégorie: ${extracted.category}',
           ),
         );
       });
@@ -190,10 +181,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
     } catch (e) {
       setState(() {
         _messages.add(
-          _KashMsg(
-            fromUser: false,
-            text: "Erreur d'analyse: ${e.toString()}",
-          ),
+          _KashMsg(fromUser: false, text: "Erreur d'analyse: ${e.toString()}"),
         );
       });
       await _scrollToBottom();
@@ -222,7 +210,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
         const _KashMsg(
           fromUser: false,
           text:
-          "Pour analyser une dépense, appuie sur l'icône Photo et sélectionne un reçu.",
+              "Pour analyser une dépense, appuie sur l'icône Photo et sélectionne un reçu.",
         ),
       );
     });
@@ -290,9 +278,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
             _buildTabNavigation(),
 
             // Tab Content
-            Expanded(
-              child: _buildTabContent(),
-            ),
+            Expanded(child: _buildTabContent()),
           ],
         ),
       ),
@@ -304,10 +290,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            _volt.withOpacity(0.15),
-            _gold.withOpacity(0.15),
-          ],
+          colors: [_volt.withOpacity(0.15), _gold.withOpacity(0.15)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -352,7 +335,10 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                         return Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [_volt.withOpacity(0.6), _gold.withOpacity(0.6)],
+                              colors: [
+                                _volt.withOpacity(0.6),
+                                _gold.withOpacity(0.6),
+                              ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
@@ -387,16 +373,16 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                       const SizedBox(height: 4),
                       const Text(
                         'Financial Analysis Agent',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                        ),
+                        style: TextStyle(color: Colors.white70, fontSize: 13),
                       ),
                       const SizedBox(height: 8),
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: _volt.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(12),
@@ -404,7 +390,11 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                             child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.circle, color: Colors.greenAccent, size: 8),
+                                Icon(
+                                  Icons.circle,
+                                  color: Colors.greenAccent,
+                                  size: 8,
+                                ),
                                 SizedBox(width: 4),
                                 Text(
                                   'Active',
@@ -419,7 +409,10 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: _gold.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
@@ -464,7 +457,10 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                 backgroundColor: Colors.black26,
                 child: IconButton(
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  constraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
                   icon: const Icon(
                     Icons.arrow_back_ios_new,
                     color: Colors.white,
@@ -513,18 +509,14 @@ class _KashAgentScreenState extends State<KashAgentScreen>
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: isSelected
-                ? _volt.withOpacity(0.2)
-                : Colors.transparent,
+            color: isSelected ? _volt.withOpacity(0.2) : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
             title,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: isSelected
-                  ? _volt
-                  : Colors.white70,
+              color: isSelected ? _volt : Colors.white70,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
               fontSize: 13,
             ),
@@ -547,7 +539,8 @@ class _KashAgentScreenState extends State<KashAgentScreen>
                 padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                 itemCount: _messages.length + (_isAnalyzing ? 1 : 0),
                 itemBuilder: (context, index) {
-                  final isLoadingRow = _isAnalyzing && index == _messages.length;
+                  final isLoadingRow =
+                      _isAnalyzing && index == _messages.length;
                   if (isLoadingRow) {
                     return Align(
                       alignment: Alignment.centerLeft,
@@ -627,10 +620,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            _volt.withOpacity(0.05),
-            _gold.withOpacity(0.03),
-          ],
+          colors: [_volt.withOpacity(0.05), _gold.withOpacity(0.03)],
         ),
       ),
       child: Column(
@@ -699,10 +689,7 @@ class _KashAgentScreenState extends State<KashAgentScreen>
               icon: const Icon(Icons.camera_alt, size: 20),
               label: const Text(
                 'Scanner ma première facture',
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                ),
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
               ),
             ),
           ),
@@ -749,9 +736,7 @@ class _Composer extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: const Color(0xFF0F130F),
-        border: Border(
-          top: BorderSide(color: Colors.white.withOpacity(0.06)),
-        ),
+        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.06))),
       ),
       child: Row(
         children: [
@@ -765,8 +750,10 @@ class _Composer extends StatelessWidget {
                 hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
                 filled: true,
                 fillColor: const Color(0xFF111511),
-                contentPadding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide(color: Colors.white.withOpacity(0.06)),
@@ -815,7 +802,9 @@ class _MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final fromUser = msg.fromUser;
     final bg = fromUser ? const Color(0xFF121A12) : const Color(0xFF111511);
-    final border = fromUser ? _volt.withOpacity(0.25) : Colors.white.withOpacity(0.06);
+    final border = fromUser
+        ? _volt.withOpacity(0.25)
+        : Colors.white.withOpacity(0.06);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -831,8 +820,9 @@ class _MessageBubble extends StatelessWidget {
               border: Border.all(color: border),
             ),
             child: Column(
-              crossAxisAlignment:
-              fromUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              crossAxisAlignment: fromUser
+                  ? CrossAxisAlignment.end
+                  : CrossAxisAlignment.start,
               children: [
                 Text(
                   msg.text,
@@ -1041,11 +1031,7 @@ class _KashMsg {
   final String text;
   final Uint8List? imageBytes;
 
-  const _KashMsg({
-    required this.fromUser,
-    required this.text,
-    this.imageBytes,
-  });
+  const _KashMsg({required this.fromUser, required this.text, this.imageBytes});
 }
 
 class _ExtractedExpense {
@@ -1067,7 +1053,9 @@ class _ExtractedExpense {
 
   factory _ExtractedExpense.fromJson(Map<String, dynamic> json) {
     final amountRaw = json['amount'];
-    final amount = (amountRaw is num) ? amountRaw.toDouble() : double.parse('$amountRaw');
+    final amount = (amountRaw is num)
+        ? amountRaw.toDouble()
+        : double.parse('$amountRaw');
 
     return _ExtractedExpense(
       amount: amount,

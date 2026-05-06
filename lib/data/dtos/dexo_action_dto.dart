@@ -5,7 +5,13 @@ class DexoActionDTO {
   final Map<String, dynamic> details;
   final String createdAt;
 
-  DexoActionDTO({required this.id, required this.actionType, required this.employeeName, required this.details, required this.createdAt});
+  DexoActionDTO({
+    required this.id,
+    required this.actionType,
+    required this.employeeName,
+    required this.details,
+    required this.createdAt,
+  });
 
   factory DexoActionDTO.fromJson(Map<String, dynamic> json) {
     return DexoActionDTO(

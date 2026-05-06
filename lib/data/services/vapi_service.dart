@@ -1,11 +1,12 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:vapi/vapi.dart';
 import 'package:e_team/core/config/app_secrets.dart';
 
 enum HeraVoiceStatus { idle, connecting, listening, speaking, ended, error }
 
-class VapiService extends ChangeNotifier {
+typedef VapiServiceListener = void Function();
+
+class VapiService {
   static String get _publicKey => AppSecrets.vapiPublicKey;
   static String get _assistantId => AppSecrets.vapiAssistantId;
 
@@ -13,6 +14,7 @@ class VapiService extends ChangeNotifier {
   VapiCall? _call;
 
   StreamSubscription<VapiEvent>? _eventSubscription;
+  final List<VapiServiceListener> _listeners = [];
 
   HeraVoiceStatus _status = HeraVoiceStatus.idle;
   HeraVoiceStatus get status => _status;
@@ -38,7 +40,7 @@ class VapiService extends ChangeNotifier {
 
     _client = VapiClient(_publicKey);
     _initialized = true;
-    notifyListeners();
+    _notifyListeners();
   }
 
   Future<void> start() async {
@@ -49,50 +51,47 @@ class VapiService extends ChangeNotifier {
 
       _status = HeraVoiceStatus.connecting;
       _errorMessage = '';
-      notifyListeners();
+      _notifyListeners();
 
       _call = await _client.start(assistantId: _assistantId);
 
       await _eventSubscription?.cancel();
       _eventSubscription = _call!.onEvent.listen(_handleEvent);
 
-      notifyListeners();
+      _notifyListeners();
     } catch (e) {
       _status = HeraVoiceStatus.error;
       _errorMessage = e.toString();
-      notifyListeners();
+      _notifyListeners();
     }
   }
 
   void _handleEvent(VapiEvent event) {
-    debugPrint('VAPI EVENT => ${event.label}');
-    debugPrint('VAPI VALUE => ${event.value}');
-
     switch (event.label) {
       case 'call-start':
         _status = HeraVoiceStatus.listening;
-        notifyListeners();
+        _notifyListeners();
         return;
 
       case 'call-end':
         _status = HeraVoiceStatus.ended;
-        notifyListeners();
+        _notifyListeners();
         return;
 
       case 'speech-start':
         _status = HeraVoiceStatus.speaking;
-        notifyListeners();
+        _notifyListeners();
         return;
 
       case 'speech-end':
         _status = HeraVoiceStatus.listening;
-        notifyListeners();
+        _notifyListeners();
         return;
 
       case 'error':
         _status = HeraVoiceStatus.error;
         _errorMessage = event.value?.toString() ?? 'Erreur inconnue';
-        notifyListeners();
+        _notifyListeners();
         return;
 
       case 'message':
@@ -119,10 +118,10 @@ class VapiService extends ChangeNotifier {
           _lastAssistantTranscript = transcript;
         }
 
-        notifyListeners();
+        _notifyListeners();
       }
-    } catch (e) {
-      debugPrint('Transcript parse error: $e');
+    } catch (_) {
+      return;
     }
   }
 
@@ -130,11 +129,11 @@ class VapiService extends ChangeNotifier {
     try {
       await _call?.stop();
       _status = HeraVoiceStatus.ended;
-      notifyListeners();
+      _notifyListeners();
     } catch (e) {
       _status = HeraVoiceStatus.error;
       _errorMessage = e.toString();
-      notifyListeners();
+      _notifyListeners();
     }
   }
 
@@ -151,7 +150,7 @@ class VapiService extends ChangeNotifier {
 
     try {
       _lastUserTranscript = text.trim();
-      notifyListeners();
+      _notifyListeners();
 
       await _call!.send({
         'type': 'add-message',
@@ -160,7 +159,7 @@ class VapiService extends ChangeNotifier {
     } catch (e) {
       _status = HeraVoiceStatus.error;
       _errorMessage = e.toString();
-      notifyListeners();
+      _notifyListeners();
     }
   }
 
@@ -169,14 +168,28 @@ class VapiService extends ChangeNotifier {
     _lastUserTranscript = '';
     _lastAssistantTranscript = '';
     _errorMessage = '';
-    notifyListeners();
+    _notifyListeners();
   }
 
-  @override
+  void addListener(VapiServiceListener listener) {
+    if (_listeners.contains(listener)) return;
+    _listeners.add(listener);
+  }
+
+  void removeListener(VapiServiceListener listener) {
+    _listeners.remove(listener);
+  }
+
+  void _notifyListeners() {
+    for (final listener in List<VapiServiceListener>.of(_listeners)) {
+      listener();
+    }
+  }
+
   void dispose() {
     _eventSubscription?.cancel();
     _call?.dispose();
     _client.dispose();
-    super.dispose();
+    _listeners.clear();
   }
 }

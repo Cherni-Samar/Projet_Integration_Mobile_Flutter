@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import '../services/api_service.dart';
-import '../services/auth_service.dart';
+import 'package:e_team/data/services/api_service.dart';
+import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/core/utils/constants.dart';
 
 class StripeService {
@@ -52,7 +51,6 @@ class StripeService {
       paymentSheetParameters: SetupPaymentSheetParameters(
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: 'E-Team',
-        style: ThemeMode.system,
       ),
     );
 

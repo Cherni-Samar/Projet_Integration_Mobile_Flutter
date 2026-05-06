@@ -1,23 +1,13 @@
-import 'package:flutter/material.dart';
-
 // ─── Chat message types ───────────────────────────────────────────────────────
 
-enum ChatMessageType {
-  bot,
-  user,
-  blueprint,
-}
+enum ChatMessageType { bot, user, blueprint }
 
 class ChatMessage {
   final ChatMessageType type;
   final String text;
-  final Widget? widget;
+  final WorkforcePlan? blueprintPlan;
 
-  const ChatMessage._({
-    required this.type,
-    this.text = '',
-    this.widget,
-  });
+  const ChatMessage._({required this.type, this.text = '', this.blueprintPlan});
 
   factory ChatMessage.bot(String text) {
     return ChatMessage._(type: ChatMessageType.bot, text: text);
@@ -27,8 +17,8 @@ class ChatMessage {
     return ChatMessage._(type: ChatMessageType.user, text: text);
   }
 
-  factory ChatMessage.blueprint(Widget widget) {
-    return ChatMessage._(type: ChatMessageType.blueprint, widget: widget);
+  factory ChatMessage.blueprint(WorkforcePlan plan) {
+    return ChatMessage._(type: ChatMessageType.blueprint, blueprintPlan: plan);
   }
 }
 
@@ -69,7 +59,8 @@ class WorkforceDepartment {
 
   factory WorkforceDepartment.fromJson(Map<String, dynamic> json) {
     return WorkforceDepartment(
-      name: json['name']?.toString() ??
+      name:
+          json['name']?.toString() ??
           json['department']?.toString() ??
           'Department',
       targetCount: WorkforcePlan._toInt(
@@ -106,17 +97,16 @@ class WorkforcePlan {
         ? Map<String, dynamic>.from(json['proposal'])
         : json;
 
-    final departmentsRaw =
-        proposal['departments'] ?? json['departments'] ?? [];
+    final departmentsRaw = proposal['departments'] ?? json['departments'] ?? [];
 
     List<WorkforceDepartment> parsedDepartments = [];
 
     if (departmentsRaw is List) {
       parsedDepartments = departmentsRaw
           .whereType<Map>()
-          .map((e) => WorkforceDepartment.fromJson(
-                Map<String, dynamic>.from(e),
-              ))
+          .map(
+            (e) => WorkforceDepartment.fromJson(Map<String, dynamic>.from(e)),
+          )
           .where((d) => d.name.trim().isNotEmpty)
           .toList();
     }
@@ -146,13 +136,12 @@ class WorkforcePlan {
 
     return WorkforcePlan(
       departments: parsedDepartments,
-      explanation: proposal['explanation']?.toString() ??
+      explanation:
+          proposal['explanation']?.toString() ??
           'Dexo generated this organization structure from your company vision.',
       recommendedAgents: (agentsRaw as List? ?? [])
           .whereType<Map>()
-          .map((e) => RecommendedAgent.fromJson(
-                Map<String, dynamic>.from(e),
-              ))
+          .map((e) => RecommendedAgent.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
     );
   }
@@ -191,10 +180,6 @@ class RecommendedAgent {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'reason': reason,
-    };
+    return {'id': id, 'name': name, 'reason': reason};
   }
 }

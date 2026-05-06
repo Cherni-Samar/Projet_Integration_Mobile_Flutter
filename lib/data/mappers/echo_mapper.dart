@@ -29,7 +29,8 @@ class EchoMapper {
       content: _str(json['content'] ?? json['body']),
       summary: _str(json['summary']),
       isUrgent: _bool(json['isUrgent']),
-      isSpam: _bool(json['isSpam']) ||
+      isSpam:
+          _bool(json['isSpam']) ||
           _bool(json['is_spam']) ||
           _str(json['category']).toLowerCase() == 'spam',
       priority: _str(json['priority']).isEmpty ? 'low' : _str(json['priority']),
@@ -41,15 +42,13 @@ class EchoMapper {
   }
 
   static PendingItem pendingFromJson(Map<String, dynamic> json) {
-    final scheduledAt = DateTime.tryParse(
-      _str(json['scheduledAt'] ?? json['scheduled_at']),
-    ) ??
+    final scheduledAt =
+        DateTime.tryParse(_str(json['scheduledAt'] ?? json['scheduled_at'])) ??
         DateTime.tryParse(_str(json['sendAt'] ?? json['send_at'])) ??
         DateTime.now();
 
     final remainingRaw = json['remainingMinutes'] ?? json['remaining_minutes'];
-    double remainingMinutes =
-    remainingRaw == null ? 0 : _double(remainingRaw);
+    double remainingMinutes = remainingRaw == null ? 0 : _double(remainingRaw);
 
     String willSendIn = _str(
       json['willSendIn'] ?? json['will_send_in'] ?? json['timeRemaining'],
@@ -66,10 +65,15 @@ class EchoMapper {
     }
 
     return PendingItem(
-      emailId: _str(json['emailId'] ?? json['email_id'] ?? json['id'] ?? json['_id']),
+      emailId: _str(
+        json['emailId'] ?? json['email_id'] ?? json['id'] ?? json['_id'],
+      ),
       subject: _str(json['subject']),
       sender: _str(
-        json['sender'] ?? json['from'] ?? json['senderEmail'] ?? json['fromEmail'],
+        json['sender'] ??
+            json['from'] ??
+            json['senderEmail'] ??
+            json['fromEmail'],
       ),
       scheduledAt: scheduledAt,
       remainingMinutes: remainingMinutes,
@@ -82,9 +86,9 @@ class EchoMapper {
 
     if (json['platforms'] is List) {
       platforms.addAll(
-        (json['platforms'] as List)
-            .whereType<Map>()
-            .map((item) => postPlatformFromJson(Map<String, dynamic>.from(item))),
+        (json['platforms'] as List).whereType<Map>().map(
+          (item) => postPlatformFromJson(Map<String, dynamic>.from(item)),
+        ),
       );
     }
 
@@ -139,8 +143,8 @@ class EchoMapper {
   }
 
   static DocumentClassification documentClassificationFromJson(
-      Map<String, dynamic> json,
-      ) {
+    Map<String, dynamic> json,
+  ) {
     return DocumentClassification(
       category: _str(json['category']),
       confidentialityLevel: _str(json['confidentialityLevel']),
@@ -153,13 +157,14 @@ class EchoMapper {
   }
 
   static ResponseSuggestion responseSuggestionFromJson(
-      Map<String, dynamic> json,
-      ) {
+    Map<String, dynamic> json,
+  ) {
     return ResponseSuggestion(
       type: _str(json['type']),
       title: _str(json['title']),
       content: _str(json['content']),
-      category: json['category']?.toString() ?? json['messageCategory']?.toString(),
+      category:
+          json['category']?.toString() ?? json['messageCategory']?.toString(),
     );
   }
 
@@ -170,19 +175,25 @@ class EchoMapper {
       description: _str(json['description'] ?? json['details']),
       assignee: json['assignee']?.toString(),
       deadline: DateTime.tryParse(_str(json['deadline'])),
-      category: _str(json['category']).isEmpty ? 'other' : _str(json['category']),
-      priority: _str(json['priority']).isEmpty ? 'medium' : _str(json['priority']),
-      status: _str(json['status'] ?? json['state'] ?? json['taskStatus']).isEmpty
+      category: _str(json['category']).isEmpty
+          ? 'other'
+          : _str(json['category']),
+      priority: _str(json['priority']).isEmpty
+          ? 'medium'
+          : _str(json['priority']),
+      status:
+          _str(json['status'] ?? json['state'] ?? json['taskStatus']).isEmpty
           ? 'todo'
           : _str(json['status'] ?? json['state'] ?? json['taskStatus']),
       confidence: _double(json['confidence'], fallback: 0.5),
       extractedFrom: json['extractedFrom'] is Map
           ? taskExtractedFromJson(
-        Map<String, dynamic>.from(json['extractedFrom']),
-      )
+              Map<String, dynamic>.from(json['extractedFrom']),
+            )
           : null,
       notes: json['notes']?.toString(),
-      createdAt: DateTime.tryParse(_str(json['createdAt'] ?? json['created_at'])) ??
+      createdAt:
+          DateTime.tryParse(_str(json['createdAt'] ?? json['created_at'])) ??
           DateTime.now(),
       completedAt: DateTime.tryParse(
         _str(json['completedAt'] ?? json['completed_at']),
@@ -195,7 +206,8 @@ class EchoMapper {
       emailId: json['emailId']?.toString(),
       sender: json['sender']?.toString(),
       subject: json['subject']?.toString(),
-      extractedAt: DateTime.tryParse(_str(json['extractedAt'])) ?? DateTime.now(),
+      extractedAt:
+          DateTime.tryParse(_str(json['extractedAt'])) ?? DateTime.now(),
     );
   }
 

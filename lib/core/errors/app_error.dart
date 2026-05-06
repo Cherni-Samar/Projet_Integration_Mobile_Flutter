@@ -40,47 +40,43 @@ class AppError {
   /// The raw exception, kept for logging / debugging.
   final Object? source;
 
-  const AppError({
-    required this.message,
-    required this.type,
-    this.source,
-  });
+  const AppError({required this.message, required this.type, this.source});
 
   // ─── Named constructors ───────────────────────────────────────────────────
 
   /// Network / connectivity failure.
   const AppError.network({Object? source})
-      : message = 'Connexion impossible. Vérifiez votre réseau.',
-        type = ErrorType.network,
-        source = source;
+    : message = 'Connexion impossible. Vérifiez votre réseau.',
+      type = ErrorType.network,
+      source = source;
 
   /// Generic server-side failure with an optional backend message.
   AppError.server(String? detail, {Object? source})
-      : message = (detail != null && detail.isNotEmpty)
-            ? detail
-            : 'Une erreur serveur est survenue.',
-        type = ErrorType.server,
-        source = source;
+    : message = (detail != null && detail.isNotEmpty)
+          ? detail
+          : 'Une erreur serveur est survenue.',
+      type = ErrorType.server,
+      source = source;
 
   /// Auth / session failure.
   const AppError.auth({Object? source})
-      : message = 'Session expirée. Veuillez vous reconnecter.',
-        type = ErrorType.auth,
-        source = source;
+    : message = 'Session expirée. Veuillez vous reconnecter.',
+      type = ErrorType.auth,
+      source = source;
 
   /// Mutation failure (delete, update, create).
   AppError.mutation(String? detail, {Object? source})
-      : message = (detail != null && detail.isNotEmpty)
-            ? detail
-            : "L'opération a échoué. Réessayez.",
-        type = ErrorType.mutation,
-        source = source;
+    : message = (detail != null && detail.isNotEmpty)
+          ? detail
+          : "L'opération a échoué. Réessayez.",
+      type = ErrorType.mutation,
+      source = source;
 
   /// Unknown / unexpected failure.
   AppError.unknown(Object? source)
-      : message = 'Une erreur inattendue est survenue.',
-        type = ErrorType.unknown,
-        source = source;
+    : message = 'Une erreur inattendue est survenue.',
+      type = ErrorType.unknown,
+      source = source;
 
   /// Inspect [e] and return the most appropriate [AppError].
   factory AppError.from(Object e) {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../../../providers/user_provider.dart';
-import '/data/services/kash_service.dart';
+import 'package:e_team/presentation/providers/user_provider.dart';
+import 'package:e_team/data/services/kash_service.dart';
 import 'package:e_team/presentation/widgets/kash/kash_theme.dart';
 import 'package:e_team/presentation/widgets/kash/kash_add_budget_sheet.dart';
 import 'package:e_team/presentation/widgets/kash/kash_add_reminder_sheet.dart';
@@ -31,17 +31,18 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
   bool _loadingExpenses = false;
   bool _loadingBudgets = false;
   bool _loadingReminders = false;
-  int _selectedTab = 0; // 0 = Overview, 1 = Expenses, 2 = Budgets, 3 = Reminders
+  int _selectedTab =
+      0; // 0 = Overview, 1 = Expenses, 2 = Budgets, 3 = Reminders
 
   late AnimationController _fadeController;
   late AnimationController _pulseController;
   late AnimationController _glowController;
 
   static const _tabs = [
-    (Icons.trending_up_rounded,      'Aperçu'),
-    (Icons.receipt_long_rounded,     'Dépenses'),
-    (Icons.account_balance_rounded,  'Budgets'),
-    (Icons.notifications_rounded,    'Paiements'),
+    (Icons.trending_up_rounded, 'Aperçu'),
+    (Icons.receipt_long_rounded, 'Dépenses'),
+    (Icons.account_balance_rounded, 'Budgets'),
+    (Icons.notifications_rounded, 'Paiements'),
   ];
 
   @override
@@ -74,11 +75,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     try {
       setState(() {});
 
-      await Future.wait([
-        _loadExpenses(),
-        _loadBudgets(),
-        _loadReminders(),
-      ]);
+      await Future.wait([_loadExpenses(), _loadBudgets(), _loadReminders()]);
 
       _calculateMetrics();
 
@@ -99,8 +96,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       setState(() {
         _expenses = expenses;
       });
-    } catch (e) {
-      print('Error loading expenses: $e');
+    } catch (_) {
     } finally {
       setState(() => _loadingExpenses = false);
     }
@@ -113,8 +109,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       setState(() {
         _budgets = budgets;
       });
-    } catch (e) {
-      print('Error loading budgets: $e');
+    } catch (_) {
     } finally {
       setState(() => _loadingBudgets = false);
     }
@@ -127,12 +122,12 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       setState(() {
         _reminders = reminders;
       });
-    } catch (e) {
-      print('Error loading reminders: $e');
+    } catch (_) {
     } finally {
       setState(() => _loadingReminders = false);
     }
   }
+
   dynamic _readValue(dynamic item, String key) {
     if (item is Map) return item[key];
 
@@ -177,12 +172,14 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     }
     return DateTime.now();
   }
+
   void _calculateMetrics() {
     setState(() {
       _totalSpent = 0.0;
 
       for (final expense in _expenses) {
-        final amount = (_readValue(expense, 'amount') as num?)?.toDouble() ?? 0.0;
+        final amount =
+            (_readValue(expense, 'amount') as num?)?.toDouble() ?? 0.0;
         _totalSpent += amount;
       }
 
@@ -198,6 +195,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
           .length;
     });
   }
+
   /// Get combined list of categories: budget categories first, then standard categories
   /// Removes duplicates automatically
   List<String> _getCombinedCategories() {
@@ -210,10 +208,18 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       }
     }
 
-    categories.addAll(['SaaS', 'Marketing', 'Travel', 'Office', 'Salaries', 'Other']);
+    categories.addAll([
+      'SaaS',
+      'Marketing',
+      'Travel',
+      'Office',
+      'Salaries',
+      'Other',
+    ]);
 
     return categories.toList();
   }
+
   Future<void> _markReminderPaid(String reminderId) async {
     try {
       await KashService.markReminderPaid(reminderId);
@@ -234,14 +240,12 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ Error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('❌ Error: $e'), backgroundColor: Colors.red),
         );
       }
     }
   }
+
   void _showAddBudgetSheet() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showKashAddBudgetSheet(
@@ -340,9 +344,15 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: d ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.07),
+                color: d
+                    ? Colors.white.withOpacity(0.08)
+                    : Colors.black.withOpacity(0.07),
               ),
-              child: Icon(Icons.arrow_back_ios_new_rounded, color: KP.text(d), size: 16),
+              child: Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: KP.text(d),
+                size: 16,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -354,7 +364,9 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: KP.primary.withOpacity(0.25 + 0.2 * _glowController.value),
+                    color: KP.primary.withOpacity(
+                      0.25 + 0.2 * _glowController.value,
+                    ),
                     blurRadius: 14 + 8 * _glowController.value,
                   ),
                 ],
@@ -370,7 +382,10 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => CircleAvatar(
                   backgroundColor: KP.primary,
-                  child: const Icon(Icons.account_balance_wallet, color: Colors.white),
+                  child: const Icon(
+                    Icons.account_balance_wallet,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -398,7 +413,9 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                         height: 7,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: KP.primary.withOpacity(0.6 + 0.4 * _pulseController.value),
+                          color: KP.primary.withOpacity(
+                            0.6 + 0.4 * _pulseController.value,
+                          ),
                         ),
                       ),
                     ),
@@ -421,7 +438,9 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
             decoration: BoxDecoration(
-              color: d ? Colors.white.withOpacity(0.07) : Colors.black.withOpacity(0.05),
+              color: d
+                  ? Colors.white.withOpacity(0.07)
+                  : Colors.black.withOpacity(0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -463,7 +482,11 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(_tabs[i].$1, size: 17, color: sel ? Colors.white : KP.textMuted(d)),
+                  Icon(
+                    _tabs[i].$1,
+                    size: 17,
+                    color: sel ? Colors.white : KP.textMuted(d),
+                  ),
                   const SizedBox(height: 3),
                   Text(
                     _tabs[i].$2,
@@ -577,7 +600,11 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.schedule_rounded, size: 12, color: KP.textMuted(d)),
+                    Icon(
+                      Icons.schedule_rounded,
+                      size: 12,
+                      color: KP.textMuted(d),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       DateFormat('EEE dd MMM', 'fr_FR').format(date),
@@ -607,6 +634,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       ),
     );
   }
+
   Widget _emptyState(String message, IconData icon, bool d) {
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -625,10 +653,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
               const SizedBox(height: 16),
               Text(
                 message,
-                style: TextStyle(
-                  color: KP.textMuted(d),
-                  fontSize: 15,
-                ),
+                style: TextStyle(color: KP.textMuted(d), fontSize: 15),
               ),
             ],
           ),

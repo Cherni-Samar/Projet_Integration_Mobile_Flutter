@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../../providers/user_provider.dart';
-import '../../../../data/services/dexo_service.dart';
+import 'package:e_team/presentation/providers/user_provider.dart';
+import 'package:e_team/data/services/dexo_service.dart';
+
 class DexoOrganizationPulseScreen extends StatefulWidget {
   const DexoOrganizationPulseScreen({super.key});
 
@@ -62,11 +63,11 @@ class _DexoOrganizationPulseScreenState
       _departments = settings
           .map(
             (s) => _DepartmentPulse(
-          name: s.department,
-          targetCount: s.targetCount,
-          currentCount: s.currentCount,
-        ),
-      )
+              name: s.department,
+              targetCount: s.targetCount,
+              currentCount: s.currentCount,
+            ),
+          )
           .toList();
 
       _isLoading = false;
@@ -107,8 +108,7 @@ class _DexoOrganizationPulseScreenState
       }
 
       await context.read<UserProvider>().refreshFromApi();
-    } catch (e) {
-      debugPrint('❌ Workforce autosave error: $e');
+    } catch (_) {
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);
@@ -116,8 +116,7 @@ class _DexoOrganizationPulseScreenState
     }
   }
 
-  int get _totalTarget =>
-      _departments.fold(0, (sum, d) => sum + d.targetCount);
+  int get _totalTarget => _departments.fold(0, (sum, d) => sum + d.targetCount);
 
   int get _totalCurrent =>
       _departments.fold(0, (sum, d) => sum + d.currentCount);
@@ -132,27 +131,25 @@ class _DexoOrganizationPulseScreenState
             _buildHeader(context),
             Expanded(
               child: _isLoading
-                  ? const Center(
-                child: CircularProgressIndicator(color: _dark),
-              )
+                  ? const Center(child: CircularProgressIndicator(color: _dark))
                   : RefreshIndicator(
-                color: _dark,
-                onRefresh: _loadFromUser,
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
-                  children: [
-                    _buildPulseHero(),
-                    const SizedBox(height: 22),
-                    _sectionTitle('DEPARTMENT TARGETS'),
-                    const SizedBox(height: 12),
-                    if (_departments.isEmpty)
-                      _emptyState()
-                    else
-                      ..._departments.map(_departmentCard),
-                  ],
-                ),
-              ),
+                      color: _dark,
+                      onRefresh: _loadFromUser,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+                        children: [
+                          _buildPulseHero(),
+                          const SizedBox(height: 22),
+                          _sectionTitle('DEPARTMENT TARGETS'),
+                          const SizedBox(height: 12),
+                          if (_departments.isEmpty)
+                            _emptyState()
+                          else
+                            ..._departments.map(_departmentCard),
+                        ],
+                      ),
+                    ),
             ),
           ],
         ),
@@ -184,23 +181,23 @@ class _DexoOrganizationPulseScreenState
             duration: const Duration(milliseconds: 180),
             child: _isSaving
                 ? Text(
-              'Saving...',
-              key: const ValueKey('saving'),
-              style: GoogleFonts.plusJakartaSans(
-                color: _muted,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-              ),
-            )
+                    'Saving...',
+                    key: const ValueKey('saving'),
+                    style: GoogleFonts.plusJakartaSans(
+                      color: _muted,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  )
                 : Text(
-              'Auto-saved',
-              key: const ValueKey('saved'),
-              style: GoogleFonts.plusJakartaSans(
-                color: _green,
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
+                    'Auto-saved',
+                    key: const ValueKey('saved'),
+                    style: GoogleFonts.plusJakartaSans(
+                      color: _green,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -209,8 +206,9 @@ class _DexoOrganizationPulseScreenState
 
   Widget _buildPulseHero() {
     final gap = (_totalTarget - _totalCurrent).clamp(0, 999);
-    final progress =
-    _totalTarget == 0 ? 0.0 : (_totalCurrent / _totalTarget).clamp(0.0, 1.0);
+    final progress = _totalTarget == 0
+        ? 0.0
+        : (_totalCurrent / _totalTarget).clamp(0.0, 1.0);
 
     return Container(
       padding: const EdgeInsets.all(22),
@@ -255,7 +253,7 @@ class _DexoOrganizationPulseScreenState
                           ? "Your organization matches the current vision."
                           : "Dexo recommends $gap additional hire(s).",
                       style: GoogleFonts.plusJakartaSans(
-                        color: Colors.white.withOpacity(0.68),
+                        color: Colors.white.withValues(alpha: 0.68),
                         fontSize: 12,
                         height: 1.45,
                       ),
@@ -271,7 +269,7 @@ class _DexoOrganizationPulseScreenState
             child: LinearProgressIndicator(
               minHeight: 9,
               value: progress,
-              backgroundColor: Colors.white.withOpacity(0.12),
+              backgroundColor: Colors.white.withValues(alpha: 0.12),
               valueColor: const AlwaysStoppedAnimation<Color>(_volt),
             ),
           ),
@@ -298,7 +296,7 @@ class _DexoOrganizationPulseScreenState
         border: Border.all(color: _border, width: 0.8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.028),
+            color: Colors.black.withValues(alpha: 0.028),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -347,10 +345,12 @@ class _DexoOrganizationPulseScreenState
                 ),
               ),
               Container(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.12),
+                  color: statusColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -371,7 +371,7 @@ class _DexoOrganizationPulseScreenState
               activeTrackColor: _dark,
               inactiveTrackColor: _border,
               thumbColor: _volt,
-              overlayColor: _volt.withOpacity(0.12),
+              overlayColor: _volt.withValues(alpha: 0.12),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 18),
             ),
@@ -387,10 +387,7 @@ class _DexoOrganizationPulseScreenState
             children: [
               Text(
                 '0',
-                style: GoogleFonts.plusJakartaSans(
-                  color: _muted,
-                  fontSize: 10,
-                ),
+                style: GoogleFonts.plusJakartaSans(color: _muted, fontSize: 10),
               ),
               const Spacer(),
               Text(
@@ -404,10 +401,7 @@ class _DexoOrganizationPulseScreenState
               const Spacer(),
               Text(
                 '30',
-                style: GoogleFonts.plusJakartaSans(
-                  color: _muted,
-                  fontSize: 10,
-                ),
+                style: GoogleFonts.plusJakartaSans(color: _muted, fontSize: 10),
               ),
             ],
           ),
@@ -527,10 +521,7 @@ class _DexoOrganizationPulseScreenState
     );
   }
 
-  Widget _roundButton({
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
+  Widget _roundButton({required IconData icon, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

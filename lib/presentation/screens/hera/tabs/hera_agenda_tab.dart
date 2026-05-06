@@ -46,8 +46,9 @@ class HeraAgendaTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final leaves =
-        selectedDay != null ? _leavesForDay(selectedDay!) : <HeraLeave>[];
+    final leaves = selectedDay != null
+        ? _leavesForDay(selectedDay!)
+        : <HeraLeave>[];
 
     return RefreshIndicator(
       onRefresh: onRefresh,
@@ -166,8 +167,8 @@ class _CalendarCard extends StatelessWidget {
             final color = dayLeaves.any((l) => l.type == 'urgent')
                 ? HeraPalette.danger
                 : dayLeaves.any((l) => l.type == 'sick')
-                    ? HeraPalette.warning
-                    : HeraPalette.mauve;
+                ? HeraPalette.warning
+                : HeraPalette.mauve;
 
             return Container(
               margin: const EdgeInsets.all(4),
@@ -198,8 +199,8 @@ class _CalendarCard extends StatelessWidget {
                   final color = leave.type == 'urgent'
                       ? HeraPalette.danger
                       : leave.type == 'sick'
-                          ? HeraPalette.warning
-                          : HeraPalette.mauve;
+                      ? HeraPalette.warning
+                      : HeraPalette.mauve;
                   return Container(
                     width: 4,
                     height: 4,
@@ -298,13 +299,13 @@ class _LeaveDetailCard extends StatelessWidget {
     final icon = leave.type == 'sick'
         ? Icons.medical_services
         : leave.type == 'urgent'
-            ? Icons.warning_amber_rounded
-            : Icons.beach_access;
+        ? Icons.warning_amber_rounded
+        : Icons.beach_access;
     final color = leave.type == 'sick'
         ? HeraPalette.warning
         : leave.type == 'urgent'
-            ? HeraPalette.danger
-            : HeraPalette.mauve;
+        ? HeraPalette.danger
+        : HeraPalette.mauve;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),

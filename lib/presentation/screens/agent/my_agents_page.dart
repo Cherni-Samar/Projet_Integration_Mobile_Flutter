@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/owned_agents_provider.dart';
-import '../../providers/theme_provider.dart';
-import '../../providers/user_provider.dart';
-import '/data/services/stripe_service.dart';
-import 'agent_chat_page.dart';
+import 'package:e_team/data/services/stripe_service.dart';
+import 'package:e_team/presentation/providers/owned_agents_provider.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/presentation/providers/user_provider.dart';
+import 'package:e_team/presentation/screens/agent/agent_chat_page.dart';
+import 'package:e_team/presentation/screens/agent/dexo/dexo_dashboard_page.dart';
+import 'package:e_team/presentation/screens/agent/echo/echo_dashboard_page.dart';
+import 'package:e_team/presentation/screens/agent/finance/kash_dashboard_screen.dart';
 import 'package:e_team/presentation/screens/hera/hera_dashboard_page.dart';
-import 'echo/echo_dashboard_page.dart';
-import 'finance/kash_dashboard_screen.dart';
-import 'timo/timo_dashboard_page.dart';
-import 'dexo/dexo_dashboard_page.dart';
+import 'package:e_team/presentation/screens/agent/timo/timo_dashboard_page.dart';
+import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
+
 class MyAgentsPage extends StatelessWidget {
   const MyAgentsPage({Key? key}) : super(key: key);
 
@@ -212,10 +214,10 @@ class MyAgentsPage extends StatelessWidget {
   }
 
   Widget _buildAgentsList(
-      OwnedAgentsProvider owned,
-      bool isDark,
-      BuildContext context,
-      ) {
+    OwnedAgentsProvider owned,
+    bool isDark,
+    BuildContext context,
+  ) {
     final energyBalance = context.watch<UserProvider>().energyBalance;
     final activeCount = context.watch<OwnedAgentsProvider>().count;
 
@@ -384,7 +386,7 @@ class MyAgentsPage extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (_) => EchoDashboardPage(
                             token:
-                            null, // Temporaire, à remplacer par le vrai token plus tard
+                                null, // Temporaire, à remplacer par le vrai token plus tard
                           ),
                         ),
                       );
@@ -467,7 +469,7 @@ class MyAgentsPage extends StatelessWidget {
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         agent.displayName,

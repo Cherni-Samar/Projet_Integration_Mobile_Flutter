@@ -89,11 +89,7 @@ class PostImage {
   final String type;
   final String? source;
 
-  const PostImage({
-    required this.url,
-    required this.type,
-    this.source,
-  });
+  const PostImage({required this.url, required this.type, this.source});
 }
 
 class PostPlatform {
@@ -245,14 +241,13 @@ class TaskItem {
 
   bool get isOverdue {
     final s = status.toLowerCase();
-    final completed = s.contains('complete') ||
+    final completed =
+        s.contains('complete') ||
         s.contains('termine') ||
         s == 'done' ||
         s == 'closed';
 
-    return deadline != null &&
-        deadline!.isBefore(DateTime.now()) &&
-        !completed;
+    return deadline != null && deadline!.isBefore(DateTime.now()) && !completed;
   }
 }
 
@@ -284,12 +279,7 @@ class TaskStats {
   });
 
   factory TaskStats.empty() {
-    return const TaskStats(
-      todo: 0,
-      inProgress: 0,
-      completed: 0,
-      overdue: 0,
-    );
+    return const TaskStats(todo: 0, inProgress: 0, completed: 0, overdue: 0);
   }
 }
 

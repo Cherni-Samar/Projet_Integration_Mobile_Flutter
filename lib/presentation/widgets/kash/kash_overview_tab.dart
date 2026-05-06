@@ -11,7 +11,8 @@ class KashOverviewTab extends StatelessWidget {
   final List<dynamic> expenses;
   final VoidCallback onAddExpense;
   final Widget Function(dynamic expense, bool isDark) buildExpenseCard;
-  final Widget Function(String message, IconData icon, bool isDark) buildEmptyState;
+  final Widget Function(String message, IconData icon, bool isDark)
+  buildEmptyState;
 
   const KashOverviewTab({
     Key? key,
@@ -39,7 +40,9 @@ class KashOverviewTab extends StatelessWidget {
   }
 
   Widget _buildStatsPulse() {
-    final pct = totalBudget > 0 ? (totalSpent / totalBudget).clamp(0.0, 1.0) : 0.0;
+    final pct = totalBudget > 0
+        ? (totalSpent / totalBudget).clamp(0.0, 1.0)
+        : 0.0;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -83,7 +86,10 @@ class KashOverviewTab extends StatelessWidget {
           const SizedBox(height: 16),
           Row(
             children: [
-              Text('Utilisation du budget', style: TextStyle(color: KP.textMuted(isDark), fontSize: 11)),
+              Text(
+                'Utilisation du budget',
+                style: TextStyle(color: KP.textMuted(isDark), fontSize: 11),
+              ),
               const Spacer(),
               Text(
                 '${(pct * 100).toStringAsFixed(0)}%',
@@ -102,7 +108,9 @@ class KashOverviewTab extends StatelessWidget {
               value: pct,
               minHeight: 7,
               backgroundColor: KP.cardSoft(isDark),
-              valueColor: AlwaysStoppedAnimation(pct > 0.8 ? KP.danger : KP.primary),
+              valueColor: AlwaysStoppedAnimation(
+                pct > 0.8 ? KP.danger : KP.primary,
+              ),
             ),
           ),
         ],
@@ -110,12 +118,7 @@ class KashOverviewTab extends StatelessWidget {
     );
   }
 
-  Widget _statItem(
-    String val,
-    String label,
-    Color color,
-    IconData icon,
-  ) =>
+  Widget _statItem(String val, String label, Color color, IconData icon) =>
       Column(
         children: [
           Container(
@@ -152,7 +155,8 @@ class KashOverviewTab extends StatelessWidget {
       );
 
   Widget _buildRecentExpenses() {
-    if (loadingExpenses) return const Center(child: CircularProgressIndicator());
+    if (loadingExpenses)
+      return const Center(child: CircularProgressIndicator());
     if (expenses.isEmpty)
       return buildEmptyState('Aucune dépense', Icons.inbox_rounded, isDark);
 
@@ -173,7 +177,10 @@ class KashOverviewTab extends StatelessWidget {
             GestureDetector(
               onTap: onAddExpense,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 7,
+                ),
                 decoration: BoxDecoration(
                   color: KP.primary.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(20),

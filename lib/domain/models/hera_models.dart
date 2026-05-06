@@ -17,6 +17,7 @@ class HeraAction {
     this.createdAt,
   });
 }
+
 class HeraEmployee {
   final String id;
   final String name;
@@ -62,6 +63,7 @@ class HeraLeave {
     required this.reason,
   });
 }
+
 class HeraCandidate {
   final String id;
   final String name;

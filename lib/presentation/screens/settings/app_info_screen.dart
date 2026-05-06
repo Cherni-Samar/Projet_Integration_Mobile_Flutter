@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/theme_provider.dart';
-import '/l10n/app_localizations.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/l10n/app_localizations.dart';
 
 class AppInfoScreen extends StatelessWidget {
   const AppInfoScreen({Key? key}) : super(key: key);
@@ -13,7 +13,9 @@ class AppInfoScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFFAFAFA),
       body: SafeArea(
         child: Column(
           children: [
@@ -23,21 +25,18 @@ class AppInfoScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: isDark
                     ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF1E1E1E),
-                    const Color(0xFF2A2A2A),
-                  ],
-                )
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFF1E1E1E),
+                          const Color(0xFF2A2A2A),
+                        ],
+                      )
                     : LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    const Color(0xFFF9FAFB),
-                  ],
-                ),
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.white, const Color(0xFFF9FAFB)],
+                      ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
@@ -131,10 +130,7 @@ class AppInfoScreen extends StatelessWidget {
                         ],
                       ),
                       child: Center(
-                        child: Text(
-                          '🤖',
-                          style: const TextStyle(fontSize: 60),
-                        ),
+                        child: Text('🤖', style: const TextStyle(fontSize: 60)),
                       ),
                     ),
 
@@ -176,13 +172,13 @@ class AppInfoScreen extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: isDark
                               ? [
-                            const Color(0xFFCDFF00).withOpacity(0.2),
-                            const Color(0xFFAADD00).withOpacity(0.15),
-                          ]
+                                  const Color(0xFFCDFF00).withOpacity(0.2),
+                                  const Color(0xFFAADD00).withOpacity(0.15),
+                                ]
                               : [
-                            const Color(0xFFCDFF00).withOpacity(0.3),
-                            const Color(0xFFAADD00).withOpacity(0.2),
-                          ],
+                                  const Color(0xFFCDFF00).withOpacity(0.3),
+                                  const Color(0xFFAADD00).withOpacity(0.2),
+                                ],
                         ),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
@@ -192,7 +188,9 @@ class AppInfoScreen extends StatelessWidget {
                       child: Text(
                         l10n.appInfoVersion('1.0.0'),
                         style: TextStyle(
-                          color: isDark ? const Color(0xFFCDFF00) : Colors.black,
+                          color: isDark
+                              ? const Color(0xFFCDFF00)
+                              : Colors.black,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
@@ -205,9 +203,7 @@ class AppInfoScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? const Color(0xFF1E1E1E)
-                            : Colors.white,
+                        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: isDark
@@ -216,7 +212,9 @@ class AppInfoScreen extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                            color: Colors.black.withOpacity(
+                              isDark ? 0.3 : 0.05,
+                            ),
                             blurRadius: 15,
                             offset: const Offset(0, 4),
                           ),
@@ -272,8 +270,6 @@ class AppInfoScreen extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 20),
-
-
 
                     const SizedBox(height: 20),
 
@@ -337,8 +333,6 @@ class AppInfoScreen extends StatelessWidget {
                           color: const Color(0xFF3B82F6),
                           onTap: () => _showComingSoon(context, isDark),
                         ),
-
-
                       ],
                     ),
 
@@ -464,15 +458,9 @@ class AppInfoScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: iconColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: iconColor.withOpacity(0.3),
-                  ),
+                  border: Border.all(color: iconColor.withOpacity(0.3)),
                 ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 22,
-                ),
+                child: Icon(icon, color: iconColor, size: 22),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -557,16 +545,9 @@ class AppInfoScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: color.withOpacity(0.15),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: color.withOpacity(0.3),
-                width: 2,
-              ),
+              border: Border.all(color: color.withOpacity(0.3), width: 2),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 28,
-            ),
+            child: Icon(icon, color: color, size: 28),
           ),
           const SizedBox(height: 8),
           Text(
@@ -616,9 +597,7 @@ class AppInfoScreen extends StatelessWidget {
         ),
         backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.black87,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

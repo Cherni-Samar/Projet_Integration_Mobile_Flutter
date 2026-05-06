@@ -1,6 +1,7 @@
 // presentation/widgets/echo/echo_analysis_card.dart
 import 'package:flutter/material.dart';
 import 'package:e_team/data/dtos/echo_dto.dart';
+
 class EchoAnalysisCard extends StatelessWidget {
   final EchoResponse analysis;
 
@@ -39,10 +40,7 @@ class EchoAnalysisCard extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             ),
             const SizedBox(height: 4),
-            Text(
-              analysis.summary!,
-              style: const TextStyle(fontSize: 14),
-            ),
+            Text(analysis.summary!, style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 12),
           ],
 
@@ -61,7 +59,10 @@ class EchoAnalysisCard extends StatelessWidget {
               ),
               child: Text(
                 analysis.transcribedText!,
-                style: const TextStyle(fontSize: 13, fontStyle: FontStyle.italic),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -74,21 +75,20 @@ class EchoAnalysisCard extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             ),
             const SizedBox(height: 8),
-            ...analysis.actions.map((action) => Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('• ', style: TextStyle(fontSize: 14)),
-                  Expanded(
-                    child: Text(
-                      action,
-                      style: const TextStyle(fontSize: 13),
+            ...analysis.actions.map(
+              (action) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('• ', style: TextStyle(fontSize: 14)),
+                    Expanded(
+                      child: Text(action, style: const TextStyle(fontSize: 13)),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            )),
+            ),
           ],
 
           // Catégorie

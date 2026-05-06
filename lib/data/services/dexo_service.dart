@@ -25,9 +25,9 @@ class DexoService {
       if (userId != null) queryParams['userId'] = userId;
 
       final token = await AuthService().getToken();
-      final uri = Uri.parse('$baseUrl/documents-by-category')
-          .replace(queryParameters: queryParams)
-          .toString();
+      final uri = Uri.parse(
+        '$baseUrl/documents-by-category',
+      ).replace(queryParameters: queryParams).toString();
 
       return await ApiService.get(endpoint: uri, token: token);
     } catch (e) {
@@ -45,9 +45,9 @@ class DexoService {
       if (userId != null) queryParams['userId'] = userId;
 
       final token = await AuthService().getToken();
-      final uri = Uri.parse('$baseUrl/document-content/$documentId')
-          .replace(queryParameters: queryParams)
-          .toString();
+      final uri = Uri.parse(
+        '$baseUrl/document-content/$documentId',
+      ).replace(queryParameters: queryParams).toString();
 
       return await ApiService.get(endpoint: uri, token: token);
     } catch (e) {
@@ -57,7 +57,8 @@ class DexoService {
 
   // Mettre à jour les paramètres de workforce
   static Future<Map<String, dynamic>> updateWorkforceSettings(
-      Map<String, dynamic> data) async {
+    Map<String, dynamic> data,
+  ) async {
     final token = await AuthService().getToken();
     return ApiService.patch(
       endpoint: '${ApiConfig.baseUrl}/api/dexo/workforce-settings',
@@ -68,7 +69,8 @@ class DexoService {
 
   // Obtenir des conseils stratégiques via l'IA Dexo
   static Future<Map<String, dynamic>> getStrategicAdvice(
-      Map<String, dynamic> payload) async {
+    Map<String, dynamic> payload,
+  ) async {
     return ApiService.post(
       endpoint: '${ApiConfig.baseUrl}/api/dexo/strategic-advice',
       body: payload,
@@ -77,7 +79,8 @@ class DexoService {
 
   // Sauvegarder la vision organisationnelle
   static Future<Map<String, dynamic>> saveVision(
-      Map<String, dynamic> payload) async {
+    Map<String, dynamic> payload,
+  ) async {
     return ApiService.post(
       endpoint: '${ApiConfig.baseUrl}/api/dexo/save-vision',
       body: payload,
@@ -123,7 +126,7 @@ class DexoService {
       'technique',
       'marketing',
       'finance',
-      'autre'
+      'autre',
     ];
   }
 
@@ -137,18 +140,28 @@ class DexoService {
       'finance',
       'legal',
       'marketing',
-      'technical'
+      'technical',
     ];
   }
 
   // Valider un fichier avant upload
   static bool isFileSupported(String filename) {
     final supportedExtensions = [
-      '.pdf', '.doc', '.docx', '.txt', '.csv',
-      '.xls', '.xlsx', '.jpg', '.jpeg', '.png', '.gif'
+      '.pdf',
+      '.doc',
+      '.docx',
+      '.txt',
+      '.csv',
+      '.xls',
+      '.xlsx',
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.gif',
     ];
-    final extension =
-        filename.toLowerCase().substring(filename.lastIndexOf('.'));
+    final extension = filename.toLowerCase().substring(
+      filename.lastIndexOf('.'),
+    );
     return supportedExtensions.contains(extension);
   }
 
@@ -167,8 +180,9 @@ class DexoService {
 
   // Obtenir l'icône pour un type de fichier
   static String getFileIcon(String filename) {
-    final extension =
-        filename.toLowerCase().substring(filename.lastIndexOf('.'));
+    final extension = filename.toLowerCase().substring(
+      filename.lastIndexOf('.'),
+    );
     switch (extension) {
       case '.pdf':
         return '📄';
@@ -226,29 +240,51 @@ class DexoService {
 
   // Obtenir les départements disponibles
   static List<String> getDepartments() {
-    return ['RH', 'Finance', 'Juridique', 'Technique', 'Marketing', 'Commercial'];
+    return [
+      'RH',
+      'Finance',
+      'Juridique',
+      'Technique',
+      'Marketing',
+      'Commercial',
+    ];
   }
 
   // Obtenir les types de documents avancés
   static List<String> getAdvancedDocumentTypes() {
-    return ['contrat', 'facture', 'rapport', 'presentation', 'politique', 'procedure'];
+    return [
+      'contrat',
+      'facture',
+      'rapport',
+      'presentation',
+      'politique',
+      'procedure',
+    ];
   }
 
   // Obtenir les niveaux de confidentialité avancés
   static Map<String, Map<String, dynamic>> getAdvancedConfidentialityLevels() {
     return {
-      'public': {'level': 0, 'color': '#4CAF50', 'roles': ['all']},
+      'public': {
+        'level': 0,
+        'color': '#4CAF50',
+        'roles': ['all'],
+      },
       'interne': {
         'level': 1,
         'color': '#FF9800',
-        'roles': ['employee', 'manager', 'admin']
+        'roles': ['employee', 'manager', 'admin'],
       },
       'confidentiel': {
         'level': 2,
         'color': '#F44336',
-        'roles': ['manager', 'admin']
+        'roles': ['manager', 'admin'],
       },
-      'critique': {'level': 3, 'color': '#9C27B0', 'roles': ['admin']},
+      'critique': {
+        'level': 3,
+        'color': '#9C27B0',
+        'roles': ['admin'],
+      },
     };
   }
 
@@ -263,7 +299,7 @@ class DexoService {
       'suspicious_behavior',
       'security_alert',
       'document_expired',
-      'duplicate_detected'
+      'duplicate_detected',
     ];
   }
 

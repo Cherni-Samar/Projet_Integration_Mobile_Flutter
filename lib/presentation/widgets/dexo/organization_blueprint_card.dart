@@ -46,8 +46,7 @@ class _OrganizationBlueprintCardState extends State<OrganizationBlueprintCard> {
     );
   }
 
-  int get _total =>
-      _plan.departments.fold(0, (sum, d) => sum + d.targetCount);
+  int get _total => _plan.departments.fold(0, (sum, d) => sum + d.targetCount);
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +62,7 @@ class _OrganizationBlueprintCardState extends State<OrganizationBlueprintCard> {
         border: Border.all(color: _border, width: 0.6),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 28,
             offset: const Offset(0, 14),
           ),
@@ -119,7 +118,7 @@ class _OrganizationBlueprintCardState extends State<OrganizationBlueprintCard> {
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: _dark,
-                disabledBackgroundColor: _dark.withOpacity(0.45),
+                disabledBackgroundColor: _dark.withValues(alpha: 0.45),
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -160,11 +159,7 @@ class _OrganizationBlueprintCardState extends State<OrganizationBlueprintCard> {
             color: _primary,
             borderRadius: BorderRadius.circular(14),
           ),
-          child: const Icon(
-            Icons.account_tree_rounded,
-            color: _dark,
-            size: 24,
-          ),
+          child: const Icon(Icons.account_tree_rounded, color: _dark, size: 24),
         ),
         const SizedBox(width: 14),
         Expanded(
@@ -285,7 +280,7 @@ class _OrganizationBlueprintCardState extends State<OrganizationBlueprintCard> {
             child: Text(
               'Total recommended workforce',
               style: GoogleFonts.plusJakartaSans(
-                color: Colors.white.withOpacity(0.72),
+                color: Colors.white.withValues(alpha: 0.72),
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -423,8 +418,7 @@ class _OrganizationBlueprintCardState extends State<OrganizationBlueprintCard> {
 
   void _changeDepartment(WorkforceDepartment department, int delta) {
     setState(() {
-      department.targetCount =
-          (department.targetCount + delta).clamp(0, 99);
+      department.targetCount = (department.targetCount + delta).clamp(0, 99);
     });
   }
 }

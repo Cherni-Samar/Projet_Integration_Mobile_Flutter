@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:e_team/l10n/app_localizations.dart';
+import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 
 class AgentMarketplaceCard extends StatelessWidget {
   final Map<String, dynamic> agent;
@@ -65,7 +66,8 @@ class AgentMarketplaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+    final agentColor = colorFromValue(agent['color']);
+
     return AnimatedBuilder(
       animation: pageController,
       builder: (context, child) {
@@ -108,15 +110,13 @@ class AgentMarketplaceCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(32),
                     border: Border.all(
                       color: isCenter
-                          ? (agent['color'] as Color).withOpacity(0.3)
+                          ? agentColor.withOpacity(0.3)
                           : Colors.transparent,
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: (agent['color'] as Color).withOpacity(
-                          isCenter ? 0.25 : 0.12,
-                        ),
+                        color: agentColor.withOpacity(isCenter ? 0.25 : 0.12),
                         blurRadius: isCenter ? 30 : 15,
                         offset: const Offset(0, 10),
                       ),
@@ -142,18 +142,18 @@ class AgentMarketplaceCard extends StatelessWidget {
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    (agent['color'] as Color).withOpacity(0.2),
-                                    (agent['color'] as Color).withOpacity(0.05),
+                                    agentColor.withOpacity(0.2),
+                                    agentColor.withOpacity(0.05),
                                   ],
                                 ),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: agent['color'] as Color,
+                                  color: agentColor,
                                   width: 2.5,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: (agent['color'] as Color).withOpacity(0.3),
+                                    color: agentColor.withOpacity(0.3),
                                     blurRadius: 18,
                                     spreadRadius: 1,
                                   ),
@@ -172,7 +172,6 @@ class AgentMarketplaceCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 12), // Reduced from 16
-                            
                             // Agent Name
                             Text(
                               agent['name'],
@@ -187,7 +186,6 @@ class AgentMarketplaceCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 6), // Reduced from 8
-                            
                             // Role Badge
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -197,20 +195,20 @@ class AgentMarketplaceCard extends StatelessWidget {
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    (agent['color'] as Color).withOpacity(0.15),
-                                    (agent['color'] as Color).withOpacity(0.08),
+                                    agentColor.withOpacity(0.15),
+                                    agentColor.withOpacity(0.08),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: (agent['color'] as Color).withOpacity(0.4),
+                                  color: agentColor.withOpacity(0.4),
                                   width: 1.5,
                                 ),
                               ),
                               child: Text(
                                 agent['role'],
                                 style: TextStyle(
-                                  color: agent['color'] as Color,
+                                  color: agentColor,
                                   fontSize: 9, // Reduced from 10
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 0.8,
@@ -220,7 +218,6 @@ class AgentMarketplaceCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 10), // Reduced from 12
-                            
                             // Description
                             Text(
                               agent['description'],
@@ -237,10 +234,11 @@ class AgentMarketplaceCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 12), // Reduced from 16
-                            
                             // Stats Section
                             Container(
-                              padding: const EdgeInsets.all(10), // Reduced from 12
+                              padding: const EdgeInsets.all(
+                                10,
+                              ), // Reduced from 12
                               decoration: BoxDecoration(
                                 color: isDark
                                     ? Colors.white.withOpacity(0.05)
@@ -269,20 +267,23 @@ class AgentMarketplaceCard extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 8), // Reduced from 10
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: _getAgentStats(agent['name'] as String)
-                                        .map((stat) => _buildStatItem(
-                                              stat['label'] as String,
-                                              stat['value'] as String,
-                                              stat['icon'] as IconData,
-                                            ))
-                                        .toList(),
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children:
+                                        _getAgentStats(agent['name'] as String)
+                                            .map(
+                                              (stat) => _buildStatItem(
+                                                stat['label'] as String,
+                                                stat['value'] as String,
+                                                stat['icon'] as IconData,
+                                              ),
+                                            )
+                                            .toList(),
                                   ),
                                 ],
                               ),
                             ),
                             const SizedBox(height: 10), // Reduced from 14
-                            
                             // Active Badge
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -298,7 +299,9 @@ class AgentMarketplaceCard extends StatelessWidget {
                                 ),
                                 borderRadius: BorderRadius.circular(18),
                                 border: Border.all(
-                                  color: const Color(0xFF10B981).withOpacity(0.4),
+                                  color: const Color(
+                                    0xFF10B981,
+                                  ).withOpacity(0.4),
                                   width: 1.5,
                                 ),
                               ),
@@ -313,7 +316,9 @@ class AgentMarketplaceCard extends StatelessWidget {
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: const Color(0xFF10B981).withOpacity(0.6),
+                                          color: const Color(
+                                            0xFF10B981,
+                                          ).withOpacity(0.6),
                                           blurRadius: 6,
                                           spreadRadius: 1,
                                         ),
@@ -354,7 +359,7 @@ class AgentMarketplaceCard extends StatelessWidget {
         children: [
           Icon(
             icon,
-            color: (agent['color'] as Color).withOpacity(0.7),
+            color: colorFromValue(agent['color']).withOpacity(0.7),
             size: 16, // Reduced from 18
           ),
           const SizedBox(height: 3), // Reduced from 4

@@ -41,10 +41,7 @@ class _SplashScreenState extends State<SplashScreen>
     )..forward();
 
     _breath = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _breathController,
-        curve: Curves.easeInOutSine,
-      ),
+      CurvedAnimation(parent: _breathController, curve: Curves.easeInOutSine),
     );
 
     _textReveal = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -102,9 +99,9 @@ class _SplashScreenState extends State<SplashScreen>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: const Color(0xFFCCFF00).withOpacity(
-                          (1 - waveProgress) * 0.3,
-                        ),
+                        color: const Color(
+                          0xFFCCFF00,
+                        ).withOpacity((1 - waveProgress) * 0.3),
                         width: 1.5,
                       ),
                     ),
@@ -132,14 +129,18 @@ class _SplashScreenState extends State<SplashScreen>
                       gradient: RadialGradient(
                         colors: [
                           const Color(0xFFCCFF00).withOpacity(glowIntensity),
-                          const Color(0xFFCCFF00).withOpacity(glowIntensity * 0.3),
+                          const Color(
+                            0xFFCCFF00,
+                          ).withOpacity(glowIntensity * 0.3),
                           Colors.transparent,
                         ],
                         stops: const [0.0, 0.4, 1.0],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFCCFF00).withOpacity(glowIntensity * 0.6),
+                          color: const Color(
+                            0xFFCCFF00,
+                          ).withOpacity(glowIntensity * 0.6),
                           blurRadius: 60,
                           spreadRadius: 20,
                         ),
@@ -148,9 +149,7 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Center(
                       child: CustomPaint(
                         size: const Size(70, 70),
-                        painter: NeuralCorePainter(
-                          progress: _breath.value,
-                        ),
+                        painter: NeuralCorePainter(progress: _breath.value),
                       ),
                     ),
                   ),
@@ -175,13 +174,19 @@ class _SplashScreenState extends State<SplashScreen>
                       // E-Team avec animation
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: 'E-Team'.split('').asMap().entries.map((entry) {
+                        children: 'E-Team'.split('').asMap().entries.map((
+                          entry,
+                        ) {
                           final index = entry.key;
                           final letter = entry.value;
                           return AnimatedBuilder(
                             animation: _textController,
                             builder: (context, child) {
-                              final letterProgress = (_textController.value * 6 - index).clamp(0.0, 1.0);
+                              final letterProgress =
+                                  (_textController.value * 6 - index).clamp(
+                                    0.0,
+                                    1.0,
+                                  );
                               return Opacity(
                                 opacity: letterProgress,
                                 child: Transform.translate(
@@ -207,7 +212,10 @@ class _SplashScreenState extends State<SplashScreen>
 
                       // Tagline
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: const Color(0xFFCCFF00).withOpacity(0.3),
@@ -292,7 +300,8 @@ class NeuralCorePainter extends CustomPainter {
       final y = center.dy + math.sin(angle) * radius;
 
       // Ligne vers le centre avec opacité variable
-      final lineOpacity = 0.3 + (math.sin(progress * math.pi * 2 + i) + 1) / 2 * 0.4;
+      final lineOpacity =
+          0.3 + (math.sin(progress * math.pi * 2 + i) + 1) / 2 * 0.4;
       canvas.drawLine(
         Offset(x, y),
         center,
@@ -337,10 +346,7 @@ class NeuralFluidPainter extends CustomPainter {
       final radius = 30 + math.sin(progress * math.pi + i) * 20;
 
       final gradient = RadialGradient(
-        colors: [
-          const Color(0xFFCCFF00).withOpacity(0.1),
-          Colors.transparent,
-        ],
+        colors: [const Color(0xFFCCFF00).withOpacity(0.1), Colors.transparent],
       );
 
       final paint = Paint()

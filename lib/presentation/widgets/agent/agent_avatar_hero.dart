@@ -48,10 +48,7 @@ class AgentAvatarHero extends StatelessWidget {
                   end: Alignment.bottomRight,
                 ),
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: agentColor,
-                  width: 3,
-                ),
+                border: Border.all(color: agentColor, width: 3),
                 boxShadow: [
                   BoxShadow(
                     color: agentColor.withValues(alpha: 0.3),
@@ -79,10 +76,7 @@ class AgentAvatarHero extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFFCDFF00),
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 4,
-                  ),
+                  border: Border.all(color: Colors.white, width: 4),
                   boxShadow: [
                     BoxShadow(
                       color: const Color(0xFFCDFF00).withValues(alpha: 0.5),

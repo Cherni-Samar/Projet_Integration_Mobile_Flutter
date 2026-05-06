@@ -25,10 +25,7 @@ class EchoDashboardNavigation extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Color(0xFFB57BFF),
-            Color(0xFFA855F7),
-          ],
+          colors: [Color(0xFFB57BFF), Color(0xFFA855F7)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -60,7 +57,10 @@ class EchoDashboardNavigation extends StatelessWidget {
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                     border: isSelected
-                        ? Border.all(color: Colors.white.withOpacity(0.3), width: 0.5)
+                        ? Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 0.5,
+                          )
                         : null,
                   ),
                   child: Column(

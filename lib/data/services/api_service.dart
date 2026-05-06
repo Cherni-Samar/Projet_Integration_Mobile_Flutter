@@ -4,9 +4,7 @@ import 'package:http/http.dart' as http;
 class ApiService {
   // ✅ Headers avec x-auth-token
   static Map<String, String> _getHeaders({String? token}) {
-    final headers = {
-      'Content-Type': 'application/json',
-    };
+    final headers = {'Content-Type': 'application/json'};
 
     if (token != null) {
       headers['x-auth-token'] = token;
@@ -82,16 +80,14 @@ class ApiService {
     try {
       final headers = _getHeaders(token: token);
 
-      final response = await http.patch(
-        Uri.parse(endpoint),
-        headers: headers,
-        body: jsonEncode(body),
-      ).timeout(
-        const Duration(seconds: 10),
-        onTimeout: () {
-          throw Exception('Timeout: Server not responding');
-        },
-      );
+      final response = await http
+          .patch(Uri.parse(endpoint), headers: headers, body: jsonEncode(body))
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw Exception('Timeout: Server not responding');
+            },
+          );
 
       return _handleResponse(response);
     } catch (e) {
@@ -127,7 +123,9 @@ class ApiService {
     dynamic parsed;
     final trimmed = body.trimLeft();
     final looksLikeJson = trimmed.startsWith('{') || trimmed.startsWith('[');
-    final isJsonContentType = contentType.toLowerCase().contains('application/json');
+    final isJsonContentType = contentType.toLowerCase().contains(
+      'application/json',
+    );
 
     if (body.isNotEmpty && (isJsonContentType || looksLikeJson)) {
       try {
@@ -154,15 +152,17 @@ class ApiService {
     } else {
       // HTML errors (ex: Express default 404) or plain text
       final normalized = body.replaceAll(RegExp(r'\s+'), ' ').trim();
-      final preMatch = RegExp(r'<pre>(.*?)</pre>', caseSensitive: false)
-          .firstMatch(body)
-          ?.group(1)
-          ?.trim();
+      final preMatch = RegExp(
+        r'<pre>(.*?)</pre>',
+        caseSensitive: false,
+      ).firstMatch(body)?.group(1)?.trim();
       message = (preMatch != null && preMatch.isNotEmpty)
           ? preMatch
           : (normalized.isEmpty
-              ? 'Une erreur est survenue'
-              : (normalized.length > 200 ? normalized.substring(0, 200) + '…' : normalized));
+                ? 'Une erreur est survenue'
+                : (normalized.length > 200
+                      ? normalized.substring(0, 200) + '…'
+                      : normalized));
     }
 
     throw Exception('HTTP $status: $message');

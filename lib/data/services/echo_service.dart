@@ -153,20 +153,13 @@ class EchoService {
     try {
       return await ApiService.post(
         endpoint: '$_baseUrl/api/echo/save-document',
-        body: {
-          'content': content,
-          'classification': classification,
-        },
+        body: {'content': content, 'classification': classification},
         token: token,
       );
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
   }
-
-
-
-
 
   static Future<TaskExtractionResponse> extractAndSaveTasks({
     required String message,
@@ -207,13 +200,10 @@ class EchoService {
 
       if (queryParams.isNotEmpty) {
         endpoint +=
-        '?${queryParams.entries.map((e) => '${e.key}=${e.value}').join('&')}';
+            '?${queryParams.entries.map((e) => '${e.key}=${e.value}').join('&')}';
       }
 
-      final response = await ApiService.get(
-        endpoint: endpoint,
-        token: token,
-      );
+      final response = await ApiService.get(endpoint: endpoint, token: token);
 
       return TaskListResponse.fromJson(response);
     } catch (e) {
@@ -270,12 +260,9 @@ class EchoService {
       String endpoint = '$_baseUrl/api/echo/mobile/posts';
 
       endpoint +=
-      '?${queryParams.entries.map((e) => '${e.key}=${e.value}').join('&')}';
+          '?${queryParams.entries.map((e) => '${e.key}=${e.value}').join('&')}';
 
-      final response = await ApiService.get(
-        endpoint: endpoint,
-        token: token,
-      );
+      final response = await ApiService.get(endpoint: endpoint, token: token);
 
       return PostsResponse.fromJson(response);
     } catch (e) {
@@ -362,9 +349,7 @@ class EchoService {
     String? token,
   }) async {
     try {
-      final queryParams = <String, String>{
-        'limit': limit.toString(),
-      };
+      final queryParams = <String, String>{'limit': limit.toString()};
 
       if (status != null) {
         queryParams['status'] = status;
@@ -373,18 +358,11 @@ class EchoService {
       String endpoint = '$_baseUrl/api/echo/product/campaign/history';
 
       endpoint +=
-      '?${queryParams.entries.map((e) => '${e.key}=${e.value}').join('&')}';
+          '?${queryParams.entries.map((e) => '${e.key}=${e.value}').join('&')}';
 
-      return await ApiService.get(
-        endpoint: endpoint,
-        token: token,
-      );
+      return await ApiService.get(endpoint: endpoint, token: token);
     } catch (e) {
-      return {
-        'success': false,
-        'error': e.toString(),
-        'campaigns': [],
-      };
+      return {'success': false, 'error': e.toString(), 'campaigns': []};
     }
   }
 }

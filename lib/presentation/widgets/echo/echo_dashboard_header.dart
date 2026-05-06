@@ -59,13 +59,18 @@ class EchoDashboardHeader extends StatelessWidget {
               const SizedBox(width: 16),
               _buildStaticAvatar(),
               const SizedBox(width: 20),
-              Expanded( // Garde le Expanded ici
+              Expanded(
+                // Garde le Expanded ici
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'ECHO BRAIN',
-                      style: GoogleFonts.inter(color: EchoTheme.textMain, fontSize: 18, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.inter(
+                        color: EchoTheme.textMain,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     // ✅ PULSATION ANIMATION
@@ -78,7 +83,9 @@ class EchoDashboardHeader extends StatelessWidget {
                               width: 8,
                               height: 8,
                               decoration: BoxDecoration(
-                                color: Color(0xFFFF00DD).withOpacity(0.4 + 0.6 * pulseController.value),
+                                color: Color(0xFFFF00DD).withOpacity(
+                                  0.4 + 0.6 * pulseController.value,
+                                ),
                                 shape: BoxShape.circle,
                               ),
                             );
@@ -137,11 +144,7 @@ class EchoDashboardHeader extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: EchoTheme.violet.withOpacity(0.1),
               ),
-              child: Icon(
-                Icons.psychology,
-                color: EchoTheme.violet,
-                size: 24,
-              ),
+              child: Icon(Icons.psychology, color: EchoTheme.violet, size: 24),
             );
           },
         ),
@@ -192,7 +195,12 @@ class EchoDashboardHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusMetric(String label, String value, IconData icon, Color color) {
+  Widget _buildStatusMetric(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Column(
       children: [
         Icon(icon, color: color, size: 16),

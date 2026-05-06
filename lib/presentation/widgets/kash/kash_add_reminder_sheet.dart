@@ -70,10 +70,7 @@ Future<void> showKashAddReminderSheet({
                 ),
               ),
               items: ['TND', 'USD', 'EUR'].map((cur) {
-                return DropdownMenuItem(
-                  value: cur,
-                  child: Text(cur),
-                );
+                return DropdownMenuItem(value: cur, child: Text(cur));
               }).toList(),
               onChanged: (value) {
                 if (value != null) {
@@ -139,9 +136,7 @@ Future<void> showKashAddReminderSheet({
                     if (titleController.text.isEmpty ||
                         amountController.text.isEmpty) {
                       messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('Please fill all fields'),
-                        ),
+                        const SnackBar(content: Text('Please fill all fields')),
                       );
                       return;
                     }

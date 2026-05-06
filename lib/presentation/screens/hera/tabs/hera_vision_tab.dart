@@ -167,10 +167,7 @@ class HeraVisionTab extends StatelessWidget {
               Expanded(
                 child: Text(
                   'Mauve = département à ≥ 80% de capacité. Orange = sous-effectif, recrutement recommandé.',
-                  style: TextStyle(
-                    color: HeraPalette.textMuted,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: HeraPalette.textMuted, fontSize: 11),
                 ),
               ),
             ],

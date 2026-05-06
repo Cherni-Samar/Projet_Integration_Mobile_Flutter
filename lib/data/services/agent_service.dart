@@ -35,9 +35,7 @@ class AgentService {
   /// Returns an empty map on any error — callers should fall back to defaults.
   static Future<Map<String, int>> fetchAgentEnergies() async {
     try {
-      final response = await ApiService.get(
-        endpoint: '$_baseUrl/api/agents',
-      );
+      final response = await ApiService.get(endpoint: '$_baseUrl/api/agents');
       if (response['success'] == true && response['data'] != null) {
         final agentsData = response['data']['agents'] as List<dynamic>;
         return {

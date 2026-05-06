@@ -55,18 +55,16 @@ class HeraActionsResponse {
   });
 
   factory HeraActionsResponse.fromJson(
-      Map<String, dynamic> json, {
-        String key = 'actions',
-      }) {
+    Map<String, dynamic> json, {
+    String key = 'actions',
+  }) {
     final items = <HeraAction>[];
     final raw = json[key] ?? json['recent_actions'];
 
     if (raw is List) {
       for (final item in raw) {
         if (item is Map) {
-          items.add(
-            HeraMapper.actionFromJson(Map<String, dynamic>.from(item)),
-          );
+          items.add(HeraMapper.actionFromJson(Map<String, dynamic>.from(item)));
         }
       }
     }
@@ -100,10 +98,10 @@ class HeraLeavesResponse {
   });
 
   factory HeraLeavesResponse.fromJson(
-      Map<String, dynamic> json, {
-        String employeeName = '',
-        String employeeRole = '',
-      }) {
+    Map<String, dynamic> json, {
+    String employeeName = '',
+    String employeeRole = '',
+  }) {
     final items = <HeraLeave>[];
 
     if (json['leaves'] is List) {
@@ -128,11 +126,7 @@ class HeraLeavesResponse {
   }
 
   factory HeraLeavesResponse.error(String message) {
-    return HeraLeavesResponse(
-      success: false,
-      leaves: const [],
-      error: message,
-    );
+    return HeraLeavesResponse(success: false, leaves: const [], error: message);
   }
 }
 
@@ -181,11 +175,7 @@ class HeraStatsResponse {
   final HeraStats? stats;
   final String? error;
 
-  const HeraStatsResponse({
-    required this.success,
-    this.stats,
-    this.error,
-  });
+  const HeraStatsResponse({required this.success, this.stats, this.error});
 
   factory HeraStatsResponse.fromJson(Map<String, dynamic> json) {
     return HeraStatsResponse(
@@ -198,9 +188,6 @@ class HeraStatsResponse {
   }
 
   factory HeraStatsResponse.error(String message) {
-    return HeraStatsResponse(
-      success: false,
-      error: message,
-    );
+    return HeraStatsResponse(success: false, error: message);
   }
 }

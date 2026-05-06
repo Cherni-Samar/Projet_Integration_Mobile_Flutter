@@ -19,6 +19,5 @@ class KashReminder {
 
   bool get isPaid => status == 'paid';
 
-  bool get isOverdue =>
-      !isPaid && dueDate.isBefore(DateTime.now());
+  bool get isOverdue => !isPaid && dueDate.isBefore(DateTime.now());
 }

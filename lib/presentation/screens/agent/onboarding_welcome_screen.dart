@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import '/l10n/app_localizations.dart';
+import 'package:e_team/l10n/app_localizations.dart';
 
 class OnboardingWelcomeScreen extends StatefulWidget {
   final String email;
 
-  const OnboardingWelcomeScreen({Key? key, required this.email}) : super(key: key);
+  const OnboardingWelcomeScreen({Key? key, required this.email})
+    : super(key: key);
 
   @override
-  State<OnboardingWelcomeScreen> createState() => _OnboardingWelcomeScreenState();
+  State<OnboardingWelcomeScreen> createState() =>
+      _OnboardingWelcomeScreenState();
 }
 
 class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
@@ -85,7 +87,10 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
                         ),
                       ),
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                       ),
                     ),
                   ),
@@ -138,7 +143,9 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFCDFF00).withOpacity(0.3 * _pulseController.value),
+                        color: const Color(
+                          0xFFCDFF00,
+                        ).withOpacity(0.3 * _pulseController.value),
                         blurRadius: 60,
                         spreadRadius: 20,
                       ),
@@ -193,7 +200,9 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
 
                       // Orbiting dots
                       ...List.generate(4, (index) {
-                        final angle = (index * math.pi / 2) + (_pulseController.value * 2 * math.pi);
+                        final angle =
+                            (index * math.pi / 2) +
+                            (_pulseController.value * 2 * math.pi);
                         final x = math.cos(angle) * 90;
                         final y = math.sin(angle) * 90;
                         return Transform.translate(
@@ -283,7 +292,8 @@ class _OnboardingWelcomeScreenState extends State<OnboardingWelcomeScreen>
                         },
                         onHorizontalDragUpdate: (details) {
                           setState(() {
-                            _slidePosition = (_slidePosition + details.delta.dx).clamp(0.0, maxSlide);
+                            _slidePosition = (_slidePosition + details.delta.dx)
+                                .clamp(0.0, maxSlide);
                           });
 
                           if (_slidePosition >= maxSlide * 0.95) {

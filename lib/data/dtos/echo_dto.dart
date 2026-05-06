@@ -125,7 +125,9 @@ class PendingResponse {
     if (raw != null) {
       for (final item in raw) {
         if (item is Map) {
-          items.add(EchoMapper.pendingFromJson(Map<String, dynamic>.from(item)));
+          items.add(
+            EchoMapper.pendingFromJson(Map<String, dynamic>.from(item)),
+          );
         }
       }
     }
@@ -256,18 +258,15 @@ class DocumentClassificationResponse {
       success: json['success'] == true,
       classification: json['classification'] is Map
           ? EchoMapper.documentClassificationFromJson(
-        Map<String, dynamic>.from(json['classification']),
-      )
+              Map<String, dynamic>.from(json['classification']),
+            )
           : null,
       error: json['error']?.toString(),
     );
   }
 
   factory DocumentClassificationResponse.error(String message) {
-    return DocumentClassificationResponse(
-      success: false,
-      error: message,
-    );
+    return DocumentClassificationResponse(success: false, error: message);
   }
 }
 
@@ -346,8 +345,8 @@ class PostsResponse {
       posts: posts,
       pagination: data['pagination'] is Map
           ? EchoMapper.postsPaginationFromJson(
-        Map<String, dynamic>.from(data['pagination']),
-      )
+              Map<String, dynamic>.from(data['pagination']),
+            )
           : PostsPagination.empty(),
       error: json['error']?.toString(),
     );
@@ -440,12 +439,16 @@ class TaskListResponse {
       if (raw is! List) return [];
       return raw
           .whereType<Map>()
-          .map((item) => EchoMapper.taskFromJson(Map<String, dynamic>.from(item)))
+          .map(
+            (item) => EchoMapper.taskFromJson(Map<String, dynamic>.from(item)),
+          )
           .toList();
     }
 
     final tasks = parseTasks(root['tasks'] ?? root['items'] ?? root['results']);
-    final overdueTasks = parseTasks(root['overdueTasks'] ?? root['overdue_tasks']);
+    final overdueTasks = parseTasks(
+      root['overdueTasks'] ?? root['overdue_tasks'],
+    );
 
     final groupedTasks = <String, List<TaskItem>>{};
     final rawGrouped = root['groupedTasks'] ?? root['grouped_tasks'];
@@ -457,13 +460,18 @@ class TaskListResponse {
     }
 
     return TaskListResponse(
-      success: json['success'] == true || tasks.isNotEmpty || groupedTasks.isNotEmpty,
+      success:
+          json['success'] == true ||
+          tasks.isNotEmpty ||
+          groupedTasks.isNotEmpty,
       tasks: tasks,
       groupedTasks: groupedTasks,
       overdueTasks: overdueTasks,
       totalTasks: root['totalTasks'] ?? root['total_tasks'] ?? tasks.length,
       stats: root['stats'] is Map
-          ? EchoMapper.taskStatsFromJson(Map<String, dynamic>.from(root['stats']))
+          ? EchoMapper.taskStatsFromJson(
+              Map<String, dynamic>.from(root['stats']),
+            )
           : TaskStats.empty(),
       error: root['error']?.toString() ?? json['error']?.toString(),
     );

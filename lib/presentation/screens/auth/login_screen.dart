@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:provider/provider.dart';
-import '/data/services/auth_service.dart';
-import '../../providers/theme_provider.dart';
-import '/l10n/app_localizations.dart';
+import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/data/dtos/user_dto.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -89,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen>
         // ✅ Check if onboarding is completed
         if (!user.onboardingCompleted) {
           Navigator.pushReplacementNamed(
-            context, 
+            context,
             '/onboarding-welcome',
             arguments: {'email': _emailController.text.trim()},
           );
@@ -142,6 +143,7 @@ class _LoginScreenState extends State<LoginScreen>
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -149,7 +151,9 @@ class _LoginScreenState extends State<LoginScreen>
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFFAFAFA),
       body: Stack(
         children: [
           // Effet de glow
@@ -166,8 +170,9 @@ class _LoginScreenState extends State<LoginScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFFCDFF00)
-                            .withOpacity(isDark ? 0.15 : 0.08 + _glowController.value * 0.04),
+                        const Color(0xFFCDFF00).withOpacity(
+                          isDark ? 0.15 : 0.08 + _glowController.value * 0.04,
+                        ),
                         Colors.transparent,
                       ],
                     ),
@@ -185,8 +190,9 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 60), // ✅ Supprimé le toggle dark mode
-
+                    const SizedBox(
+                      height: 60,
+                    ), // ✅ Supprimé le toggle dark mode
                     // Logo
                     Center(
                       child: Container(
@@ -195,11 +201,14 @@ class _LoginScreenState extends State<LoginScreen>
                         decoration: BoxDecoration(
                           gradient: isDark
                               ? const LinearGradient(
-                            colors: [Color(0xFFCDFF00), Color(0xFFAADD00)],
-                          )
+                                  colors: [
+                                    Color(0xFFCDFF00),
+                                    Color(0xFFAADD00),
+                                  ],
+                                )
                               : const LinearGradient(
-                            colors: [Colors.black, Color(0xFF1A1A1A)],
-                          ),
+                                  colors: [Colors.black, Color(0xFF1A1A1A)],
+                                ),
                           borderRadius: BorderRadius.circular(28),
                           boxShadow: [
                             BoxShadow(
@@ -238,8 +247,6 @@ class _LoginScreenState extends State<LoginScreen>
 
                     const SizedBox(height: 12),
 
-
-
                     const SizedBox(height: 50),
 
                     // Email field
@@ -258,8 +265,9 @@ class _LoginScreenState extends State<LoginScreen>
                         if (value == null || value.isEmpty) {
                           return l10n.authEmailRequired;
                         }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value)) {
+                        if (!RegExp(
+                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        ).hasMatch(value)) {
                           return l10n.authEmailInvalid;
                         }
                         return null;
@@ -365,7 +373,9 @@ class _LoginScreenState extends State<LoginScreen>
                           backgroundColor: isDark
                               ? const Color(0xFFCDFF00)
                               : Colors.black,
-                          foregroundColor: isDark ? Colors.black : const Color(0xFFCDFF00),
+                          foregroundColor: isDark
+                              ? Colors.black
+                              : const Color(0xFFCDFF00),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
@@ -376,23 +386,25 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                         child: _isLoading
                             ? SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              isDark ? Colors.black : const Color(0xFFCDFF00),
-                            ),
-                          ),
-                        )
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    isDark
+                                        ? Colors.black
+                                        : const Color(0xFFCDFF00),
+                                  ),
+                                ),
+                              )
                             : Text(
-                          l10n.authSignIn,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
+                                l10n.authSignIn,
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
                       ),
                     ),
 
@@ -427,7 +439,9 @@ class _LoginScreenState extends State<LoginScreen>
                             child: Text(
                               l10n.authCreateAccount,
                               style: TextStyle(
-                                color: isDark ? const Color(0xFFCDFF00) : Colors.black,
+                                color: isDark
+                                    ? const Color(0xFFCDFF00)
+                                    : Colors.black,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15,
                               ),
@@ -467,13 +481,13 @@ class _LoginScreenState extends State<LoginScreen>
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
-          color: isDark
-              ? Colors.white.withOpacity(0.05)
-              : Colors.white,
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isFocused
-                ? (isDark ? const Color(0xFFCDFF00) : Colors.black.withOpacity(0.3))
+                ? (isDark
+                      ? const Color(0xFFCDFF00)
+                      : Colors.black.withOpacity(0.3))
                 : (isDark ? Colors.white.withOpacity(0.1) : Colors.transparent),
             width: isFocused ? 2 : 1.5,
           ),
@@ -481,11 +495,11 @@ class _LoginScreenState extends State<LoginScreen>
             BoxShadow(
               color: isFocused
                   ? (isDark
-                  ? const Color(0xFFCDFF00).withOpacity(0.2)
-                  : Colors.black.withOpacity(0.06))
+                        ? const Color(0xFFCDFF00).withOpacity(0.2)
+                        : Colors.black.withOpacity(0.06))
                   : (isDark
-                  ? Colors.transparent
-                  : Colors.black.withOpacity(0.03)),
+                        ? Colors.transparent
+                        : Colors.black.withOpacity(0.03)),
               blurRadius: isFocused ? 15 : 10,
               spreadRadius: 0,
               offset: const Offset(0, 4),
@@ -514,8 +528,12 @@ class _LoginScreenState extends State<LoginScreen>
             ),
             labelStyle: TextStyle(
               color: isFocused
-                  ? (isDark ? const Color(0xFFCDFF00) : Colors.black.withOpacity(0.7))
-                  : (isDark ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.4)),
+                  ? (isDark
+                        ? const Color(0xFFCDFF00)
+                        : Colors.black.withOpacity(0.7))
+                  : (isDark
+                        ? Colors.white.withOpacity(0.5)
+                        : Colors.black.withOpacity(0.4)),
               fontWeight: FontWeight.w500,
             ),
             floatingLabelStyle: TextStyle(
@@ -525,24 +543,28 @@ class _LoginScreenState extends State<LoginScreen>
             prefixIcon: Icon(
               icon,
               color: isFocused
-                  ? (isDark ? const Color(0xFFCDFF00) : Colors.black.withOpacity(0.6))
-                  : (isDark ? Colors.white.withOpacity(0.4) : Colors.black.withOpacity(0.3)),
+                  ? (isDark
+                        ? const Color(0xFFCDFF00)
+                        : Colors.black.withOpacity(0.6))
+                  : (isDark
+                        ? Colors.white.withOpacity(0.4)
+                        : Colors.black.withOpacity(0.3)),
               size: 22,
             ),
             suffixIcon: isPassword
                 ? IconButton(
-              icon: Icon(
-                _obscurePassword
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-                color: isDark
-                    ? Colors.white.withOpacity(0.4)
-                    : Colors.black.withOpacity(0.3),
-                size: 22,
-              ),
-              onPressed: () =>
-                  setState(() => _obscurePassword = !_obscurePassword),
-            )
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: isDark
+                          ? Colors.white.withOpacity(0.4)
+                          : Colors.black.withOpacity(0.3),
+                      size: 22,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
+                  )
                 : null,
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(

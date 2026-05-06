@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:e_team/domain/models/owned_agent.dart';
-import '/data/services/agent_metadata_service.dart';
-import '/data/services/agent_service.dart';
+import 'package:e_team/data/services/agent_metadata_service.dart';
+import 'package:e_team/data/services/agent_service.dart';
 
 export 'package:e_team/domain/models/owned_agent.dart';
 
@@ -49,7 +49,7 @@ class OwnedAgentsProvider extends ChangeNotifier {
         OwnedAgent(
           agentName: defaults['displayName'] as String,
           agentIllustration: defaults['illustration'] as String,
-          agentColor: defaults['color'] as Color,
+          agentColorValue: defaults['colorValue'] as int,
           packTitle: 'Active',
           energy: defaults['defaultEnergy'] as int,
           purchasedAt: DateTime.now(),

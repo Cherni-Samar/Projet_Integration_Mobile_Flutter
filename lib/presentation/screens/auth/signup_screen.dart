@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import '/data/services/auth_service.dart';
-import '../settings/terms_and_conditions_screen.dart';
-import '../settings/privacy_policy_screen.dart';
-import '/l10n/app_localizations.dart';
+import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/presentation/screens/settings/terms_and_conditions_screen.dart';
+import 'package:e_team/presentation/screens/settings/privacy_policy_screen.dart';
+import 'package:e_team/l10n/app_localizations.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -184,8 +184,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     if (value == null || value.isEmpty) {
                       return l10n.authEmailRequired;
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                        .hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
                       return l10n.authEmailInvalid;
                     }
                     return null;
@@ -236,7 +237,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
                   textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (_) => _acceptTerms ? _handleSignUp() : null,
+                  onFieldSubmitted: (_) =>
+                      _acceptTerms ? _handleSignUp() : null,
                   decoration: InputDecoration(
                     labelText: l10n.authConfirmPasswordLabel,
                     hintText: '••••••••',
@@ -254,8 +256,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             : Icons.visibility_off_outlined,
                       ),
                       onPressed: () {
-                        setState(() =>
-                        _obscureConfirmPassword = !_obscureConfirmPassword);
+                        setState(
+                          () => _obscureConfirmPassword =
+                              !_obscureConfirmPassword,
+                        );
                       },
                     ),
                   ),
@@ -314,7 +318,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                        const TermsAndConditionsScreen(),
+                                            const TermsAndConditionsScreen(),
                                       ),
                                     );
                                   },
@@ -333,7 +337,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                        const PrivacyPolicyScreen(),
+                                            const PrivacyPolicyScreen(),
                                       ),
                                     );
                                   },
@@ -352,9 +356,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: (_isLoading || !_acceptTerms) ? null : _handleSignUp,
+                    onPressed: (_isLoading || !_acceptTerms)
+                        ? null
+                        : _handleSignUp,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _acceptTerms ? Colors.black : Colors.grey,
+                      backgroundColor: _acceptTerms
+                          ? Colors.black
+                          : Colors.grey,
                       foregroundColor: const Color(0xFFCDFF00),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -365,23 +373,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     child: _isLoading
                         ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Color(0xFFCDFF00),
-                        ),
-                      ),
-                    )
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Color(0xFFCDFF00),
+                              ),
+                            ),
+                          )
                         : Text(
-                      l10n.authCreateAccountTitle,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: _acceptTerms ? const Color(0xFFCDFF00) : Colors.grey.shade600,
-                      ),
-                    ),
+                            l10n.authCreateAccountTitle,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: _acceptTerms
+                                  ? const Color(0xFFCDFF00)
+                                  : Colors.grey.shade600,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 30),

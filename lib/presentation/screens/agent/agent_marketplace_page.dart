@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/data/services/agent_service.dart';
-import 'package:e_team/domain/models/user_model.dart';
-import 'package:e_team/presentation/providers/theme_provider.dart';
-import 'package:e_team/presentation/providers/cart_provider.dart';
-import 'package:e_team/presentation/providers/user_provider.dart';
-import 'package:e_team/l10n/app_localizations.dart';
+import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/data/services/agent_metadata_service.dart';
-
-import 'agent_details_page.dart';
-import 'my_agents_page.dart';
-import 'agent_inter_flow_page.dart';
-import '../activity/activity_logs_screen.dart';
-import '../pricing_page.dart';
-import '../auth/user_profile_page.dart';
-import '../../widgets/agent/agent_marketplace_card.dart';
-import '../../widgets/common/app_bottom_nav_bar.dart';
-import '../../widgets/common/round_icon_button.dart';
+import 'package:e_team/domain/models/user_model.dart';
+import 'package:e_team/l10n/app_localizations.dart';
+import 'package:e_team/presentation/providers/cart_provider.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/presentation/providers/user_provider.dart';
+import 'package:e_team/presentation/screens/activity/activity_logs_screen.dart';
+import 'package:e_team/presentation/screens/agent/agent_details_page.dart';
+import 'package:e_team/presentation/screens/agent/agent_inter_flow_page.dart';
+import 'package:e_team/presentation/screens/agent/my_agents_page.dart';
+import 'package:e_team/presentation/screens/auth/user_profile_page.dart';
+import 'package:e_team/presentation/screens/pricing_page.dart';
+import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
+import 'package:e_team/presentation/widgets/agent/agent_marketplace_card.dart';
+import 'package:e_team/presentation/widgets/common/app_bottom_nav_bar.dart';
+import 'package:e_team/presentation/widgets/common/round_icon_button.dart';
 
 class AgentMarketplacePage extends StatefulWidget {
   const AgentMarketplacePage({Key? key}) : super(key: key);
@@ -84,8 +84,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
       if (mounted) {
         setState(() => _currentUser = context.read<UserProvider>().user);
       }
-    } catch (e) {
-      debugPrint('Error loading user: $e');
+    } catch (_) {
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -108,10 +107,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         throw Exception('You must be logged in');
       }
 
-      final resp = await AgentService.hireAgent(
-        agentId: agentId,
-        token: token,
-      );
+      final resp = await AgentService.hireAgent(agentId: agentId, token: token);
 
       if (resp['success'] == true) {
         if (mounted) {
@@ -179,7 +175,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                         const Color(0xFF2D2D2D),
                                         const Color(
                                           0xFFCDFF00,
-                                        ).withOpacity(0.05),
+                                        ).withValues(alpha: 0.05),
                                         _headerAnimationController.value,
                                       )!,
                                     ],
@@ -194,7 +190,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                         const Color(0xFFFAFAFA),
                                         const Color(
                                           0xFFCDFF00,
-                                        ).withOpacity(0.03),
+                                        ).withValues(alpha: 0.03),
                                         _headerAnimationController.value,
                                       )!,
                                     ],
@@ -202,8 +198,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                             boxShadow: [
                               BoxShadow(
                                 color: isDark
-                                    ? Colors.black.withOpacity(0.5)
-                                    : Colors.black.withOpacity(0.08),
+                                    ? Colors.black.withValues(alpha: 0.5)
+                                    : Colors.black.withValues(alpha: 0.08),
                                 blurRadius: 30,
                                 offset: const Offset(0, 10),
                               ),
@@ -243,7 +239,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                             BoxShadow(
                                               color: const Color(
                                                 0xFFA855F7,
-                                              ).withOpacity(0.5),
+                                              ).withValues(alpha: 0.5),
                                               blurRadius: 20,
                                               offset: const Offset(0, 4),
                                             ),
@@ -252,7 +248,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                             color: isDark
                                                 ? const Color(
                                                     0xFFCDFF00,
-                                                  ).withOpacity(0.3)
+                                                  ).withValues(alpha: 0.3)
                                                 : Colors.white,
                                             width: 2.5,
                                           ),
@@ -279,11 +275,11 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                               l10n.agentMarketplaceWelcomeBack,
                                               style: TextStyle(
                                                 color: isDark
-                                                    ? Colors.white.withOpacity(
-                                                        0.5,
+                                                    ? Colors.white.withValues(
+                                                        alpha: 0.5,
                                                       )
-                                                    : Colors.black.withOpacity(
-                                                        0.5,
+                                                    : Colors.black.withValues(
+                                                        alpha: 0.5,
                                                       ),
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500,
@@ -335,8 +331,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                               shape: BoxShape.circle,
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.red.withOpacity(
-                                                    0.8,
+                                                  color: Colors.red.withValues(
+                                                    alpha: 0.8,
                                                   ),
                                                   blurRadius: 8,
                                                   spreadRadius: 2,
@@ -406,7 +402,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                           BoxShadow(
                                             color: const Color(
                                               0xFFCDFF00,
-                                            ).withOpacity(0.8),
+                                            ).withValues(alpha: 0.8),
                                             blurRadius: 8,
                                             spreadRadius: 2,
                                           ),
@@ -462,8 +458,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                               Icon(
                                 Icons.touch_app,
                                 color: isDark
-                                    ? Colors.white.withOpacity(0.5)
-                                    : Colors.black.withOpacity(0.5),
+                                    ? Colors.white.withValues(alpha: 0.5)
+                                    : Colors.black.withValues(alpha: 0.5),
                                 size: 16,
                               ),
                               const SizedBox(width: 6),
@@ -473,8 +469,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                 ),
                                 style: TextStyle(
                                   color: isDark
-                                      ? Colors.white.withOpacity(0.5)
-                                      : Colors.black.withOpacity(0.5),
+                                      ? Colors.white.withValues(alpha: 0.5)
+                                      : Colors.black.withValues(alpha: 0.5),
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -498,7 +494,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                             currentPage: _currentPage,
                             isDark: isDark,
                             onTap: () {
-                              final isCenter = (_currentPage - index).abs() < 0.5;
+                              final isCenter =
+                                  (_currentPage - index).abs() < 0.5;
                               if (!isCenter) {
                                 _pageController.animateToPage(
                                   index,
@@ -506,7 +503,10 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                   curve: Curves.easeInOut,
                                 );
                               } else {
-                                final currentIndex = _currentPage.round().clamp(0, _agents.length - 1);
+                                final currentIndex = _currentPage.round().clamp(
+                                  0,
+                                  _agents.length - 1,
+                                );
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -539,13 +539,13 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                 height: 56,
                                 decoration: BoxDecoration(
                                   color: isDark
-                                      ? Colors.white.withOpacity(0.08)
-                                      : Colors.black.withOpacity(0.05),
+                                      ? Colors.white.withValues(alpha: 0.08)
+                                      : Colors.black.withValues(alpha: 0.05),
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
                                     color: isDark
-                                        ? Colors.white.withOpacity(0.15)
-                                        : Colors.black.withOpacity(0.1),
+                                        ? Colors.white.withValues(alpha: 0.15)
+                                        : Colors.black.withValues(alpha: 0.1),
                                     width: 2,
                                   ),
                                 ),
@@ -564,8 +564,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                   icon: Icon(
                                     Icons.arrow_forward_ios,
                                     color: isDark
-                                        ? Colors.white.withOpacity(0.7)
-                                        : Colors.black.withOpacity(0.7),
+                                        ? Colors.white.withValues(alpha: 0.7)
+                                        : Colors.black.withValues(alpha: 0.7),
                                     size: 20,
                                   ),
                                 ),
@@ -594,8 +594,10 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                                         color: isDark
                                             ? const Color(
                                                 0xFFCDFF00,
-                                              ).withOpacity(0.4)
-                                            : Colors.black.withOpacity(0.15),
+                                              ).withValues(alpha: 0.4)
+                                            : Colors.black.withValues(
+                                                alpha: 0.15,
+                                              ),
                                         blurRadius: 20,
                                         offset: const Offset(0, 8),
                                       ),
@@ -703,17 +705,13 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
         onActivityTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ActivityLogsScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const ActivityLogsScreen()),
           );
         },
         onStatsTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const AgentInterFlowPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const AgentInterFlowPage()),
           );
         },
         onSettingsTap: () {
@@ -757,8 +755,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
             textAlign: TextAlign.center,
             style: TextStyle(
               color: isDark
-                  ? Colors.white.withOpacity(0.75)
-                  : Colors.black.withOpacity(0.75),
+                  ? Colors.white.withValues(alpha: 0.75)
+                  : Colors.black.withValues(alpha: 0.75),
               fontSize: 15,
               height: 1.5,
               fontWeight: FontWeight.w500,
@@ -788,7 +786,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
                 icon: Icons.language,
                 label: l10n.agentMarketplaceStatLanguages,
                 value: agent['stats']['languages'],
-                color: agent['color'],
+                color: colorFromValue(agent['color']),
                 isDark: isDark,
               ),
             ],
@@ -812,13 +810,16 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
           height: 50,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+              colors: [
+                color.withValues(alpha: 0.15),
+                color.withValues(alpha: 0.05),
+              ],
             ),
             shape: BoxShape.circle,
             border: Border.all(color: color, width: 2.5),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.3),
+                color: color.withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -831,8 +832,8 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
           label,
           style: TextStyle(
             color: isDark
-                ? Colors.white.withOpacity(0.6)
-                : Colors.black.withOpacity(0.6),
+                ? Colors.white.withValues(alpha: 0.6)
+                : Colors.black.withValues(alpha: 0.6),
             fontSize: 11,
             fontWeight: FontWeight.w600,
           ),

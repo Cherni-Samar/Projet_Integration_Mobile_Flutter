@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/data/services/activity_service.dart';
-import '../../providers/theme_provider.dart';
+import 'package:e_team/data/services/activity_service.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
 
 class ActivityLogsScreen extends StatefulWidget {
   const ActivityLogsScreen({Key? key}) : super(key: key);
@@ -43,7 +43,8 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       _loadMoreActivities();
     }
   }
@@ -133,10 +134,7 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
@@ -144,9 +142,11 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
-    
+
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFFAFAFA),
       appBar: AppBar(
         backgroundColor: isDark ? const Color(0xFF1A1A1A) : Colors.white,
         title: Text(
@@ -166,9 +166,7 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: Colors.purple),
-            )
+          ? const Center(child: CircularProgressIndicator(color: Colors.purple))
           : RefreshIndicator(
               onRefresh: _loadInitialData,
               child: CustomScrollView(
@@ -176,15 +174,11 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
                 slivers: [
                   // Dashboard Overview
                   if (_dashboard != null)
-                    SliverToBoxAdapter(
-                      child: _buildDashboardOverview(),
-                    ),
-                  
+                    SliverToBoxAdapter(child: _buildDashboardOverview()),
+
                   // Agent Filter
-                  SliverToBoxAdapter(
-                    child: _buildAgentFilter(),
-                  ),
-                  
+                  SliverToBoxAdapter(child: _buildAgentFilter()),
+
                   // Activities List
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
@@ -195,7 +189,9 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
                           return const Padding(
                             padding: EdgeInsets.all(16.0),
                             child: Center(
-                              child: CircularProgressIndicator(color: Colors.purple),
+                              child: CircularProgressIndicator(
+                                color: Colors.purple,
+                              ),
                             ),
                           );
                         }
@@ -214,7 +210,7 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
     final overview = _dashboard!.overview;
-    
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
@@ -222,18 +218,20 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
         color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark 
-            ? Colors.purple.withOpacity(0.3) 
-            : Colors.grey.withOpacity(0.3),
+          color: isDark
+              ? Colors.purple.withOpacity(0.3)
+              : Colors.grey.withOpacity(0.3),
         ),
-        boxShadow: isDark ? null : [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,10 +293,15 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
-    
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -334,7 +337,7 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
   Widget _buildAgentFilter() {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDark = themeProvider.isDarkMode;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -358,25 +361,28 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
                   onTap: () => _onAgentFilterChanged(agent),
                   child: Container(
                     margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected 
-                        ? Colors.purple 
-                        : Colors.transparent,
+                      color: isSelected ? Colors.purple : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: isSelected 
-                          ? Colors.purple 
-                          : (isDark ? Colors.grey : Colors.grey[400]!),
+                        color: isSelected
+                            ? Colors.purple
+                            : (isDark ? Colors.grey : Colors.grey[400]!),
                       ),
                     ),
                     child: Text(
                       agent == 'all' ? 'All Agents' : agent.toUpperCase(),
                       style: TextStyle(
-                        color: isSelected 
-                          ? Colors.white 
-                          : (isDark ? Colors.grey : Colors.grey[600]),
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected
+                            ? Colors.white
+                            : (isDark ? Colors.grey : Colors.grey[600]),
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ),
@@ -394,7 +400,7 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
     final isDark = themeProvider.isDarkMode;
     final statusColor = _getStatusColor(activity.status);
     final priorityColor = _getPriorityColor(activity.priority);
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.all(16),
@@ -402,18 +408,20 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
         color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark 
-            ? Colors.grey.withOpacity(0.2) 
-            : Colors.grey.withOpacity(0.3),
+          color: isDark
+              ? Colors.grey.withOpacity(0.2)
+              : Colors.grey.withOpacity(0.3),
         ),
-        boxShadow: isDark ? null : [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -421,10 +429,7 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
           // Header with log entry and timestamp
           Row(
             children: [
-              Text(
-                activity.icon,
-                style: const TextStyle(fontSize: 20),
-              ),
+              Text(activity.icon, style: const TextStyle(fontSize: 20)),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -446,7 +451,7 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          
+
           // Title and description
           Text(
             activity.title,
@@ -466,9 +471,9 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
               ),
             ),
           ],
-          
+
           const SizedBox(height: 12),
-          
+
           // Status, priority, and energy
           Row(
             children: [
@@ -489,9 +494,9 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(width: 8),
-              
+
               // Priority badge
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -509,9 +514,9 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
                   ),
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               // Energy consumed
               Row(
                 children: [
@@ -569,7 +574,7 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
   String _formatTimestamp(DateTime timestamp) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
-    
+
     if (difference.inMinutes < 1) {
       return 'Just now';
     } else if (difference.inMinutes < 60) {

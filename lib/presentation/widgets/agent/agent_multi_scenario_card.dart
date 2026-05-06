@@ -27,9 +27,7 @@ class AgentMultiScenarioCard extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: agentColor.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: agentColor.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,11 +65,7 @@ class AgentMultiScenarioCard extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.bolt,
-                      color: Color(0xFFF59E0B),
-                      size: 16,
-                    ),
+                    const Icon(Icons.bolt, color: Color(0xFFF59E0B), size: 16),
                     const SizedBox(width: 2),
                     Text(
                       '${scenario['cost']}',

@@ -1,19 +1,17 @@
-import 'package:flutter/material.dart';
-
 class OwnedAgent {
   final String agentName;
-  String customName;             // user-given nickname
+  String customName; // user-given nickname
   final String agentIllustration;
-  final Color agentColor;
-  String packTitle;               // latest pack purchased
-  int energy;                     // cumulative energy
+  final int agentColorValue;
+  String packTitle; // latest pack purchased
+  int energy; // cumulative energy
   final DateTime purchasedAt;
 
   OwnedAgent({
     required this.agentName,
     String? customName,
     required this.agentIllustration,
-    required this.agentColor,
+    required this.agentColorValue,
     required this.packTitle,
     required this.energy,
     required this.purchasedAt,

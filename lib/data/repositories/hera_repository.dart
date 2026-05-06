@@ -45,18 +45,12 @@ class HeraRepository {
 
   Future<Map<String, dynamic>> getLeaves(String employeeId) async {
     final token = await _token();
-    return ApiService.get(
-      endpoint: '$_base/leaves/$employeeId',
-      token: token,
-    );
+    return ApiService.get(endpoint: '$_base/leaves/$employeeId', token: token);
   }
 
   Future<Map<String, dynamic>> getHistory(String employeeId) async {
     final token = await _token();
-    return ApiService.get(
-      endpoint: '$_base/history/$employeeId',
-      token: token,
-    );
+    return ApiService.get(endpoint: '$_base/history/$employeeId', token: token);
   }
 
   Future<Map<String, dynamic>> getRecentActions({int limit = 20}) async {
@@ -80,18 +74,12 @@ class HeraRepository {
 
   Future<Map<String, dynamic>> getDexoCheckup() async {
     final token = await _token();
-    return ApiService.get(
-      endpoint: '$_base/admin/dexo-checkup',
-      token: token,
-    );
+    return ApiService.get(endpoint: '$_base/admin/dexo-checkup', token: token);
   }
 
   Future<Map<String, dynamic>> getOpportunities() async {
     final token = await _token();
-    return ApiService.get(
-      endpoint: '$_base/admin/opportunities',
-      token: token,
-    );
+    return ApiService.get(endpoint: '$_base/admin/opportunities', token: token);
   }
 
   Future<Map<String, dynamic>> getDocumentActions({int limit = 20}) async {
@@ -176,10 +164,7 @@ class HeraRepository {
     final token = await _token();
     return ApiService.post(
       endpoint: '$_base/generate-doc',
-      body: {
-        'employee_id': employeeId,
-        'doc_type': docType,
-      },
+      body: {'employee_id': employeeId, 'doc_type': docType},
       token: token,
     );
   }
@@ -191,10 +176,7 @@ class HeraRepository {
     final token = await _token();
     return ApiService.post(
       endpoint: '$_base/request-doc',
-      body: {
-        'employeeId': employeeId,
-        'docType': docType,
-      },
+      body: {'employeeId': employeeId, 'docType': docType},
       token: token,
     );
   }
@@ -207,11 +189,7 @@ class HeraRepository {
     final token = await _token();
     return ApiService.post(
       endpoint: '$_base/send-to-echo',
-      body: {
-        'subject': subject,
-        'content': content,
-        'from': from,
-      },
+      body: {'subject': subject, 'content': content, 'from': from},
       token: token,
     );
   }
@@ -220,11 +198,7 @@ class HeraRepository {
     final token = await _token();
     return ApiService.post(
       endpoint: '$_base/chat',
-      body: {
-        'username': username,
-        'intent': 'hello',
-        'message': 'hello',
-      },
+      body: {'username': username, 'intent': 'hello', 'message': 'hello'},
       token: token,
     );
   }

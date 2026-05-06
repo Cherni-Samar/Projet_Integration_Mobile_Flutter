@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/theme_provider.dart';
-import '../../providers/owned_agents_provider.dart';
+import 'package:e_team/presentation/providers/owned_agents_provider.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 
 class AgentChatPage extends StatefulWidget {
   final OwnedAgent agent;
@@ -58,11 +59,13 @@ class _AgentChatPageState extends State<AgentChatPage> {
     setState(() {
       _messages.add(_ChatMsg(fromUser: true, text: v));
       // réponse fake (UI only)
-      _messages.add(_ChatMsg(
-        fromUser: false,
-        text:
-        "✅ Noted.\n(For now: UI only. Next step: connect to your backend.)",
-      ));
+      _messages.add(
+        _ChatMsg(
+          fromUser: false,
+          text:
+              "✅ Noted.\n(For now: UI only. Next step: connect to your backend.)",
+        ),
+      );
     });
 
     _controller.clear();
@@ -96,7 +99,9 @@ class _AgentChatPageState extends State<AgentChatPage> {
     final bgTop = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFEFFAF7);
     final bgBottom = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF2E9FF);
 
-    final glass = isDark ? const Color(0xFF141414) : Colors.white.withOpacity(0.72);
+    final glass = isDark
+        ? const Color(0xFF141414)
+        : Colors.white.withValues(alpha: 0.72);
     final textMain = isDark ? Colors.white : const Color(0xFF0F172A);
     final textSub = isDark ? Colors.white70 : const Color(0xFF64748B);
     final accent = agent.agentColor;
@@ -176,8 +181,8 @@ class _AgentChatPageState extends State<AgentChatPage> {
                 child: _glassCard(
                   color: glass,
                   borderColor: isDark
-                      ? Colors.white.withOpacity(0.08)
-                      : Colors.black.withOpacity(0.06),
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.black.withValues(alpha: 0.06),
                   child: Column(
                     children: [
                       const SizedBox(height: 8),
@@ -227,29 +232,29 @@ class _AgentChatPageState extends State<AgentChatPage> {
               Expanded(
                 child: _messages.isEmpty
                     ? Center(
-                  child: Text(
-                    "Start a conversation…",
-                    style: TextStyle(
-                      color: textSub,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                )
+                        child: Text(
+                          "Start a conversation…",
+                          style: TextStyle(
+                            color: textSub,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      )
                     : ListView.builder(
-                  controller: _scroll,
-                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
-                  itemCount: _messages.length,
-                  itemBuilder: (_, i) {
-                    final m = _messages[i];
-                    return _bubble(
-                      isDark: isDark,
-                      accent: accent,
-                      textMain: textMain,
-                      msg: m.text,
-                      fromUser: m.fromUser,
-                    );
-                  },
-                ),
+                        controller: _scroll,
+                        padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+                        itemCount: _messages.length,
+                        itemBuilder: (_, i) {
+                          final m = _messages[i];
+                          return _bubble(
+                            isDark: isDark,
+                            accent: accent,
+                            textMain: textMain,
+                            msg: m.text,
+                            fromUser: m.fromUser,
+                          );
+                        },
+                      ),
               ),
 
               // ── BOTTOM BAR (actions + input) ───────────────────────
@@ -262,15 +267,19 @@ class _AgentChatPageState extends State<AgentChatPage> {
                 ),
                 decoration: BoxDecoration(
                   color: glass,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
                   border: Border.all(
                     color: isDark
-                        ? Colors.white.withOpacity(0.08)
-                        : Colors.black.withOpacity(0.06),
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withValues(alpha: 0.06),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.35 : 0.08,
+                      ),
                       blurRadius: 18,
                       offset: const Offset(0, -8),
                     ),
@@ -325,7 +334,7 @@ class _AgentChatPageState extends State<AgentChatPage> {
                               filled: true,
                               fillColor: isDark
                                   ? const Color(0xFF1E1E1E)
-                                  : Colors.white.withOpacity(0.65),
+                                  : Colors.white.withValues(alpha: 0.65),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
                                 borderSide: BorderSide.none,
@@ -348,15 +357,23 @@ class _AgentChatPageState extends State<AgentChatPage> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: isDark
-                                    ? [const Color(0xFFCDFF00), const Color(0xFFAADD00)]
-                                    : [accent.withOpacity(0.25), accent.withOpacity(0.12)],
+                                    ? [
+                                        const Color(0xFFCDFF00),
+                                        const Color(0xFFAADD00),
+                                      ]
+                                    : [
+                                        accent.withValues(alpha: 0.25),
+                                        accent.withValues(alpha: 0.12),
+                                      ],
                               ),
-                              color: isDark ? null : Colors.white.withOpacity(0.7),
+                              color: isDark
+                                  ? null
+                                  : Colors.white.withValues(alpha: 0.7),
                               borderRadius: BorderRadius.circular(18),
                               border: Border.all(
                                 color: isDark
                                     ? Colors.transparent
-                                    : Colors.black.withOpacity(0.06),
+                                    : Colors.black.withValues(alpha: 0.06),
                               ),
                             ),
                             child: Icon(
@@ -401,7 +418,7 @@ class _AgentChatPageState extends State<AgentChatPage> {
       width: 36,
       height: 36,
       decoration: BoxDecoration(
-        color: accent.withOpacity(0.12),
+        color: accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
       ),
       child: ClipRRect(
@@ -425,22 +442,21 @@ class _AgentChatPageState extends State<AgentChatPage> {
             shape: BoxShape.circle,
             gradient: LinearGradient(
               colors: [
-                accent.withOpacity(0.25),
-                accent.withOpacity(0.10),
+                accent.withValues(alpha: 0.25),
+                accent.withValues(alpha: 0.10),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            border: Border.all(color: accent.withOpacity(0.35), width: 3),
+            border: Border.all(color: accent.withValues(alpha: 0.35), width: 3),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(999),
             child: Image.asset(
               agent.agentIllustration,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Center(
-                child: Icon(Icons.smart_toy, size: 60, color: accent),
-              ),
+              errorBuilder: (_, __, ___) =>
+                  Center(child: Icon(Icons.smart_toy, size: 60, color: accent)),
             ),
           ),
         ),
@@ -451,9 +467,9 @@ class _AgentChatPageState extends State<AgentChatPage> {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.black.withOpacity(0.06)),
+              border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
             ),
             child: const Icon(Icons.help_outline, size: 18),
           ),
@@ -474,13 +490,21 @@ class _AgentChatPageState extends State<AgentChatPage> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.white.withOpacity(0.65),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.white.withValues(alpha: 0.65),
           shape: BoxShape.circle,
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.10) : Colors.black.withOpacity(0.06),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.10)
+                : Colors.black.withValues(alpha: 0.06),
           ),
         ),
-        child: Icon(icon, size: 20, color: isDark ? Colors.white : Colors.black),
+        child: Icon(
+          icon,
+          size: 20,
+          color: isDark ? Colors.white : Colors.black,
+        ),
       ),
     );
   }
@@ -496,10 +520,14 @@ class _AgentChatPageState extends State<AgentChatPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.white.withOpacity(0.75),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.white.withValues(alpha: 0.75),
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.10) : Colors.black.withOpacity(0.06),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.10)
+                : Colors.black.withValues(alpha: 0.06),
           ),
         ),
         child: Text(
@@ -527,10 +555,14 @@ class _AgentChatPageState extends State<AgentChatPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.white.withOpacity(0.65),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.white.withValues(alpha: 0.65),
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.10) : Colors.black.withOpacity(0.06),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.10)
+                : Colors.black.withValues(alpha: 0.06),
           ),
         ),
         child: Row(
@@ -564,10 +596,14 @@ class _AgentChatPageState extends State<AgentChatPage> {
         width: 52,
         height: 52,
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.white.withOpacity(0.65),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.white.withValues(alpha: 0.65),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.10) : Colors.black.withOpacity(0.06),
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.10)
+                : Colors.black.withValues(alpha: 0.06),
           ),
         ),
         child: Icon(icon, color: isDark ? Colors.white : Colors.black),
@@ -584,22 +620,30 @@ class _AgentChatPageState extends State<AgentChatPage> {
   }) {
     final bg = fromUser
         ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
-        : (isDark ? const Color(0xFF1E1E1E) : Colors.white.withOpacity(0.75));
-    final fg = fromUser ? (isDark ? Colors.black : const Color(0xFFCDFF00)) : textMain;
+        : (isDark
+              ? const Color(0xFF1E1E1E)
+              : Colors.white.withValues(alpha: 0.75));
+    final fg = fromUser
+        ? (isDark ? Colors.black : const Color(0xFFCDFF00))
+        : textMain;
 
     return Align(
       alignment: fromUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.78,
+        ),
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: fromUser
                 ? Colors.transparent
-                : (isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06)),
+                : (isDark
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.black.withValues(alpha: 0.06)),
           ),
         ),
         child: Text(

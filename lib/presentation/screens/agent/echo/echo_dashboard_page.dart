@@ -16,11 +16,7 @@ class SocialPost {
   final String text;
   final String time;
 
-  SocialPost({
-    required this.platform,
-    required this.text,
-    required this.time,
-  });
+  SocialPost({required this.platform, required this.text, required this.time});
 }
 
 class EchoDashboardPage extends StatefulWidget {
@@ -31,8 +27,8 @@ class EchoDashboardPage extends StatefulWidget {
   State<EchoDashboardPage> createState() => _EchoDashboardPageState();
 }
 
-class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProviderStateMixin {
-
+class _EchoDashboardPageState extends State<EchoDashboardPage>
+    with TickerProviderStateMixin {
   int _selectedTab = 0;
 
   // ✅ ANIMATION CONTROLLER POUR PULSATION
@@ -66,7 +62,10 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
     )..repeat(reverse: true);
 
     _loadDashboardData();
-    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) => _loadDashboardData());
+    _refreshTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) => _loadDashboardData(),
+    );
   }
 
   @override
@@ -95,7 +94,10 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
   Future<void> _loadSocialPosts() async {
     setState(() => _loadingSocial = true);
     try {
-      final result = await EchoService.getMobilePosts(token: widget.token, limit: 20);
+      final result = await EchoService.getMobilePosts(
+        token: widget.token,
+        limit: 20,
+      );
       if (result.success && mounted) {
         setState(() {
           _posts = result.posts; // Use real PostItem objects
@@ -104,13 +106,10 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
       } else {
         setState(() => _loadingSocial = false);
       }
-    } catch (e) {
-      print('❌ Error loading social posts: $e');
+    } catch (_) {
       setState(() => _loadingSocial = false);
     }
   }
-
-
 
   Future<void> _loadStats() async {
     try {
@@ -132,11 +131,13 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
   /// Messages reçus utiles (hors spam, hors réponses auto Echo) pour combler l'API stats si elle renvoie 0.
   int _countInboxMessagesForStats() {
     return _emails
-        .where((e) =>
-    !e.isSpam &&
-        e.category != 'auto_reply' &&
-        e.category != 'auto_reply_pending' &&
-        e.sender != 'echo@e-team.com')
+        .where(
+          (e) =>
+              !e.isSpam &&
+              e.category != 'auto_reply' &&
+              e.category != 'auto_reply_pending' &&
+              e.sender != 'echo@e-team.com',
+        )
         .length;
   }
 
@@ -154,8 +155,7 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
 
       final apiP = asInt(_stats!['totalProcessed']);
       final apiS = asInt(_stats!['spamBlocked']);
-      _stats!['totalProcessed'] =
-      localProcessed > apiP ? localProcessed : apiP;
+      _stats!['totalProcessed'] = localProcessed > apiP ? localProcessed : apiP;
       _stats!['spamBlocked'] = localSpam > apiS ? localSpam : apiS;
     });
   }
@@ -206,9 +206,7 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
           children: [
             _buildProfessionalHeader(),
             _buildCleanNavigation(),
-            Expanded(
-              child: _buildTabContent(),
-            ),
+            Expanded(child: _buildTabContent()),
           ],
         ),
       ),
@@ -238,10 +236,14 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
     if (!mounted) return Container();
 
     switch (_selectedTab) {
-      case 0: return _buildOverviewTab();
-      case 1: return _buildMessagesTab();
-      case 2: return _buildPostsTab();
-      default: return _buildOverviewTab();
+      case 0:
+        return _buildOverviewTab();
+      case 1:
+        return _buildMessagesTab();
+      case 2:
+        return _buildPostsTab();
+      default:
+        return _buildOverviewTab();
     }
   }
 
@@ -254,17 +256,14 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
       formatTime: _formatTime,
     );
   }
+
   // --- HELPERS ---
   Widget _buildEmptyState(String message, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(32),
       child: Column(
         children: [
-          Icon(
-            icon,
-            size: 48,
-            color: EchoTheme.textMuted,
-          ),
+          Icon(icon, size: 48, color: EchoTheme.textMuted),
           const SizedBox(height: 16),
           Text(
             message,
@@ -335,5 +334,4 @@ class _EchoDashboardPageState extends State<EchoDashboardPage> with TickerProvid
     if (diff.inMinutes > 0) return '${diff.inMinutes}m ago';
     return 'now';
   }
-
 }

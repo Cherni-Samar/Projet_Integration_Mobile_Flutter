@@ -36,7 +36,9 @@ class CartProvider extends ChangeNotifier {
       _items.removeWhere((existing) => existing.isPlan);
     } else {
       // For agents, don't allow duplicates
-      if (_items.any((existing) => !existing.isPlan && existing.agentName == item.agentName)) {
+      if (_items.any(
+        (existing) => !existing.isPlan && existing.agentName == item.agentName,
+      )) {
         return false;
       }
     }

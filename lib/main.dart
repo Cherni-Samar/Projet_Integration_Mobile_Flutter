@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-
-import '/app/app.dart';
-import '/app/app_providers.dart';
-import '/core/config/app_secrets.dart';
+import 'package:e_team/app/app.dart';
+import 'package:e_team/app/app_providers.dart';
+import 'package:e_team/core/config/app_secrets.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

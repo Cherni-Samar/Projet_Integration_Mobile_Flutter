@@ -59,11 +59,13 @@ class HeraMapper {
           ? Map<String, dynamic>.from(json['details'])
           : {},
     );
-  }  static HeraLeave leaveFromJson(
-      Map<String, dynamic> json, {
-        String employeeName = '',
-        String employeeRole = '',
-      }) {
+  }
+
+  static HeraLeave leaveFromJson(
+    Map<String, dynamic> json, {
+    String employeeName = '',
+    String employeeRole = '',
+  }) {
     return HeraLeave(
       id: extractId(json['_id'] ?? json['id']),
       employeeName: employeeName.isNotEmpty

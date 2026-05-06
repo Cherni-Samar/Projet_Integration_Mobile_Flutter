@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/../l10n/app_localizations.dart';
 
-import '../../providers/cart_provider.dart';
-import '../../providers/theme_provider.dart';
-import '../../providers/user_provider.dart';
+import 'package:e_team/data/services/agent_metadata_service.dart';
 import 'package:e_team/data/services/hera_service.dart';
+import 'package:e_team/l10n/app_localizations.dart';
+import 'package:e_team/presentation/providers/cart_provider.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/presentation/screens/hera/hera_dashboard_page.dart';
-import '../../widgets/agent/agent_swipe_dots.dart';
-import '../../widgets/agent/agent_avatar_hero.dart';
-import '../../widgets/agent/agent_description_bubble.dart';
-import '../../widgets/agent/agent_multi_scenario_card.dart';
-import '../../widgets/agent/agent_energy_pack_sheet.dart';
-import '../../widgets/agent/agent_hire_fab.dart';
-import '../../widgets/agent/agent_appbar_actions.dart';
-import '../../widgets/agent/agent_skills_section.dart';
-import '../../widgets/agent/agent_energy_costs_section.dart';
-import '../../widgets/agent/agent_name_header.dart';
-import '/data/services/agent_metadata_service.dart';
+import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
+import 'package:e_team/presentation/widgets/agent/agent_appbar_actions.dart';
+import 'package:e_team/presentation/widgets/agent/agent_avatar_hero.dart';
+import 'package:e_team/presentation/widgets/agent/agent_description_bubble.dart';
+import 'package:e_team/presentation/widgets/agent/agent_energy_costs_section.dart';
+import 'package:e_team/presentation/widgets/agent/agent_energy_pack_sheet.dart';
+import 'package:e_team/presentation/widgets/agent/agent_hire_fab.dart';
+import 'package:e_team/presentation/widgets/agent/agent_multi_scenario_card.dart';
+import 'package:e_team/presentation/widgets/agent/agent_name_header.dart';
+import 'package:e_team/presentation/widgets/agent/agent_skills_section.dart';
+import 'package:e_team/presentation/widgets/agent/agent_swipe_dots.dart';
 
 class AgentDetailsPage extends StatefulWidget {
   // ✅ Legacy single agent (optionnel)
@@ -105,7 +106,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       (agent['name'] ?? '').toString();
 
   Color _agentColor(Map<String, dynamic> agent) =>
-      agent['color'] as Color? ?? Colors.black;
+      colorFromValue(agent['color'], fallback: Colors.black);
 
   String _agentIcon(Map<String, dynamic> agent) =>
       (agent['icon'] ?? '').toString();
@@ -253,7 +254,8 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                     builder: (context, cart, child) {
                       return AgentAppBarActions(
                         cartItemCount: cart.itemCount,
-                        onCartPressed: () => Navigator.pushNamed(context, '/cart'),
+                        onCartPressed: () =>
+                            Navigator.pushNamed(context, '/cart'),
                         onSharePressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -272,7 +274,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
                                 borderRadius: BorderRadius.circular(12),
                                 side: isDark
                                     ? BorderSide(
-                                        color: Colors.white.withValues(alpha: 0.1),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.1,
+                                        ),
                                         width: 1,
                                       )
                                     : BorderSide.none,
@@ -319,7 +323,9 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
 
                           // Description bubble
                           AgentDescriptionBubble(
-                            description: _agentDescriptionLines(agent).join('\n\n'),
+                            description: _agentDescriptionLines(
+                              agent,
+                            ).join('\n\n'),
                             agentColor: color,
                             isDark: isDark,
                           ),
@@ -427,9 +433,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         if (canOpenDashboard) {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => const HeraDashboardPage(),
-            ),
+            MaterialPageRoute(builder: (_) => const HeraDashboardPage()),
           );
           return;
         }
@@ -491,9 +495,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         // 4. ✅ Navigate vers HeraDashboardPage
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => const HeraDashboardPage(),
-          ),
+          MaterialPageRoute(builder: (_) => const HeraDashboardPage()),
         );
       } catch (e) {
         if (!context.mounted) return;
@@ -552,6 +554,4 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       energyPacks: packs,
     );
   }
-
 }
-

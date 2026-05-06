@@ -10,12 +10,22 @@ class HeraEnergyTab extends StatelessWidget {
   const HeraEnergyTab({super.key, required this.energyBalance});
 
   static const _tasks = [
-    ('Demande de congé',       10, Icons.event_note_rounded,       HeraPalette.violet),
-    ('Congé urgent',           15, Icons.flash_on_rounded,         Color(0xFFEC4899)),
-    ('Onboarding employé',     25, Icons.person_add_alt_1_rounded, Color(0xFF8B5CF6)),
-    ('Promotion',              20, Icons.trending_up_rounded,      Color(0xFF06B6D4)),
-    ('Évaluation performance', 18, Icons.workspace_premium,        HeraPalette.warning),
-    ('Offboarding',            30, Icons.exit_to_app_rounded,      HeraPalette.danger),
+    ('Demande de congé', 10, Icons.event_note_rounded, HeraPalette.violet),
+    ('Congé urgent', 15, Icons.flash_on_rounded, Color(0xFFEC4899)),
+    (
+      'Onboarding employé',
+      25,
+      Icons.person_add_alt_1_rounded,
+      Color(0xFF8B5CF6),
+    ),
+    ('Promotion', 20, Icons.trending_up_rounded, Color(0xFF06B6D4)),
+    (
+      'Évaluation performance',
+      18,
+      Icons.workspace_premium,
+      HeraPalette.warning,
+    ),
+    ('Offboarding', 30, Icons.exit_to_app_rounded, HeraPalette.danger),
   ];
 
   @override
@@ -116,10 +126,7 @@ class HeraEnergyTab extends StatelessWidget {
               Expanded(
                 child: Text(
                   'L\'énergie se recharge chaque jour. Chaque action IA consomme des points selon sa complexité.',
-                  style: TextStyle(
-                    color: HeraPalette.textMuted,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: HeraPalette.textMuted, fontSize: 11),
                 ),
               ),
             ],

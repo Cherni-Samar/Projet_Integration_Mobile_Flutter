@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:e_team/data/services/echo_service.dart';
 import 'package:e_team/domain/models/echo_models.dart';
-import '../agent_communication_screen.dart';
+import 'package:e_team/presentation/screens/agent/agent_communication_screen.dart';
 import 'echo_email_detail_screen.dart';
 
 class EchoInboxScreen extends StatefulWidget {
@@ -55,10 +55,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
   Future<void> _markAsRead(EmailItem email) async {
     if (email.isRead) return;
 
-    final success = await EchoService.markAsRead(
-      email.id,
-      token: widget.token,
-    );
+    final success = await EchoService.markAsRead(email.id, token: widget.token);
 
     if (success && mounted) {
       setState(() {
@@ -83,10 +80,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Supprimer',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -103,9 +97,9 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
           _emails.removeWhere((e) => e.id == email.id);
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email supprimé')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Email supprimé')));
       }
     }
   }
@@ -142,10 +136,10 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
             Expanded(
               child: _isLoading
                   ? const Center(
-                child: CircularProgressIndicator(
-                  color: Color(0xFF7C3AED),
-                ),
-              )
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF7C3AED),
+                      ),
+                    )
                   : _selectedTab == 0
                   ? _buildBody(receivedEmails)
                   : _buildSentEmails(sentEmails),
@@ -155,6 +149,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
       ),
     );
   }
+
   Widget _buildTabs() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -171,10 +166,8 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
       ),
     );
   }
-  Widget _buildTabButton({
-    required String label,
-    required int index,
-  }) {
+
+  Widget _buildTabButton({required String label, required int index}) {
     final selected = _selectedTab == index;
 
     return GestureDetector(
@@ -187,12 +180,12 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
           borderRadius: BorderRadius.circular(10),
           boxShadow: selected
               ? [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            )
-          ]
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
               : [],
         ),
         child: Text(
@@ -207,6 +200,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
       ),
     );
   }
+
   Widget _buildHeaderAction({
     required IconData icon,
     required String label,
@@ -250,6 +244,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
       ),
     );
   }
+
   Widget _buildEchoInboxHeader() {
     final urgentCount = _emails
         .where((e) => e.isUrgent && !e.isRead && e.sender != 'echo@e-team.com')
@@ -407,6 +402,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
       ),
     );
   }
+
   Widget _buildBody(List<EmailItem> emails) {
     if (_errorMessage != null) {
       return _buildErrorState();
@@ -448,15 +444,9 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
         children: [
           Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
           const SizedBox(height: 16),
-          Text(
-            _errorMessage!,
-            style: TextStyle(color: Colors.grey[600]),
-          ),
+          Text(_errorMessage!, style: TextStyle(color: Colors.grey[600])),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadData,
-            child: const Text('Réessayer'),
-          ),
+          ElevatedButton(onPressed: _loadData, child: const Text('Réessayer')),
         ],
       ),
     );
@@ -473,10 +463,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
         children: [
           Icon(icon, size: 64, color: Colors.grey[400]),
           const SizedBox(height: 16),
-          Text(
-            title,
-            style: TextStyle(color: Colors.grey[500], fontSize: 16),
-          ),
+          Text(title, style: TextStyle(color: Colors.grey[500], fontSize: 16)),
           const SizedBox(height: 8),
           Text(
             subtitle,
@@ -487,13 +474,11 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
     );
   }
 
-
-
   Widget _buildEmailCard(EmailItem email) {
     final isUnread = !email.isRead && !email.isSpam;
 
     final pendingItem = _pending.firstWhere(
-          (p) => p.emailId == email.id,
+      (p) => p.emailId == email.id,
       orElse: () => PendingItem(
         emailId: '',
         subject: '',
@@ -505,7 +490,8 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
     );
 
     final isPending = pendingItem.emailId.isNotEmpty;
-    final isAutoReply = email.category == 'auto_reply' ||
+    final isAutoReply =
+        email.category == 'auto_reply' ||
         email.category == 'auto_reply_pending';
 
     return GestureDetector(
@@ -564,9 +550,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
                 radius: 24,
                 backgroundColor: _getSenderColor(email.sender),
                 child: Text(
-                  email.sender.isNotEmpty
-                      ? email.sender[0].toUpperCase()
-                      : '?',
+                  email.sender.isNotEmpty ? email.sender[0].toUpperCase() : '?',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -709,8 +693,6 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
     );
   }
 
-
-
   Widget _chipText({
     required String text,
     required Color bg,
@@ -803,7 +785,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
                       Navigator.pop(context);
                       _deleteEmail(email);
                     },
-                  )
+                  ),
                 ],
               ),
               SliverPadding(
@@ -898,10 +880,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
           Expanded(
             child: Text(
               '⚠️ Message urgent - À traiter immédiatement',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
             ),
           ),
         ],
@@ -916,10 +895,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
         color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 14, height: 1.4),
-      ),
+      child: Text(text, style: const TextStyle(fontSize: 14, height: 1.4)),
     );
   }
 
@@ -947,7 +923,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
             ),
             const SizedBox(height: 8),
             ...email.actions.map(
-                  (action) => Padding(
+              (action) => Padding(
                 padding: const EdgeInsets.only(bottom: 6),
                 child: Row(
                   children: [
@@ -1001,24 +977,24 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
         content: _pending.isEmpty
             ? const Text('Aucune réponse en attente')
             : SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: _pending.length,
-            itemBuilder: (context, index) {
-              final item = _pending[index];
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _pending.length,
+                  itemBuilder: (context, index) {
+                    final item = _pending[index];
 
-              return ListTile(
-                title: Text(item.subject),
-                subtitle: Text('De: ${item.sender}'),
-                trailing: Text(
-                  item.willSendIn,
-                  style: const TextStyle(color: Colors.orange),
+                    return ListTile(
+                      title: Text(item.subject),
+                      subtitle: Text('De: ${item.sender}'),
+                      trailing: Text(
+                        item.willSendIn,
+                        style: const TextStyle(color: Colors.orange),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ),
+              ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

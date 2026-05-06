@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/domain/models/user_model.dart';
-import '/data/services/auth_service.dart';
-import '../../providers/theme_provider.dart';
-import 'edit_profile_screen.dart';
-import '../settings/terms_and_conditions_screen.dart';
-import '../settings/privacy_policy_screen.dart';
-import '../settings/language_settings_screen.dart';
-import '/l10n/app_localizations.dart';
+import 'package:e_team/domain/models/user_model.dart';
+import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/presentation/screens/auth/edit_profile_screen.dart';
+import 'package:e_team/presentation/screens/settings/terms_and_conditions_screen.dart';
+import 'package:e_team/presentation/screens/settings/privacy_policy_screen.dart';
+import 'package:e_team/presentation/screens/settings/language_settings_screen.dart';
+import 'package:e_team/l10n/app_localizations.dart';
 
 class UserProfilePage extends StatefulWidget {
   final User? user;
@@ -40,9 +40,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           _isLoading = false;
         });
       }
-    } catch (e) {
-      print('Error loading user: $e');
-
+    } catch (_) {
       if (mounted) {
         setState(() {
           _currentUser = widget.user;
@@ -51,6 +49,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       }
     }
   }
+
   Future<void> _logout() async {
     final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
@@ -61,7 +60,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
         return AlertDialog(
           backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
           title: Text(
             l10n.logoutDialogTitle,
             style: TextStyle(
@@ -72,7 +73,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
           content: Text(
             l10n.logoutDialogMessage,
             style: TextStyle(
-              color: isDark ? Colors.white.withOpacity(0.7) : const Color(0xFF6B7280),
+              color: isDark
+                  ? Colors.white.withOpacity(0.7)
+                  : const Color(0xFF6B7280),
             ),
           ),
           actions: [
@@ -81,16 +84,24 @@ class _UserProfilePageState extends State<UserProfilePage> {
               child: Text(
                 l10n.commonCancel,
                 style: TextStyle(
-                  color: isDark ? Colors.white.withOpacity(0.5) : const Color(0xFF6B7280),
+                  color: isDark
+                      ? Colors.white.withOpacity(0.5)
+                      : const Color(0xFF6B7280),
                 ),
               ),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDark ? const Color(0xFFCDFF00) : Colors.black,
-                foregroundColor: isDark ? Colors.black : const Color(0xFFCDFF00),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                backgroundColor: isDark
+                    ? const Color(0xFFCDFF00)
+                    : Colors.black,
+                foregroundColor: isDark
+                    ? Colors.black
+                    : const Color(0xFFCDFF00),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: Text(l10n.profileLogout),
             ),
@@ -115,7 +126,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+        backgroundColor: isDark
+            ? const Color(0xFF0A0A0A)
+            : const Color(0xFFFAFAFA),
         body: Center(
           child: CircularProgressIndicator(
             color: isDark ? const Color(0xFFCDFF00) : Colors.black,
@@ -125,7 +138,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFFAFAFA),
       body: SafeArea(
         child: Column(
           children: [
@@ -140,11 +155,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+                        color: isDark
+                            ? Colors.white.withOpacity(0.05)
+                            : Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+                            color: Colors.black.withOpacity(
+                              isDark ? 0.2 : 0.05,
+                            ),
                             blurRadius: 10,
                           ),
                         ],
@@ -223,7 +242,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
             Text(
               _currentUser?.email ?? l10n.commonEmailPlaceholder,
               style: TextStyle(
-                color: isDark ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5),
+                color: isDark
+                    ? Colors.white.withOpacity(0.5)
+                    : Colors.black.withOpacity(0.5),
                 fontSize: 15,
               ),
             ),
@@ -261,7 +282,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                         child: Icon(
                           isDark ? Icons.dark_mode : Icons.light_mode,
-                          color: isDark ? const Color(0xFFCDFF00) : Colors.black,
+                          color: isDark
+                              ? const Color(0xFFCDFF00)
+                              : Colors.black,
                           size: 22,
                         ),
                       ),
@@ -277,7 +300,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         value: isDark,
                         onChanged: (value) => themeProvider.toggleTheme(),
                         activeColor: const Color(0xFFCDFF00),
-                        activeTrackColor: const Color(0xFFCDFF00).withOpacity(0.3),
+                        activeTrackColor: const Color(
+                          0xFFCDFF00,
+                        ).withOpacity(0.3),
                       ),
                     ),
                   ),
@@ -300,7 +325,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EditProfileScreen(user: _currentUser!),
+                          builder: (context) =>
+                              EditProfileScreen(user: _currentUser!),
                         ),
                       );
 
@@ -310,7 +336,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           SnackBar(
                             content: Row(
                               children: [
-                                const Icon(Icons.check_circle, color: Colors.white),
+                                const Icon(
+                                  Icons.check_circle,
+                                  color: Colors.white,
+                                ),
                                 const SizedBox(width: 12),
                                 Text(l10n.profileUpdatedSuccessfully),
                               ],
@@ -350,7 +379,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const TermsAndConditionsScreen(),
+                          builder: (context) =>
+                              const TermsAndConditionsScreen(),
                         ),
                       );
                     },

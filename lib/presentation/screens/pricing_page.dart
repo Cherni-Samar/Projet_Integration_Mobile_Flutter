@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '/l10n/app_localizations.dart';
-import '/data/services/stripe_service.dart';
+import 'package:e_team/l10n/app_localizations.dart';
+import 'package:e_team/data/services/stripe_service.dart';
 import 'package:e_team/data/dtos/user_dto.dart';
 import 'package:provider/provider.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/data/services/payment_plan_metadata_service.dart';
+
 class PricingPage extends StatefulWidget {
   const PricingPage({super.key});
 
@@ -196,9 +197,7 @@ class _PricingPageState extends State<PricingPage> {
                     ),
                     child: Text(
                       l10n.onboardingChatbotContinue,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),
                 ),
@@ -222,9 +221,7 @@ class _PricingPageState extends State<PricingPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.pricingOffersTitle),
-      ),
+      appBar: AppBar(title: Text(l10n.pricingOffersTitle)),
       body: Stack(
         children: [
           ListView(
@@ -248,8 +245,7 @@ class _PricingPageState extends State<PricingPage> {
                     isDark: isDark,
                     isLoading:
                         _isProcessing && _processingPackId == offer.packId,
-                    onTap:
-                        _isProcessing ? null : () => _handlePurchase(offer),
+                    onTap: _isProcessing ? null : () => _handlePurchase(offer),
                   ),
                   const SizedBox(height: 12),
                 ],
@@ -263,9 +259,7 @@ class _PricingPageState extends State<PricingPage> {
                 child: ColoredBox(
                   color: Colors.black.withValues(alpha: 0.35),
                   child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFFCDFF00),
-                    ),
+                    child: CircularProgressIndicator(color: Color(0xFFCDFF00)),
                   ),
                 ),
               ),
@@ -278,10 +272,7 @@ class _PricingPageState extends State<PricingPage> {
   static Widget _sectionTitle(String text) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
     );
   }
 
@@ -312,10 +303,7 @@ class _PricingPageState extends State<PricingPage> {
           decoration: BoxDecoration(
             color: isDark ? PricingPage.cardBg : Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: borderColor,
-              width: 0.8,
-            ),
+            border: Border.all(color: borderColor, width: 0.8),
             boxShadow: isBestValue
                 ? [
                     BoxShadow(

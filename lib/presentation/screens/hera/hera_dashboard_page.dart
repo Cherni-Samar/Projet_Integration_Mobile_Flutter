@@ -49,12 +49,8 @@ class _FluxData {
           stats == other.stats;
 
   @override
-  int get hashCode => Object.hash(
-        recentActions,
-        loadingStats,
-        loadingActions,
-        stats,
-      );
+  int get hashCode =>
+      Object.hash(recentActions, loadingStats, loadingActions, stats);
 }
 
 @immutable
@@ -203,12 +199,11 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
 
   // ─── Action handlers ──────────────────────────────────────────────────────
 
-  Future<void> _deleteAction(
-    Map<String, dynamic> action,
-    int index,
-  ) async {
-    final error =
-        await context.read<HeraProvider>().deleteAction(action, index);
+  Future<void> _deleteAction(Map<String, dynamic> action, int index) async {
+    final error = await context.read<HeraProvider>().deleteAction(
+      action,
+      index,
+    );
     if (!mounted) return;
     if (error != null) {
       AppErrorSnackBar.show(context, error);
@@ -227,9 +222,9 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
       data: ThemeData.light().copyWith(
         scaffoldBackgroundColor: HeraPalette.bg,
         textTheme: ThemeData.light().textTheme.apply(
-              bodyColor: HeraPalette.textPrimary,
-              displayColor: HeraPalette.textPrimary,
-            ),
+          bodyColor: HeraPalette.textPrimary,
+          displayColor: HeraPalette.textPrimary,
+        ),
       ),
       child: Scaffold(
         backgroundColor: HeraPalette.bg,
@@ -293,8 +288,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                           loadingActions: data.loadingActions,
                           stats: data.stats,
                           pulseCtrl: _pulseCtrl,
-                          onRefresh:
-                              context.read<HeraProvider>().refresh,
+                          onRefresh: context.read<HeraProvider>().refresh,
                           onDeleteAction: _deleteAction,
                           onShowDetail: _showActionDetail,
                         ),
@@ -312,16 +306,14 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                           focusedDay: _focusedDay,
                           calendarFormat: _calendarFormat,
                           allLeaves: allLeaves.toList(),
-                          onRefresh:
-                              context.read<HeraProvider>().refresh,
+                          onRefresh: context.read<HeraProvider>().refresh,
                           onDaySelected: (selected, focused) => setState(() {
                             _selectedDay = selected;
                             _focusedDay = focused;
                           }),
                           onFormatChanged: (format) =>
                               setState(() => _calendarFormat = format),
-                          onPageChanged: (focused) =>
-                              _focusedDay = focused,
+                          onPageChanged: (focused) => _focusedDay = focused,
                         ),
                       ),
 
@@ -339,8 +331,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                           candidates: data.candidates.toList(),
                           loadingEmployees: data.loadingEmployees,
                           employeeSubTab: _employeeSubTab,
-                          onRefresh:
-                              context.read<HeraProvider>().refresh,
+                          onRefresh: context.read<HeraProvider>().refresh,
                           onSubTabChanged: (i) =>
                               setState(() => _employeeSubTab = i),
                           onEmployeeTap: _showEmployeeDocuments,
@@ -353,18 +344,16 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                       // rebuilds when the balance actually changes.
                       Selector<UserProvider, int>(
                         selector: (_, p) => p.energyBalance,
-                        builder: (_, energyBalance, __) => HeraEnergyTab(
-                          energyBalance: energyBalance,
-                        ),
+                        builder: (_, energyBalance, __) =>
+                            HeraEnergyTab(energyBalance: energyBalance),
                       ),
 
                       // Tab 4 — Vision
                       // Rebuilds only when employees list changes.
                       Selector<HeraProvider, List<HeraEmployee>>(
                         selector: (_, p) => p.employees,
-                        builder: (_, employees, __) => HeraVisionTab(
-                          employees: employees.toList(),
-                        ),
+                        builder: (_, employees, __) =>
+                            HeraVisionTab(employees: employees.toList()),
                       ),
                     ],
                   ),
@@ -385,8 +374,10 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
         : <String, dynamic>{};
 
     final date = action['created_at'] != null
-        ? DateFormat('dd MMMM yyyy · HH:mm', 'fr_FR')
-            .format(DateTime.parse(action['created_at']))
+        ? DateFormat(
+            'dd MMMM yyyy · HH:mm',
+            'fr_FR',
+          ).format(DateTime.parse(action['created_at']))
         : 'Date inconnue';
 
     showDialog(
@@ -560,9 +551,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                           child: Row(
                             children: [
                               Icon(
-                                isContract
-                                    ? Icons.description
-                                    : Icons.payments,
+                                isContract ? Icons.description : Icons.payments,
                                 color: HeraPalette.mauve,
                               ),
                               const SizedBox(width: 12),

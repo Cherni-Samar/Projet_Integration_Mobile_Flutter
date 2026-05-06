@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import '/l10n/app_localizations.dart';
-import '/data/services/auth_service.dart';
+import 'package:e_team/l10n/app_localizations.dart';
+import 'package:e_team/data/services/auth_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
@@ -83,7 +83,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF8B5CF6).withOpacity(0.08 + _animationController.value * 0.04),
+                        const Color(
+                          0xFF8B5CF6,
+                        ).withOpacity(0.08 + _animationController.value * 0.04),
                         Colors.transparent,
                       ],
                     ),
@@ -200,7 +202,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
 
           // Champ email style login
           Focus(
-            onFocusChange: (focused) => setState(() => _isEmailFocused = focused),
+            onFocusChange: (focused) =>
+                setState(() => _isEmailFocused = focused),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               decoration: BoxDecoration(
@@ -292,23 +295,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
               ),
               child: _isLoading
                   ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Color(0xFFCCFF00),
-                  ),
-                ),
-              )
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFFCCFF00),
+                        ),
+                      ),
+                    )
                   : Text(
-                l10n.authSendResetLink,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                ),
-              ),
+                      l10n.authSendResetLink,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
             ),
           ),
 
@@ -448,7 +451,10 @@ class NeuralCorePainter extends CustomPainter {
   final double progress;
   final Color color;
 
-  NeuralCorePainter({required this.progress, this.color = const Color(0xFFCCFF00)});
+  NeuralCorePainter({
+    required this.progress,
+    this.color = const Color(0xFFCCFF00),
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -475,7 +481,8 @@ class NeuralCorePainter extends CustomPainter {
       final x = center.dx + math.cos(angle) * radius;
       final y = center.dy + math.sin(angle) * radius;
 
-      final lineOpacity = 0.3 + (math.sin(progress * math.pi * 2 + i) + 1) / 2 * 0.4;
+      final lineOpacity =
+          0.3 + (math.sin(progress * math.pi * 2 + i) + 1) / 2 * 0.4;
       canvas.drawLine(
         Offset(x, y),
         center,

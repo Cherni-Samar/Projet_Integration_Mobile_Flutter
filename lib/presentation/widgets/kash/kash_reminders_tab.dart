@@ -8,7 +8,8 @@ class KashRemindersTab extends StatelessWidget {
   final bool loadingReminders;
   final List<dynamic> reminders;
   final VoidCallback onAddReminder;
-  final Widget Function(String message, IconData icon, bool isDark) buildEmptyState;
+  final Widget Function(String message, IconData icon, bool isDark)
+  buildEmptyState;
   final dynamic Function(dynamic item, String key) readValue;
   final DateTime Function(dynamic value) safeDate;
   final Future<void> Function(String reminderId) onMarkReminderPaid;
@@ -49,7 +50,10 @@ class KashRemindersTab extends StatelessWidget {
               GestureDetector(
                 onTap: onAddReminder,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
                     color: KP.primary.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(20),
@@ -79,12 +83,18 @@ class KashRemindersTab extends StatelessWidget {
         Expanded(
           child: reminders.isEmpty
               ? Center(
-            child: buildEmptyState('Aucun paiement', Icons.notifications_off_rounded, isDark),
-          )
+                  child: buildEmptyState(
+                    'Aucun paiement',
+                    Icons.notifications_off_rounded,
+                    isDark,
+                  ),
+                )
               : ListView(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-            children: reminders.map((r) => _buildReminderCard(r)).toList(),
-          ),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                  children: reminders
+                      .map((r) => _buildReminderCard(r))
+                      .toList(),
+                ),
         ),
       ],
     );
@@ -93,16 +103,13 @@ class KashRemindersTab extends StatelessWidget {
   Widget _buildReminderCard(dynamic reminder) {
     final title = (readValue(reminder, 'title') ?? 'Unnamed').toString();
     final status = (readValue(reminder, 'status') ?? 'pending').toString();
-    final amount =
-        (readValue(reminder, 'amount') as num?)?.toDouble() ?? 0.0;
+    final amount = (readValue(reminder, 'amount') as num?)?.toDouble() ?? 0.0;
 
     final dueDate = safeDate(readValue(reminder, 'dueDate'));
 
-    final isOverdue =
-        status == 'pending' && dueDate.isBefore(DateTime.now());
+    final isOverdue = status == 'pending' && dueDate.isBefore(DateTime.now());
 
-    final reminderId =
-        readValue(reminder, '_id') ?? readValue(reminder, 'id');
+    final reminderId = readValue(reminder, '_id') ?? readValue(reminder, 'id');
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -156,14 +163,18 @@ class KashRemindersTab extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(Icons.schedule_rounded,
-                            size: 12, color: KP.textMuted(isDark)),
+                        Icon(
+                          Icons.schedule_rounded,
+                          size: 12,
+                          color: KP.textMuted(isDark),
+                        ),
                         const SizedBox(width: 4),
                         Text(
-                          DateFormat('EEE dd MMM', 'fr_FR')
-                              .format(dueDate),
+                          DateFormat('EEE dd MMM', 'fr_FR').format(dueDate),
                           style: TextStyle(
-                              color: KP.textMuted(isDark), fontSize: 11),
+                            color: KP.textMuted(isDark),
+                            fontSize: 11,
+                          ),
                         ),
                       ],
                     ),
@@ -185,7 +196,9 @@ class KashRemindersTab extends StatelessWidget {
                   if (status != 'paid')
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: isOverdue
                             ? KP.danger.withOpacity(0.12)
@@ -195,9 +208,7 @@ class KashRemindersTab extends StatelessWidget {
                       child: Text(
                         isOverdue ? 'RETARD' : 'À VENIR',
                         style: TextStyle(
-                          color: isOverdue
-                              ? KP.danger
-                              : KP.warning,
+                          color: isOverdue ? KP.danger : KP.warning,
                           fontSize: 9,
                           fontWeight: FontWeight.w900,
                         ),
@@ -206,7 +217,9 @@ class KashRemindersTab extends StatelessWidget {
                   else
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: KP.success.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(6),
@@ -233,18 +246,14 @@ class KashRemindersTab extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   backgroundColor: KP.primary,
                   foregroundColor: Colors.white,
-                  padding:
-                  const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
                 child: const Text(
                   'Mark as Paid',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
                 ),
               ),
             ),

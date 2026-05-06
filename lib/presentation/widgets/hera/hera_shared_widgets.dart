@@ -314,25 +314,25 @@ class HeraWorkforcePulse extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF7C3AED).withOpacity(
-                0.13 + 0.04 * pulseCtrl.value,
-              ),
+              const Color(
+                0xFF7C3AED,
+              ).withOpacity(0.13 + 0.04 * pulseCtrl.value),
               const Color(0xFFB57BFF).withOpacity(0.07),
               HeraPalette.bg,
             ],
           ),
           borderRadius: BorderRadius.circular(28),
           border: Border.all(
-            color: const Color(0xFF7C3AED).withOpacity(
-              0.45 + 0.1 * pulseCtrl.value,
-            ),
+            color: const Color(
+              0xFF7C3AED,
+            ).withOpacity(0.45 + 0.1 * pulseCtrl.value),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF7C3AED).withOpacity(
-                0.10 + 0.04 * pulseCtrl.value,
-              ),
+              color: const Color(
+                0xFF7C3AED,
+              ).withOpacity(0.10 + 0.04 * pulseCtrl.value),
               blurRadius: 24,
               spreadRadius: 2,
             ),
@@ -356,8 +356,10 @@ class HeraWorkforcePulse extends StatelessWidget {
               ),
               const Spacer(),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF7C3AED).withOpacity(0.12),
                   borderRadius: BorderRadius.circular(20),
@@ -685,10 +687,7 @@ class HeraOnboardingCard extends StatelessWidget {
                     ),
                     Text(
                       '${employee.role} · ${employee.department}',
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 11,
-                      ),
+                      style: const TextStyle(color: Colors.grey, fontSize: 11),
                     ),
                   ],
                 ),
@@ -1039,8 +1038,7 @@ class HeraPillTabBar extends StatelessWidget {
                     Icon(
                       tabs[index].$1,
                       size: 17,
-                      color:
-                          isSelected ? Colors.white : HeraPalette.textMuted,
+                      color: isSelected ? Colors.white : HeraPalette.textMuted,
                     ),
                     const SizedBox(height: 3),
                     Text(

@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'dart:math';
-import '/data/services/agent_interaction_service.dart';
-import '/domain/models/agent_interaction_model.dart';
+
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:e_team/data/services/agent_interaction_service.dart';
+import 'package:e_team/domain/models/agent_interaction_model.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 🎨 AGENT INTER-FLOW - WHITE SAAS PREMIUM DESIGN
@@ -11,31 +12,33 @@ import '/domain/models/agent_interaction_model.dart';
 
 class AgentInterFlowDesignSystem {
   // White SaaS Theme Colors
-  static const Color bg = Color(0xFFFFFFFF);           // Fond blanc pur
-  static const Color card = Color(0xFFFFFFFF);         // Cartes blanches
-  static const Color border = Color(0xFFF1F5F9);       // Bordures ultra-fines gris-bleu
-  static const Color textPrimary = Color(0xFF0F172A);  // Texte principal
+  static const Color bg = Color(0xFFFFFFFF); // Fond blanc pur
+  static const Color card = Color(0xFFFFFFFF); // Cartes blanches
+  static const Color border = Color(
+    0xFFF1F5F9,
+  ); // Bordures ultra-fines gris-bleu
+  static const Color textPrimary = Color(0xFF0F172A); // Texte principal
   static const Color textSecondary = Color(0xFF64748B); // Texte secondaire
-  static const Color textMuted = Color(0xFF94A3B8);    // Texte atténué
-  
+  static const Color textMuted = Color(0xFF94A3B8); // Texte atténué
+
   // Agent Identity Colors (Pastels)
-  static const Color heraGreen = Color(0xFFE8F5E8);    // Hera - Vert pastel
-  static const Color echoViolet = Color(0xFFF3E8FF);   // Echo - Violet pastel
-  static const Color timoOrange = Color(0xFFFFF4E6);   // Timo - Orange pastel
-  static const Color dexoBlue = Color(0xFFE6F3FF);     // Dexo - Bleu pastel
-  static const Color kashTeal = Color(0xFFE6FFFA);     // Kash - Teal pastel
-  
+  static const Color heraGreen = Color(0xFFE8F5E8); // Hera - Vert pastel
+  static const Color echoViolet = Color(0xFFF3E8FF); // Echo - Violet pastel
+  static const Color timoOrange = Color(0xFFFFF4E6); // Timo - Orange pastel
+  static const Color dexoBlue = Color(0xFFE6F3FF); // Dexo - Bleu pastel
+  static const Color kashTeal = Color(0xFFE6FFFA); // Kash - Teal pastel
+
   // Agent Icon Colors (Vifs)
   static const Color heraGreenIcon = Color(0xFF10B981);
   static const Color echoVioletIcon = Color(0xFF8B5CF6);
   static const Color timoOrangeIcon = Color(0xFFFF9800);
   static const Color dexoBlueIcon = Color(0xFF3B82F6);
   static const Color kashTealIcon = Color(0xFF06B6D4);
-  
+
   // Status Colors
-  static const Color success = Color(0xFF10B981);      // Vert succès
-  static const Color encrypted = Color(0xFF8B5CF6);    // Violet pour encrypted
-  static const Color shadowLight = Color(0x08000000);  // Ombre ultra-légère
+  static const Color success = Color(0xFF10B981); // Vert succès
+  static const Color encrypted = Color(0xFF8B5CF6); // Violet pour encrypted
+  static const Color shadowLight = Color(0x08000000); // Ombre ultra-légère
 }
 
 class AgentInteractionUi {
@@ -101,7 +104,6 @@ class AgentInterFlowPage extends StatefulWidget {
 
 class _AgentInterFlowPageState extends State<AgentInterFlowPage>
     with TickerProviderStateMixin {
-  
   List<AgentInteraction> _interactions = [];
   Map<String, int> _stats = {};
   bool _isLoading = true;
@@ -112,17 +114,17 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
   @override
   void initState() {
     super.initState();
-    
+
     _refreshController = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
     );
-    
+
     _arrowController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     )..repeat();
-    
+
     _loadInteractions();
   }
 
@@ -138,16 +140,12 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
       _isLoading = true;
       _error = null;
     });
-    
+
     try {
-      print('🔄 Chargement des interactions depuis le backend...');
-      
       // ✅ CHARGEMENT DYNAMIQUE DEPUIS LE BACKEND
       final interactions = await AgentInteractionService.getAgentInteractions();
       final stats = await AgentInteractionService.getInteractionStats();
-      
-      print('✅ Reçu ${interactions.length} interactions du backend');
-      
+
       if (mounted) {
         setState(() {
           _interactions = interactions;
@@ -155,10 +153,7 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
           _isLoading = false;
         });
       }
-      
-    } catch (e) {
-      print('❌ Erreur lors du chargement des interactions: $e');
-      
+    } catch (_) {
       if (mounted) {
         setState(() {
           _error = 'Erreur de connexion au serveur';
@@ -179,30 +174,31 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
 
   // ✅ FALLBACK - Données simulées en cas d'erreur de connexion
   List<AgentInteraction> _generateFallbackInteractions() {
-    print('⚠️ Utilisation des données de fallback (simulées)');
-    
     final random = Random();
     final interactions = <AgentInteraction>[];
-    
+
     // Exemples d'échanges réalistes pour le fallback
     final examples = [
       {
         'sender': AgentType.hera,
         'receiver': AgentType.echo,
         'actionType': 'Staffing Alert',
-        'summary': 'Recruitment required for Tech Dept - Senior Flutter Developer position',
+        'summary':
+            'Recruitment required for Tech Dept - Senior Flutter Developer position',
       },
       {
         'sender': AgentType.echo,
         'receiver': AgentType.hera,
         'actionType': 'Social Post Confirmation',
-        'summary': 'LinkedIn Job Post ID #4221 created and published successfully',
+        'summary':
+            'LinkedIn Job Post ID #4221 created and published successfully',
       },
       {
         'sender': AgentType.hera,
         'receiver': AgentType.timo,
         'actionType': 'Schedule Request',
-        'summary': 'Schedule exit interview for employee Eya - Departure date confirmed',
+        'summary':
+            'Schedule exit interview for employee Eya - Departure date confirmed',
       },
       {
         'sender': AgentType.dexo,
@@ -221,18 +217,20 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
     for (int i = 0; i < 8; i++) {
       final example = examples[random.nextInt(examples.length)];
       final minutesAgo = random.nextInt(120) + 1;
-      
-      interactions.add(AgentInteraction(
-        id: 'fallback_$i',
-        sender: example['sender'] as AgentType,
-        receiver: example['receiver'] as AgentType,
-        actionType: example['actionType'] as String,
-        summary: example['summary'] as String,
-        timestamp: DateTime.now().subtract(Duration(minutes: minutesAgo)),
-        status: random.nextBool() 
-            ? InteractionStatus.success 
-            : InteractionStatus.encrypted,
-      ));
+
+      interactions.add(
+        AgentInteraction(
+          id: 'fallback_$i',
+          sender: example['sender'] as AgentType,
+          receiver: example['receiver'] as AgentType,
+          actionType: example['actionType'] as String,
+          summary: example['summary'] as String,
+          timestamp: DateTime.now().subtract(Duration(minutes: minutesAgo)),
+          status: random.nextBool()
+              ? InteractionStatus.success
+              : InteractionStatus.encrypted,
+        ),
+      );
     }
 
     // Trier par timestamp décroissant
@@ -244,7 +242,7 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
     _refreshController.forward().then((_) {
       _refreshController.reset();
     });
-    
+
     await _loadInteractions();
   }
 
@@ -258,7 +256,9 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
             _buildProfessionalHeader(),
             _buildSystemStats(),
             Expanded(
-              child: _isLoading ? _buildLoadingState() : _buildInteractionFlow(),
+              child: _isLoading
+                  ? _buildLoadingState()
+                  : _buildInteractionFlow(),
             ),
           ],
         ),
@@ -269,7 +269,7 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
   // ═══════════════════════════════════════════════════════════════
   // 🏗️ PROFESSIONAL HEADER
   // ═══════════════════════════════════════════════════════════════
-  
+
   Widget _buildProfessionalHeader() {
     return Container(
       margin: const EdgeInsets.all(16),
@@ -277,7 +277,10 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
       decoration: BoxDecoration(
         color: AgentInterFlowDesignSystem.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AgentInterFlowDesignSystem.border, width: 0.5),
+        border: Border.all(
+          color: AgentInterFlowDesignSystem.border,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: AgentInterFlowDesignSystem.shadowLight,
@@ -295,7 +298,10 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
             decoration: BoxDecoration(
               color: AgentInterFlowDesignSystem.bg,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AgentInterFlowDesignSystem.border, width: 0.5),
+              border: Border.all(
+                color: AgentInterFlowDesignSystem.border,
+                width: 0.5,
+              ),
             ),
             child: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 16),
@@ -304,12 +310,14 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
             ),
           ),
           const SizedBox(width: 16),
-          
+
           // Icône système
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AgentInterFlowDesignSystem.encrypted.withOpacity(0.1),
+              color: AgentInterFlowDesignSystem.encrypted.withValues(
+                alpha: 0.1,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -319,7 +327,7 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
             ),
           ),
           const SizedBox(width: 16),
-          
+
           // Titre et sous-titre
           Expanded(
             child: Column(
@@ -346,7 +354,7 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
               ],
             ),
           ),
-          
+
           // Bouton Refresh
           GestureDetector(
             onTap: _refreshInteractions,
@@ -358,10 +366,14 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AgentInterFlowDesignSystem.success.withOpacity(0.1),
+                      color: AgentInterFlowDesignSystem.success.withValues(
+                        alpha: 0.1,
+                      ),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: AgentInterFlowDesignSystem.success.withOpacity(0.2),
+                        color: AgentInterFlowDesignSystem.success.withValues(
+                          alpha: 0.2,
+                        ),
                         width: 0.5,
                       ),
                     ),
@@ -383,19 +395,30 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
   // ═══════════════════════════════════════════════════════════════
   // 📊 SYSTEM STATS
   // ═══════════════════════════════════════════════════════════════
-  
+
   Widget _buildSystemStats() {
     final totalInteractions = _stats['total'] ?? _interactions.length;
-    final successfulInteractions = _stats['successful'] ?? _interactions.where((i) => i.status == InteractionStatus.success).length;
-    final encryptedInteractions = _stats['encrypted'] ?? _interactions.where((i) => i.status == InteractionStatus.encrypted).length;
-    
+    final successfulInteractions =
+        _stats['successful'] ??
+        _interactions
+            .where((i) => i.status == InteractionStatus.success)
+            .length;
+    final encryptedInteractions =
+        _stats['encrypted'] ??
+        _interactions
+            .where((i) => i.status == InteractionStatus.encrypted)
+            .length;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AgentInterFlowDesignSystem.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AgentInterFlowDesignSystem.border, width: 0.5),
+        border: Border.all(
+          color: AgentInterFlowDesignSystem.border,
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: AgentInterFlowDesignSystem.shadowLight,
@@ -414,7 +437,11 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
               AgentInterFlowDesignSystem.textPrimary,
             ),
           ),
-          Container(width: 1, height: 40, color: AgentInterFlowDesignSystem.border),
+          Container(
+            width: 1,
+            height: 40,
+            color: AgentInterFlowDesignSystem.border,
+          ),
           Expanded(
             child: _buildStatMetric(
               'SUCCESSFUL',
@@ -423,7 +450,11 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
               AgentInterFlowDesignSystem.success,
             ),
           ),
-          Container(width: 1, height: 40, color: AgentInterFlowDesignSystem.border),
+          Container(
+            width: 1,
+            height: 40,
+            color: AgentInterFlowDesignSystem.border,
+          ),
           Expanded(
             child: _buildStatMetric(
               'ENCRYPTED',
@@ -437,7 +468,12 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
     );
   }
 
-  Widget _buildStatMetric(String label, String value, IconData icon, Color color) {
+  Widget _buildStatMetric(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Column(
       children: [
         Icon(icon, color: color, size: 20),
@@ -468,7 +504,7 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
   // ═══════════════════════════════════════════════════════════════
   // 🔄 INTERACTION FLOW
   // ═══════════════════════════════════════════════════════════════
-  
+
   Widget _buildInteractionFlow() {
     if (_interactions.isEmpty) {
       return _buildEmptyState();
@@ -490,8 +526,9 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
 
   Widget _buildInteractionCard(AgentInteraction interaction, int index) {
     final senderConfig = AgentInteractionUi.agentConfig[interaction.sender]!;
-    final receiverConfig = AgentInteractionUi.agentConfig[interaction.receiver]!;
-    
+    final receiverConfig =
+        AgentInteractionUi.agentConfig[interaction.receiver]!;
+
     return TweenAnimationBuilder<double>(
       duration: Duration(milliseconds: 300 + (index * 50)),
       tween: Tween(begin: 0.0, end: 1.0),
@@ -499,10 +536,7 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
       builder: (context, value, child) {
         return Transform.translate(
           offset: Offset(0, 20 * (1 - value)),
-          child: Opacity(
-            opacity: value,
-            child: child,
-          ),
+          child: Opacity(opacity: value, child: child),
         );
       },
       child: Container(
@@ -511,7 +545,10 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
         decoration: BoxDecoration(
           color: AgentInterFlowDesignSystem.card,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AgentInterFlowDesignSystem.border, width: 0.5),
+          border: Border.all(
+            color: AgentInterFlowDesignSystem.border,
+            width: 0.5,
+          ),
           boxShadow: [
             BoxShadow(
               color: AgentInterFlowDesignSystem.shadowLight,
@@ -533,16 +570,14 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
                   senderConfig['bgColor'],
                   senderConfig['iconColor'],
                 ),
-                
+
                 const SizedBox(width: 16),
-                
+
                 // Flèche animée
-                Expanded(
-                  child: _buildAnimatedArrow(),
-                ),
-                
+                Expanded(child: _buildAnimatedArrow()),
+
                 const SizedBox(width: 16),
-                
+
                 // Agent récepteur
                 _buildAgentAvatar(
                   receiverConfig['name'],
@@ -550,17 +585,20 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
                   receiverConfig['bgColor'],
                   receiverConfig['iconColor'],
                 ),
-                
+
                 const SizedBox(width: 16),
-                
+
                 // Badge de statut
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: interaction.statusColor.withOpacity(0.1),
+                    color: interaction.statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: interaction.statusColor.withOpacity(0.2),
+                      color: interaction.statusColor.withValues(alpha: 0.2),
                       width: 0.5,
                     ),
                   ),
@@ -576,9 +614,9 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Type d'action
             Text(
               interaction.actionType.toUpperCase(),
@@ -589,9 +627,9 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
                 letterSpacing: 0.8,
               ),
             ),
-            
+
             const SizedBox(height: 4),
-            
+
             // Résumé du message
             Text(
               interaction.summary,
@@ -602,9 +640,9 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
                 height: 1.4,
               ),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Timestamp
             Row(
               children: [
@@ -630,7 +668,12 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
     );
   }
 
-  Widget _buildAgentAvatar(String name, IconData icon, Color bgColor, Color iconColor) {
+  Widget _buildAgentAvatar(
+    String name,
+    IconData icon,
+    Color bgColor,
+    Color iconColor,
+  ) {
     return Column(
       children: [
         Container(
@@ -639,13 +682,12 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
           decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: iconColor.withOpacity(0.2), width: 0.5),
+            border: Border.all(
+              color: iconColor.withValues(alpha: 0.2),
+              width: 0.5,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: iconColor,
-            size: 24,
-          ),
+          child: Icon(icon, color: iconColor, size: 24),
         ),
         const SizedBox(height: 6),
         Text(
@@ -673,15 +715,17 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AgentInterFlowDesignSystem.encrypted.withOpacity(0.3),
-                      AgentInterFlowDesignSystem.encrypted.withOpacity(0.8),
-                      AgentInterFlowDesignSystem.encrypted.withOpacity(0.3),
+                      AgentInterFlowDesignSystem.encrypted.withValues(
+                        alpha: 0.3,
+                      ),
+                      AgentInterFlowDesignSystem.encrypted.withValues(
+                        alpha: 0.8,
+                      ),
+                      AgentInterFlowDesignSystem.encrypted.withValues(
+                        alpha: 0.3,
+                      ),
                     ],
-                    stops: [
-                      0.0,
-                      _arrowController.value,
-                      1.0,
-                    ],
+                    stops: [0.0, _arrowController.value, 1.0],
                   ),
                   borderRadius: BorderRadius.circular(1),
                 ),
@@ -690,7 +734,9 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
             const SizedBox(width: 4),
             Icon(
               Icons.arrow_forward_rounded,
-              color: AgentInterFlowDesignSystem.encrypted.withOpacity(0.6 + 0.4 * _arrowController.value),
+              color: AgentInterFlowDesignSystem.encrypted.withValues(
+                alpha: 0.6 + 0.4 * _arrowController.value,
+              ),
               size: 16,
             ),
           ],
@@ -702,7 +748,7 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
   // ═══════════════════════════════════════════════════════════════
   // 🔄 LOADING & EMPTY STATES
   // ═══════════════════════════════════════════════════════════════
-  
+
   Widget _buildLoadingState() {
     return Center(
       child: Column(
@@ -716,8 +762,8 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
           Text(
             _error != null ? _error! : 'Scanning network activity...',
             style: GoogleFonts.plusJakartaSans(
-              color: _error != null 
-                  ? Colors.red 
+              color: _error != null
+                  ? Colors.red
                   : AgentInterFlowDesignSystem.textMuted,
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -748,13 +794,17 @@ class _AgentInterFlowPageState extends State<AgentInterFlowPage>
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: AgentInterFlowDesignSystem.encrypted.withOpacity(0.1),
+              color: AgentInterFlowDesignSystem.encrypted.withValues(
+                alpha: 0.1,
+              ),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.hub_outlined,
               size: 64,
-              color: AgentInterFlowDesignSystem.encrypted.withOpacity(0.5),
+              color: AgentInterFlowDesignSystem.encrypted.withValues(
+                alpha: 0.5,
+              ),
             ),
           ),
           const SizedBox(height: 24),

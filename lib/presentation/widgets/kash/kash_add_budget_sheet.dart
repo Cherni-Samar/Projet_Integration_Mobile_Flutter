@@ -36,9 +36,9 @@ Future<void> showKashAddBudgetSheet({
           children: [
             Text(
               'Ajouter un Budget',
-              style: Theme.of(sheetContext).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-              ),
+              style: Theme.of(
+                sheetContext,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 16),
 
@@ -167,8 +167,9 @@ Future<void> showKashAddBudgetSheet({
                         amountController.text.isEmpty) {
                       messenger.showSnackBar(
                         SnackBar(
-                          content:
-                              const Text('Veuillez remplir tous les champs'),
+                          content: const Text(
+                            'Veuillez remplir tous les champs',
+                          ),
                           backgroundColor: KP.danger,
                           behavior: SnackBarBehavior.floating,
                         ),
@@ -182,7 +183,8 @@ Future<void> showKashAddBudgetSheet({
                         messenger.showSnackBar(
                           SnackBar(
                             content: const Text(
-                                'Le montant doit être supérieur à 0'),
+                              'Le montant doit être supérieur à 0',
+                            ),
                             backgroundColor: KP.danger,
                             behavior: SnackBarBehavior.floating,
                           ),

@@ -27,11 +27,7 @@ class AgentDescriptionBubble extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Icon(
-            Icons.format_quote_rounded,
-            color: agentColor,
-            size: 32,
-          ),
+          Icon(Icons.format_quote_rounded, color: agentColor, size: 32),
           const SizedBox(height: 8),
           Text(
             description,

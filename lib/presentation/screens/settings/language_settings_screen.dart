@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/theme_provider.dart';
-import '../../providers/locale_provider.dart';
-import '/l10n/app_localizations.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/presentation/providers/locale_provider.dart';
+import 'package:e_team/l10n/app_localizations.dart';
 
 class LanguageSettingsScreen extends StatefulWidget {
   const LanguageSettingsScreen({Key? key}) : super(key: key);
@@ -16,18 +16,8 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   bool _didInitFromProvider = false;
 
   final List<Map<String, dynamic>> _languages = [
-    {
-      'code': 'en',
-      'name': 'English',
-      'nativeName': 'English',
-      'flag': '🇬🇧',
-    },
-    {
-      'code': 'fr',
-      'name': 'French',
-      'nativeName': 'Français',
-      'flag': '🇫🇷',
-    },
+    {'code': 'en', 'name': 'English', 'nativeName': 'English', 'flag': '🇬🇧'},
+    {'code': 'fr', 'name': 'French', 'nativeName': 'Français', 'flag': '🇫🇷'},
   ];
 
   @override
@@ -55,7 +45,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFFAFAFA),
       body: SafeArea(
         child: Column(
           children: [
@@ -65,21 +57,18 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               decoration: BoxDecoration(
                 gradient: isDark
                     ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF1E1E1E),
-                    const Color(0xFF2A2A2A),
-                  ],
-                )
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFF1E1E1E),
+                          const Color(0xFF2A2A2A),
+                        ],
+                      )
                     : LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    const Color(0xFFF9FAFB),
-                  ],
-                ),
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.white, const Color(0xFFF9FAFB)],
+                      ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
@@ -155,13 +144,13 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                   gradient: LinearGradient(
                     colors: isDark
                         ? [
-                      const Color(0xFFCDFF00).withOpacity(0.15),
-                      const Color(0xFFAADD00).withOpacity(0.1),
-                    ]
+                            const Color(0xFFCDFF00).withOpacity(0.15),
+                            const Color(0xFFAADD00).withOpacity(0.1),
+                          ]
                         : [
-                      const Color(0xFFCDFF00).withOpacity(0.2),
-                      const Color(0xFFAADD00).withOpacity(0.15),
-                    ],
+                            const Color(0xFFCDFF00).withOpacity(0.2),
+                            const Color(0xFFAADD00).withOpacity(0.15),
+                          ],
                   ),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
@@ -188,7 +177,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                       child: Text(
                         l10n.languageInfoBanner,
                         style: TextStyle(
-                          color: isDark ? const Color(0xFFCDFF00) : Colors.black,
+                          color: isDark
+                              ? const Color(0xFFCDFF00)
+                              : Colors.black,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -255,7 +246,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                       backgroundColor: isDark
                           ? const Color(0xFFCDFF00)
                           : Colors.black,
-                      foregroundColor: isDark ? Colors.black : const Color(0xFFCDFF00),
+                      foregroundColor: isDark
+                          ? Colors.black
+                          : const Color(0xFFCDFF00),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -297,16 +290,16 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
       decoration: BoxDecoration(
         gradient: isSelected
             ? LinearGradient(
-          colors: isDark
-              ? [
-            const Color(0xFFCDFF00).withOpacity(0.15),
-            const Color(0xFFAADD00).withOpacity(0.1),
-          ]
-              : [
-            const Color(0xFFCDFF00).withOpacity(0.2),
-            const Color(0xFFAADD00).withOpacity(0.15),
-          ],
-        )
+                colors: isDark
+                    ? [
+                        const Color(0xFFCDFF00).withOpacity(0.15),
+                        const Color(0xFFAADD00).withOpacity(0.1),
+                      ]
+                    : [
+                        const Color(0xFFCDFF00).withOpacity(0.2),
+                        const Color(0xFFAADD00).withOpacity(0.15),
+                      ],
+              )
             : null,
         color: isSelected
             ? null
@@ -374,7 +367,9 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                         language['nativeName'],
                         style: TextStyle(
                           color: isSelected
-                              ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
+                              ? (isDark
+                                    ? const Color(0xFFCDFF00)
+                                    : Colors.black)
                               : (isDark ? Colors.white : Colors.black),
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -414,11 +409,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                         ),
                       ],
                     ),
-                    child: Icon(
-                      Icons.check,
-                      color: Colors.black,
-                      size: 20,
-                    ),
+                    child: Icon(Icons.check, color: Colors.black, size: 20),
                   )
                 else
                   Container(
@@ -446,22 +437,17 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
 
   Widget _buildConfirmationDialog(bool isDark) {
     final selectedLang = _languages.firstWhere(
-          (lang) => lang['code'] == _selectedLanguage,
+      (lang) => lang['code'] == _selectedLanguage,
     );
 
     final l10n = AppLocalizations.of(context)!;
 
     return AlertDialog(
       backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       title: Row(
         children: [
-          Text(
-            selectedLang['flag'],
-            style: const TextStyle(fontSize: 32),
-          ),
+          Text(selectedLang['flag'], style: const TextStyle(fontSize: 32)),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -498,7 +484,10 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         ),
         ElevatedButton(
           onPressed: () async {
-            final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+            final localeProvider = Provider.of<LocaleProvider>(
+              context,
+              listen: false,
+            );
             await localeProvider.setLocale(Locale(_selectedLanguage));
 
             Navigator.pop(context); // Fermer dialog
@@ -509,7 +498,10 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               SnackBar(
                 content: Row(
                   children: [
-                    Text(selectedLang['flag'], style: const TextStyle(fontSize: 20)),
+                    Text(
+                      selectedLang['flag'],
+                      style: const TextStyle(fontSize: 20),
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(

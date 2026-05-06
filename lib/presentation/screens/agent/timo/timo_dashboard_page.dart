@@ -3,33 +3,37 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '/data/services/timo_service.dart';
+import 'package:e_team/data/services/timo_service.dart';
 
 // ═══════════════════════════════════════════════════════════════
 // 🎨 WHITE SAAS PREMIUM DESIGN SYSTEM
 // ═══════════════════════════════════════════════════════════════
 class TimoDesignSystem {
   // White SaaS Theme Colors
-  static const Color bg = Color(0xFFFFFFFF);           // Fond blanc pur
-  static const Color card = Color(0xFFFFFFFF);         // Cartes blanches
-  static const Color border = Color(0xFFF1F5F9);       // Bordures ultra-fines gris-bleu
-  static const Color textPrimary = Color(0xFF0F172A);  // Texte principal
+  static const Color bg = Color(0xFFFFFFFF); // Fond blanc pur
+  static const Color card = Color(0xFFFFFFFF); // Cartes blanches
+  static const Color border = Color(
+    0xFFF1F5F9,
+  ); // Bordures ultra-fines gris-bleu
+  static const Color textPrimary = Color(0xFF0F172A); // Texte principal
   static const Color textSecondary = Color(0xFF64748B); // Texte secondaire
-  static const Color textMuted = Color(0xFF94A3B8);    // Texte atténué
-  
+  static const Color textMuted = Color(0xFF94A3B8); // Texte atténué
+
   // Task Type Colors
-  static const Color interview = Color(0xFF06B6D4);    // Cyan pour interviews
-  static const Color onboarding = Color(0xFF10B981);   // Emerald pour onboarding
-  static const Color offboarding = Color(0xFFF87171);  // Rouge Corail pour offboarding
-  static const Color other = Color(0xFFFF9800);        // Orange pour autres
-  
+  static const Color interview = Color(0xFF06B6D4); // Cyan pour interviews
+  static const Color onboarding = Color(0xFF10B981); // Emerald pour onboarding
+  static const Color offboarding = Color(
+    0xFFF87171,
+  ); // Rouge Corail pour offboarding
+  static const Color other = Color(0xFFFF9800); // Orange pour autres
+
   // Status Colors
-  static const Color success = Color(0xFF10B981);      // Vert succès
-  static const Color warning = Color(0xFFF59E0B);      // Orange warning
-  static const Color neonGreen = Color(0xFFCCFF00);    // Point de vie pulsant
-  
+  static const Color success = Color(0xFF10B981); // Vert succès
+  static const Color warning = Color(0xFFF59E0B); // Orange warning
+  static const Color neonGreen = Color(0xFFCCFF00); // Point de vie pulsant
+
   // Shadows & Effects
-  static const Color shadowLight = Color(0x08000000);  // Ombre ultra-légère
+  static const Color shadowLight = Color(0x08000000); // Ombre ultra-légère
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -38,12 +42,12 @@ class TimoDesignSystem {
 enum TaskType { interview, onboarding, offboarding, other }
 
 class TimoTask {
-  final String    raw;
-  final String    employeeName;
-  final TaskType  type;
-  final String    status;
+  final String raw;
+  final String employeeName;
+  final TaskType type;
+  final String status;
   final DateTime? deadline;
-  final String    id;
+  final String id;
 
   TimoTask({
     required this.raw,
@@ -55,25 +59,31 @@ class TimoTask {
   });
 
   factory TimoTask.fromMap(Map<String, dynamic> m) {
-    final title  = m['title'] as String? ?? '';
+    final title = m['title'] as String? ?? '';
     final status = m['status'] as String? ?? 'todo';
-    final id     = m['_id']?.toString() ?? '';
+    final id = m['_id']?.toString() ?? '';
 
     DateTime? deadline;
-    try { deadline = DateTime.parse(m['deadline']); } catch (_) {}
+    try {
+      deadline = DateTime.parse(m['deadline']);
+    } catch (_) {}
 
     // ✅ NOUVELLE LOGIQUE DE CLASSIFICATION PAR MOTS-CLÉS
     TaskType type = TaskType.other;
     String employeeName = title;
 
     final lowerTitle = title.toLowerCase();
-    
+
     // Classification par mots-clés
-    if (lowerTitle.contains('démission') || lowerTitle.contains('départ') || lowerTitle.contains('offboarding')) {
+    if (lowerTitle.contains('démission') ||
+        lowerTitle.contains('départ') ||
+        lowerTitle.contains('offboarding')) {
       type = TaskType.offboarding;
-    } else if (lowerTitle.contains('intégration') || lowerTitle.contains('onboarding')) {
+    } else if (lowerTitle.contains('intégration') ||
+        lowerTitle.contains('onboarding')) {
       type = TaskType.onboarding;
-    } else if (lowerTitle.contains('entretien') || lowerTitle.contains('interview')) {
+    } else if (lowerTitle.contains('entretien') ||
+        lowerTitle.contains('interview')) {
       type = TaskType.interview;
     }
 
@@ -86,12 +96,12 @@ class TimoTask {
     }
 
     return TimoTask(
-      raw: title, 
-      employeeName: employeeName, 
+      raw: title,
+      employeeName: employeeName,
       type: type,
-      status: status, 
-      deadline: deadline, 
-      id: id
+      status: status,
+      deadline: deadline,
+      id: id,
     );
   }
 
@@ -99,24 +109,24 @@ class TimoTask {
 
   // Configuration visuelle selon le type
   IconData get icon => switch (type) {
-    TaskType.interview   => Icons.record_voice_over_rounded,
-    TaskType.onboarding  => Icons.person_add_alt_1_rounded,
+    TaskType.interview => Icons.record_voice_over_rounded,
+    TaskType.onboarding => Icons.person_add_alt_1_rounded,
     TaskType.offboarding => Icons.exit_to_app_rounded,
-    TaskType.other       => Icons.event_rounded,
+    TaskType.other => Icons.event_rounded,
   };
 
   Color get color => switch (type) {
-    TaskType.interview   => TimoDesignSystem.interview,
-    TaskType.onboarding  => TimoDesignSystem.onboarding,
+    TaskType.interview => TimoDesignSystem.interview,
+    TaskType.onboarding => TimoDesignSystem.onboarding,
     TaskType.offboarding => TimoDesignSystem.offboarding,
-    TaskType.other       => TimoDesignSystem.other,
+    TaskType.other => TimoDesignSystem.other,
   };
 
   String get typeLabel => switch (type) {
-    TaskType.interview   => 'INTERVIEW',
-    TaskType.onboarding  => 'ONBOARDING',
+    TaskType.interview => 'INTERVIEW',
+    TaskType.onboarding => 'ONBOARDING',
     TaskType.offboarding => 'OFFBOARDING',
-    TaskType.other       => 'TÂCHE',
+    TaskType.other => 'TÂCHE',
   };
 }
 
@@ -131,14 +141,13 @@ class TimoDashboardPage extends StatefulWidget {
 
 class _TimoDashboardPageState extends State<TimoDashboardPage>
     with TickerProviderStateMixin {
-
   int _tab = 0;
   TaskType? _activeFilter;
 
   bool _isLoading = true;
   List<TimoTask> _tasks = [];
 
-  DateTime  _focusedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   CalendarFormat _calFmt = CalendarFormat.month;
 
@@ -146,7 +155,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
   late AnimationController _pulseController;
 
   static const _tabs = [
-    (Icons.article_rounded,        'Journal IA'),
+    (Icons.article_rounded, 'Journal IA'),
     (Icons.calendar_month_rounded, 'Agenda'),
   ];
 
@@ -154,13 +163,13 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
   @override
   void initState() {
     super.initState();
-    
+
     // ✅ INITIALISER UNIQUEMENT LE CONTROLLER DE PULSATION
     _pulseController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
-    
+
     _loadData();
   }
 
@@ -176,38 +185,43 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
     setState(() => _isLoading = true);
     try {
       final r = await TimoService.getTimoTasks();
-      if (mounted) setState(() {
-        _tasks = List<Map<String, dynamic>>.from(r['tasks'] ?? [])
-            .map(TimoTask.fromMap)
-            .toList();
-        
-        // ✅ TRI CHRONOLOGIQUE PAR DATE (DEADLINE)
-        _tasks.sort((a, b) {
-          if (a.deadline == null && b.deadline == null) return 0;
-          if (a.deadline == null) return 1;
-          if (b.deadline == null) return -1;
-          return a.deadline!.compareTo(b.deadline!);
+      if (mounted)
+        setState(() {
+          _tasks = List<Map<String, dynamic>>.from(
+            r['tasks'] ?? [],
+          ).map(TimoTask.fromMap).toList();
+
+          // ✅ TRI CHRONOLOGIQUE PAR DATE (DEADLINE)
+          _tasks.sort((a, b) {
+            if (a.deadline == null && b.deadline == null) return 0;
+            if (a.deadline == null) return 1;
+            if (b.deadline == null) return -1;
+            return a.deadline!.compareTo(b.deadline!);
+          });
+
+          _isLoading = false;
         });
-        
-        _isLoading = false;
-      });
     } catch (_) {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   // ── Computed ───────────────────────────────────────────────
-  List<TimoTask> get _interviews   => _tasks.where((t) => t.type == TaskType.interview).toList();
-  List<TimoTask> get _onboardings  => _tasks.where((t) => t.type == TaskType.onboarding).toList();
-  List<TimoTask> get _offboardings => _tasks.where((t) => t.type == TaskType.offboarding).toList();
-  List<TimoTask> get _done         => _tasks.where((t) => t.isDone).toList();
+  List<TimoTask> get _interviews =>
+      _tasks.where((t) => t.type == TaskType.interview).toList();
+  List<TimoTask> get _onboardings =>
+      _tasks.where((t) => t.type == TaskType.onboarding).toList();
+  List<TimoTask> get _offboardings =>
+      _tasks.where((t) => t.type == TaskType.offboarding).toList();
+  List<TimoTask> get _done => _tasks.where((t) => t.isDone).toList();
 
   List<TimoTask> get _filtered => _activeFilter == null
       ? _tasks
       : _tasks.where((t) => t.type == _activeFilter).toList();
 
-  List<TimoTask> _tasksOn(DateTime day) => _tasks.where((t) =>
-  t.deadline != null && isSameDay(t.deadline!, day)).toList();
+  List<TimoTask> _tasksOn(DateTime day) => _tasks
+      .where((t) => t.deadline != null && isSameDay(t.deadline!, day))
+      .toList();
 
   // ── Build ──────────────────────────────────────────────────
   @override
@@ -223,11 +237,15 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
             const SizedBox(height: 8),
             Expanded(
               child: _isLoading
-                  ? Center(child: CircularProgressIndicator(color: TimoDesignSystem.other))
-                  : IndexedStack(index: _tab, children: [
-                _buildJournal(),
-                _buildAgenda(),
-              ]),
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: TimoDesignSystem.other,
+                      ),
+                    )
+                  : IndexedStack(
+                      index: _tab,
+                      children: [_buildJournal(), _buildAgenda()],
+                    ),
             ),
           ],
         ),
@@ -272,7 +290,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
             ),
           ),
           const SizedBox(width: 16),
-          
+
           // Avatar Timo
           Container(
             width: 50,
@@ -310,7 +328,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
             ),
           ),
           const SizedBox(width: 20),
-          
+
           // Nom et statut
           Expanded(
             child: Column(
@@ -335,7 +353,9 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: TimoDesignSystem.neonGreen.withOpacity(0.4 + 0.6 * _pulseController.value),
+                            color: TimoDesignSystem.neonGreen.withOpacity(
+                              0.4 + 0.6 * _pulseController.value,
+                            ),
                             shape: BoxShape.circle,
                           ),
                         );
@@ -373,10 +393,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            TimoDesignSystem.other,
-            const Color(0xFFF57C00),
-          ],
+          colors: [TimoDesignSystem.other, const Color(0xFFF57C00)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -408,7 +425,10 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(12),
                     border: isSelected
-                        ? Border.all(color: Colors.white.withOpacity(0.3), width: 0.5)
+                        ? Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 0.5,
+                          )
                         : null,
                   ),
                   child: Column(
@@ -455,9 +475,12 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
   //  TAB 0 — JOURNAL IA - WHITE SAAS DESIGN
   // ════════════════════════════════════════════════════════════
   Widget _buildJournal() {
-    if (_tasks.isEmpty) return _emptyState(
-        Icons.article_outlined, 'Aucune tâche planifiée',
-        'Hera n\'a encore rien envoyé à Timo.');
+    if (_tasks.isEmpty)
+      return _emptyState(
+        Icons.article_outlined,
+        'Aucune tâche planifiée',
+        'Hera n\'a encore rien envoyé à Timo.',
+      );
 
     return RefreshIndicator(
       onRefresh: _loadData,
@@ -475,8 +498,11 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
 
           // ── Tâches filtrées ──
           if (_filtered.isEmpty)
-            _emptyState(Icons.filter_list_off_rounded,
-                'Aucun résultat', 'Pas de tâche pour ce filtre.')
+            _emptyState(
+              Icons.filter_list_off_rounded,
+              'Aucun résultat',
+              'Pas de tâche pour ce filtre.',
+            )
           else
             ..._filtered.map((t) => _buildTaskCard(t)),
         ],
@@ -487,8 +513,8 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
   // ── Stats: Interviews / Onboardings / Offboardings ─────────
   Widget _buildCleanStats() {
     final total = _tasks.length;
-    final done  = _done.length;
-    final pct   = total == 0 ? 0.0 : done / total;
+    final done = _done.length;
+    final pct = total == 0 ? 0.0 : done / total;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -509,11 +535,32 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
           // 3 métriques métier
           Row(
             children: [
-              Expanded(child: _statItem('${_interviews.length}',   'INTERVIEWS',   TimoDesignSystem.interview,    Icons.record_voice_over_rounded)),
+              Expanded(
+                child: _statItem(
+                  '${_interviews.length}',
+                  'INTERVIEWS',
+                  TimoDesignSystem.interview,
+                  Icons.record_voice_over_rounded,
+                ),
+              ),
               Container(width: 1, height: 50, color: TimoDesignSystem.border),
-              Expanded(child: _statItem('${_onboardings.length}',  'ONBOARDINGS',  TimoDesignSystem.onboarding, Icons.person_add_alt_1_rounded)),
+              Expanded(
+                child: _statItem(
+                  '${_onboardings.length}',
+                  'ONBOARDINGS',
+                  TimoDesignSystem.onboarding,
+                  Icons.person_add_alt_1_rounded,
+                ),
+              ),
               Container(width: 1, height: 50, color: TimoDesignSystem.border),
-              Expanded(child: _statItem('${_offboardings.length}', 'OFFBOARDINGS', TimoDesignSystem.offboarding,  Icons.exit_to_app_rounded)),
+              Expanded(
+                child: _statItem(
+                  '${_offboardings.length}',
+                  'OFFBOARDINGS',
+                  TimoDesignSystem.offboarding,
+                  Icons.exit_to_app_rounded,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -533,7 +580,9 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
               Text(
                 '$done / $total',
                 style: GoogleFonts.plusJakartaSans(
-                  color: pct > 0.7 ? TimoDesignSystem.success : TimoDesignSystem.other,
+                  color: pct > 0.7
+                      ? TimoDesignSystem.success
+                      : TimoDesignSystem.other,
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
                 ),
@@ -547,7 +596,9 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
               value: pct,
               minHeight: 7,
               backgroundColor: TimoDesignSystem.border,
-              valueColor: AlwaysStoppedAnimation(pct > 0.7 ? TimoDesignSystem.success : TimoDesignSystem.other),
+              valueColor: AlwaysStoppedAnimation(
+                pct > 0.7 ? TimoDesignSystem.success : TimoDesignSystem.other,
+              ),
             ),
           ),
         ],
@@ -594,10 +645,10 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
   // ── Filtres pills ───────────────────────────────────────────
   Widget _buildFilterPills() {
     final filters = [
-      (null,               'Tous',         TimoDesignSystem.other),
-      (TaskType.interview,  'Interview',   TimoDesignSystem.interview),
-      (TaskType.onboarding, 'Onboarding',  TimoDesignSystem.onboarding),
-      (TaskType.offboarding,'Offboarding', TimoDesignSystem.offboarding),
+      (null, 'Tous', TimoDesignSystem.other),
+      (TaskType.interview, 'Interview', TimoDesignSystem.interview),
+      (TaskType.onboarding, 'Onboarding', TimoDesignSystem.onboarding),
+      (TaskType.offboarding, 'Offboarding', TimoDesignSystem.offboarding),
     ];
     return SizedBox(
       height: 34,
@@ -683,7 +734,9 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                 Text(
                   task.employeeName,
                   style: GoogleFonts.plusJakartaSans(
-                    color: task.isDone ? TimoDesignSystem.textMuted : TimoDesignSystem.textPrimary,
+                    color: task.isDone
+                        ? TimoDesignSystem.textMuted
+                        : TimoDesignSystem.textPrimary,
                     fontWeight: FontWeight.w900,
                     fontSize: 15,
                     decoration: task.isDone ? TextDecoration.lineThrough : null,
@@ -695,10 +748,17 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                 if (task.deadline != null)
                   Row(
                     children: [
-                      Icon(Icons.schedule_rounded, size: 12, color: TimoDesignSystem.textMuted),
+                      Icon(
+                        Icons.schedule_rounded,
+                        size: 12,
+                        color: TimoDesignSystem.textMuted,
+                      ),
                       const SizedBox(width: 4),
                       Text(
-                        DateFormat('dd MMM • HH:mm', 'fr_FR').format(task.deadline!),
+                        DateFormat(
+                          'dd MMM • HH:mm',
+                          'fr_FR',
+                        ).format(task.deadline!),
                         style: GoogleFonts.plusJakartaSans(
                           color: TimoDesignSystem.textMuted,
                           fontSize: 11,
@@ -733,7 +793,11 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
               ),
               if (task.isDone) ...[
                 const SizedBox(height: 6),
-                Icon(Icons.verified_rounded, color: TimoDesignSystem.success, size: 16),
+                Icon(
+                  Icons.verified_rounded,
+                  color: TimoDesignSystem.success,
+                  size: 16,
+                ),
               ],
             ],
           ),
@@ -746,7 +810,9 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
   //  TAB 1 — AGENDA - WHITE SAAS DESIGN
   // ════════════════════════════════════════════════════════════
   Widget _buildAgenda() {
-    final dayTasks = _selectedDay != null ? _tasksOn(_selectedDay!) : <TimoTask>[];
+    final dayTasks = _selectedDay != null
+        ? _tasksOn(_selectedDay!)
+        : <TimoTask>[];
 
     return RefreshIndicator(
       onRefresh: _loadData,
@@ -779,7 +845,10 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            DateFormat('MMMM yyyy', 'fr_FR').format(_focusedDay).toUpperCase(),
+                            DateFormat(
+                              'MMMM yyyy',
+                              'fr_FR',
+                            ).format(_focusedDay).toUpperCase(),
                             style: GoogleFonts.plusJakartaSans(
                               color: TimoDesignSystem.textPrimary,
                               fontSize: 15,
@@ -800,10 +869,16 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                       const Spacer(),
                       // Toggle semaine / mois
                       GestureDetector(
-                        onTap: () => setState(() => _calFmt = _calFmt == CalendarFormat.month
-                            ? CalendarFormat.week : CalendarFormat.month),
+                        onTap: () => setState(
+                          () => _calFmt = _calFmt == CalendarFormat.month
+                              ? CalendarFormat.week
+                              : CalendarFormat.month,
+                        ),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 7,
+                          ),
                           decoration: BoxDecoration(
                             color: TimoDesignSystem.other.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(20),
@@ -812,13 +887,16 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                             children: [
                               Icon(
                                 _calFmt == CalendarFormat.month
-                                    ? Icons.view_week_rounded : Icons.calendar_month_rounded,
+                                    ? Icons.view_week_rounded
+                                    : Icons.calendar_month_rounded,
                                 size: 13,
                                 color: TimoDesignSystem.other,
                               ),
                               const SizedBox(width: 5),
                               Text(
-                                _calFmt == CalendarFormat.month ? 'Semaine' : 'Mois',
+                                _calFmt == CalendarFormat.month
+                                    ? 'Semaine'
+                                    : 'Mois',
                                 style: GoogleFonts.plusJakartaSans(
                                   color: TimoDesignSystem.other,
                                   fontSize: 11,
@@ -839,7 +917,10 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                   focusedDay: _focusedDay,
                   calendarFormat: _calFmt,
                   selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  onDaySelected: (sel, foc) => setState(() { _selectedDay = sel; _focusedDay = foc; }),
+                  onDaySelected: (sel, foc) => setState(() {
+                    _selectedDay = sel;
+                    _focusedDay = foc;
+                  }),
                   onFormatChanged: (f) => setState(() => _calFmt = f),
                   onPageChanged: (f) => setState(() => _focusedDay = f),
                   eventLoader: _tasksOn,
@@ -852,7 +933,9 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                         decoration: BoxDecoration(
                           color: TimoDesignSystem.other.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: TimoDesignSystem.other.withOpacity(0.45)),
+                          border: Border.all(
+                            color: TimoDesignSystem.other.withOpacity(0.45),
+                          ),
                         ),
                         child: Center(
                           child: Text(
@@ -914,15 +997,22 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                         bottom: 4,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: ts.take(3).map((t) => Container(
-                            width: 5,
-                            height: 5,
-                            margin: const EdgeInsets.symmetric(horizontal: 1),
-                            decoration: BoxDecoration(
-                              color: t.color,
-                              shape: BoxShape.circle,
-                            ),
-                          )).toList(),
+                          children: ts
+                              .take(3)
+                              .map(
+                                (t) => Container(
+                                  width: 5,
+                                  height: 5,
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 1,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: t.color,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              )
+                              .toList(),
                         ),
                       );
                     },
@@ -956,7 +1046,10 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
                       color: TimoDesignSystem.textPrimary,
                       size: 24,
                     ),
-                    headerPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    headerPadding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                   ),
                   daysOfWeekStyle: DaysOfWeekStyle(
                     weekdayStyle: GoogleFonts.plusJakartaSans(
@@ -1012,7 +1105,10 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
               const Spacer(),
               if (dayTasks.isNotEmpty)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: TimoDesignSystem.other.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(20),
@@ -1031,8 +1127,11 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
           const SizedBox(height: 12),
 
           if (dayTasks.isEmpty)
-            _emptyState(Icons.event_available_rounded,
-                'Aucun planning', 'Rien de planifié ce jour-là.')
+            _emptyState(
+              Icons.event_available_rounded,
+              'Aucun planning',
+              'Rien de planifié ce jour-là.',
+            )
           else
             ...dayTasks.map((t) => _buildTaskCard(t)),
         ],

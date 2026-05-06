@@ -8,7 +8,8 @@ class KashExpensesTab extends StatelessWidget {
   final List<dynamic> expenses;
   final VoidCallback onAddExpense;
   final Widget Function(dynamic expense, bool isDark) buildExpenseCard;
-  final Widget Function(String message, IconData icon, bool isDark) buildEmptyState;
+  final Widget Function(String message, IconData icon, bool isDark)
+  buildEmptyState;
 
   const KashExpensesTab({
     Key? key,
@@ -44,7 +45,10 @@ class KashExpensesTab extends StatelessWidget {
               GestureDetector(
                 onTap: onAddExpense,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
                     color: KP.primary.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(20),
@@ -74,12 +78,18 @@ class KashExpensesTab extends StatelessWidget {
         Expanded(
           child: expenses.isEmpty
               ? Center(
-            child: buildEmptyState('Aucune dépense', Icons.inbox_rounded, isDark),
-          )
+                  child: buildEmptyState(
+                    'Aucune dépense',
+                    Icons.inbox_rounded,
+                    isDark,
+                  ),
+                )
               : ListView(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-            children: expenses.map((e) => buildExpenseCard(e, isDark)).toList(),
-          ),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                  children: expenses
+                      .map((e) => buildExpenseCard(e, isDark))
+                      .toList(),
+                ),
         ),
       ],
     );

@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:e_team/domain/models/echo_models.dart';
 import 'package:e_team/core/config/api_config.dart';
 import 'echo_theme.dart';
-import '../../screens/agent/echo/product_marketing_screen.dart';
+import 'package:e_team/presentation/screens/agent/echo/product_marketing_screen.dart';
 
 /// Posts tab for Echo dashboard showing AI-generated social media posts
 class EchoPostsTab extends StatelessWidget {
@@ -32,9 +32,7 @@ class EchoPostsTab extends StatelessWidget {
       child: Column(
         children: [
           _buildPostsHeader(context),
-          Expanded(
-            child: _buildPostsList(),
-          ),
+          Expanded(child: _buildPostsList()),
         ],
       ),
     );
@@ -46,10 +44,7 @@ class EchoPostsTab extends StatelessWidget {
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF7C3AED),
-            Color(0xFFA855F7),
-          ],
+          colors: [Color(0xFF7C3AED), Color(0xFFA855F7)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -108,7 +103,10 @@ class EchoPostsTab extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.16),
                   borderRadius: BorderRadius.circular(999),
@@ -247,7 +245,10 @@ class EchoPostsTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: EchoTheme.card,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: EchoTheme.border.withOpacity(0.75), width: 0.7),
+        border: Border.all(
+          color: EchoTheme.border.withOpacity(0.75),
+          width: 0.7,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.035),
@@ -304,7 +305,10 @@ class EchoPostsTab extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: EchoTheme.violet.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(999),
@@ -409,7 +413,7 @@ class EchoPostsTab extends StatelessWidget {
                   child: CircularProgressIndicator(
                     value: loadingProgress.expectedTotalBytes != null
                         ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
+                              loadingProgress.expectedTotalBytes!
                         : null,
                     color: EchoTheme.violet,
                   ),
@@ -479,10 +483,7 @@ class EchoPostsTab extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  platform.icon,
-                  style: const TextStyle(fontSize: 16),
-                ),
+                Text(platform.icon, style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 6),
                 Text(
                   platform.name.toUpperCase(),
@@ -513,9 +514,9 @@ class EchoPostsTab extends StatelessWidget {
   // Method to open URL
   Future<void> _openPostUrl(BuildContext context, String? url) async {
     if (url == null || url.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Post URL not available')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Post URL not available')));
       return;
     }
 
@@ -529,9 +530,9 @@ class EchoPostsTab extends StatelessWidget {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error opening URL: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error opening URL: $e')));
     }
   }
 

@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-
-import '/presentation/screens/agent/agent_details_page.dart';
-import '/presentation/screens/agent/agent_marketplace_page.dart';
-import '/presentation/screens/agent/my_agents_page.dart';
-import '/presentation/screens/agent/onboarding_chatbot_screen.dart';
-import '/presentation/screens/agent/onboarding_welcome_screen.dart';
-import '/presentation/screens/auth/email_verification_screen.dart';
-import '/presentation/screens/auth/forgot_password_screen.dart';
-import '/presentation/screens/auth/login_screen.dart';
-import '/presentation/screens/auth/signup_screen.dart';
-import '/presentation/screens/cart/cart_page.dart';
-import '/presentation/screens/settings/privacy_policy_screen.dart';
-import '/presentation/screens/settings/terms_and_conditions_screen.dart';
-import '/presentation/screens/splash_screen.dart';
+import 'package:e_team/presentation/screens/agent/agent_details_page.dart';
+import 'package:e_team/presentation/screens/agent/agent_marketplace_page.dart';
+import 'package:e_team/presentation/screens/agent/my_agents_page.dart';
+import 'package:e_team/presentation/screens/agent/onboarding_chatbot_screen.dart';
+import 'package:e_team/presentation/screens/agent/onboarding_welcome_screen.dart';
+import 'package:e_team/presentation/screens/auth/email_verification_screen.dart';
+import 'package:e_team/presentation/screens/auth/forgot_password_screen.dart';
+import 'package:e_team/presentation/screens/auth/login_screen.dart';
+import 'package:e_team/presentation/screens/auth/signup_screen.dart';
+import 'package:e_team/presentation/screens/cart/cart_page.dart';
+import 'package:e_team/presentation/screens/settings/privacy_policy_screen.dart';
+import 'package:e_team/presentation/screens/settings/terms_and_conditions_screen.dart';
+import 'package:e_team/presentation/screens/splash_screen.dart';
 
 class AppRoutes {
   AppRoutes._();

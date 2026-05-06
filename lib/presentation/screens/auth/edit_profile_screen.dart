@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/data/services/auth_service.dart';
-import '/domain/models/user_model.dart';
-import '../../providers/theme_provider.dart';
-import '/l10n/app_localizations.dart';
+import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/domain/models/user_model.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/l10n/app_localizations.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final User user;
@@ -70,7 +70,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await _authService.updateUser(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
-        currentPassword: _showPasswordFields ? _currentPasswordController.text : null,
+        currentPassword: _showPasswordFields
+            ? _currentPasswordController.text
+            : null,
         newPassword: _showPasswordFields ? _newPasswordController.text : null,
       );
 
@@ -106,7 +108,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFFAFAFA),
       appBar: AppBar(
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         elevation: 0,
@@ -169,7 +173,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             color: Colors.black,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                              color: isDark
+                                  ? const Color(0xFF1E1E1E)
+                                  : Colors.white,
                               width: 2,
                             ),
                           ),
@@ -262,23 +268,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   TextFormField(
                     controller: _currentPasswordController,
                     obscureText: _obscureCurrentPassword,
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                     decoration: _buildInputDecoration(
                       hintText: l10n.authEnterCurrentPasswordHint,
                       icon: Icons.lock_outline,
                       isDark: isDark,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscureCurrentPassword ? Icons.visibility_off : Icons.visibility,
-                          color: isDark ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5),
+                          _obscureCurrentPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: isDark
+                              ? Colors.white.withOpacity(0.5)
+                              : Colors.black.withOpacity(0.5),
                         ),
                         onPressed: () {
-                          setState(() => _obscureCurrentPassword = !_obscureCurrentPassword);
+                          setState(
+                            () => _obscureCurrentPassword =
+                                !_obscureCurrentPassword,
+                          );
                         },
                       ),
                     ),
                     validator: (value) {
-                      if (_showPasswordFields && (value == null || value.isEmpty)) {
+                      if (_showPasswordFields &&
+                          (value == null || value.isEmpty)) {
                         return l10n.authCurrentPasswordRequired;
                       }
                       return null;
@@ -293,23 +309,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   TextFormField(
                     controller: _newPasswordController,
                     obscureText: _obscureNewPassword,
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                     decoration: _buildInputDecoration(
                       hintText: l10n.authEnterNewPasswordHint,
                       icon: Icons.lock_outline,
                       isDark: isDark,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscureNewPassword ? Icons.visibility_off : Icons.visibility,
-                          color: isDark ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5),
+                          _obscureNewPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: isDark
+                              ? Colors.white.withOpacity(0.5)
+                              : Colors.black.withOpacity(0.5),
                         ),
                         onPressed: () {
-                          setState(() => _obscureNewPassword = !_obscureNewPassword);
+                          setState(
+                            () => _obscureNewPassword = !_obscureNewPassword,
+                          );
                         },
                       ),
                     ),
                     validator: (value) {
-                      if (_showPasswordFields && (value == null || value.length < 6)) {
+                      if (_showPasswordFields &&
+                          (value == null || value.length < 6)) {
                         return l10n.authPasswordMin6;
                       }
                       return null;
@@ -324,23 +349,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                     decoration: _buildInputDecoration(
                       hintText: l10n.authConfirmNewPasswordHint,
                       icon: Icons.lock_outline,
                       isDark: isDark,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                          color: isDark ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5),
+                          _obscureConfirmPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: isDark
+                              ? Colors.white.withOpacity(0.5)
+                              : Colors.black.withOpacity(0.5),
                         ),
                         onPressed: () {
-                          setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
+                          setState(
+                            () => _obscureConfirmPassword =
+                                !_obscureConfirmPassword,
+                          );
                         },
                       ),
                     ),
                     validator: (value) {
-                      if (_showPasswordFields && value != _newPasswordController.text) {
+                      if (_showPasswordFields &&
+                          value != _newPasswordController.text) {
                         return l10n.authPasswordsDoNotMatch;
                       }
                       return null;
@@ -366,20 +401,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     child: _isLoading
                         ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
                         : Text(
-                      l10n.authUpdateProfileButton,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                            l10n.authUpdateProfileButton,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ],
@@ -410,7 +445,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return InputDecoration(
       hintText: hintText,
       hintStyle: TextStyle(
-        color: isDark ? Colors.white.withOpacity(0.3) : Colors.black.withOpacity(0.3),
+        color: isDark
+            ? Colors.white.withOpacity(0.3)
+            : Colors.black.withOpacity(0.3),
       ),
       filled: true,
       fillColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
@@ -420,7 +457,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
       prefixIcon: Icon(
         icon,
-        color: isDark ? Colors.white.withOpacity(0.5) : Colors.black.withOpacity(0.5),
+        color: isDark
+            ? Colors.white.withOpacity(0.5)
+            : Colors.black.withOpacity(0.5),
       ),
       suffixIcon: suffixIcon,
     );

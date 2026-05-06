@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/data/services/dexo_service.dart';
+import 'package:e_team/data/services/dexo_service.dart';
 
 class DocumentCategoryPage extends StatefulWidget {
   final String category;
@@ -54,8 +54,10 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
       );
 
       if (result['success'] == true) {
-        final newDocuments = List<Map<String, dynamic>>.from(result['documents'] ?? []);
-        
+        final newDocuments = List<Map<String, dynamic>>.from(
+          result['documents'] ?? [],
+        );
+
         setState(() {
           if (refresh) {
             _documents = newDocuments;
@@ -146,7 +148,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
   Widget _buildDocumentCard(Map<String, dynamic> document) {
     final securityColor = _getSecurityColor(document['confidentialityLevel']);
     final fileIcon = _getFileIcon(document['fileExtension']);
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -176,21 +178,20 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
-                  child: Text(
-                    fileIcon,
-                    style: const TextStyle(fontSize: 24),
-                  ),
+                  child: Text(fileIcon, style: const TextStyle(fontSize: 24)),
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Document info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      document['originalName'] ?? document['filename'] ?? 'Unknown',
+                      document['originalName'] ??
+                          document['filename'] ??
+                          'Unknown',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -203,13 +204,19 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: securityColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            document['confidentialityLevel']?.toString().toUpperCase() ?? 'UNKNOWN',
+                            document['confidentialityLevel']
+                                    ?.toString()
+                                    .toUpperCase() ??
+                                'UNKNOWN',
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
@@ -230,21 +237,14 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                     const SizedBox(height: 4),
                     Text(
                       'Uploaded: ${_formatDate(document['uploadedAt'])}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                     ),
                   ],
                 ),
               ),
-              
+
               // Arrow icon
-              Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: Colors.grey[400],
-              ),
+              Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[400]),
             ],
           ),
         ),
@@ -305,7 +305,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                   ],
                 ),
               ),
-              
+
               // Content
               Flexible(
                 child: SingleChildScrollView(
@@ -313,20 +313,38 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildDetailRow('Filename', document['originalName'] ?? 'Unknown'),
-                      _buildDetailRow('Size', document['sizeFormatted'] ?? '0 Bytes'),
-                      _buildDetailRow('Security Level', document['confidentialityLevel'] ?? 'Unknown'),
-                      _buildDetailRow('Uploaded', _formatDate(document['uploadedAt'])),
-                      if (document['tags'] != null && document['tags'].isNotEmpty)
-                        _buildTagsRow('Tags', List<String>.from(document['tags'])),
+                      _buildDetailRow(
+                        'Filename',
+                        document['originalName'] ?? 'Unknown',
+                      ),
+                      _buildDetailRow(
+                        'Size',
+                        document['sizeFormatted'] ?? '0 Bytes',
+                      ),
+                      _buildDetailRow(
+                        'Security Level',
+                        document['confidentialityLevel'] ?? 'Unknown',
+                      ),
+                      _buildDetailRow(
+                        'Uploaded',
+                        _formatDate(document['uploadedAt']),
+                      ),
+                      if (document['tags'] != null &&
+                          document['tags'].isNotEmpty)
+                        _buildTagsRow(
+                          'Tags',
+                          List<String>.from(document['tags']),
+                        ),
                       if (document['aiClassification'] != null)
-                        _buildDetailRow('AI Confidence', 
-                          '${((document['aiClassification']['confidence'] ?? 0.0) * 100).toStringAsFixed(1)}%'),
+                        _buildDetailRow(
+                          'AI Confidence',
+                          '${((document['aiClassification']['confidence'] ?? 0.0) * 100).toStringAsFixed(1)}%',
+                        ),
                     ],
                   ),
                 ),
               ),
-              
+
               // Action buttons
               Container(
                 padding: const EdgeInsets.all(20),
@@ -360,14 +378,12 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
   void _viewDocumentContent(Map<String, dynamic> document) async {
     // Close the details dialog first
     Navigator.of(context).pop();
-    
+
     // Show loading dialog
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
     try {
@@ -381,7 +397,9 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
       if (result['success'] == true) {
         _showDocumentContentDialog(document, result['content']);
       } else {
-        _showErrorSnackBar(result['error'] ?? 'Failed to load document content');
+        _showErrorSnackBar(
+          result['error'] ?? 'Failed to load document content',
+        );
       }
     } catch (e) {
       // Close loading dialog
@@ -390,7 +408,10 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
     }
   }
 
-  void _showDocumentContentDialog(Map<String, dynamic> document, String content) {
+  void _showDocumentContentDialog(
+    Map<String, dynamic> document,
+    String content,
+  ) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -444,7 +465,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                   ],
                 ),
               ),
-              
+
               // Content
               Expanded(
                 child: Container(
@@ -470,7 +491,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                   ),
                 ),
               ),
-              
+
               // Footer with document info
               Container(
                 padding: const EdgeInsets.all(20),
@@ -488,18 +509,12 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
                     Expanded(
                       child: Text(
                         'Security Level: ${document['confidentialityLevel']?.toString().toUpperCase() ?? 'UNKNOWN'}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ),
                     Text(
                       '${content.length} characters',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -531,10 +546,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
             ),
           ),
         ],
@@ -560,21 +572,28 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
           Wrap(
             spacing: 6,
             runSpacing: 6,
-            children: tags.map((tag) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: widget.categoryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                tag,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: widget.categoryColor,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            )).toList(),
+            children: tags
+                .map(
+                  (tag) => Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: widget.categoryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      tag,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: widget.categoryColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -598,7 +617,10 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
               children: [
                 Text(
                   widget.category.toUpperCase(),
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
                   '${_documents.length} documents',
@@ -676,10 +698,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
           const SizedBox(height: 8),
           Text(
             'View documents in this category',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),

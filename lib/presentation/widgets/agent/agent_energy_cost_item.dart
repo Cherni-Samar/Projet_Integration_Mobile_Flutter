@@ -17,10 +17,7 @@ class AgentEnergyCostItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 14,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         border: !isLast
             ? Border(
@@ -51,10 +48,7 @@ class AgentEnergyCostItem extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 4,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(8),
@@ -62,11 +56,7 @@ class AgentEnergyCostItem extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.bolt,
-                  color: color,
-                  size: 16,
-                ),
+                Icon(Icons.bolt, color: color, size: 16),
                 const SizedBox(width: 2),
                 Text(
                   '${task['cost']}',

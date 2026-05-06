@@ -15,6 +15,5 @@ class KashBudget {
 
   double get remaining => limit - spent;
 
-  double get usagePercent =>
-      limit == 0 ? 0 : (spent / limit).clamp(0, 1);
+  double get usagePercent => limit == 0 ? 0 : (spent / limit).clamp(0, 1);
 }

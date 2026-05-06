@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:e_team/data/services/echo_service.dart';
 import 'package:e_team/domain/models/echo_models.dart';
+
 class EchoEmailDetailScreen extends StatefulWidget {
   final EmailItem email;
   final String? token;
@@ -26,7 +27,6 @@ class EchoEmailDetailScreen extends StatefulWidget {
 }
 
 class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
-
   // Couleurs Thème Pro
   static const Color _bg = Color(0xFFFFFFFF);
   static const Color _violet = Color(0xFF6366F1);
@@ -83,7 +83,11 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
       backgroundColor: _bg,
       elevation: 0,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: _textMain),
+        icon: const Icon(
+          Icons.arrow_back_ios_new_rounded,
+          size: 18,
+          color: _textMain,
+        ),
         onPressed: () => Navigator.pop(context),
       ),
       actions: [
@@ -92,7 +96,11 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
           onPressed: () {},
         ),
         IconButton(
-          icon: const Icon(Icons.delete_outline_rounded, size: 22, color: Colors.redAccent),
+          icon: const Icon(
+            Icons.delete_outline_rounded,
+            size: 22,
+            color: Colors.redAccent,
+          ),
           onPressed: _showDeleteDialog,
         ),
         const SizedBox(width: 12),
@@ -106,7 +114,11 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
         CircleAvatar(
           radius: 22,
           backgroundColor: isFromHera ? _violet : _getSenderColor(email.sender),
-          child: Icon(isFromHera ? Icons.auto_awesome : Icons.person, color: Colors.white, size: 20),
+          child: Icon(
+            isFromHera ? Icons.auto_awesome : Icons.person,
+            color: Colors.white,
+            size: 20,
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -123,7 +135,10 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
               ),
               Text(
                 DateFormat('EEEE, d MMM • HH:mm').format(email.receivedAt),
-                style: GoogleFonts.plusJakartaSans(fontSize: 12, color: _textMuted),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  color: _textMuted,
+                ),
               ),
             ],
           ),
@@ -135,7 +150,14 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
               color: Colors.red.withOpacity(0.1),
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Text('URGENT', style: GoogleFonts.plusJakartaSans(color: Colors.red, fontSize: 10, fontWeight: FontWeight.w800)),
+            child: Text(
+              'URGENT',
+              style: GoogleFonts.plusJakartaSans(
+                color: Colors.red,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
           ),
       ],
     );
@@ -185,7 +207,7 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
               runSpacing: 8,
               children: email.actions.map((a) => _buildActionChip(a)).toList(),
             ),
-          ]
+          ],
         ],
       ),
     );
@@ -202,9 +224,20 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.check_circle_outline_rounded, size: 12, color: Colors.green),
+          const Icon(
+            Icons.check_circle_outline_rounded,
+            size: 12,
+            color: Colors.green,
+          ),
           const SizedBox(width: 6),
-          Text(text, style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.w600, color: _textMain)),
+          Text(
+            text,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: _textMain,
+            ),
+          ),
         ],
       ),
     );
@@ -244,7 +277,10 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
         title: const Text('Delete Email'),
         content: const Text('This action cannot be undone.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -263,7 +299,12 @@ class _EchoEmailDetailScreenState extends State<EchoEmailDetailScreen> {
   }
 
   Color _getSenderColor(String sender) {
-    final colors = [Color(0xFF3B82F6), Color(0xFF10B981), Color(0xFFF59E0B), Color(0xFF8B5CF6)];
+    final colors = [
+      Color(0xFF3B82F6),
+      Color(0xFF10B981),
+      Color(0xFFF59E0B),
+      Color(0xFF8B5CF6),
+    ];
     return colors[sender.length % colors.length];
   }
 }

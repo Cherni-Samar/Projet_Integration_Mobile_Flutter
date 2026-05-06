@@ -1,9 +1,10 @@
-import '../../../domain/models/kash/kash_expense_model.dart';
-import '../../../domain/models/kash/kash_budget_model.dart';
-import '../../../domain/models/kash/kash_reminder_model.dart';
-import '../../dtos/kash/kash_expense_dto.dart';
-import '../../dtos/kash/kash_budget_dto.dart';
-import '../../dtos/kash/kash_reminder_dto.dart';
+import 'package:e_team/domain/models/kash/kash_expense_model.dart';
+import 'package:e_team/domain/models/kash/kash_budget_model.dart';
+import 'package:e_team/domain/models/kash/kash_reminder_model.dart';
+import 'package:e_team/data/dtos/kash/kash_expense_dto.dart';
+import 'package:e_team/data/dtos/kash/kash_budget_dto.dart';
+import 'package:e_team/data/dtos/kash/kash_reminder_dto.dart';
+
 class KashMapper {
   static KashExpense toExpense(KashExpenseDTO dto) {
     return KashExpense(

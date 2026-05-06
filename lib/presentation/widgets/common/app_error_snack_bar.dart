@@ -34,9 +34,7 @@ class AppErrorSnackBar {
       SnackBar(
         behavior: SnackBarBehavior.floating,
         backgroundColor: color,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         duration: const Duration(seconds: 4),
         content: Row(

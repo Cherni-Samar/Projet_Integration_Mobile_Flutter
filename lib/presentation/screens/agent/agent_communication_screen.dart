@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/data/services/echo_service.dart';
+import 'package:e_team/data/services/echo_service.dart';
 import 'package:e_team/data/services/hera_service.dart';
 
 class AgentCommunicationScreen extends StatefulWidget {
@@ -13,7 +13,8 @@ class AgentCommunicationScreen extends StatefulWidget {
   });
 
   @override
-  State<AgentCommunicationScreen> createState() => _AgentCommunicationScreenState();
+  State<AgentCommunicationScreen> createState() =>
+      _AgentCommunicationScreenState();
 }
 
 class _AgentCommunicationScreenState extends State<AgentCommunicationScreen> {

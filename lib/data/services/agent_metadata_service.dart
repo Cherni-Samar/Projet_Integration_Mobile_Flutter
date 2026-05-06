@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:e_team/domain/models/agent_metadata_model.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 
@@ -8,9 +7,10 @@ class AgentMetadataService {
       id: 'hera',
       name: 'Hera',
       roleKey: 'agentRoleHrRecruitmentAI', // Updated: HR & Recruitment AI
-      descriptionKey: 'agentDescHrRecruitmentAI', // Updated: HR analysis, candidate scoring, employee management
+      descriptionKey:
+          'agentDescHrRecruitmentAI', // Updated: HR analysis, candidate scoring, employee management
       iconPath: 'assets/images/hera.png',
-      color: Color(0xFF8B5CF6),
+      colorValue: 0xFF8B5CF6,
       stats: AgentStats(
         response: '< 1.2s',
         accuracy: '99.4%',
@@ -18,7 +18,8 @@ class AgentMetadataService {
       ),
       rating: 4.9,
       hires: '1.2k',
-      priceLabel: '1–5 ⚡ per task', // Backend reality: dynamic energy based on task type
+      priceLabel:
+          '1–5 ⚡ per task', // Backend reality: dynamic energy based on task type
       versionKey: 'agentVersionAlpha',
       skillKeys: [
         'skillCandidateScoring', // Updated: Backend reality - candidate analysis
@@ -28,9 +29,18 @@ class AgentMetadataService {
         'skillStaffingAnalysis', // Updated: Backend reality - staffing checks and analysis
       ],
       energyTasks: [
-        AgentEnergyTask(task: 'Candidate scoring', cost: 1), // Backend reality: candidate analysis
-        AgentEnergyTask(task: 'Employee analysis', cost: 4), // Backend reality: HR analysis
-        AgentEnergyTask(task: 'Leave processing', cost: 5), // Backend reality: leave request analysis
+        AgentEnergyTask(
+          task: 'Candidate scoring',
+          cost: 1,
+        ), // Backend reality: candidate analysis
+        AgentEnergyTask(
+          task: 'Employee analysis',
+          cost: 4,
+        ), // Backend reality: HR analysis
+        AgentEnergyTask(
+          task: 'Leave processing',
+          cost: 5,
+        ), // Backend reality: leave request analysis
       ],
       multiScenarios: [
         AgentMultiScenario(
@@ -40,9 +50,24 @@ class AgentMetadataService {
         ),
       ],
       energyPacks: [
-        AgentEnergyPack(title: 'Starter', energy: 1000, price: 10.0, color: 0xFF10B981),
-        AgentEnergyPack(title: 'Pro', energy: 6000, price: 45.0, color: 0xFF8B5CF6),
-        AgentEnergyPack(title: 'Business', energy: 15000, price: 100.0, color: 0xFFF59E0B),
+        AgentEnergyPack(
+          title: 'Starter',
+          energy: 1000,
+          price: 10.0,
+          color: 0xFF10B981,
+        ),
+        AgentEnergyPack(
+          title: 'Pro',
+          energy: 6000,
+          price: 45.0,
+          color: 0xFF8B5CF6,
+        ),
+        AgentEnergyPack(
+          title: 'Business',
+          energy: 15000,
+          price: 100.0,
+          color: 0xFFF59E0B,
+        ),
       ],
       defaultEnergy: 170,
     ),
@@ -50,9 +75,10 @@ class AgentMetadataService {
       id: 'kash',
       name: 'Kash',
       roleKey: 'agentRoleFinanceBudgetAI', // Updated: Finance & Budget AI
-      descriptionKey: 'agentDescFinanceBudgetAI', // Updated: expense tracking, budget monitoring, financial analysis
+      descriptionKey:
+          'agentDescFinanceBudgetAI', // Updated: expense tracking, budget monitoring, financial analysis
       iconPath: 'assets/images/kash.png',
-      color: Color(0xFFF59E0B),
+      colorValue: 0xFFF59E0B,
       stats: AgentStats(
         response: '< 0.8s',
         accuracy: '98.9%',
@@ -60,7 +86,8 @@ class AgentMetadataService {
       ),
       rating: 4.8,
       hires: '980',
-      priceLabel: '1–5 ⚡ per task', // Backend reality: dynamic energy based on task type
+      priceLabel:
+          '1–5 ⚡ per task', // Backend reality: dynamic energy based on task type
       versionKey: 'agentVersionFinanceWizard',
       skillKeys: [
         'skillExpenseTracking', // Updated: Backend reality - expense management
@@ -70,9 +97,18 @@ class AgentMetadataService {
         'skillFinancialReports', // Updated: Backend reality - financial reporting
       ],
       energyTasks: [
-        AgentEnergyTask(task: 'Expense tracking', cost: 2), // Backend reality: expense management
-        AgentEnergyTask(task: 'Budget analysis', cost: 3), // Backend reality: budget tracking
-        AgentEnergyTask(task: 'Financial reports', cost: 5), // Backend reality: financial reporting
+        AgentEnergyTask(
+          task: 'Expense tracking',
+          cost: 2,
+        ), // Backend reality: expense management
+        AgentEnergyTask(
+          task: 'Budget analysis',
+          cost: 3,
+        ), // Backend reality: budget tracking
+        AgentEnergyTask(
+          task: 'Financial reports',
+          cost: 5,
+        ), // Backend reality: financial reporting
       ],
       multiScenarios: [
         AgentMultiScenario(
@@ -82,19 +118,36 @@ class AgentMetadataService {
         ),
       ],
       energyPacks: [
-        AgentEnergyPack(title: 'Starter', energy: 1000, price: 15.0, color: 0xFF10B981),
-        AgentEnergyPack(title: 'Pro', energy: 6000, price: 55.0, color: 0xFF8B5CF6),
-        AgentEnergyPack(title: 'Business', energy: 15000, price: 120.0, color: 0xFFF59E0B),
+        AgentEnergyPack(
+          title: 'Starter',
+          energy: 1000,
+          price: 15.0,
+          color: 0xFF10B981,
+        ),
+        AgentEnergyPack(
+          title: 'Pro',
+          energy: 6000,
+          price: 55.0,
+          color: 0xFF8B5CF6,
+        ),
+        AgentEnergyPack(
+          title: 'Business',
+          energy: 15000,
+          price: 120.0,
+          color: 0xFFF59E0B,
+        ),
       ],
       defaultEnergy: 170,
     ),
     AgentMetadata(
       id: 'dexo',
       name: 'Dexo',
-      roleKey: 'agentRoleDocumentIntelligenceAI', // Updated: Document Intelligence AI
-      descriptionKey: 'agentDescDocumentIntelligenceAI', // Updated: document classification, search, security, duplicates
+      roleKey:
+          'agentRoleDocumentIntelligenceAI', // Updated: Document Intelligence AI
+      descriptionKey:
+          'agentDescDocumentIntelligenceAI', // Updated: document classification, search, security, duplicates
       iconPath: 'assets/images/dexo.png',
-      color: Color(0xFF10B981),
+      colorValue: 0xFF10B981,
       stats: AgentStats(
         response: '< 1.5s',
         accuracy: '97.8%',
@@ -102,7 +155,8 @@ class AgentMetadataService {
       ),
       rating: 5.0,
       hires: '2.1k',
-      priceLabel: '1–5 ⚡ per task', // Backend reality: dynamic energy based on task type
+      priceLabel:
+          '1–5 ⚡ per task', // Backend reality: dynamic energy based on task type
       versionKey: 'agentVersionAdminPro',
       skillKeys: [
         'skillDocumentClassification', // Updated: Backend reality - AI document classification
@@ -112,9 +166,18 @@ class AgentMetadataService {
         'skillVersionTracking', // Updated: Backend reality - document versioning/audit
       ],
       energyTasks: [
-        AgentEnergyTask(task: 'Document classification', cost: 2), // Backend reality: AI classification
-        AgentEnergyTask(task: 'Security analysis', cost: 3), // Backend reality: security monitoring
-        AgentEnergyTask(task: 'Duplicate detection', cost: 4), // Backend reality: advanced duplicate analysis
+        AgentEnergyTask(
+          task: 'Document classification',
+          cost: 2,
+        ), // Backend reality: AI classification
+        AgentEnergyTask(
+          task: 'Security analysis',
+          cost: 3,
+        ), // Backend reality: security monitoring
+        AgentEnergyTask(
+          task: 'Duplicate detection',
+          cost: 4,
+        ), // Backend reality: advanced duplicate analysis
       ],
       multiScenarios: [
         AgentMultiScenario(
@@ -124,9 +187,24 @@ class AgentMetadataService {
         ),
       ],
       energyPacks: [
-        AgentEnergyPack(title: 'Starter', energy: 1000, price: 8.0, color: 0xFF10B981),
-        AgentEnergyPack(title: 'Pro', energy: 6000, price: 35.0, color: 0xFF8B5CF6),
-        AgentEnergyPack(title: 'Business', energy: 15000, price: 80.0, color: 0xFFF59E0B),
+        AgentEnergyPack(
+          title: 'Starter',
+          energy: 1000,
+          price: 8.0,
+          color: 0xFF10B981,
+        ),
+        AgentEnergyPack(
+          title: 'Pro',
+          energy: 6000,
+          price: 35.0,
+          color: 0xFF8B5CF6,
+        ),
+        AgentEnergyPack(
+          title: 'Business',
+          energy: 15000,
+          price: 80.0,
+          color: 0xFFF59E0B,
+        ),
       ],
       defaultEnergy: 170,
     ),
@@ -134,9 +212,10 @@ class AgentMetadataService {
       id: 'timo',
       name: 'Timo',
       roleKey: 'agentRoleSchedulingTimeAI', // Updated: Scheduling & Time AI
-      descriptionKey: 'agentDescSchedulingTimeAI', // Updated: calendar management, reminders, meeting planning
+      descriptionKey:
+          'agentDescSchedulingTimeAI', // Updated: calendar management, reminders, meeting planning
       iconPath: 'assets/images/krono.png',
-      color: Color(0xFFEC4899),
+      colorValue: 0xFFEC4899,
       stats: AgentStats(
         response: '< 1.0s',
         accuracy: '96.5%',
@@ -144,7 +223,8 @@ class AgentMetadataService {
       ),
       rating: 4.7,
       hires: '850',
-      priceLabel: '1–5 ⚡ per task', // Backend reality: dynamic energy based on task type
+      priceLabel:
+          '1–5 ⚡ per task', // Backend reality: dynamic energy based on task type
       versionKey: 'agentVersionPlanningBot',
       skillKeys: [
         'skillCalendarPlanning', // Updated: Backend reality - calendar management
@@ -154,9 +234,18 @@ class AgentMetadataService {
         'skillTimeManagement', // Updated: Backend reality - time management
       ],
       energyTasks: [
-        AgentEnergyTask(task: 'Reminders', cost: 1), // Backend reality: reminder creation
-        AgentEnergyTask(task: 'Calendar sync', cost: 2), // Backend reality: calendar management
-        AgentEnergyTask(task: 'Meeting planning', cost: 4), // Backend reality: schedule optimization
+        AgentEnergyTask(
+          task: 'Reminders',
+          cost: 1,
+        ), // Backend reality: reminder creation
+        AgentEnergyTask(
+          task: 'Calendar sync',
+          cost: 2,
+        ), // Backend reality: calendar management
+        AgentEnergyTask(
+          task: 'Meeting planning',
+          cost: 4,
+        ), // Backend reality: schedule optimization
       ],
       multiScenarios: [
         AgentMultiScenario(
@@ -171,19 +260,36 @@ class AgentMetadataService {
         ),
       ],
       energyPacks: [
-        AgentEnergyPack(title: 'Starter', energy: 1000, price: 12.0, color: 0xFF10B981),
-        AgentEnergyPack(title: 'Pro', energy: 6000, price: 50.0, color: 0xFF8B5CF6),
-        AgentEnergyPack(title: 'Business', energy: 15000, price: 110.0, color: 0xFFF59E0B),
+        AgentEnergyPack(
+          title: 'Starter',
+          energy: 1000,
+          price: 12.0,
+          color: 0xFF10B981,
+        ),
+        AgentEnergyPack(
+          title: 'Pro',
+          energy: 6000,
+          price: 50.0,
+          color: 0xFF8B5CF6,
+        ),
+        AgentEnergyPack(
+          title: 'Business',
+          energy: 15000,
+          price: 110.0,
+          color: 0xFFF59E0B,
+        ),
       ],
       defaultEnergy: 170,
     ),
     AgentMetadata(
       id: 'echo',
       name: 'Echo',
-      roleKey: 'agentRoleCommunicationMarketingAI', // Updated: Communication & Marketing AI
-      descriptionKey: 'agentDescCommunicationMarketingAI', // Updated: email intelligence, smart replies, social media automation
+      roleKey:
+          'agentRoleCommunicationMarketingAI', // Updated: Communication & Marketing AI
+      descriptionKey:
+          'agentDescCommunicationMarketingAI', // Updated: email intelligence, smart replies, social media automation
       iconPath: 'assets/images/voxi.png',
-      color: Color(0xFFA855F7),
+      colorValue: 0xFFA855F7,
       stats: AgentStats(
         response: '< 0.9s',
         accuracy: '98.2%',
@@ -191,7 +297,8 @@ class AgentMetadataService {
       ),
       rating: 4.9,
       hires: '1.5k',
-      priceLabel: '1–5 ⚡ per task', // Backend reality: dynamic energy based on task type
+      priceLabel:
+          '1–5 ⚡ per task', // Backend reality: dynamic energy based on task type
       versionKey: 'agentVersionCommSync',
       skillKeys: [
         'skillEmailAnalysis', // Updated: Backend reality - email/message processing
@@ -201,9 +308,18 @@ class AgentMetadataService {
         'skillLinkedInCampaigns', // Updated: Backend reality - LinkedIn campaign automation
       ],
       energyTasks: [
-        AgentEnergyTask(task: 'Email processing', cost: 1), // Backend reality: email analysis
-        AgentEnergyTask(task: 'Social posts', cost: 3), // Backend reality: social media posting
-        AgentEnergyTask(task: 'Content generation', cost: 4), // Backend reality: content creation
+        AgentEnergyTask(
+          task: 'Email processing',
+          cost: 1,
+        ), // Backend reality: email analysis
+        AgentEnergyTask(
+          task: 'Social posts',
+          cost: 3,
+        ), // Backend reality: social media posting
+        AgentEnergyTask(
+          task: 'Content generation',
+          cost: 4,
+        ), // Backend reality: content creation
       ],
       multiScenarios: [
         AgentMultiScenario(
@@ -213,9 +329,24 @@ class AgentMetadataService {
         ),
       ],
       energyPacks: [
-        AgentEnergyPack(title: 'Starter', energy: 1000, price: 5.0, color: 0xFF10B981),
-        AgentEnergyPack(title: 'Pro', energy: 6000, price: 25.0, color: 0xFF8B5CF6),
-        AgentEnergyPack(title: 'Business', energy: 15000, price: 60.0, color: 0xFFF59E0B),
+        AgentEnergyPack(
+          title: 'Starter',
+          energy: 1000,
+          price: 5.0,
+          color: 0xFF10B981,
+        ),
+        AgentEnergyPack(
+          title: 'Pro',
+          energy: 6000,
+          price: 25.0,
+          color: 0xFF8B5CF6,
+        ),
+        AgentEnergyPack(
+          title: 'Business',
+          energy: 15000,
+          price: 60.0,
+          color: 0xFFF59E0B,
+        ),
       ],
       defaultEnergy: 170,
     ),
@@ -235,9 +366,7 @@ class AgentMetadataService {
   static AgentMetadata? getAgentById(String id) {
     final normalizedId = id.trim().toLowerCase();
     try {
-      return _agentMetadata.firstWhere(
-        (agent) => agent.id == normalizedId,
-      );
+      return _agentMetadata.firstWhere((agent) => agent.id == normalizedId);
     } catch (e) {
       return null;
     }
@@ -261,7 +390,10 @@ class AgentMetadataService {
   }
 
   /// Get skills for agent (localized)
-  static List<String> getSkillsForAgent(AppLocalizations l10n, String agentName) {
+  static List<String> getSkillsForAgent(
+    AppLocalizations l10n,
+    String agentName,
+  ) {
     final agent = getAgentByName(agentName);
     if (agent == null) {
       return [
@@ -272,7 +404,9 @@ class AgentMetadataService {
         _getLocalizedString(l10n, 'skillAutomation'),
       ];
     }
-    return agent.skillKeys.map((key) => _getLocalizedString(l10n, key)).toList();
+    return agent.skillKeys
+        .map((key) => _getLocalizedString(l10n, key))
+        .toList();
   }
 
   /// Get energy costs for agent
@@ -298,9 +432,19 @@ class AgentMetadataService {
     final agent = getAgentByName(agentName);
     if (agent == null) {
       return [
-        {'title': 'Starter', 'energy': 1000, 'price': 10.0, 'color': 0xFF10B981},
+        {
+          'title': 'Starter',
+          'energy': 1000,
+          'price': 10.0,
+          'color': 0xFF10B981,
+        },
         {'title': 'Pro', 'energy': 6000, 'price': 45.0, 'color': 0xFF8B5CF6},
-        {'title': 'Business', 'energy': 15000, 'price': 100.0, 'color': 0xFFF59E0B},
+        {
+          'title': 'Business',
+          'energy': 15000,
+          'price': 100.0,
+          'color': 0xFFF59E0B,
+        },
       ];
     }
     return agent.energyPacks.map((pack) => pack.toMap()).toList();
@@ -349,14 +493,14 @@ class AgentMetadataService {
       return {
         'displayName': capitalizedName,
         'illustration': 'assets/images/hera.png',
-        'color': const Color(0xFF8B5CF6),
+        'colorValue': 0xFF8B5CF6,
         'defaultEnergy': 170,
       };
     }
     return {
       'displayName': agent.name,
       'illustration': agent.iconPath,
-      'color': agent.color,
+      'colorValue': agent.colorValue,
       'defaultEnergy': agent.defaultEnergy,
     };
   }
@@ -386,7 +530,7 @@ class AgentMetadataService {
           return l10n.agentRoleCommunicationPro;
         case 'agentRoleCommunicationMarketingAI': // Updated: Communication & Marketing AI
           return 'Communication & Marketing AI';
-        
+
         // Descriptions
         case 'agentDescAlpha':
           return l10n.agentDescAlpha;
@@ -408,7 +552,7 @@ class AgentMetadataService {
           return l10n.agentDescCommSync;
         case 'agentDescCommunicationMarketingAI': // Updated: Communication & Marketing AI description
           return 'Email intelligence, smart replies, content generation, social media automation, and LinkedIn campaign management';
-        
+
         // Versions
         case 'agentVersionAlpha':
           return l10n.agentVersionAlpha;
@@ -422,7 +566,7 @@ class AgentMetadataService {
           return l10n.agentVersionCommSync;
         case 'agentVersionDefault':
           return l10n.agentVersionDefault;
-        
+
         // Skills
         case 'skillRecruitmentOnboarding':
           return l10n.skillRecruitmentOnboarding;
@@ -526,7 +670,7 @@ class AgentMetadataService {
           return l10n.skillDataAnalysis;
         case 'skillAutomation':
           return l10n.skillAutomation;
-        
+
         default:
           return key; // Fallback to key if not found
       }

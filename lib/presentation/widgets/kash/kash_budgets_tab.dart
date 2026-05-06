@@ -7,7 +7,8 @@ class KashBudgetsTab extends StatelessWidget {
   final bool loadingBudgets;
   final List<dynamic> budgets;
   final VoidCallback onAddBudget;
-  final Widget Function(String message, IconData icon, bool isDark) buildEmptyState;
+  final Widget Function(String message, IconData icon, bool isDark)
+  buildEmptyState;
   final dynamic Function(dynamic item, String key) readValue;
 
   const KashBudgetsTab({
@@ -22,8 +23,7 @@ class KashBudgetsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (loadingBudgets)
-      return const Center(child: CircularProgressIndicator());
+    if (loadingBudgets) return const Center(child: CircularProgressIndicator());
 
     return Column(
       children: [
@@ -44,7 +44,10 @@ class KashBudgetsTab extends StatelessWidget {
               GestureDetector(
                 onTap: onAddBudget,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
                     color: KP.primary.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(20),
@@ -74,12 +77,16 @@ class KashBudgetsTab extends StatelessWidget {
         Expanded(
           child: budgets.isEmpty
               ? Center(
-            child: buildEmptyState('Aucun budget', Icons.trending_up_rounded, isDark),
-          )
+                  child: buildEmptyState(
+                    'Aucun budget',
+                    Icons.trending_up_rounded,
+                    isDark,
+                  ),
+                )
               : ListView(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
-            children: budgets.map((b) => _buildBudgetCard(b)).toList(),
-          ),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                  children: budgets.map((b) => _buildBudgetCard(b)).toList(),
+                ),
         ),
       ],
     );
@@ -92,8 +99,11 @@ class KashBudgetsTab extends StatelessWidget {
     final currency = (readValue(budget, 'currency') ?? 'TND').toString();
 
     final percentage = limit > 0 ? (spent / limit).clamp(0.0, 1.0) : 0.0;
-    final color =
-    percentage > 0.8 ? KP.danger : percentage > 0.5 ? KP.warning : KP.success;
+    final color = percentage > 0.8
+        ? KP.danger
+        : percentage > 0.5
+        ? KP.warning
+        : KP.success;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),

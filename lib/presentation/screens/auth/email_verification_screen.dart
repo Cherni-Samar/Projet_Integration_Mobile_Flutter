@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import '/data/services/auth_service.dart';
-import '/l10n/app_localizations.dart';
+import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/l10n/app_localizations.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({Key? key}) : super(key: key);
@@ -15,7 +15,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   final _authService = AuthService();
   final List<TextEditingController> _controllers = List.generate(
     6,
-        (_) => TextEditingController(),
+    (_) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
@@ -32,7 +32,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
     // Récupérer l'email depuis les arguments
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
       if (args != null && args['email'] != null) {
         setState(() {
           _email = args['email'];
@@ -113,7 +114,6 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             (route) => false,
           );
         }
-
       }
     } catch (e) {
       if (mounted) {
@@ -131,7 +131,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 '/login',
-                    (route) => false,
+                (route) => false,
               );
             }
           });
@@ -264,7 +264,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(
                   6,
-                      (index) => _OTPBox(
+                  (index) => _OTPBox(
                     controller: _controllers[index],
                     focusNode: _focusNodes[index],
                     onChanged: (value) {
@@ -298,22 +298,22 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   ),
                   child: _isLoading
                       ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Color(0xFFCDFF00),
-                      ),
-                    ),
-                  )
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color(0xFFCDFF00),
+                            ),
+                          ),
+                        )
                       : Text(
-                    l10n.authVerifyEmailButton,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                          l10n.authVerifyEmailButton,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 30),
@@ -339,17 +339,17 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       onPressed: _isResending ? null : _resendCode,
                       child: _isResending
                           ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
                           : Text(
-                        l10n.authResendCode,
-                        style: const TextStyle(
-                          color: Color(0xFFA855F7),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                              l10n.authResendCode,
+                              style: const TextStyle(
+                                color: Color(0xFFA855F7),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                 ],
               ),

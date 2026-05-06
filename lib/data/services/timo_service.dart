@@ -22,11 +22,7 @@ class TimoService {
     try {
       return await ApiService.post(
         endpoint: '$baseUrl/admin/timo-confirm',
-        body: {
-          'emailId': emailId,
-          'selectedDate': date,
-          'employeeName': name,
-        },
+        body: {'emailId': emailId, 'selectedDate': date, 'employeeName': name},
       );
     } catch (e) {
       return {'success': false, 'error': e.toString()};

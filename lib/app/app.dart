@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '/app/app_routes.dart';
-import '/app/app_theme.dart';
-import '/l10n/app_localizations.dart';
-import '/presentation/providers/locale_provider.dart';
-import '/presentation/providers/theme_provider.dart';
+import 'package:e_team/app/app_routes.dart';
+import 'package:e_team/app/app_theme.dart';
+import 'package:e_team/l10n/app_localizations.dart';
+import 'package:e_team/presentation/providers/locale_provider.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
 
 class ETeamApp extends StatelessWidget {
   const ETeamApp({super.key});

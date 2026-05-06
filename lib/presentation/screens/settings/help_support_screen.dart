@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../providers/theme_provider.dart';
-import '/l10n/app_localizations.dart';
+import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/l10n/app_localizations.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({Key? key}) : super(key: key);
@@ -21,9 +21,7 @@ class HelpSupportScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -36,7 +34,9 @@ class HelpSupportScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : const Color(0xFFFAFAFA),
+      backgroundColor: isDark
+          ? const Color(0xFF0A0A0A)
+          : const Color(0xFFFAFAFA),
       body: SafeArea(
         child: Column(
           children: [
@@ -46,21 +46,18 @@ class HelpSupportScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: isDark
                     ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color(0xFF1E1E1E),
-                    const Color(0xFF2A2A2A),
-                  ],
-                )
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          const Color(0xFF1E1E1E),
+                          const Color(0xFF2A2A2A),
+                        ],
+                      )
                     : LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white,
-                    const Color(0xFFF9FAFB),
-                  ],
-                ),
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.white, const Color(0xFFF9FAFB)],
+                      ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(isDark ? 0.4 : 0.08),
@@ -138,13 +135,10 @@ class HelpSupportScreen extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: isDark
                               ? [
-                            const Color(0xFF1E1E1E),
-                            const Color(0xFF2A2A2A),
-                          ]
-                              : [
-                            Colors.white,
-                            const Color(0xFFF9FAFB),
-                          ],
+                                  const Color(0xFF1E1E1E),
+                                  const Color(0xFF2A2A2A),
+                                ]
+                              : [Colors.white, const Color(0xFFF9FAFB)],
                         ),
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
@@ -177,7 +171,9 @@ class HelpSupportScreen extends StatelessWidget {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFFCDFF00).withOpacity(0.4),
+                                  color: const Color(
+                                    0xFFCDFF00,
+                                  ).withOpacity(0.4),
                                   blurRadius: 20,
                                   offset: const Offset(0, 8),
                                 ),
@@ -253,7 +249,10 @@ class HelpSupportScreen extends StatelessWidget {
                     const SizedBox(height: 32),
 
                     // Contact methods
-                    _buildSectionTitle(isDark, l10n.helpSupportContactSectionTitle),
+                    _buildSectionTitle(
+                      isDark,
+                      l10n.helpSupportContactSectionTitle,
+                    ),
                     const SizedBox(height: 12),
 
                     _buildContactCard(
@@ -264,14 +263,14 @@ class HelpSupportScreen extends StatelessWidget {
                       title: l10n.helpSupportEmailSupportTitle,
                       subtitle: 'e-team@e-team.com',
                       description: l10n.helpSupportEmailSupportDesc,
-                      onTap: () => _copyToClipboard(context, 'e-team@e-team.com', l10n.authEmailLabel),
+                      onTap: () => _copyToClipboard(
+                        context,
+                        'e-team@e-team.com',
+                        l10n.authEmailLabel,
+                      ),
                     ),
 
-
-
-
                     const SizedBox(height: 32),
-
                   ],
                 ),
               ),
@@ -405,15 +404,9 @@ class HelpSupportScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: iconColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: iconColor.withOpacity(0.3),
-            ),
+            border: Border.all(color: iconColor.withOpacity(0.3)),
           ),
-          child: Icon(
-            icon,
-            color: iconColor,
-            size: 24,
-          ),
+          child: Icon(icon, color: iconColor, size: 24),
         ),
         title: Text(
           title,
@@ -457,5 +450,4 @@ class HelpSupportScreen extends StatelessWidget {
       ),
     );
   }
-
 }

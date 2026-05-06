@@ -25,7 +25,6 @@ class EchoOverviewTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           const SizedBox(height: 24),
           _buildSectionTitle('LATEST COMMUNICATIONS'),
           const SizedBox(height: 16),
@@ -54,7 +53,9 @@ class EchoOverviewTab extends StatelessWidget {
   }
 
   Widget _buildActivityCard(EmailItem email) {
-    final bool isRecruitment = email.subject.toLowerCase().contains('recrutement');
+    final bool isRecruitment = email.subject.toLowerCase().contains(
+      'recrutement',
+    );
     final bool isApproved = email.subject.toLowerCase().contains('validé');
     final bool isFromHera = email.sender.contains('hera@e-team.com');
 
@@ -82,10 +83,7 @@ class EchoOverviewTab extends StatelessWidget {
       decoration: BoxDecoration(
         color: EchoTheme.card,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: accentColor.withOpacity(0.22),
-          width: 0.8,
-        ),
+        border: Border.all(color: accentColor.withOpacity(0.22), width: 0.8),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.035),
@@ -103,11 +101,7 @@ class EchoOverviewTab extends StatelessWidget {
               color: accentColor.withOpacity(0.12),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(
-              icon,
-              color: accentColor,
-              size: 24,
-            ),
+            child: Icon(icon, color: accentColor, size: 24),
           ),
           const SizedBox(width: 14),
           Expanded(

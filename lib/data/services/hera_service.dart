@@ -154,10 +154,7 @@ class HeraService {
     required String docType,
   }) async {
     try {
-      return await _repo.generateDoc(
-        employeeId: employeeId,
-        docType: docType,
-      );
+      return await _repo.generateDoc(employeeId: employeeId, docType: docType);
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
@@ -173,10 +170,7 @@ class HeraService {
     }
   }
 
-  static Future<bool> requestDexoDoc(
-    String employeeId,
-    String docType,
-  ) async {
+  static Future<bool> requestDexoDoc(String employeeId, String docType) async {
     try {
       final response = await _repo.requestDexoDoc(
         employeeId: employeeId,
@@ -188,17 +182,11 @@ class HeraService {
     }
   }
 
-  static Future<Map<String, dynamic>> getRecentActions({
-    int limit = 20,
-  }) async {
+  static Future<Map<String, dynamic>> getRecentActions({int limit = 20}) async {
     try {
       return await _repo.getRecentActions(limit: limit);
     } catch (e) {
-      return {
-        'success': false,
-        'recent_actions': [],
-        'error': e.toString(),
-      };
+      return {'success': false, 'recent_actions': [], 'error': e.toString()};
     }
   }
 
@@ -246,9 +234,7 @@ class HeraService {
     }
   }
 
-  static Future<Map<String, dynamic>> hello({
-    required String username,
-  }) async {
+  static Future<Map<String, dynamic>> hello({required String username}) async {
     try {
       return await _repo.hello(username);
     } catch (e) {
@@ -279,11 +265,7 @@ class HeraService {
     try {
       return await _repo.getDocumentActions(limit: limit);
     } catch (e) {
-      return {
-        'success': false,
-        'actions': [],
-        'error': e.toString(),
-      };
+      return {'success': false, 'actions': [], 'error': e.toString()};
     }
   }
 }

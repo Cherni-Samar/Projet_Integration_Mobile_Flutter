@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class AgentStats {
   final String response;
   final String accuracy;
@@ -12,11 +10,7 @@ class AgentStats {
   });
 
   Map<String, dynamic> toMap() {
-    return {
-      'response': response,
-      'accuracy': accuracy,
-      'languages': languages,
-    };
+    return {'response': response, 'accuracy': accuracy, 'languages': languages};
   }
 }
 
@@ -24,16 +18,10 @@ class AgentEnergyTask {
   final String task;
   final int cost;
 
-  const AgentEnergyTask({
-    required this.task,
-    required this.cost,
-  });
+  const AgentEnergyTask({required this.task, required this.cost});
 
   Map<String, dynamic> toMap() {
-    return {
-      'task': task,
-      'cost': cost,
-    };
+    return {'task': task, 'cost': cost};
   }
 }
 
@@ -49,11 +37,7 @@ class AgentMultiScenario {
   });
 
   Map<String, dynamic> toMap() {
-    return {
-      'scenario': scenario,
-      'agents': agents,
-      'cost': cost,
-    };
+    return {'scenario': scenario, 'agents': agents, 'cost': cost};
   }
 }
 
@@ -71,12 +55,7 @@ class AgentEnergyPack {
   });
 
   Map<String, dynamic> toMap() {
-    return {
-      'title': title,
-      'energy': energy,
-      'price': price,
-      'color': color,
-    };
+    return {'title': title, 'energy': energy, 'price': price, 'color': color};
   }
 }
 
@@ -86,7 +65,7 @@ class AgentMetadata {
   final String roleKey; // Localization key for role
   final String descriptionKey; // Localization key for description
   final String iconPath;
-  final Color color;
+  final int colorValue;
   final AgentStats stats;
   final double rating;
   final String hires;
@@ -106,7 +85,7 @@ class AgentMetadata {
     required this.roleKey,
     required this.descriptionKey,
     required this.iconPath,
-    required this.color,
+    required this.colorValue,
     required this.stats,
     required this.rating,
     required this.hires,
@@ -126,7 +105,7 @@ class AgentMetadata {
     return {
       'name': name,
       'icon': iconPath,
-      'color': color,
+      'color': colorValue,
       'stats': stats.toMap(),
       'rating': rating,
       'hires': hires,
@@ -144,7 +123,7 @@ class AgentMetadata {
       'role': role,
       'description': description,
       'icon': iconPath,
-      'color': color,
+      'color': colorValue,
       'stats': stats.toMap(),
       'rating': rating,
       'hires': hires,

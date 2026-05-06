@@ -37,6 +37,7 @@ class UserProvider extends ChangeNotifier {
 
     await refreshFromApi();
   }
+
   List<String> get activeAgents {
     return _user?.activeAgents ?? [];
   }

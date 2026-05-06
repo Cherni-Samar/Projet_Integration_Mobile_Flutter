@@ -22,8 +22,9 @@ class EchoFormatters {
     }
 
     if (map == null) {
-      final singleQuoteSummary =
-      RegExp(r"summary\s*:\s*'([^']*)'").firstMatch(text)?.group(1);
+      final singleQuoteSummary = RegExp(
+        r"summary\s*:\s*'([^']*)'",
+      ).firstMatch(text)?.group(1);
 
       if (singleQuoteSummary != null && singleQuoteSummary.trim().isNotEmpty) {
         return _composeAutoReplyFromAnalysis({
@@ -31,8 +32,9 @@ class EchoFormatters {
         });
       }
 
-      final doubleQuoteSummary =
-      RegExp(r'summary\s*:\s*"([^"]*)"').firstMatch(text)?.group(1);
+      final doubleQuoteSummary = RegExp(
+        r'summary\s*:\s*"([^"]*)"',
+      ).firstMatch(text)?.group(1);
 
       if (doubleQuoteSummary != null && doubleQuoteSummary.trim().isNotEmpty) {
         return _composeAutoReplyFromAnalysis({
@@ -43,7 +45,8 @@ class EchoFormatters {
       return raw;
     }
 
-    final direct = map['reply'] ??
+    final direct =
+        map['reply'] ??
         map['replyText'] ??
         map['replyContent'] ??
         map['generatedReply'] ??
@@ -72,7 +75,8 @@ class EchoFormatters {
 
     if (summary.isNotEmpty) {
       var line = summary.trimRight();
-      final endsWell = line.endsWith('.') ||
+      final endsWell =
+          line.endsWith('.') ||
           line.endsWith('!') ||
           line.endsWith('?') ||
           line.endsWith('…');

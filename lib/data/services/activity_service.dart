@@ -20,9 +20,9 @@ class ActivityService {
         'agentFilter': agentFilter,
     };
 
-    final uri = Uri.parse('$baseUrl/mobile/feed')
-        .replace(queryParameters: queryParams)
-        .toString();
+    final uri = Uri.parse(
+      '$baseUrl/mobile/feed',
+    ).replace(queryParameters: queryParams).toString();
 
     final jsonData = await ApiService.get(endpoint: uri, token: token);
 
@@ -71,10 +71,7 @@ class ActivityFeedResponse {
   final List<ActivityItem> activities;
   final ActivityPagination pagination;
 
-  ActivityFeedResponse({
-    required this.activities,
-    required this.pagination,
-  });
+  ActivityFeedResponse({required this.activities, required this.pagination});
 
   factory ActivityFeedResponse.fromJson(Map<String, dynamic> json) {
     return ActivityFeedResponse(

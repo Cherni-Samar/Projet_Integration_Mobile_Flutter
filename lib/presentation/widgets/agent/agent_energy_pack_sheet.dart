@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/cart_provider.dart';
+import 'package:e_team/presentation/providers/cart_provider.dart';
+import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 
 Future<void> showAgentEnergyPackSheet({
   required BuildContext context,
@@ -11,7 +12,7 @@ Future<void> showAgentEnergyPackSheet({
   required List<Map<String, dynamic>> energyPacks,
 }) {
   final cart = Provider.of<CartProvider>(context, listen: false);
-  
+
   return showModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
@@ -74,7 +75,7 @@ Future<void> showAgentEnergyPackSheet({
                           id: 'agent-$agentName',
                           agentName: agentName,
                           agentIllustration: agentIcon,
-                          agentColor: agentColor,
+                          agentColorValue: colorToValue(agentColor),
                           packTitle: title,
                           energy: energy,
                           price: price,
@@ -101,14 +102,17 @@ Future<void> showAgentEnergyPackSheet({
                               action: SnackBarAction(
                                 label: 'VIEW CART',
                                 textColor: const Color(0xFFCDFF00),
-                                onPressed: () => Navigator.pushNamed(context, '/cart'),
+                                onPressed: () =>
+                                    Navigator.pushNamed(context, '/cart'),
                               ),
                             ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('$agentName is already in your cart!'),
+                              content: Text(
+                                '$agentName is already in your cart!',
+                              ),
                               backgroundColor: Colors.orange.shade700,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
@@ -142,7 +146,11 @@ Future<void> showAgentEnergyPackSheet({
                                 color: packColor.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(14),
                               ),
-                              child: Icon(Icons.bolt, color: packColor, size: 26),
+                              child: Icon(
+                                Icons.bolt,
+                                color: packColor,
+                                size: 26,
+                              ),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -170,7 +178,9 @@ Future<void> showAgentEnergyPackSheet({
                                           ),
                                           decoration: BoxDecoration(
                                             color: packColor,
-                                            borderRadius: BorderRadius.circular(6),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
                                           ),
                                           child: const Text(
                                             'BEST VALUE',

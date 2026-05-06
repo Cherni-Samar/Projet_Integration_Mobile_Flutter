@@ -66,17 +66,19 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
           ? Map<String, dynamic>.from(action['details'])
           : <String, dynamic>{};
 
-      final docType = (details['document'] ??
-          details['doc_type'] ??
-          details['type'] ??
-          action['action_type'] ??
-          '')
-          .toString()
-          .toLowerCase();
+      final docType =
+          (details['document'] ??
+                  details['doc_type'] ??
+                  details['type'] ??
+                  action['action_type'] ??
+                  '')
+              .toString()
+              .toLowerCase();
 
       final createdRaw = action['created_at'] ?? action['createdAt'];
-      final createdAt =
-      createdRaw != null ? DateTime.tryParse(createdRaw.toString()) : null;
+      final createdAt = createdRaw != null
+          ? DateTime.tryParse(createdRaw.toString())
+          : null;
 
       final matchType =
           _selectedDocType == 'all' || docType.contains(_selectedDocType);
@@ -101,7 +103,7 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
 
         matchDate =
             createdAt.isAfter(start.subtract(const Duration(seconds: 1))) &&
-                createdAt.isBefore(end.add(const Duration(seconds: 1)));
+            createdAt.isBefore(end.add(const Duration(seconds: 1)));
       }
 
       return matchType && matchDate;
@@ -120,27 +122,25 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
             _buildHeader(context),
             Expanded(
               child: _isLoading
-                  ? const Center(
-                child: CircularProgressIndicator(color: _dark),
-              )
+                  ? const Center(child: CircularProgressIndicator(color: _dark))
                   : RefreshIndicator(
-                color: _dark,
-                onRefresh: _refresh,
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
-                  children: [
-                    _buildFilterBar(),
-                    const SizedBox(height: 22),
-                    _sectionTitle('PRODUCTION LOGS'),
-                    const SizedBox(height: 12),
-                    if (actions.isEmpty)
-                      _emptyState()
-                    else
-                      ...actions.map(_productionTile),
-                  ],
-                ),
-              ),
+                      color: _dark,
+                      onRefresh: _refresh,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+                        children: [
+                          _buildFilterBar(),
+                          const SizedBox(height: 22),
+                          _sectionTitle('PRODUCTION LOGS'),
+                          const SizedBox(height: 12),
+                          if (actions.isEmpty)
+                            _emptyState()
+                          else
+                            ...actions.map(_productionTile),
+                        ],
+                      ),
+                    ),
             ),
           ],
         ),
@@ -256,18 +256,12 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
           decoration: BoxDecoration(
             color: selected ? _dark : Colors.white,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: selected ? _dark : _border,
-            ),
+            border: Border.all(color: selected ? _dark : _border),
           ),
           child: Row(
             children: [
               if (icon != null) ...[
-                Icon(
-                  icon,
-                  size: 15,
-                  color: selected ? Colors.white : _dark,
-                ),
+                Icon(icon, size: 15, color: selected ? Colors.white : _dark),
                 const SizedBox(width: 6),
               ],
               Text(
@@ -318,7 +312,8 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
         ? Map<String, dynamic>.from(action['details'])
         : <String, dynamic>{};
 
-    final docType = details['document'] ??
+    final docType =
+        details['document'] ??
         details['doc_type'] ??
         details['type'] ??
         action['action_type'] ??
@@ -326,7 +321,8 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
 
     final filename = details['filename'] ?? 'document.pdf';
 
-    final employeeName = action['employee_name'] ??
+    final employeeName =
+        action['employee_name'] ??
         details['employee_name'] ??
         action['employee_id']?['name'] ??
         'System';
@@ -345,7 +341,7 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
           border: Border.all(color: _border, width: 0.8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.028),
+              color: Colors.black.withValues(alpha: 0.028),
               blurRadius: 14,
               offset: const Offset(0, 7),
             ),
@@ -406,7 +402,7 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.plusJakartaSans(
-                        color: _muted.withOpacity(0.85),
+                        color: _muted.withValues(alpha: 0.85),
                         fontSize: 10,
                       ),
                     ),
@@ -416,7 +412,7 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
                     Text(
                       _formatDate(date.toString()),
                       style: GoogleFonts.plusJakartaSans(
-                        color: _muted.withOpacity(0.7),
+                        color: _muted.withValues(alpha: 0.7),
                         fontSize: 10,
                       ),
                     ),
@@ -463,9 +459,7 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
           padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),
           decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(30),
-            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
           ),
           child: SafeArea(
             top: false,
@@ -540,7 +534,7 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: _green.withOpacity(0.1),
+                    color: _green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -646,10 +640,7 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
     );
   }
 
-  Widget _roundButton({
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
+  Widget _roundButton({required IconData icon, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:e_team/domain/models/hera_models.dart';
-import '../hera_history_page.dart';
+import 'package:e_team/presentation/screens/hera/hera_history_page.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Flux tab — recent activity feed and workforce pulse.
@@ -31,7 +31,8 @@ class HeraFluxTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasTimoAction = recentActions.isNotEmpty &&
+    final hasTimoAction =
+        recentActions.isNotEmpty &&
         recentActions.first['details']?['agent'] == 'Timo';
 
     return RefreshIndicator(
@@ -55,10 +56,8 @@ class HeraFluxTab extends StatelessWidget {
             onAction: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => HeraHistoryPage(
-                  actions: recentActions,
-                  isDark: true,
-                ),
+                builder: (_) =>
+                    HeraHistoryPage(actions: recentActions, isDark: true),
               ),
             ),
           ),
@@ -74,7 +73,12 @@ class HeraFluxTab extends StatelessWidget {
               sub: '...',
             )
           else
-            ...recentActions.take(5).toList().asMap().entries.map(
+            ...recentActions
+                .take(5)
+                .toList()
+                .asMap()
+                .entries
+                .map(
                   (entry) => _ActionCard(
                     action: entry.value,
                     index: entry.key,

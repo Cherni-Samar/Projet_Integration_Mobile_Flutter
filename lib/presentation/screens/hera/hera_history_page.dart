@@ -24,7 +24,7 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
   final Set<String> _deletedIds = {};
 
   // ─── PALETTE MAUVE HERA ───
-  static const _lime   = Color(0xFFB57BFF); // Mauve Hera principal
+  static const _lime = Color(0xFFB57BFF); // Mauve Hera principal
   static const _purple = Color(0xFF7C3AED); // Violet profond secondaire
 
   @override
@@ -61,7 +61,9 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
     try {
       final result = await HeraService.getAllActions(page: _page, limit: 20);
       if (result['success'] == true) {
-        final newActions = List<Map<String, dynamic>>.from(result['actions'] ?? []);
+        final newActions = List<Map<String, dynamic>>.from(
+          result['actions'] ?? [],
+        );
 
         // ✅ FIX : On filtre les actions déjà supprimées localement
         final filtered = newActions.where((a) {
@@ -73,16 +75,23 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
           _actions.addAll(filtered);
           // Backward-compatible: new backend returns pagination.pages,
           // old shape returned total_pages at the top level.
-          final totalPages = result['pagination']?['pages'] ?? result['total_pages'] ?? 1;
+          final totalPages =
+              result['pagination']?['pages'] ?? result['total_pages'] ?? 1;
           _hasMore = _page < totalPages;
           _loading = false;
           _loadingMore = false;
         });
       } else {
-        setState(() { _loading = false; _loadingMore = false; });
+        setState(() {
+          _loading = false;
+          _loadingMore = false;
+        });
       }
     } catch (e) {
-      setState(() { _loading = false; _loadingMore = false; });
+      setState(() {
+        _loading = false;
+        _loadingMore = false;
+      });
     }
   }
 
@@ -110,7 +119,9 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
               content: const Text('Erreur lors de la suppression'),
               backgroundColor: const Color(0xFF1A1A1A),
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           );
           return;
@@ -124,7 +135,9 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
           content: const Text('Action supprimée'),
           backgroundColor: const Color(0xFF1A1A1A),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
     }
@@ -133,23 +146,68 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
   Map<String, dynamic> _getConfig(Map<String, dynamic> action) {
     switch (action['action_type']) {
       case 'onboarding_started':
-        return {'icon': Icons.person_add_rounded,      'color': _lime,                      'label': 'Onboarding démarré',    'badge': 'NOUVEAU'};
+        return {
+          'icon': Icons.person_add_rounded,
+          'color': _lime,
+          'label': 'Onboarding démarré',
+          'badge': 'NOUVEAU',
+        };
       case 'onboarding_completed':
-        return {'icon': Icons.check_circle_rounded,    'color': const Color(0xFF10B981),    'label': 'Onboarding complété',   'badge': 'ACTIF'};
+        return {
+          'icon': Icons.check_circle_rounded,
+          'color': const Color(0xFF10B981),
+          'label': 'Onboarding complété',
+          'badge': 'ACTIF',
+        };
       case 'leave_approved':
-        return {'icon': Icons.event_available_rounded, 'color': const Color(0xFF10B981),    'label': 'Congé approuvé',        'badge': 'APPROUVÉ'};
+        return {
+          'icon': Icons.event_available_rounded,
+          'color': const Color(0xFF10B981),
+          'label': 'Congé approuvé',
+          'badge': 'APPROUVÉ',
+        };
       case 'leave_refused':
-        return {'icon': Icons.event_busy_rounded,      'color': const Color(0xFFEF4444),    'label': 'Congé refusé',          'badge': 'REFUSÉ'};
+        return {
+          'icon': Icons.event_busy_rounded,
+          'color': const Color(0xFFEF4444),
+          'label': 'Congé refusé',
+          'badge': 'REFUSÉ',
+        };
       case 'offboarding_started':
-        return {'icon': Icons.logout_rounded,          'color': const Color(0xFFF59E0B),    'label': 'Offboarding démarré',   'badge': 'DÉPART'};
+        return {
+          'icon': Icons.logout_rounded,
+          'color': const Color(0xFFF59E0B),
+          'label': 'Offboarding démarré',
+          'badge': 'DÉPART',
+        };
       case 'offboarding_completed':
-        return {'icon': Icons.exit_to_app_rounded,     'color': const Color(0xFFEF4444),    'label': 'Offboarding complété',  'badge': 'INACTIF'};
+        return {
+          'icon': Icons.exit_to_app_rounded,
+          'color': const Color(0xFFEF4444),
+          'label': 'Offboarding complété',
+          'badge': 'INACTIF',
+        };
       case 'promotion':
-        return {'icon': Icons.trending_up_rounded,     'color': _purple,                    'label': 'Promotion',             'badge': 'PROMU'};
+        return {
+          'icon': Icons.trending_up_rounded,
+          'color': _purple,
+          'label': 'Promotion',
+          'badge': 'PROMU',
+        };
       case 'absence_alert':
-        return {'icon': Icons.warning_amber_rounded,   'color': const Color(0xFFF59E0B),    'label': 'Alerte absences',       'badge': 'ALERTE'};
+        return {
+          'icon': Icons.warning_amber_rounded,
+          'color': const Color(0xFFF59E0B),
+          'label': 'Alerte absences',
+          'badge': 'ALERTE',
+        };
       default:
-        return {'icon': Icons.auto_awesome_rounded,    'color': _purple,                    'label': 'Action Hera',           'badge': 'INFO'};
+        return {
+          'icon': Icons.auto_awesome_rounded,
+          'color': _purple,
+          'label': 'Action Hera',
+          'badge': 'INFO',
+        };
     }
   }
 
@@ -165,11 +223,13 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
   @override
   Widget build(BuildContext context) {
     final isDark = widget.isDark;
-    final bgColor      = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF8FAFC);
-    final headerColor  = isDark ? const Color(0xFF141414) : Colors.white;
-    final cardColor    = isDark ? const Color(0xFF141414) : Colors.white;
-    final textColor    = isDark ? Colors.white : const Color(0xFF0F172A);
-    final mutedColor   = isDark ? const Color(0xFF888888) : const Color(0xFF64748B);
+    final bgColor = isDark ? const Color(0xFF0A0A0A) : const Color(0xFFF8FAFC);
+    final headerColor = isDark ? const Color(0xFF141414) : Colors.white;
+    final cardColor = isDark ? const Color(0xFF141414) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final mutedColor = isDark
+        ? const Color(0xFF888888)
+        : const Color(0xFF64748B);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -191,7 +251,8 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
-                      width: 40, height: 40,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
                         color: isDark
                             ? Colors.white.withOpacity(0.08)
@@ -209,12 +270,17 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
 
                   // Icône Hera + titre
                   Container(
-                    width: 38, height: 38,
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
                       color: _lime.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(11),
                     ),
-                    child: const Icon(Icons.history_rounded, color: _lime, size: 20),
+                    child: const Icon(
+                      Icons.history_rounded,
+                      color: _lime,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 12),
 
@@ -241,7 +307,10 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
 
                   // Badge compteur
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: _lime.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(10),
@@ -267,162 +336,191 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
                   : _actions.isEmpty
                   ? _buildEmpty(isDark, textColor, mutedColor)
                   : RefreshIndicator(
-                onRefresh: () => _loadActions(refresh: true),
-                color: _lime,
-                backgroundColor: headerColor,
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (scroll) {
-                    if (scroll.metrics.pixels >=
-                        scroll.metrics.maxScrollExtent - 200 &&
-                        _hasMore && !_loadingMore) {
-                      _page++;
-                      _loadActions();
-                    }
-                    return false;
-                  },
-                  child: ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                    itemCount: _actions.length + (_hasMore ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      // Loader pagination
-                      if (index == _actions.length) {
-                        return Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: CircularProgressIndicator(color: _lime),
-                          ),
-                        );
-                      }
-
-                      final action = _actions[index];
-                      final config = _getConfig(action);
-                      final accent = config['color'] as Color;
-                      final employeeName = action['employee_name'] ?? 'Employé';
-                      final createdAt = action['created_at'] != null
-                          ? DateTime.tryParse(action['created_at'].toString())
-                          : null;
-                      final actionId = _extractId(action['_id']);
-
-                      return Dismissible(
-                        key: Key('hist_${actionId}_$index'),
-                        direction: DismissDirection.startToEnd,
-                        onDismissed: (_) => _deleteAction(index, actionId),
-                        background: Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444).withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: const Color(0xFFEF4444).withOpacity(0.25),
-                            ),
-                          ),
-                          alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.delete_outline_rounded,
-                                  color: Color(0xFFEF4444), size: 20),
-                              SizedBox(width: 8),
-                              Text(
-                                'Supprimer',
-                                style: TextStyle(
-                                  color: Color(0xFFEF4444),
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 10),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: cardColor,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: accent.withOpacity(0.15),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              // Icône
-                              Container(
-                                width: 44, height: 44,
-                                decoration: BoxDecoration(
-                                  color: accent.withOpacity(0.12),
-                                  borderRadius: BorderRadius.circular(13),
-                                ),
-                                child: Icon(
-                                  config['icon'] as IconData,
-                                  color: accent,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-
-                              // Texte
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      employeeName,
-                                      style: TextStyle(
-                                        color: textColor,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      config['label'] as String,
-                                      style: TextStyle(color: mutedColor, fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Badge + temps
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: accent.withOpacity(0.15),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      config['badge'] as String,
-                                      style: TextStyle(
-                                        color: accent,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
+                      onRefresh: () => _loadActions(refresh: true),
+                      color: _lime,
+                      backgroundColor: headerColor,
+                      child: NotificationListener<ScrollNotification>(
+                        onNotification: (scroll) {
+                          if (scroll.metrics.pixels >=
+                                  scroll.metrics.maxScrollExtent - 200 &&
+                              _hasMore &&
+                              !_loadingMore) {
+                            _page++;
+                            _loadActions();
+                          }
+                          return false;
+                        },
+                        child: ListView.builder(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                          itemCount: _actions.length + (_hasMore ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            // Loader pagination
+                            if (index == _actions.length) {
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: CircularProgressIndicator(
+                                    color: _lime,
                                   ),
-                                  if (createdAt != null) ...[
-                                    const SizedBox(height: 5),
+                                ),
+                              );
+                            }
+
+                            final action = _actions[index];
+                            final config = _getConfig(action);
+                            final accent = config['color'] as Color;
+                            final employeeName =
+                                action['employee_name'] ?? 'Employé';
+                            final createdAt = action['created_at'] != null
+                                ? DateTime.tryParse(
+                                    action['created_at'].toString(),
+                                  )
+                                : null;
+                            final actionId = _extractId(action['_id']);
+
+                            return Dismissible(
+                              key: Key('hist_${actionId}_$index'),
+                              direction: DismissDirection.startToEnd,
+                              onDismissed: (_) =>
+                                  _deleteAction(index, actionId),
+                              background: Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFFEF4444,
+                                  ).withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: const Color(
+                                      0xFFEF4444,
+                                    ).withOpacity(0.25),
+                                  ),
+                                ),
+                                alignment: Alignment.centerLeft,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Icon(
+                                      Icons.delete_outline_rounded,
+                                      color: Color(0xFFEF4444),
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 8),
                                     Text(
-                                      _timeAgo(createdAt),
-                                      style: TextStyle(color: mutedColor, fontSize: 10),
+                                      'Supprimer',
+                                      style: TextStyle(
+                                        color: Color(0xFFEF4444),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13,
+                                      ),
                                     ),
                                   ],
-                                ],
+                                ),
                               ),
-                            ],
-                          ),
+
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: cardColor,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: accent.withOpacity(0.15),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    // Icône
+                                    Container(
+                                      width: 44,
+                                      height: 44,
+                                      decoration: BoxDecoration(
+                                        color: accent.withOpacity(0.12),
+                                        borderRadius: BorderRadius.circular(13),
+                                      ),
+                                      child: Icon(
+                                        config['icon'] as IconData,
+                                        color: accent,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+
+                                    // Texte
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            employeeName,
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 3),
+                                          Text(
+                                            config['label'] as String,
+                                            style: TextStyle(
+                                              color: mutedColor,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    // Badge + temps
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: accent.withOpacity(0.15),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            config['badge'] as String,
+                                            style: TextStyle(
+                                              color: accent,
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.w900,
+                                              letterSpacing: 0.5,
+                                            ),
+                                          ),
+                                        ),
+                                        if (createdAt != null) ...[
+                                          const SizedBox(height: 5),
+                                          Text(
+                                            _timeAgo(createdAt),
+                                            style: TextStyle(
+                                              color: mutedColor,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ),
+                      ),
+                    ),
             ),
           ],
         ),
@@ -436,7 +534,8 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 72, height: 72,
+            width: 72,
+            height: 72,
             decoration: BoxDecoration(
               color: _lime.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
