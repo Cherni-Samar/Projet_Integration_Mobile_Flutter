@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/data/services/kash_service.dart';
 import 'package:e_team/presentation/widgets/kash/kash_theme.dart';
 import 'package:e_team/presentation/widgets/kash/kash_add_budget_sheet.dart';
 import 'package:e_team/presentation/widgets/kash/kash_add_reminder_sheet.dart';
 import 'package:e_team/presentation/widgets/kash/kash_add_expense_sheet.dart';
+import 'package:e_team/presentation/widgets/kash/kash_dashboard_widgets.dart';
 import 'package:e_team/presentation/widgets/kash/kash_overview_tab.dart';
 import 'package:e_team/presentation/widgets/kash/kash_expenses_tab.dart';
 import 'package:e_team/presentation/widgets/kash/kash_budgets_tab.dart';
@@ -302,9 +302,20 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
         child: SafeArea(
           child: Column(
             children: [
-              _buildHeader(d, energyBalance),
+              KashDashboardHeader(
+                isDark: d,
+                energy: energyBalance,
+                pulseController: _pulseController,
+                glowController: _glowController,
+                onBack: () => Navigator.pop(context),
+              ),
               const SizedBox(height: 10),
-              _buildPillTabBar(d),
+              KashPillTabBar(
+                isDark: d,
+                tabs: _tabs,
+                selectedTab: _selectedTab,
+                onTabSelected: (index) => setState(() => _selectedTab = index),
+              ),
               const SizedBox(height: 8),
               Expanded(
                 child: RefreshIndicator(
@@ -327,184 +338,6 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       ),
     );
   }
-
-  Widget _buildHeader(bool d, int energy) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: KP.card(d),
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: KP.border(d)),
-      ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: d
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.07),
-              ),
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: KP.text(d),
-                size: 16,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          AnimatedBuilder(
-            animation: _glowController,
-            builder: (_, child) => Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: KP.primary.withValues(
-                      alpha: 0.25 + 0.2 * _glowController.value,
-                    ),
-                    blurRadius: 14 + 8 * _glowController.value,
-                  ),
-                ],
-              ),
-              child: child,
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(23),
-              child: Image.asset(
-                'assets/images/kash.png',
-                width: 46,
-                height: 46,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => CircleAvatar(
-                  backgroundColor: KP.primary,
-                  child: const Icon(
-                    Icons.account_balance_wallet,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Kash Dashboard',
-                  style: TextStyle(
-                    color: KP.text(d),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                Row(
-                  children: [
-                    AnimatedBuilder(
-                      animation: _pulseController,
-                      builder: (_, _) => Container(
-                        width: 7,
-                        height: 7,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: KP.primary.withValues(
-                            alpha: 0.6 + 0.4 * _pulseController.value,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'FINANCIAL MANAGEMENT',
-                      style: TextStyle(
-                        color: KP.primary,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-            decoration: BoxDecoration(
-              color: d
-                  ? Colors.white.withValues(alpha: 0.07)
-                  : Colors.black.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              '⚡ $energy',
-              style: TextStyle(
-                color: KP.text(d),
-                fontSize: 13,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPillTabBar(bool d) => Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16),
-    padding: const EdgeInsets.all(4),
-    decoration: BoxDecoration(
-      color: KP.card(d),
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: KP.border(d)),
-    ),
-    child: Row(
-      children: List.generate(_tabs.length, (i) {
-        final sel = _selectedTab == i;
-        return Expanded(
-          child: GestureDetector(
-            onTap: () => setState(() => _selectedTab = i),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: sel ? KP.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _tabs[i].$1,
-                    size: 17,
-                    color: sel ? Colors.white : KP.textMuted(d),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    _tabs[i].$2,
-                    style: TextStyle(
-                      color: sel ? Colors.white : KP.textMuted(d),
-                      fontSize: 10,
-                      fontWeight: sel ? FontWeight.w800 : FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }),
-    ),
-  );
 
   Widget _buildOverviewTab(bool d) {
     return KashOverviewTab(
@@ -562,116 +395,17 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     final category = (_readValue(expense, 'category') ?? 'Other').toString();
     final date = _safeDate(_readValue(expense, 'date'));
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: KP.card(d),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: KP.border(d)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: _getCategoryColor(category).withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              Icons.receipt_long_rounded,
-              color: _getCategoryColor(category),
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  vendor,
-                  style: TextStyle(
-                    color: KP.text(d),
-                    fontWeight: FontWeight.w900,
-                    fontSize: 15,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.schedule_rounded,
-                      size: 12,
-                      color: KP.textMuted(d),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      DateFormat('EEE dd MMM', 'fr_FR').format(date),
-                      style: TextStyle(color: KP.textMuted(d), fontSize: 11),
-                    ),
-                    const SizedBox(width: 8),
-                    Text('•', style: TextStyle(color: KP.textMuted(d))),
-                    const SizedBox(width: 8),
-                    Text(
-                      category,
-                      style: TextStyle(color: KP.textMuted(d), fontSize: 11),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Text(
-            '${amount.toStringAsFixed(2)} $currency',
-            style: TextStyle(
-              color: KP.danger,
-              fontSize: 13,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ],
-      ),
+    return KashExpenseCard(
+      isDark: d,
+      vendor: vendor,
+      amount: amount,
+      currency: currency,
+      category: category,
+      date: date,
     );
   }
 
   Widget _emptyState(String message, IconData icon, bool d) {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: KP.card(d),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: KP.border(d)),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 48, color: KP.textSoft(d)),
-              const SizedBox(height: 16),
-              Text(
-                message,
-                style: TextStyle(color: KP.textMuted(d), fontSize: 15),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Color _getCategoryColor(String category) {
-    final colors = {
-      'SaaS': KP.accent,
-      'Marketing': Colors.purple,
-      'Travel': Colors.orange,
-      'Office': Colors.green,
-      'Salaries': KP.danger,
-      'Other': KP.textMuted(false),
-    };
-    return colors[category] ?? KP.primary;
+    return KashEmptyState(message: message, icon: icon, isDark: d);
   }
 }

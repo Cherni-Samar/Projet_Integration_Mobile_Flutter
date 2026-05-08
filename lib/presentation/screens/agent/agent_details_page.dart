@@ -4,21 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:e_team/data/services/agent_metadata_service.dart';
 import 'package:e_team/data/services/hera_service.dart';
 import 'package:e_team/l10n/app_localizations.dart';
-import 'package:e_team/presentation/providers/cart_provider.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/presentation/screens/hera/hera_dashboard_page.dart';
 import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
-import 'package:e_team/presentation/widgets/agent/agent_appbar_actions.dart';
-import 'package:e_team/presentation/widgets/agent/agent_avatar_hero.dart';
-import 'package:e_team/presentation/widgets/agent/agent_description_bubble.dart';
-import 'package:e_team/presentation/widgets/agent/agent_energy_costs_section.dart';
 import 'package:e_team/presentation/widgets/agent/agent_energy_pack_sheet.dart';
-import 'package:e_team/presentation/widgets/agent/agent_hire_fab.dart';
-import 'package:e_team/presentation/widgets/agent/agent_multi_scenario_card.dart';
-import 'package:e_team/presentation/widgets/agent/agent_name_header.dart';
-import 'package:e_team/presentation/widgets/agent/agent_skills_section.dart';
-import 'package:e_team/presentation/widgets/agent/agent_swipe_dots.dart';
+import 'package:e_team/presentation/widgets/agent/details/agent_details_widgets.dart';
 
 class AgentDetailsPage extends StatefulWidget {
   // ✅ Legacy single agent (optionnel)
@@ -205,201 +196,28 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     final multiScenarios = _getMultiAgentScenarios(name);
     final skills = _getSkillsForAgent(l10n, name);
 
-    final abs = swipeDiff.abs().clamp(0.0, 1.0);
-    final avatarDx = -swipeDiff * 28.0;
-    final contentDy = 16.0 * abs;
-    final contentOpacity = (1.0 - 0.25 * abs).clamp(0.75, 1.0);
-
-    return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0A0A0A) : Colors.white,
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              // ── AppBar ──────────────────────────────────────────────────
-              SliverAppBar(
-                backgroundColor: isDark
-                    ? const Color(0xFF0A0A0A)
-                    : Colors.white,
-                pinned: true,
-                elevation: 0,
-                leading: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.1)
-                          : const Color(0xFFF5F5F5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.arrow_back,
-                      color: isDark ? Colors.white : Colors.black,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                title: Text(
-                  l10n.agentDetailsTitle,
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                actions: [
-                  Consumer<CartProvider>(
-                    builder: (context, cart, child) {
-                      return AgentAppBarActions(
-                        cartItemCount: cart.itemCount,
-                        onCartPressed: () =>
-                            Navigator.pushNamed(context, '/cart'),
-                        onSharePressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  const Icon(Icons.share, color: Colors.white),
-                                  const SizedBox(width: 12),
-                                  Text(l10n.agentDetailsShareSnack(name)),
-                                ],
-                              ),
-                              backgroundColor: isDark
-                                  ? const Color(0xFF1E1E1E)
-                                  : Colors.black87,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                side: isDark
-                                    ? BorderSide(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.1,
-                                        ),
-                                        width: 1,
-                                      )
-                                    : BorderSide.none,
-                              ),
-                            ),
-                          );
-                        },
-                        isDark: isDark,
-                      );
-                    },
-                  ),
-                ],
-              ),
-
-              // ── Content ─────────────────────────────────────────────────
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Opacity(
-                    opacity: contentOpacity,
-                    child: Transform.translate(
-                      offset: Offset(0, contentDy),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Avatar
-                          AgentAvatarHero(
-                            agentIcon: icon,
-                            agentColor: color,
-                            pulseController: _animationController,
-                            avatarDx: avatarDx,
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          // Name
-                          AgentNameHeader(
-                            agentName: name,
-                            version: _getVersionForAgent(l10n, name),
-                            isDark: isDark,
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          // Description bubble
-                          AgentDescriptionBubble(
-                            description: _agentDescriptionLines(
-                              agent,
-                            ).join('\n\n'),
-                            agentColor: color,
-                            isDark: isDark,
-                          ),
-
-                          const SizedBox(height: 32),
-
-                          // Skills
-                          AgentSkillsSection(
-                            title: l10n.agentDetailsCoreSkills,
-                            skills: skills,
-                            isDark: isDark,
-                          ),
-
-                          const SizedBox(height: 32),
-
-                          // Energy Cost per Task
-                          AgentEnergyCostsSection(
-                            title: 'ENERGY COST PER TASK',
-                            energyCosts: energyCosts,
-                            agentColor: color,
-                            isDark: isDark,
-                          ),
-
-                          // Multi-Agent Scenarios
-                          if (multiScenarios.isNotEmpty) ...[
-                            const SizedBox(height: 32),
-                            Text(
-                              'MULTI-AGENT SCENARIOS',
-                              style: TextStyle(
-                                color: isDark ? Colors.white : Colors.black,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            ...multiScenarios.map(
-                              (s) => AgentMultiScenarioCard(
-                                scenario: s,
-                                agentColor: color,
-                                isDark: isDark,
-                              ),
-                            ),
-                          ],
-
-                          const SizedBox(height: 120),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          // Dots overlay
-          Positioned(
-            top: MediaQuery.of(context).padding.top + kToolbarHeight + 10,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: _isSwipeMode
-                  ? AgentSwipeDots(
-                      itemCount: widget.agents!.length,
-                      pageController: _pageController,
-                      currentIndex: _currentIndex,
-                      isDark: isDark,
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: _buildFab(
+    return AgentDetailsScaffold(
+      l10n: l10n,
+      isDark: isDark,
+      isSwipeMode: _isSwipeMode,
+      swipeItemCount: widget.agents?.length ?? 0,
+      currentIndex: _currentIndex,
+      pageController: _pageController,
+      pulseController: _animationController,
+      agentName: name,
+      agentColor: color,
+      agentIcon: icon,
+      description: _agentDescriptionLines(agent).join('\n\n'),
+      version: _getVersionForAgent(l10n, name),
+      isActive: isActive,
+      swipeDiff: swipeDiff,
+      skills: skills,
+      energyCosts: energyCosts,
+      multiScenarios: multiScenarios,
+      onBackPressed: () => Navigator.pop(context),
+      onCartPressed: () => Navigator.pushNamed(context, '/cart'),
+      onSharePressed: () => _showShareSnackBar(context, l10n, isDark, name),
+      onPrimaryActionPressed: () => _handlePrimaryAction(
         context: context,
         isDark: isDark,
         name: name,
@@ -407,14 +225,37 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         icon: icon,
         isActive: isActive,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
-  // ---------------------------
-  // ✅ FAB — Hire ou Buy Energy
-  // ---------------------------
-  Widget _buildFab({
+  void _showShareSnackBar(
+    BuildContext context,
+    AppLocalizations l10n,
+    bool isDark,
+    String name,
+  ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.share, color: Colors.white),
+            const SizedBox(width: 12),
+            Text(l10n.agentDetailsShareSnack(name)),
+          ],
+        ),
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.black87,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: isDark
+              ? BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 1)
+              : BorderSide.none,
+        ),
+      ),
+    );
+  }
+
+  void _handlePrimaryAction({
     required BuildContext context,
     required bool isDark,
     required String name,
@@ -425,21 +266,15 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     final isHera = name.trim().toLowerCase() == 'hera';
     final canOpenDashboard = isHera && isActive;
 
-    return AgentHireFab(
-      isDark: isDark,
-      agentName: name,
-      isActive: isActive,
-      onPressed: () {
-        if (canOpenDashboard) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const HeraDashboardPage()),
-          );
-          return;
-        }
-        _handleHireAgent(context, isDark, name, color, icon);
-      },
-    );
+    if (canOpenDashboard) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const HeraDashboardPage()),
+      );
+      return;
+    }
+
+    _handleHireAgent(context, isDark, name, color, icon);
   }
 
   // ---------------------------
@@ -457,30 +292,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => Center(
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(color: Color(0xFF8B5CF6)),
-                const SizedBox(height: 16),
-                Text(
-                  'Connexion à Hera...',
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        builder: (_) => AgentConnectionDialog(isDark: isDark),
       );
 
       try {

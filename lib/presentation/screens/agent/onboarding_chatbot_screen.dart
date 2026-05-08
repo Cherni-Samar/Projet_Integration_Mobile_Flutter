@@ -1,14 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:e_team/data/services/dexo_service.dart';
 import 'package:e_team/data/services/payment_plan_metadata_service.dart';
 import 'package:e_team/domain/models/dexo/dexo_onboarding_models.dart';
 import 'package:e_team/presentation/providers/cart_provider.dart';
 import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
-import 'package:e_team/presentation/widgets/dexo/organization_blueprint_card.dart';
+import 'package:e_team/presentation/widgets/agent/onboarding/onboarding_chatbot_widgets.dart';
 
 class OnboardingChatbotScreen extends StatefulWidget {
   final String email;
@@ -33,15 +32,6 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
   bool _isTyping = false;
   bool _hasBlueprint = false;
   String _vision = '';
-
-  static const Color _primary = Color(0xFFCDFF00);
-  static const Color _dark = Color(0xFF0A0A0A);
-  static const Color _bg = Color(0xFFFFFFFF);
-  static const Color _botBubble = Color(0xFFF8FAFC);
-  static const Color _border = Color(0xFFE5E7EB);
-  static const Color _textMain = Color(0xFF0F172A);
-  static const Color _textMuted = Color(0xFF64748B);
-  static const Color _green = Color(0xFF22C55E);
 
   final Map<String, Map<String, dynamic>> _agentCatalog = {
     'hera': {
@@ -302,8 +292,17 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: _bg,
-      appBar: _buildHeader(),
+      backgroundColor: OnboardingChatbotTheme.bg,
+      appBar: OnboardingChatbotHeader(
+        pulseController: _pulseController,
+        onBack: () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/agent-marketplace',
+            (route) => false,
+          );
+        },
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -314,10 +313,13 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
                 itemCount: _messages.length + (_isTyping ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index == _messages.length) {
-                    return _buildTypingIndicator();
+                    return const OnboardingTypingIndicator();
                   }
 
-                  return _buildMessage(_messages[index]);
+                  return OnboardingChatMessageView(
+                    message: _messages[index],
+                    onConfirmBlueprint: _activateOrganizationVision,
+                  );
                 },
               ),
             ),
@@ -325,291 +327,13 @@ class _OnboardingChatbotScreenState extends State<OnboardingChatbotScreen>
               duration: const Duration(milliseconds: 180),
               curve: Curves.easeOut,
               padding: EdgeInsets.only(bottom: bottomInset > 0 ? 8 : 0),
-              child: _buildInputBar(),
+              child: OnboardingInputBar(
+                controller: _inputController,
+                hasBlueprint: _hasBlueprint,
+                onSend: _handleSend,
+              ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildHeader() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      centerTitle: true,
-      surfaceTintColor: Colors.white,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded),
-        color: _dark,
-        onPressed: () {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/agent-marketplace',
-            (route) => false,
-          );
-        },
-      ),
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          AnimatedBuilder(
-            animation: _pulseController,
-            builder: (_, _) {
-              return Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: _green.withValues(
-                    alpha: 0.4 + 0.6 * _pulseController.value,
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: _green.withValues(alpha: 0.25),
-                      blurRadius: 10,
-                      spreadRadius: 2,
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 10),
-          Text(
-            "DEXO CONSULTATION",
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              color: _dark,
-              letterSpacing: 1.4,
-            ),
-          ),
-        ],
-      ),
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
-        child: Container(height: 0.5, color: _border),
-      ),
-    );
-  }
-
-  Widget _buildMessage(ChatMessage message) {
-    if (message.type == ChatMessageType.blueprint) {
-      final plan = message.blueprintPlan;
-      if (plan == null) return const SizedBox.shrink();
-
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 24),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: OrganizationBlueprintCard(
-            initialPlan: plan,
-            onConfirm: _activateOrganizationVision,
-          ),
-        ),
-      );
-    }
-
-    final isBot = message.type == ChatMessageType.bot;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
-      child: Align(
-        alignment: isBot ? Alignment.centerLeft : Alignment.centerRight,
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.78,
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: isBot ? _botBubble : _dark,
-            borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(20),
-              topRight: const Radius.circular(20),
-              bottomLeft: Radius.circular(isBot ? 4 : 20),
-              bottomRight: Radius.circular(isBot ? 20 : 4),
-            ),
-            border: isBot ? Border.all(color: _border, width: 0.5) : null,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.025),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Text(
-            message.text,
-            style: GoogleFonts.plusJakartaSans(
-              color: isBot ? _textMain : _primary,
-              fontSize: 14,
-              height: 1.55,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTypingIndicator() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: _botBubble,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: _border, width: 0.5),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const _DotDelay(delay: 0),
-              const SizedBox(width: 4),
-              const _DotDelay(delay: 150),
-              const SizedBox(width: 4),
-              const _DotDelay(delay: 300),
-              const SizedBox(width: 10),
-              Text(
-                "Dexo is analyzing your company...",
-                style: GoogleFonts.plusJakartaSans(
-                  color: _textMuted,
-                  fontSize: 12,
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInputBar() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: _border, width: 0.5)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _inputController,
-              enabled: !_hasBlueprint,
-              minLines: 1,
-              maxLines: 4,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                color: _textMain,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                hintText: _hasBlueprint
-                    ? "Blueprint generated"
-                    : "Describe your company...",
-                hintStyle: GoogleFonts.plusJakartaSans(
-                  color: _textMuted,
-                  fontSize: 13,
-                ),
-                filled: true,
-                fillColor: _botBubble,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 13,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              onSubmitted: (_) => _handleSend(),
-            ),
-          ),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: _handleSend,
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: _hasBlueprint ? _textMuted : _dark,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: _dark.withValues(alpha: 0.18),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.arrow_upward_rounded,
-                color: _primary,
-                size: 22,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Typing indicator dot ─────────────────────────────────────────────────────
-
-class _DotDelay extends StatefulWidget {
-  final int delay;
-
-  const _DotDelay({required this.delay});
-
-  @override
-  State<_DotDelay> createState() => _DotDelayState();
-}
-
-class _DotDelayState extends State<_DotDelay>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _opacity;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
-
-    _opacity = Tween<double>(begin: 0.25, end: 1).animate(_controller);
-
-    Future.delayed(Duration(milliseconds: widget.delay), () {
-      if (mounted) _controller.repeat(reverse: true);
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _opacity,
-      child: Container(
-        width: 6,
-        height: 6,
-        decoration: const BoxDecoration(
-          color: Color(0xFF64748B),
-          shape: BoxShape.circle,
         ),
       ),
     );
