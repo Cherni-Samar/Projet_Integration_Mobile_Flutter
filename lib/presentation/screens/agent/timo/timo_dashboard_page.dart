@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:e_team/data/services/timo_service.dart';
 import 'package:e_team/presentation/models/timo/timo_task_view_model.dart';
 import 'package:e_team/presentation/widgets/timo/timo_design_system.dart';
+import 'package:e_team/presentation/widgets/timo/timo_dashboard_tabs.dart';
 import 'package:e_team/presentation/widgets/timo/timo_shared_widgets.dart';
 
 // ─────────────────────────────────────────────────────────────
@@ -157,98 +156,17 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
   //  TAB 0 — JOURNAL IA - WHITE SAAS DESIGN
   // ════════════════════════════════════════════════════════════
   Widget _buildJournal() {
-    if (_tasks.isEmpty) {
-      return _emptyState(
-        Icons.article_outlined,
-        'Aucune tâche planifiée',
-        'Hera n\'a encore rien envoyé à Timo.',
-      );
-    }
-
-    return RefreshIndicator(
+    return TimoJournalTab(
+      tasks: _tasks,
+      filteredTasks: _filtered,
+      activeFilter: _activeFilter,
+      interviewsCount: _interviews.length,
+      onboardingsCount: _onboardings.length,
+      offboardingsCount: _offboardings.length,
+      doneCount: _done.length,
       onRefresh: _loadData,
-      color: TimoDesignSystem.other,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
-        children: [
-          // ── Stats par type ──
-          _buildCleanStats(),
-          const SizedBox(height: 16),
-
-          // ── Filtres pills ──
-          _buildFilterPills(),
-          const SizedBox(height: 16),
-
-          // ── Tâches filtrées ──
-          if (_filtered.isEmpty)
-            _emptyState(
-              Icons.filter_list_off_rounded,
-              'Aucun résultat',
-              'Pas de tâche pour ce filtre.',
-            )
-          else
-            ..._filtered.map((t) => _buildTaskCard(t)),
-        ],
-      ),
+      onFilterChanged: (filter) => setState(() => _activeFilter = filter),
     );
-  }
-
-  // ── Stats: Interviews / Onboardings / Offboardings ─────────
-  Widget _buildCleanStats() {
-    return TimoStatsCard(
-      interviews: _interviews.length,
-      onboardings: _onboardings.length,
-      offboardings: _offboardings.length,
-      done: _done.length,
-      total: _tasks.length,
-    );
-  }
-
-  // ── Filtres pills ───────────────────────────────────────────
-  Widget _buildFilterPills() {
-    final filters = [
-      (null, 'Tous', TimoDesignSystem.other),
-      (TaskType.interview, 'Interview', TimoDesignSystem.interview),
-      (TaskType.onboarding, 'Onboarding', TimoDesignSystem.onboarding),
-      (TaskType.offboarding, 'Offboarding', TimoDesignSystem.offboarding),
-    ];
-    return SizedBox(
-      height: 34,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: filters.map((f) {
-          final sel = _activeFilter == f.$1;
-          return GestureDetector(
-            onTap: () => setState(() => _activeFilter = f.$1),
-            child: Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-              decoration: BoxDecoration(
-                color: sel ? f.$3 : TimoDesignSystem.card,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: sel ? f.$3 : TimoDesignSystem.border,
-                  width: 0.5,
-                ),
-              ),
-              child: Text(
-                f.$2,
-                style: GoogleFonts.plusJakartaSans(
-                  color: sel ? Colors.white : TimoDesignSystem.textMuted,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  // ── Carte tâche avec design amélioré ─────────────────────────────────────────────
-  Widget _buildTaskCard(TimoTask task) {
-    return TimoTaskCard(task: task);
   }
 
   // ════════════════════════════════════════════════════════════
@@ -259,345 +177,25 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
         ? _tasksOn(_selectedDay!)
         : <TimoTask>[];
 
-    return RefreshIndicator(
+    return TimoAgendaTab(
+      tasks: _tasks,
+      dayTasks: dayTasks,
+      focusedDay: _focusedDay,
+      selectedDay: _selectedDay,
+      calendarFormat: _calFmt,
+      tasksOn: _tasksOn,
       onRefresh: _loadData,
-      color: TimoDesignSystem.other,
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
-        children: [
-          // Calendrier
-          Container(
-            decoration: BoxDecoration(
-              color: TimoDesignSystem.card,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: TimoDesignSystem.border, width: 0.5),
-              boxShadow: [
-                BoxShadow(
-                  color: TimoDesignSystem.shadowLight,
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Header custom
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
-                  child: Row(
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            DateFormat(
-                              'MMMM yyyy',
-                              'fr_FR',
-                            ).format(_focusedDay).toUpperCase(),
-                            style: GoogleFonts.plusJakartaSans(
-                              color: TimoDesignSystem.textPrimary,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          Text(
-                            '${_tasks.length} événements',
-                            style: GoogleFonts.plusJakartaSans(
-                              color: TimoDesignSystem.textMuted,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      // Toggle semaine / mois
-                      GestureDetector(
-                        onTap: () => setState(
-                          () => _calFmt = _calFmt == CalendarFormat.month
-                              ? CalendarFormat.week
-                              : CalendarFormat.month,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 7,
-                          ),
-                          decoration: BoxDecoration(
-                            color: TimoDesignSystem.other.withValues(
-                              alpha: 0.12,
-                            ),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                _calFmt == CalendarFormat.month
-                                    ? Icons.view_week_rounded
-                                    : Icons.calendar_month_rounded,
-                                size: 13,
-                                color: TimoDesignSystem.other,
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                _calFmt == CalendarFormat.month
-                                    ? 'Semaine'
-                                    : 'Mois',
-                                style: GoogleFonts.plusJakartaSans(
-                                  color: TimoDesignSystem.other,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                TableCalendar(
-                  firstDay: DateTime.utc(2020, 1, 1),
-                  lastDay: DateTime.utc(2030, 12, 31),
-                  focusedDay: _focusedDay,
-                  calendarFormat: _calFmt,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  onDaySelected: (sel, foc) => setState(() {
-                    _selectedDay = sel;
-                    _focusedDay = foc;
-                  }),
-                  onFormatChanged: (f) => setState(() => _calFmt = f),
-                  onPageChanged: (f) => setState(() => _focusedDay = f),
-                  eventLoader: _tasksOn,
-                  calendarBuilders: CalendarBuilders(
-                    defaultBuilder: (ctx, day, _) {
-                      final ts = _tasksOn(day);
-                      if (ts.isEmpty) return null;
-                      return Container(
-                        margin: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: TimoDesignSystem.other.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: TimoDesignSystem.other.withValues(
-                              alpha: 0.45,
-                            ),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${day.day}',
-                            style: GoogleFonts.plusJakartaSans(
-                              color: TimoDesignSystem.textPrimary,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                    todayBuilder: (ctx, day, _) => Container(
-                      margin: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: TimoDesignSystem.other,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${day.day}',
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    ),
-                    selectedBuilder: (ctx, day, _) => Container(
-                      margin: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF57C00),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: TimoDesignSystem.other.withValues(
-                              alpha: 0.5,
-                            ),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${day.day}',
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Points colorés selon le type
-                    markerBuilder: (ctx, date, events) {
-                      final ts = events.cast<TimoTask>();
-                      if (ts.isEmpty) return null;
-                      return Positioned(
-                        bottom: 4,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: ts
-                              .take(3)
-                              .map(
-                                (t) => Container(
-                                  width: 5,
-                                  height: 5,
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 1,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: t.color,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      );
-                    },
-                  ),
-                  calendarStyle: CalendarStyle(
-                    todayDecoration: const BoxDecoration(),
-                    selectedDecoration: const BoxDecoration(),
-                    defaultTextStyle: GoogleFonts.plusJakartaSans(
-                      color: TimoDesignSystem.textPrimary,
-                      fontSize: 13,
-                    ),
-                    weekendTextStyle: GoogleFonts.plusJakartaSans(
-                      color: TimoDesignSystem.textMuted,
-                      fontSize: 13,
-                    ),
-                    outsideTextStyle: GoogleFonts.plusJakartaSans(
-                      color: TimoDesignSystem.textMuted.withValues(alpha: 0.35),
-                    ),
-                  ),
-                  headerStyle: HeaderStyle(
-                    formatButtonVisible: false,
-                    titleCentered: false,
-                    titleTextStyle: const TextStyle(fontSize: 0),
-                    leftChevronIcon: Icon(
-                      Icons.chevron_left_rounded,
-                      color: TimoDesignSystem.textPrimary,
-                      size: 24,
-                    ),
-                    rightChevronIcon: Icon(
-                      Icons.chevron_right_rounded,
-                      color: TimoDesignSystem.textPrimary,
-                      size: 24,
-                    ),
-                    headerPadding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                  ),
-                  daysOfWeekStyle: DaysOfWeekStyle(
-                    weekdayStyle: GoogleFonts.plusJakartaSans(
-                      color: TimoDesignSystem.textMuted,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 11,
-                    ),
-                    weekendStyle: GoogleFonts.plusJakartaSans(
-                      color: TimoDesignSystem.other.withValues(alpha: 0.7),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 11,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // Légende types
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: TimoDesignSystem.card,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: TimoDesignSystem.border, width: 0.5),
-            ),
-            child: Wrap(
-              spacing: 18,
-              runSpacing: 8,
-              children: [
-                _legendChip('Interview', TimoDesignSystem.interview),
-                _legendChip('Onboarding', TimoDesignSystem.onboarding),
-                _legendChip('Offboarding', TimoDesignSystem.offboarding),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Tâches du jour sélectionné
-          Row(
-            children: [
-              Text(
-                _selectedDay != null
-                    ? 'Plannings du ${DateFormat('d MMMM', 'fr_FR').format(_selectedDay!)}'
-                    : 'Sélectionnez une date',
-                style: GoogleFonts.plusJakartaSans(
-                  color: TimoDesignSystem.textPrimary,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const Spacer(),
-              if (dayTasks.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: TimoDesignSystem.other.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '${dayTasks.length}',
-                    style: GoogleFonts.plusJakartaSans(
-                      color: TimoDesignSystem.other,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          if (dayTasks.isEmpty)
-            _emptyState(
-              Icons.event_available_rounded,
-              'Aucun planning',
-              'Rien de planifié ce jour-là.',
-            )
-          else
-            ...dayTasks.map((t) => _buildTaskCard(t)),
-        ],
+      onDaySelected: (selected, focused) => setState(() {
+        _selectedDay = selected;
+        _focusedDay = focused;
+      }),
+      onFormatChanged: (format) => setState(() => _calFmt = format),
+      onPageChanged: (focused) => setState(() => _focusedDay = focused),
+      onToggleFormat: () => setState(
+        () => _calFmt = _calFmt == CalendarFormat.month
+            ? CalendarFormat.week
+            : CalendarFormat.month,
       ),
     );
-  }
-
-  // ════════════════════════════════════════════════════════════
-  //  SHARED HELPERS - WHITE SAAS DESIGN
-  // ════════════════════════════════════════════════════════════
-  Widget _legendChip(String label, Color color) {
-    return TimoLegendChip(label: label, color: color);
-  }
-
-  Widget _emptyState(IconData icon, String title, String sub) {
-    return TimoEmptyState(icon: icon, title: title, sub: sub);
   }
 }

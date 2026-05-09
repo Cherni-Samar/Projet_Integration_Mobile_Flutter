@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:e_team/domain/models/echo_models.dart';
+import 'echo_dashboard_helpers.dart';
 import 'echo_theme.dart';
 
 /// Overview tab for Echo dashboard showing recent communications
 class EchoOverviewTab extends StatelessWidget {
   final bool loadingEmails;
   final List<EmailItem> recentEmails;
-  final Widget Function(String message, IconData icon) buildEmptyState;
-  final String Function(DateTime time) formatTime;
 
   const EchoOverviewTab({
     super.key,
     required this.loadingEmails,
     required this.recentEmails,
-    required this.buildEmptyState,
-    required this.formatTime,
   });
 
   @override
@@ -44,7 +41,10 @@ class EchoOverviewTab extends StatelessWidget {
     final recent = recentEmails.take(3).toList();
 
     if (recent.isEmpty) {
-      return buildEmptyState('No recent communications', Icons.inbox_outlined);
+      return const EchoDashboardEmptyState(
+        message: 'No recent communications',
+        icon: Icons.inbox_outlined,
+      );
     }
 
     return Column(
@@ -171,7 +171,7 @@ class EchoOverviewTab extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                formatTime(email.receivedAt),
+                formatEchoRelativeTime(email.receivedAt),
                 style: GoogleFonts.inter(
                   color: EchoTheme.textMuted,
                   fontSize: 10,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:e_team/domain/models/echo_models.dart';
+import 'echo_dashboard_helpers.dart';
 import 'echo_theme.dart';
 import 'package:e_team/presentation/screens/agent/echo/echo_email_detail_screen.dart';
 
@@ -15,7 +16,6 @@ class EchoMessagesTab extends StatelessWidget {
   final Future<void> Function(EmailItem) onMarkAsRead;
   final VoidCallback onReply;
   final VoidCallback onAfterReply;
-  final Widget Function(String message, IconData icon) buildEmptyState;
   final String? token;
 
   const EchoMessagesTab({
@@ -29,7 +29,6 @@ class EchoMessagesTab extends StatelessWidget {
     required this.onMarkAsRead,
     required this.onReply,
     required this.onAfterReply,
-    required this.buildEmptyState,
     this.token,
   });
 
@@ -149,9 +148,9 @@ class EchoMessagesTab extends StatelessWidget {
     final emailsToShow = emailSubTab == 0 ? receivedEmails : sentEmails;
 
     if (emailsToShow.isEmpty) {
-      return buildEmptyState(
-        emailSubTab == 0 ? 'No received emails' : 'No sent emails',
-        Icons.inbox_outlined,
+      return EchoDashboardEmptyState(
+        message: emailSubTab == 0 ? 'No received emails' : 'No sent emails',
+        icon: Icons.inbox_outlined,
       );
     }
 

@@ -11,6 +11,7 @@ import 'package:e_team/presentation/widgets/kash/kash_overview_tab.dart';
 import 'package:e_team/presentation/widgets/kash/kash_expenses_tab.dart';
 import 'package:e_team/presentation/widgets/kash/kash_budgets_tab.dart';
 import 'package:e_team/presentation/widgets/kash/kash_reminders_tab.dart';
+import 'package:e_team/presentation/utils/kash_dashboard_data.dart';
 
 class KashDashboardScreen extends StatefulWidget {
   const KashDashboardScreen({super.key});
@@ -128,96 +129,17 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     }
   }
 
-  dynamic _readValue(dynamic item, String key) {
-    if (item is Map) return item[key];
-
-    try {
-      switch (key) {
-        case 'vendor':
-          return item.vendor;
-        case 'amount':
-          return item.amount;
-        case 'currency':
-          return item.currency;
-        case 'category':
-          return item.category;
-        case 'date':
-          return item.date;
-        case 'limit':
-          return item.limit;
-        case 'spent':
-          return item.spent;
-        case 'status':
-          return item.status;
-        case 'title':
-          return item.title;
-        case 'dueDate':
-          return item.dueDate;
-        case 'id':
-          return item.id;
-        case '_id':
-          return item.id;
-        default:
-          return null;
-      }
-    } catch (_) {
-      return null;
-    }
-  }
-
-  DateTime _safeDate(dynamic value) {
-    if (value is DateTime) return value;
-    if (value != null) {
-      return DateTime.tryParse(value.toString()) ?? DateTime.now();
-    }
-    return DateTime.now();
-  }
-
   void _calculateMetrics() {
+    final metrics = calculateKashDashboardMetrics(
+      expenses: _expenses,
+      budgets: _budgets,
+      reminders: _reminders,
+    );
     setState(() {
-      _totalSpent = 0.0;
-
-      for (final expense in _expenses) {
-        final amount =
-            (_readValue(expense, 'amount') as num?)?.toDouble() ?? 0.0;
-        _totalSpent += amount;
-      }
-
-      _totalBudget = 0.0;
-
-      for (final budget in _budgets) {
-        final limit = (_readValue(budget, 'limit') as num?)?.toDouble() ?? 0.0;
-        _totalBudget += limit;
-      }
-
-      _pendingReminders = _reminders
-          .where((r) => _readValue(r, 'status') == 'pending')
-          .length;
+      _totalSpent = metrics.totalSpent;
+      _totalBudget = metrics.totalBudget;
+      _pendingReminders = metrics.pendingReminders;
     });
-  }
-
-  /// Get combined list of categories: budget categories first, then standard categories
-  /// Removes duplicates automatically
-  List<String> _getCombinedCategories() {
-    final categories = <String>{};
-
-    for (final budget in _budgets) {
-      final category = _readValue(budget, 'category')?.toString();
-      if (category != null && category.isNotEmpty) {
-        categories.add(category);
-      }
-    }
-
-    categories.addAll([
-      'SaaS',
-      'Marketing',
-      'Travel',
-      'Office',
-      'Salaries',
-      'Other',
-    ]);
-
-    return categories.toList();
   }
 
   Future<void> _markReminderPaid(String reminderId) async {
@@ -280,7 +202,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
     showKashAddExpenseSheet(
       context: context,
       isDark: d,
-      categories: _getCombinedCategories(),
+      categories: kashCombinedCategories(_budgets),
       onExpenseCreated: () async {
         _loadDashboardData();
         final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -371,7 +293,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       budgets: _budgets,
       onAddBudget: _showAddBudgetSheet,
       buildEmptyState: _emptyState,
-      readValue: _readValue,
+      readValue: kashReadValue,
     );
   }
 
@@ -382,18 +304,19 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       reminders: _reminders,
       onAddReminder: _showAddReminderSheet,
       buildEmptyState: _emptyState,
-      readValue: _readValue,
-      safeDate: _safeDate,
+      readValue: kashReadValue,
+      safeDate: kashSafeDate,
       onMarkReminderPaid: _markReminderPaid,
     );
   }
 
   Widget _buildExpenseCard(dynamic expense, bool d) {
-    final vendor = (_readValue(expense, 'vendor') ?? 'Unknown').toString();
-    final amount = (_readValue(expense, 'amount') as num?)?.toDouble() ?? 0.0;
-    final currency = (_readValue(expense, 'currency') ?? 'TND').toString();
-    final category = (_readValue(expense, 'category') ?? 'Other').toString();
-    final date = _safeDate(_readValue(expense, 'date'));
+    final vendor = (kashReadValue(expense, 'vendor') ?? 'Unknown').toString();
+    final amount =
+        (kashReadValue(expense, 'amount') as num?)?.toDouble() ?? 0.0;
+    final currency = (kashReadValue(expense, 'currency') ?? 'TND').toString();
+    final category = (kashReadValue(expense, 'category') ?? 'Other').toString();
+    final date = kashSafeDate(kashReadValue(expense, 'date'));
 
     return KashExpenseCard(
       isDark: d,

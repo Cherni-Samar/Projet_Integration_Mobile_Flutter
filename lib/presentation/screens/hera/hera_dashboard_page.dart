@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 
 import 'package:e_team/domain/models/hera_models.dart';
 import 'package:e_team/presentation/providers/hera_provider.dart';
@@ -13,68 +9,14 @@ import 'package:e_team/presentation/screens/hera/hera_history_page.dart';
 import 'package:e_team/presentation/screens/hera/hera_voice_page.dart';
 import 'package:e_team/presentation/widgets/common/app_error_snack_bar.dart';
 import 'package:e_team/presentation/widgets/hera/hera_dashboard_dialogs.dart';
+import 'package:e_team/presentation/widgets/hera/hera_dashboard_selectors.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
+import 'package:e_team/presentation/utils/hera_pdf_exporter.dart';
 import 'package:e_team/presentation/screens/hera/tabs/hera_flux_tab.dart';
 import 'package:e_team/presentation/screens/hera/tabs/hera_agenda_tab.dart';
 import 'package:e_team/presentation/screens/hera/tabs/hera_team_tab.dart';
 import 'package:e_team/presentation/screens/hera/tabs/hera_energy_tab.dart';
 import 'package:e_team/presentation/screens/hera/tabs/hera_vision_tab.dart';
-
-// ─── Selector value objects ──────────────────────────────────────────────────
-// Each bundles exactly the fields one tab needs.
-// Equality is value-based so Selector skips rebuilds when nothing changed.
-
-@immutable
-class _FluxData {
-  final List<Map<String, dynamic>> recentActions;
-  final bool loadingStats;
-  final bool loadingActions;
-  final HeraStats? stats;
-
-  const _FluxData({
-    required this.recentActions,
-    required this.loadingStats,
-    required this.loadingActions,
-    required this.stats,
-  });
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _FluxData &&
-          recentActions == other.recentActions &&
-          loadingStats == other.loadingStats &&
-          loadingActions == other.loadingActions &&
-          stats == other.stats;
-
-  @override
-  int get hashCode =>
-      Object.hash(recentActions, loadingStats, loadingActions, stats);
-}
-
-@immutable
-class _TeamData {
-  final List<HeraEmployee> employees;
-  final List<HeraCandidate> candidates;
-  final bool loadingEmployees;
-
-  const _TeamData({
-    required this.employees,
-    required this.candidates,
-    required this.loadingEmployees,
-  });
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is _TeamData &&
-          employees == other.employees &&
-          candidates == other.candidates &&
-          loadingEmployees == other.loadingEmployees;
-
-  @override
-  int get hashCode => Object.hash(employees, candidates, loadingEmployees);
-}
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -274,8 +216,8 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                       // Tab 0 — Flux
                       // Rebuilds only when: recentActions, loadingStats,
                       // loadingActions, or stats change.
-                      Selector<HeraProvider, _FluxData>(
-                        selector: (_, p) => _FluxData(
+                      Selector<HeraProvider, HeraFluxData>(
+                        selector: (_, p) => HeraFluxData(
                           recentActions: p.recentActions,
                           loadingStats: p.loadingStats,
                           loadingActions: p.loadingActions,
@@ -319,8 +261,8 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
                       // Tab 2 — Team
                       // Rebuilds only when employees, candidates, or
                       // loadingEmployees change.
-                      Selector<HeraProvider, _TeamData>(
-                        selector: (_, p) => _TeamData(
+                      Selector<HeraProvider, HeraTeamData>(
+                        selector: (_, p) => HeraTeamData(
                           employees: p.employees,
                           candidates: p.candidates,
                           loadingEmployees: p.loadingEmployees,
@@ -412,67 +354,6 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
   }
 
   Future<void> _generatePdf(String title, String content) async {
-    final pdf = pw.Document();
-    final cleanContent = content.replaceAll(RegExp(r'[^\x00-\x7F]'), '');
-
-    pdf.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(36),
-        build: (_) => pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              children: [
-                pw.Text(
-                  'E-TEAM — DOCUMENT OFFICIEL',
-                  style: pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
-                ),
-                pw.Text(
-                  DateFormat('dd/MM/yyyy').format(DateTime.now()),
-                  style: pw.TextStyle(fontSize: 9, color: PdfColors.grey600),
-                ),
-              ],
-            ),
-            pw.SizedBox(height: 24),
-            pw.Container(
-              padding: const pw.EdgeInsets.all(12),
-              color: PdfColors.blueGrey50,
-              child: pw.Text(
-                title.toUpperCase(),
-                style: pw.TextStyle(
-                  fontSize: 18,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-            ),
-            pw.SizedBox(height: 30),
-            pw.Text(
-              cleanContent,
-              style: const pw.TextStyle(fontSize: 12, lineSpacing: 1.5),
-            ),
-            pw.Spacer(),
-            pw.Divider(),
-            pw.Align(
-              alignment: pw.Alignment.centerRight,
-              child: pw.Text(
-                'Certifié par Hera IA',
-                style: pw.TextStyle(
-                  fontSize: 9,
-                  color: PdfColors.blue700,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    await Printing.sharePdf(
-      bytes: await pdf.save(),
-      filename: '${title.replaceAll(' ', '_')}.pdf',
-    );
+    await HeraPdfExporter.shareDocument(title: title, content: content);
   }
 }

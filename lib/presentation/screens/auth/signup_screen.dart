@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
+
 import 'package:e_team/data/services/auth_service.dart';
-import 'package:e_team/presentation/screens/settings/terms_and_conditions_screen.dart';
-import 'package:e_team/presentation/screens/settings/privacy_policy_screen.dart';
 import 'package:e_team/l10n/app_localizations.dart';
+import 'package:e_team/presentation/screens/settings/privacy_policy_screen.dart';
+import 'package:e_team/presentation/screens/settings/terms_and_conditions_screen.dart';
+import 'package:e_team/presentation/widgets/auth/signup_widgets.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -39,12 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     if (!_acceptTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.authAcceptTermsError),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showSnackBar(l10n.authAcceptTermsError, Colors.red);
       return;
     }
 
@@ -58,15 +54,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
 
       if (result['success'] == true && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.authAccountCreatedCheckEmail),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 3),
-          ),
+        _showSnackBar(
+          l10n.authAccountCreatedCheckEmail,
+          Colors.green,
+          duration: const Duration(seconds: 3),
         );
 
-        // ✅ Redirection vers la vérification d'email
         Navigator.pushReplacementNamed(
           context,
           '/verify-email',
@@ -75,23 +68,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
     } catch (e) {
       if (mounted) {
-        String errorMessage = e.toString();
-
-        if (errorMessage.contains('Email already exists') ||
-            errorMessage.contains('déjà utilisé')) {
-          errorMessage = l10n.authEmailAlreadyRegistered;
-        } else if (errorMessage.contains('SocketException')) {
-          errorMessage = l10n.authUnableToConnect;
-        } else if (errorMessage.contains('TimeoutException')) {
-          errorMessage = l10n.authConnectionTimeout;
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ $errorMessage'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
-          ),
+        _showSnackBar(
+          '❌ ${_localizedError(e, l10n)}',
+          Colors.red,
+          duration: const Duration(seconds: 4),
         );
       }
     } finally {
@@ -101,9 +81,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  String _localizedError(Object error, AppLocalizations l10n) {
+    final errorMessage = error.toString();
+
+    if (errorMessage.contains('Email already exists') ||
+        errorMessage.contains('déjà utilisé')) {
+      return l10n.authEmailAlreadyRegistered;
+    }
+    if (errorMessage.contains('SocketException')) {
+      return l10n.authUnableToConnect;
+    }
+    if (errorMessage.contains('TimeoutException')) {
+      return l10n.authConnectionTimeout;
+    }
+
+    return errorMessage;
+  }
+
+  void _showSnackBar(
+    String message,
+    Color backgroundColor, {
+    Duration? duration,
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: backgroundColor,
+        duration: duration ?? const Duration(seconds: 4),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -122,36 +134,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.authCreateAccountTitle,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.authSignupSubtitle,
-                  style: const TextStyle(fontSize: 16, color: Colors.black54),
-                ),
+                SignUpHeader(l10n: l10n),
                 const SizedBox(height: 40),
-
-                // Name field
-                TextFormField(
+                SignUpTextField(
                   controller: _nameController,
+                  labelText: l10n.authFullNameLabel,
+                  hintText: l10n.authFullNameHint,
+                  icon: Icons.person_outline,
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: l10n.authFullNameLabel,
-                    hintText: l10n.authFullNameHint,
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    prefixIcon: const Icon(Icons.person_outline),
-                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return l10n.authNameRequired;
@@ -163,23 +153,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
-                // Email field
-                TextFormField(
+                SignUpTextField(
                   controller: _emailController,
+                  labelText: l10n.authEmailLabel,
+                  hintText: l10n.authEmailHint,
+                  icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: l10n.authEmailLabel,
-                    hintText: l10n.authEmailHint,
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    prefixIcon: const Icon(Icons.email_outlined),
-                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return l10n.authEmailRequired;
@@ -193,32 +173,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
-                // Password field
-                TextFormField(
+                SignUpTextField(
                   controller: _passwordController,
+                  labelText: l10n.authPasswordLabel,
+                  hintText: '••••••••',
+                  icon: Icons.lock_outlined,
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    labelText: l10n.authPasswordLabel,
-                    hintText: '••••••••',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    prefixIcon: const Icon(Icons.lock_outlined),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                      ),
-                      onPressed: () {
-                        setState(() => _obscurePassword = !_obscurePassword);
-                      },
-                    ),
+                  suffixIcon: SignUpPasswordVisibilityButton(
+                    isObscured: _obscurePassword,
+                    onPressed: () {
+                      setState(() => _obscurePassword = !_obscurePassword);
+                    },
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -231,37 +197,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
-                // Confirm Password field
-                TextFormField(
+                SignUpTextField(
                   controller: _confirmPasswordController,
+                  labelText: l10n.authConfirmPasswordLabel,
+                  hintText: '••••••••',
+                  icon: Icons.lock_outlined,
                   obscureText: _obscureConfirmPassword,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) =>
                       _acceptTerms ? _handleSignUp() : null,
-                  decoration: InputDecoration(
-                    labelText: l10n.authConfirmPasswordLabel,
-                    hintText: '••••••••',
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    prefixIcon: const Icon(Icons.lock_outlined),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureConfirmPassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                      ),
-                      onPressed: () {
-                        setState(
-                          () => _obscureConfirmPassword =
-                              !_obscureConfirmPassword,
-                        );
-                      },
-                    ),
+                  suffixIcon: SignUpPasswordVisibilityButton(
+                    isObscured: _obscureConfirmPassword,
+                    onPressed: () {
+                      setState(
+                        () =>
+                            _obscureConfirmPassword = !_obscureConfirmPassword,
+                      );
+                    },
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -274,152 +226,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-
-                // Terms checkbox
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: Checkbox(
-                        value: _acceptTerms,
-                        onChanged: (value) {
-                          setState(() => _acceptTerms = value ?? false);
-                        },
-                        fillColor: WidgetStateProperty.resolveWith((states) {
-                          if (states.contains(WidgetState.selected)) {
-                            return const Color(0xFFA855F7);
-                          }
-                          return null;
-                        }),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                              color: Colors.black54,
-                              fontSize: 14,
-                            ),
-                            children: [
-                              TextSpan(text: l10n.authAgreeToPrefix),
-                              TextSpan(
-                                text: l10n.authTermsAndConditions,
-                                style: const TextStyle(
-                                  color: Color(0xFFA855F7),
-                                  fontWeight: FontWeight.w600,
-                                  decoration: TextDecoration.underline,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const TermsAndConditionsScreen(),
-                                      ),
-                                    );
-                                  },
-                              ),
-                              TextSpan(text: l10n.authAnd),
-                              TextSpan(
-                                text: l10n.authPrivacyPolicy,
-                                style: const TextStyle(
-                                  color: Color(0xFFA855F7),
-                                  fontWeight: FontWeight.w600,
-                                  decoration: TextDecoration.underline,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PrivacyPolicyScreen(),
-                                      ),
-                                    );
-                                  },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                SignUpTermsCheckbox(
+                  l10n: l10n,
+                  value: _acceptTerms,
+                  onChanged: (value) {
+                    setState(() => _acceptTerms = value ?? false);
+                  },
+                  onTermsPressed: () =>
+                      _pushPage(const TermsAndConditionsScreen()),
+                  onPrivacyPressed: () =>
+                      _pushPage(const PrivacyPolicyScreen()),
                 ),
                 const SizedBox(height: 30),
-
-                // Sign up button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: (_isLoading || !_acceptTerms)
-                        ? null
-                        : _handleSignUp,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _acceptTerms
-                          ? Colors.black
-                          : Colors.grey,
-                      foregroundColor: const Color(0xFFCDFF00),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                      disabledBackgroundColor: Colors.grey.shade400,
-                      disabledForegroundColor: Colors.grey.shade600,
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFFCDFF00),
-                              ),
-                            ),
-                          )
-                        : Text(
-                            l10n.authCreateAccountTitle,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: _acceptTerms
-                                  ? const Color(0xFFCDFF00)
-                                  : Colors.grey.shade600,
-                            ),
-                          ),
-                  ),
+                SignUpSubmitButton(
+                  l10n: l10n,
+                  isLoading: _isLoading,
+                  acceptTerms: _acceptTerms,
+                  onPressed: _handleSignUp,
                 ),
                 const SizedBox(height: 30),
-
-                // Sign in link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.authAlreadyHaveAccount,
-                      style: const TextStyle(color: Colors.black54),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(
-                        l10n.authSignIn,
-                        style: const TextStyle(
-                          color: Color(0xFFA855F7),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                SignUpSignInLink(
+                  l10n: l10n,
+                  onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
@@ -427,5 +255,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ),
       ),
     );
+  }
+
+  void _pushPage(Widget page) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => page));
   }
 }

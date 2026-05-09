@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:e_team/domain/models/echo_models.dart';
 import 'package:e_team/core/config/api_config.dart';
+import 'echo_dashboard_helpers.dart';
 import 'echo_theme.dart';
 import 'package:e_team/presentation/screens/agent/echo/product_marketing_screen.dart';
 
@@ -11,7 +12,6 @@ class EchoPostsTab extends StatelessWidget {
   final bool loadingSocial;
   final List<PostItem> posts;
   final String? token;
-  final String Function(DateTime time) formatTime;
   final VoidCallback onLoadSocialPosts;
   final VoidCallback onLaunchCampaign;
 
@@ -20,7 +20,6 @@ class EchoPostsTab extends StatelessWidget {
     required this.loadingSocial,
     required this.posts,
     this.token,
-    required this.formatTime,
     required this.onLoadSocialPosts,
     required this.onLaunchCampaign,
   });
@@ -298,7 +297,7 @@ class EchoPostsTab extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        formatTime(post.createdAt),
+                        formatEchoRelativeTime(post.createdAt),
                         style: GoogleFonts.inter(
                           color: EchoTheme.textMuted,
                           fontSize: 11,

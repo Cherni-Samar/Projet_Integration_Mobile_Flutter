@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:e_team/data/services/echo_service.dart';
 import 'package:e_team/domain/models/echo_models.dart';
 import 'package:e_team/presentation/widgets/echo/echo_theme.dart';
@@ -9,15 +8,6 @@ import 'package:e_team/presentation/widgets/echo/echo_dashboard_navigation.dart'
 import 'package:e_team/presentation/widgets/echo/echo_overview_tab.dart';
 import 'package:e_team/presentation/widgets/echo/echo_messages_tab.dart';
 import 'package:e_team/presentation/widgets/echo/echo_posts_tab.dart';
-
-// CLASSES DE DONNÉES
-class SocialPost {
-  final String platform;
-  final String text;
-  final String time;
-
-  SocialPost({required this.platform, required this.text, required this.time});
-}
 
 class EchoDashboardPage extends StatefulWidget {
   final String? token;
@@ -252,29 +242,6 @@ class _EchoDashboardPageState extends State<EchoDashboardPage>
     return EchoOverviewTab(
       loadingEmails: _loadingEmails,
       recentEmails: _recentEmails,
-      buildEmptyState: _buildEmptyState,
-      formatTime: _formatTime,
-    );
-  }
-
-  // --- HELPERS ---
-  Widget _buildEmptyState(String message, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        children: [
-          Icon(icon, size: 48, color: EchoTheme.textMuted),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            style: GoogleFonts.inter(
-              color: EchoTheme.textMuted,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -290,7 +257,6 @@ class _EchoDashboardPageState extends State<EchoDashboardPage>
       onMarkAsRead: _markAsRead,
       onReply: _loadAllEmails,
       onAfterReply: _loadStats,
-      buildEmptyState: _buildEmptyState,
       token: widget.token,
     );
   }
@@ -303,7 +269,6 @@ class _EchoDashboardPageState extends State<EchoDashboardPage>
       loadingSocial: _loadingSocial,
       posts: _posts,
       token: widget.token,
-      formatTime: _formatTime,
       onLoadSocialPosts: _loadSocialPosts,
       onLaunchCampaign: _loadSocialPosts,
     );
@@ -325,13 +290,5 @@ class _EchoDashboardPageState extends State<EchoDashboardPage>
         }
       });
     }
-  }
-
-  String _formatTime(DateTime time) {
-    final diff = DateTime.now().difference(time);
-    if (diff.inDays > 0) return '${diff.inDays}d ago';
-    if (diff.inHours > 0) return '${diff.inHours}h ago';
-    if (diff.inMinutes > 0) return '${diff.inMinutes}m ago';
-    return 'now';
   }
 }
