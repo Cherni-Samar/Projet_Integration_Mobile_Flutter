@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/widgets/auth/email_verification/email_verification_content.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key});
@@ -186,13 +187,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     Color backgroundColor, {
     Duration? duration,
   }) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-        duration: duration ?? const Duration(seconds: 4),
-      ),
+    AppSnackBar.show(
+      context,
+      message,
+      type: _snackBarTypeFor(backgroundColor),
+      duration: duration ?? const Duration(seconds: 4),
     );
+  }
+
+  AppSnackBarType _snackBarTypeFor(Color color) {
+    if (color == Colors.green) return AppSnackBarType.success;
+    if (color == Colors.orange) return AppSnackBarType.warning;
+    if (color == Colors.red) return AppSnackBarType.error;
+    return AppSnackBarType.info;
   }
 
   void _handleCodeChanged(int index, String value) {

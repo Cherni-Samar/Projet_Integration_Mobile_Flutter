@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:e_team/data/services/kash_service.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 /// Shows the Add Reminder bottom sheet.
 ///
@@ -16,9 +17,6 @@ Future<void> showKashAddReminderSheet({
   final notesController = TextEditingController();
   String selectedCurrency = 'TND';
   DateTime selectedDate = DateTime.now().add(const Duration(days: 7));
-
-  // Capture messenger before the async gap introduced by showModalBottomSheet.
-  final messenger = ScaffoldMessenger.of(context);
 
   await showModalBottomSheet(
     context: context,
@@ -135,9 +133,7 @@ Future<void> showKashAddReminderSheet({
 
                     if (titleController.text.isEmpty ||
                         amountController.text.isEmpty) {
-                      messenger.showSnackBar(
-                        const SnackBar(content: Text('Please fill all fields')),
-                      );
+                      AppSnackBar.warning(context, 'Please fill all fields');
                       return;
                     }
 
@@ -157,19 +153,9 @@ Future<void> showKashAddReminderSheet({
                       // Notify caller to refresh dashboard + energy balance.
                       onReminderCreated();
 
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('✅ Reminder created'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
+                      AppSnackBar.success(context, 'Reminder created');
                     } catch (e) {
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text('❌ Error: $e'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                      AppSnackBar.error(context, 'Error: $e');
                     }
                   },
                   child: const Text('Add'),

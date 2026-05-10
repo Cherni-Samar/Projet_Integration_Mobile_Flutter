@@ -13,6 +13,7 @@ import 'package:e_team/presentation/widgets/auth/user_profile/user_profile_dialo
 import 'package:e_team/presentation/widgets/auth/user_profile/user_profile_header.dart';
 import 'package:e_team/presentation/widgets/auth/user_profile/user_profile_identity.dart';
 import 'package:e_team/presentation/widgets/auth/user_profile/user_profile_options.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 class UserProfilePage extends StatefulWidget {
   final User? user;
@@ -124,12 +125,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<void> _openEditProfile(AppLocalizations l10n) async {
     if (_currentUser == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.profileUserDataNotAvailable),
-          backgroundColor: Colors.red,
-        ),
-      );
+      AppSnackBar.error(context, l10n.profileUserDataNotAvailable);
       return;
     }
 
@@ -148,19 +144,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void _showProfileUpdatedSnackBar(AppLocalizations l10n) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(l10n.profileUpdatedSuccessfully),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+    AppSnackBar.success(context, l10n.profileUpdatedSuccessfully);
   }
 }

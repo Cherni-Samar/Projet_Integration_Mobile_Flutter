@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/presentation/widgets/echo/product_marketing/echo_campaign_history_card.dart';
 import 'package:e_team/presentation/widgets/echo/product_marketing/echo_product_marketing_theme.dart';
 
@@ -21,11 +22,7 @@ class EchoCampaignHistoryTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          color: EchoProductMarketingTheme.violet,
-        ),
-      );
+      return const AppLoadingState(color: EchoProductMarketingTheme.violet);
     }
 
     if (campaigns.isEmpty) {

@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 class UserProfileLoadingScaffold extends StatelessWidget {
@@ -12,7 +13,7 @@ class UserProfileLoadingScaffold extends StatelessWidget {
           ? const Color(0xFF0A0A0A)
           : const Color(0xFFFAFAFA),
       body: Center(
-        child: CircularProgressIndicator(
+        child: AppLoadingIndicator(
           color: isDark ? const Color(0xFFCDFF00) : Colors.black,
         ),
       ),

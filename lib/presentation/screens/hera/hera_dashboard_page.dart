@@ -8,6 +8,7 @@ import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/presentation/screens/hera/hera_history_page.dart';
 import 'package:e_team/presentation/screens/hera/hera_voice_page.dart';
 import 'package:e_team/presentation/widgets/common/app_error_snack_bar.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/hera/dashboard_dialogs/hera_action_detail_dialog.dart';
 import 'package:e_team/presentation/widgets/hera/dashboard_dialogs/hera_document_preview_sheet.dart';
 import 'package:e_team/presentation/widgets/hera/dashboard_dialogs/hera_employee_documents_sheet.dart';
@@ -130,14 +131,7 @@ class _HeraDashboardPageState extends State<HeraDashboardPage>
 
   /// Generic success / info toast (non-error messages).
   void _toast(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: HeraPalette.cardSoft,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      ),
-    );
+    AppSnackBar.info(context, message);
   }
 
   // ─── Action handlers ──────────────────────────────────────────────────────

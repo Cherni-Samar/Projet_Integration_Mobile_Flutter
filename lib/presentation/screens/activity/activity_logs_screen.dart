@@ -1,8 +1,10 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/data/services/activity_service.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
 import 'package:e_team/presentation/widgets/activity/activity_cards.dart';
 import 'package:e_team/presentation/widgets/activity/activity_filters.dart';
 import 'package:e_team/presentation/widgets/activity/activity_overview.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -126,9 +128,7 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+    AppSnackBar.error(context, message);
   }
 
   @override
@@ -159,7 +159,7 @@ class _ActivityLogsScreenState extends State<ActivityLogsScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.purple))
+          ? const Center(child: AppLoadingIndicator(color: Colors.purple))
           : RefreshIndicator(
               onRefresh: _loadInitialData,
               child: CustomScrollView(

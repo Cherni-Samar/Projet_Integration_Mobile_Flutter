@@ -5,6 +5,7 @@ import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/widgets/auth/forgot_password/forgot_password_background.dart';
 import 'package:e_team/presentation/widgets/auth/forgot_password/forgot_password_form_view.dart';
 import 'package:e_team/presentation/widgets/auth/forgot_password/forgot_password_success.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -54,12 +55,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       } catch (e) {
         if (mounted) {
           setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(e.toString().replaceAll('Exception: ', '')),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-            ),
+          AppSnackBar.error(
+            context,
+            e.toString().replaceAll('Exception: ', ''),
           );
         }
       }

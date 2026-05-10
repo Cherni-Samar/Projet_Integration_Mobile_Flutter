@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_team/l10n/app_localizations.dart';
@@ -33,7 +34,7 @@ class EmailVerificationButton extends StatelessWidget {
             ? const SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(
+                child: AppLoadingIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFCDFF00)),
                 ),
@@ -88,7 +89,7 @@ class EmailVerificationResendRow extends StatelessWidget {
                 ? const SizedBox(
                     width: 16,
                     height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: AppLoadingIndicator(strokeWidth: 2),
                   )
                 : Text(
                     l10n.authResendCode,

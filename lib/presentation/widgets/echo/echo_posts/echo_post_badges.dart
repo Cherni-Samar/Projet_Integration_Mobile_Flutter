@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 class EchoPlatformBadges extends StatelessWidget {
   const EchoPlatformBadges({super.key, required this.post});
@@ -52,9 +53,7 @@ class EchoPlatformBadges extends StatelessWidget {
 
   Future<void> _openPostUrl(BuildContext context, String? url) async {
     if (url == null || url.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Post URL not available')));
+      AppSnackBar.warning(context, 'Post URL not available');
       return;
     }
 
@@ -64,15 +63,11 @@ class EchoPlatformBadges extends StatelessWidget {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open post URL')),
-        );
+        AppSnackBar.error(context, 'Could not open post URL');
       }
     } catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error opening URL: $e')));
+      AppSnackBar.error(context, 'Error opening URL: $e');
     }
   }
 }

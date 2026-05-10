@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/presentation/widgets/echo/product_marketing/echo_product_marketing_shared.dart';
 import 'package:e_team/presentation/widgets/echo/product_marketing/echo_product_marketing_theme.dart';
 import 'package:flutter/material.dart';
@@ -153,7 +154,7 @@ class EchoProductUrlInput extends StatelessWidget {
                   ? const SizedBox(
                       height: 20,
                       width: 20,
-                      child: CircularProgressIndicator(
+                      child: AppLoadingIndicator(
                         strokeWidth: 2,
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
@@ -209,7 +210,7 @@ class EchoStartCampaignButton extends StatelessWidget {
             ? const SizedBox(
                 height: 20,
                 width: 20,
-                child: CircularProgressIndicator(
+                child: AppLoadingIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),

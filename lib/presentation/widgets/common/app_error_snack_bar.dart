@@ -12,6 +12,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:e_team/core/errors/app_error.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 class AppErrorSnackBar {
   AppErrorSnackBar._();
@@ -26,58 +27,35 @@ class AppErrorSnackBar {
     VoidCallback? onRetry,
   }) {
     // Dismiss any existing SnackBar before showing the new one
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-    final color = _colorFor(error.type);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: color,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        duration: const Duration(seconds: 4),
-        content: Row(
-          children: [
-            Icon(error.icon, color: Colors.white, size: 18),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                error.message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-        action: _shouldShowRetry(error.type) && onRetry != null
-            ? SnackBarAction(
-                label: 'Réessayer',
-                textColor: Colors.white,
-                onPressed: onRetry,
-              )
-            : null,
-      ),
+    AppSnackBar.show(
+      context,
+      error.message,
+      type: _snackBarTypeFor(error.type),
+      duration: const Duration(seconds: 4),
+      action: _shouldShowRetry(error.type) && onRetry != null
+          ? SnackBarAction(
+              label: 'Réessayer',
+              textColor: Colors.white,
+              onPressed: onRetry,
+            )
+          : null,
     );
   }
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
-  static Color _colorFor(ErrorType type) {
+  static AppSnackBarType _snackBarTypeFor(ErrorType type) {
     switch (type) {
       case ErrorType.network:
-        return const Color(0xFFEF4444); // red
+        return AppSnackBarType.error;
       case ErrorType.server:
-        return const Color(0xFFF97316); // orange
+        return AppSnackBarType.warning;
       case ErrorType.auth:
-        return const Color(0xFF7C3AED); // purple
+        return AppSnackBarType.info;
       case ErrorType.mutation:
-        return const Color(0xFFEF4444); // red
+        return AppSnackBarType.error;
       case ErrorType.unknown:
-        return const Color(0xFF6B7280); // grey
+        return AppSnackBarType.info;
     }
   }
 

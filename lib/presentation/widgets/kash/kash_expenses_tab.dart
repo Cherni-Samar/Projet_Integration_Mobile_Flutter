@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'kash_theme.dart';
 
 /// Expenses tab for Kash dashboard showing all expenses
@@ -24,7 +25,7 @@ class KashExpensesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loadingExpenses) {
-      return const Center(child: CircularProgressIndicator());
+      return const AppLoadingState();
     }
 
     return Column(

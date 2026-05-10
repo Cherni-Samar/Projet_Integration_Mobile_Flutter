@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_team/domain/models/hera_models.dart';
@@ -153,9 +154,7 @@ class HeraTeamContent extends StatelessWidget {
         onRefresh: onRefresh,
         color: HeraPalette.mauve,
         child: loading
-            ? const Center(
-                child: CircularProgressIndicator(color: HeraPalette.mauve),
-              )
+            ? const Center(child: AppLoadingIndicator(color: HeraPalette.mauve))
             : selectedIndex == 0
             ? HeraActiveEmployeeList(
                 employees: activeEmployees,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'echo_dashboard_helpers.dart';
 import 'echo_theme.dart';
 
@@ -33,9 +34,7 @@ class EchoOverviewTab extends StatelessWidget {
 
   Widget _buildRecentActivityCards() {
     if (loadingEmails) {
-      return const Center(
-        child: CircularProgressIndicator(color: EchoTheme.violet),
-      );
+      return const AppLoadingState(color: EchoTheme.violet);
     }
 
     final recent = recentEmails.take(3).toList();

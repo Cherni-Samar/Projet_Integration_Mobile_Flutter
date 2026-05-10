@@ -7,6 +7,7 @@ import 'package:e_team/presentation/providers/theme_provider.dart';
 import 'package:e_team/presentation/widgets/auth/edit_profile/edit_profile_app_bar.dart';
 import 'package:e_team/presentation/widgets/auth/edit_profile/edit_profile_avatar.dart';
 import 'package:e_team/presentation/widgets/auth/edit_profile/edit_profile_fields.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final User user;
@@ -57,12 +58,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // Vérifier les mots de passe si modification
     if (_showPasswordFields) {
       if (_newPasswordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.authPasswordsDoNotMatch),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppSnackBar.error(context, l10n.authPasswordsDoNotMatch);
         return;
       }
     }
@@ -80,22 +76,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.authProfileUpdatedSnack),
-            backgroundColor: Colors.green,
-          ),
-        );
+        AppSnackBar.success(context, l10n.authProfileUpdatedSnack);
         Navigator.pop(context, true); // Retour avec succès
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppSnackBar.error(context, e.toString().replaceAll('Exception: ', ''));
       }
     } finally {
       if (mounted) {

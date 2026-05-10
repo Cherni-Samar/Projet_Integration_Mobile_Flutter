@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -117,7 +118,7 @@ class LoginSubmitButton extends StatelessWidget {
             ? SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(
+                child: AppLoadingIndicator(
                   strokeWidth: 2.5,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     isDark ? Colors.black : const Color(0xFFCDFF00),

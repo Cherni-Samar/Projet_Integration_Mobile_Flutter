@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'kash_theme.dart';
 
 /// Budgets tab for Kash dashboard showing all budgets by project
@@ -23,7 +24,7 @@ class KashBudgetsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (loadingBudgets) return const Center(child: CircularProgressIndicator());
+    if (loadingBudgets) return const AppLoadingState();
 
     return Column(
       children: [

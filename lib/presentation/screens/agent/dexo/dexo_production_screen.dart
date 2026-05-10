@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/data/services/hera_service.dart';
 import 'package:e_team/presentation/widgets/dexo/production/dexo_production_chrome.dart';
 import 'package:e_team/presentation/widgets/dexo/production/dexo_production_details.dart';
@@ -119,7 +120,7 @@ class _DexoProductionScreenState extends State<DexoProductionScreen> {
             Expanded(
               child: _isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(
+                      child: AppLoadingIndicator(
                         color: DexoProductionTheme.dark,
                       ),
                     )

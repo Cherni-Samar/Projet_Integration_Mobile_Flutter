@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/core/config/api_config.dart';
 import 'package:e_team/presentation/widgets/echo/product_marketing/echo_product_marketing_theme.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,7 @@ class EchoProductImage extends StatelessWidget {
               borderRadius: BorderRadius.circular(borderRadius),
             ),
             child: Center(
-              child: CircularProgressIndicator(
+              child: AppLoadingIndicator(
                 value: loadingProgress.expectedTotalBytes != null
                     ? loadingProgress.cumulativeBytesLoaded /
                           loadingProgress.expectedTotalBytes!

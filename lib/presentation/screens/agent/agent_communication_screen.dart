@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:e_team/data/services/echo_service.dart';
 import 'package:e_team/data/services/hera_service.dart';
@@ -120,7 +121,7 @@ class _AgentCommunicationScreenState extends State<AgentCommunicationScreen> {
                     ? const SizedBox(
                         width: 24,
                         height: 24,
-                        child: CircularProgressIndicator(
+                        child: AppLoadingIndicator(
                           strokeWidth: 2,
                           color: Colors.white,
                         ),

@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_team/l10n/app_localizations.dart';
@@ -33,7 +34,7 @@ class ForgotPasswordSubmitButton extends StatelessWidget {
             ? const SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(
+                child: AppLoadingIndicator(
                   strokeWidth: 2.5,
                   valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFCCFF00)),
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'echo_dashboard_helpers.dart';
 import 'echo_theme.dart';
 import 'package:e_team/presentation/screens/agent/echo/echo_email_detail_screen.dart';
@@ -116,9 +117,7 @@ class EchoMessagesTab extends StatelessWidget {
 
   Widget _buildEmailList(BuildContext context) {
     if (loadingEmails) {
-      return const Center(
-        child: CircularProgressIndicator(color: EchoTheme.violet),
-      );
+      return const AppLoadingState(color: EchoTheme.violet);
     }
 
     final receivedEmails = emails.where((email) {

@@ -1,9 +1,10 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/data/services/dexo_service.dart';
 import 'package:e_team/presentation/widgets/documents/document_category_app_bar.dart';
 import 'package:e_team/presentation/widgets/documents/document_category_card.dart';
 import 'package:e_team/presentation/widgets/documents/document_category_dialogs.dart';
 import 'package:e_team/presentation/widgets/documents/document_category_states.dart';
-import 'package:e_team/presentation/widgets/documents/document_category_theme.dart';
 import 'package:flutter/material.dart';
 
 class DocumentCategoryPage extends StatefulWidget {
@@ -77,20 +78,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.error, color: Colors.white, size: 20),
-            const SizedBox(width: 8),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: DocumentCategoryTheme.errorColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
+    AppSnackBar.error(context, message);
   }
 
   void _showDocumentDetails(Map<String, dynamic> document) {
@@ -114,7 +102,7 @@ class _DocumentCategoryPageState extends State<DocumentCategoryPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
+      builder: (context) => const Center(child: AppLoadingIndicator()),
     );
 
     try {

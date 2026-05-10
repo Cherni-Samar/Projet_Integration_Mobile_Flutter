@@ -7,6 +7,7 @@ import 'package:e_team/presentation/providers/owned_agents_provider.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/presentation/screens/agent/my_agents_page.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/cart/cart_content.dart';
 import 'package:e_team/presentation/widgets/cart/cart_states.dart';
 import 'package:flutter/material.dart';
@@ -65,12 +66,7 @@ class _CartPageState extends State<CartPage> {
       if (!mounted) return;
 
       if (confirm == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.paymentCancelledSnack),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        AppSnackBar.warning(context, l10n.paymentCancelledSnack);
         return;
       }
 
@@ -94,13 +90,9 @@ class _CartPageState extends State<CartPage> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.paymentFailedSnack(e.toString().replaceAll('Exception: ', '')),
-          ),
-          backgroundColor: Colors.red,
-        ),
+      AppSnackBar.error(
+        context,
+        l10n.paymentFailedSnack(e.toString().replaceAll('Exception: ', '')),
       );
     } finally {
       if (mounted) {
@@ -247,8 +239,6 @@ class _CartPageState extends State<CartPage> {
 
   void _clearCart(CartProvider cart) {
     cart.clearCart();
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Cart cleared')));
+    AppSnackBar.info(context, 'Cart cleared');
   }
 }

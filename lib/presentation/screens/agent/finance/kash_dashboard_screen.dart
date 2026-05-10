@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/data/services/kash_service.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/kash/kash_theme.dart';
 import 'package:e_team/presentation/widgets/kash/kash_add_budget_sheet.dart';
 import 'package:e_team/presentation/widgets/kash/kash_add_reminder_sheet.dart';
@@ -151,11 +152,9 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       await KashService.markReminderPaid(reminderId);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Payment marked as done — expense created'),
-            backgroundColor: Colors.green,
-          ),
+        AppSnackBar.success(
+          context,
+          'Payment marked as done — expense created',
         );
 
         await _loadDashboardData();
@@ -164,9 +163,7 @@ class _KashDashboardScreenState extends State<KashDashboardScreen>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('❌ Error: $e'), backgroundColor: Colors.red),
-        );
+        AppSnackBar.error(context, 'Error: $e');
       }
     }
   }

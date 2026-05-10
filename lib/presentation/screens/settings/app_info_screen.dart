@@ -1,5 +1,6 @@
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/settings/app_info/app_info_cards.dart';
 import 'package:e_team/presentation/widgets/settings/app_info/app_info_header.dart';
 import 'package:e_team/presentation/widgets/settings/app_info/app_info_hero.dart';
@@ -155,19 +156,6 @@ class AppInfoScreen extends StatelessWidget {
 
   void _showComingSoon(BuildContext context, bool isDark) {
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.info, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(l10n.appInfoComingSoon),
-          ],
-        ),
-        backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.black87,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+    AppSnackBar.info(context, l10n.appInfoComingSoon);
   }
 }

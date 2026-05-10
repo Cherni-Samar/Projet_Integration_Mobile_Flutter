@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/data/services/agent_metadata_service.dart';
 import 'package:e_team/data/services/agent_service.dart';
 import 'package:e_team/data/services/auth_service.dart';
@@ -16,6 +17,7 @@ import 'package:e_team/presentation/widgets/agent/marketplace/agent_marketplace_
 import 'package:e_team/presentation/widgets/agent/marketplace/agent_marketplace_header.dart';
 import 'package:e_team/presentation/widgets/agent/marketplace/agent_marketplace_info.dart';
 import 'package:e_team/presentation/widgets/common/app_bottom_nav_bar.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -112,12 +114,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.red,
-        ),
-      );
+      AppSnackBar.error(context, e.toString().replaceAll('Exception: ', ''));
     } finally {
       if (mounted) setState(() => _isHiring = false);
     }
@@ -146,7 +143,7 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
           : const Color(0xFFF8F9FA),
       body: SafeArea(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(child: AppLoadingIndicator())
             : SingleChildScrollView(
                 child: Column(
                   children: [
@@ -289,20 +286,10 @@ class _AgentMarketplacePageState extends State<AgentMarketplacePage>
   }
 
   void _showNotificationSnackBar(AppLocalizations l10n, bool isDark) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.notifications_active, color: Colors.white),
-            const SizedBox(width: 12),
-            Expanded(child: Text(l10n.agentMarketplaceNoNewNotifications)),
-          ],
-        ),
-        backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.black87,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
-      ),
+    AppSnackBar.show(
+      context,
+      l10n.agentMarketplaceNoNewNotifications,
+      duration: const Duration(seconds: 2),
     );
   }
 }

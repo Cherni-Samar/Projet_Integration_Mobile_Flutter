@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:e_team/presentation/providers/cart_provider.dart';
 import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 Future<void> showAgentEnergyPackSheet({
   required BuildContext context,
@@ -83,42 +84,21 @@ Future<void> showAgentEnergyPackSheet({
                         final added = cart.addToCart(item);
                         Navigator.pop(sheetCtx);
                         if (added) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.bolt, color: agentColor, size: 20),
-                                  const SizedBox(width: 10),
-                                  Text('$agentName ($title) added to cart!'),
-                                ],
-                              ),
-                              backgroundColor: isDark
-                                  ? const Color(0xFF1E1E1E)
-                                  : Colors.black,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              action: SnackBarAction(
-                                label: 'VIEW CART',
-                                textColor: const Color(0xFFCDFF00),
-                                onPressed: () =>
-                                    Navigator.pushNamed(context, '/cart'),
-                              ),
+                          AppSnackBar.show(
+                            context,
+                            '$agentName ($title) added to cart!',
+                            type: AppSnackBarType.success,
+                            action: SnackBarAction(
+                              label: 'VIEW CART',
+                              textColor: const Color(0xFFCDFF00),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, '/cart'),
                             ),
                           );
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                '$agentName is already in your cart!',
-                              ),
-                              backgroundColor: Colors.orange.shade700,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
+                          AppSnackBar.warning(
+                            context,
+                            '$agentName is already in your cart!',
                           );
                         }
                       },

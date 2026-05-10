@@ -11,6 +11,7 @@ import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 import 'package:e_team/presentation/widgets/agent/agent_energy_pack_sheet.dart';
 import 'package:e_team/presentation/widgets/agent/details/agent_details_dialogs.dart';
 import 'package:e_team/presentation/widgets/agent/details/agent_details_scaffold.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 class AgentDetailsPage extends StatefulWidget {
   // ✅ Legacy single agent (optionnel)
@@ -235,25 +236,7 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
     bool isDark,
     String name,
   ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.share, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(l10n.agentDetailsShareSnack(name)),
-          ],
-        ),
-        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.black87,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: isDark
-              ? BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 1)
-              : BorderSide.none,
-        ),
-      ),
-    );
+    AppSnackBar.info(context, l10n.agentDetailsShareSnack(name));
   }
 
   void _handlePrimaryAction({
@@ -316,28 +299,11 @@ class _AgentDetailsPageState extends State<AgentDetailsPage>
         // Ferme loading
         Navigator.pop(context);
 
-        // Affiche erreur
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.wifi_off, color: Colors.white),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Hera indisponible. Lance N8N sur le port 5678.',
-                    style: TextStyle(fontSize: 13),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.red.shade700,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            duration: const Duration(seconds: 4),
-          ),
+        AppSnackBar.show(
+          context,
+          'Hera indisponible. Lance N8N sur le port 5678.',
+          type: AppSnackBarType.error,
+          duration: const Duration(seconds: 4),
         );
       }
       return;

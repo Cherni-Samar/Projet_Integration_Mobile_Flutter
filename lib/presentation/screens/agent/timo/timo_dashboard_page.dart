@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -117,9 +118,7 @@ class _TimoDashboardPageState extends State<TimoDashboardPage>
             Expanded(
               child: _isLoading
                   ? Center(
-                      child: CircularProgressIndicator(
-                        color: TimoDesignSystem.other,
-                      ),
+                      child: AppLoadingIndicator(color: TimoDesignSystem.other),
                     )
                   : IndexedStack(
                       index: _tab,

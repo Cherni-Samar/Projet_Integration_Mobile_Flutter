@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:e_team/data/services/kash_service.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/kash/kash_theme.dart';
 
 /// Shows the Add Budget bottom sheet.
@@ -14,9 +15,6 @@ Future<void> showKashAddBudgetSheet({
   final amountController = TextEditingController();
   String selectedCurrency = 'TND';
   String selectedCategory = 'Marketing';
-
-  // Capture messenger before the async gap introduced by showModalBottomSheet.
-  final messenger = ScaffoldMessenger.of(context);
 
   await showModalBottomSheet(
     context: context,
@@ -165,14 +163,9 @@ Future<void> showKashAddBudgetSheet({
 
                     if (selectedCategory.isEmpty ||
                         amountController.text.isEmpty) {
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            'Veuillez remplir tous les champs',
-                          ),
-                          backgroundColor: KP.danger,
-                          behavior: SnackBarBehavior.floating,
-                        ),
+                      AppSnackBar.warning(
+                        context,
+                        'Veuillez remplir tous les champs',
                       );
                       return;
                     }
@@ -180,14 +173,9 @@ Future<void> showKashAddBudgetSheet({
                     try {
                       final amount = double.parse(amountController.text);
                       if (amount <= 0) {
-                        messenger.showSnackBar(
-                          SnackBar(
-                            content: const Text(
-                              'Le montant doit être supérieur à 0',
-                            ),
-                            backgroundColor: KP.danger,
-                            behavior: SnackBarBehavior.floating,
-                          ),
+                        AppSnackBar.warning(
+                          context,
+                          'Le montant doit être supérieur à 0',
                         );
                         return;
                       }
@@ -205,29 +193,11 @@ Future<void> showKashAddBudgetSheet({
                       // Notify caller to refresh dashboard + energy balance.
                       onBudgetCreated();
 
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('✅ Budget créé avec succès'),
-                          backgroundColor: Colors.green,
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
+                      AppSnackBar.success(context, 'Budget créé avec succès');
                     } on FormatException {
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: const Text('Montant invalide'),
-                          backgroundColor: KP.danger,
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
+                      AppSnackBar.error(context, 'Montant invalide');
                     } catch (e) {
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text('❌ Erreur: $e'),
-                          backgroundColor: KP.danger,
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
+                      AppSnackBar.error(context, 'Erreur: $e');
                     }
                   },
                   child: const Text(

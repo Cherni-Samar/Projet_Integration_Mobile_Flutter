@@ -5,6 +5,7 @@ import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/models/settings/language_option.dart';
 import 'package:e_team/presentation/providers/locale_provider.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/settings/language_settings/language_actions.dart';
 import 'package:e_team/presentation/widgets/settings/language_settings/language_header.dart';
 import 'package:e_team/presentation/widgets/settings/language_settings/language_info_banner.dart';
@@ -119,33 +120,22 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     LanguageOption selectedLanguage,
     AppLocalizations l10n,
   ) async {
-    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
-    final navigator = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
+    final pageContext = context;
+    final localeProvider = Provider.of<LocaleProvider>(
+      pageContext,
+      listen: false,
+    );
 
     await localeProvider.setLocale(Locale(_selectedLanguage));
-    if (!context.mounted) return;
+    if (!pageContext.mounted) return;
 
+    final navigator = Navigator.of(pageContext);
     navigator.pop(); // Fermer dialog
     navigator.pop(); // Retour à settings
 
-    messenger.showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Text(selectedLanguage.flag, style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                l10n.languageChangedSnack(selectedLanguage.nativeName),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
+    AppSnackBar.success(
+      pageContext,
+      '${selectedLanguage.flag} ${l10n.languageChangedSnack(selectedLanguage.nativeName)}',
     );
   }
 }

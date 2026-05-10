@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -129,7 +130,7 @@ class _DexoOrganizationPulseScreenState
             Expanded(
               child: _isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(
+                      child: AppLoadingIndicator(
                         color: DexoOrganizationPulseColors.dark,
                       ),
                     )

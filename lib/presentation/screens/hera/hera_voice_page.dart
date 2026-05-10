@@ -1,4 +1,5 @@
 import 'package:e_team/data/services/vapi_service.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/hera/voice/hera_voice_background.dart';
 import 'package:e_team/presentation/widgets/hera/voice/hera_voice_controls.dart';
 import 'package:e_team/presentation/widgets/hera/voice/hera_voice_models.dart';
@@ -133,16 +134,7 @@ class _HeraVoicePageState extends State<HeraVoicePage>
 
     if (!granted) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Permission microphone refusée'),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: const Color(0xFF191919),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
-      );
+      AppSnackBar.warning(context, 'Permission microphone refusée');
       return;
     }
 

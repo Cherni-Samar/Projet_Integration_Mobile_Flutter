@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:e_team/data/services/kash_service.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 /// Shows a modal bottom sheet to add a new expense
 Future<void> showKashAddExpenseSheet({
@@ -145,15 +146,11 @@ Future<void> showKashAddExpenseSheet({
                 const SizedBox(width: 8),
                 FilledButton(
                   onPressed: () async {
-                    // Capture parent context references before async operations
-                    final messenger = ScaffoldMessenger.of(context);
                     final navigator = Navigator.of(sheetContext);
 
                     if (vendorController.text.isEmpty ||
                         amountController.text.isEmpty) {
-                      messenger.showSnackBar(
-                        const SnackBar(content: Text('Please fill all fields')),
-                      );
+                      AppSnackBar.warning(context, 'Please fill all fields');
                       return;
                     }
 
@@ -172,20 +169,10 @@ Future<void> showKashAddExpenseSheet({
                       navigator.pop();
                       onExpenseCreated();
 
-                      messenger.showSnackBar(
-                        const SnackBar(
-                          content: Text('✅ Expense added'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
+                      AppSnackBar.success(context, 'Expense added');
                     } catch (e) {
                       if (!sheetContext.mounted) return;
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text('❌ Error: $e'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                      AppSnackBar.error(context, 'Error: $e');
                     }
                   },
                   child: const Text('Add'),

@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 class AgentConnectionDialog extends StatelessWidget {
@@ -17,7 +18,7 @@ class AgentConnectionDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircularProgressIndicator(color: Color(0xFF8B5CF6)),
+            const AppLoadingIndicator(color: Color(0xFF8B5CF6)),
             const SizedBox(height: 16),
             Text(
               'Connexion à Hera...',

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
+
 class DocumentCategoryEmptyState extends StatelessWidget {
   const DocumentCategoryEmptyState({
     super.key,
@@ -54,11 +56,6 @@ class DocumentLoadingMoreIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: CircularProgressIndicator(),
-      ),
-    );
+    return const AppLoadingState(padding: EdgeInsets.all(16));
   }
 }

@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_team/l10n/app_localizations.dart';
@@ -146,10 +147,7 @@ class EditProfileUpdateButton extends StatelessWidget {
             ? const SizedBox(
                 width: 24,
                 height: 24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
+                child: AppLoadingIndicator(color: Colors.white, strokeWidth: 2),
               )
             : Text(
                 l10n.authUpdateProfileButton,

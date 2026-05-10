@@ -8,6 +8,7 @@ import 'package:e_team/presentation/screens/agent/echo/echo_dashboard_page.dart'
 import 'package:e_team/presentation/screens/agent/finance/kash_dashboard_screen.dart';
 import 'package:e_team/presentation/screens/agent/timo/timo_dashboard_page.dart';
 import 'package:e_team/presentation/screens/hera/hera_dashboard_page.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/agent/my_agents/my_agents_list.dart';
 import 'package:e_team/presentation/widgets/agent/my_agents/my_agents_sheets.dart';
 import 'package:flutter/material.dart';
@@ -149,14 +150,7 @@ class MyAgentsPage extends StatelessWidget {
   ) {
     final displayName = name.trim().isEmpty ? agent.agentName : name.trim();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Renamed to "$displayName"'),
-        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.black,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+    AppSnackBar.info(context, 'Renamed to "$displayName"');
   }
 
   Future<void> _showEnergyTopupSheet(BuildContext context) async {
@@ -195,12 +189,7 @@ class MyAgentsPage extends StatelessWidget {
       if (!rootContext.mounted) return;
 
       if (success != null) {
-        ScaffoldMessenger.of(rootContext).showSnackBar(
-          const SnackBar(
-            content: Text('Énergie créditée !'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        AppSnackBar.success(rootContext, 'Énergie créditée !');
 
         Navigator.pushReplacement(
           rootContext,
@@ -209,11 +198,9 @@ class MyAgentsPage extends StatelessWidget {
       }
     } catch (e) {
       if (!rootContext.mounted) return;
-      ScaffoldMessenger.of(rootContext).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.red,
-        ),
+      AppSnackBar.error(
+        rootContext,
+        e.toString().replaceAll('Exception: ', ''),
       );
     }
   }

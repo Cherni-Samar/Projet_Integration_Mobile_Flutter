@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_team/data/services/hera_service.dart';
@@ -48,9 +49,7 @@ class HeraEmployeeDocumentsSheet extends StatelessWidget {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
-                      child: CircularProgressIndicator(
-                        color: HeraPalette.mauve,
-                      ),
+                      child: AppLoadingIndicator(color: HeraPalette.mauve),
                     );
                   }
 

@@ -1,4 +1,5 @@
 import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/presentation/widgets/echo/echo_posts/echo_post_card_view.dart';
 import 'package:e_team/presentation/widgets/echo/echo_theme.dart';
 import 'package:flutter/material.dart';
@@ -19,9 +20,7 @@ class EchoPostsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loadingSocial) {
-      return const Center(
-        child: CircularProgressIndicator(color: EchoTheme.violet),
-      );
+      return const AppLoadingState(color: EchoTheme.violet);
     }
 
     if (posts.isEmpty) {

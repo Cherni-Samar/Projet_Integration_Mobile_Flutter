@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/settings/help_support/help_support_content.dart';
 import 'package:e_team/presentation/widgets/settings/help_support/help_support_header.dart';
 
@@ -13,20 +14,11 @@ class HelpSupportScreen extends StatelessWidget {
   void _copyToClipboard(BuildContext context, String text, String label) {
     final l10n = AppLocalizations.of(context)!;
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(l10n.helpSupportCopiedToClipboard(label)),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 2),
-      ),
+    AppSnackBar.show(
+      context,
+      l10n.helpSupportCopiedToClipboard(label),
+      type: AppSnackBarType.success,
+      duration: const Duration(seconds: 2),
     );
   }
 

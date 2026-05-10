@@ -1,3 +1,5 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/data/services/hera_service.dart';
 import 'package:e_team/presentation/widgets/hera/history/hera_history_config.dart';
 import 'package:e_team/presentation/widgets/hera/history/hera_history_empty_state.dart';
@@ -119,14 +121,7 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFF1A1A1A),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+    AppSnackBar.info(context, message);
   }
 
   @override
@@ -148,9 +143,7 @@ class _HeraHistoryPageState extends State<HeraHistoryPage> {
             Expanded(
               child: _loading
                   ? const Center(
-                      child: CircularProgressIndicator(
-                        color: HeraHistoryTheme.lime,
-                      ),
+                      child: AppLoadingIndicator(color: HeraHistoryTheme.lime),
                     )
                   : _actions.isEmpty
                   ? HeraHistoryEmptyState(isDark: isDark)

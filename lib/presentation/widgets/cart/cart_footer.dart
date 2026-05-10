@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/presentation/providers/cart_provider.dart';
 import 'package:e_team/presentation/widgets/cart/cart_helpers.dart';
 import 'package:e_team/presentation/widgets/cart/cart_theme.dart';
@@ -65,7 +66,7 @@ class CartCheckoutFooter extends StatelessWidget {
                   ? SizedBox(
                       height: 22,
                       width: 22,
-                      child: CircularProgressIndicator(
+                      child: AppLoadingIndicator(
                         strokeWidth: 2.5,
                         color: isDark ? Colors.black : Colors.white,
                       ),

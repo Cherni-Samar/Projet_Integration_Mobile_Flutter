@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/core/config/api_config.dart';
 import 'package:e_team/domain/models/echo_models.dart';
 import 'package:e_team/presentation/widgets/echo/echo_theme.dart';
@@ -32,7 +33,7 @@ class EchoPostImage extends StatelessWidget {
               return SizedBox(
                 height: 200,
                 child: Center(
-                  child: CircularProgressIndicator(
+                  child: AppLoadingIndicator(
                     value: loadingProgress.expectedTotalBytes != null
                         ? loadingProgress.cumulativeBytesLoaded /
                               loadingProgress.expectedTotalBytes!

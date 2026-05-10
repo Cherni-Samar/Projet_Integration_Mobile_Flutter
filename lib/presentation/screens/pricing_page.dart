@@ -7,6 +7,7 @@ import 'package:e_team/data/services/stripe_service.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/models/pricing/pricing_offer.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/pricing/pricing_dialogs.dart';
 import 'package:e_team/presentation/widgets/pricing/pricing_offers_list.dart';
 import 'package:e_team/presentation/widgets/pricing/pricing_processing_overlay.dart';
@@ -58,12 +59,7 @@ class _PricingPageState extends State<PricingPage> {
     // Free Trial is a special case (Stripe typically doesn't support 0€ intents)
     if (offer.packId == 'free_trial') {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.pricingFreeTrialAlreadyAvailableSnack),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppSnackBar.info(context, l10n.pricingFreeTrialAlreadyAvailableSnack);
       return;
     }
 
@@ -81,13 +77,7 @@ class _PricingPageState extends State<PricingPage> {
 
       if (confirm == null) {
         // User cancelled the payment sheet
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.paymentCancelledSnack),
-            backgroundColor: Colors.orange,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppSnackBar.warning(context, l10n.paymentCancelledSnack);
         return;
       }
 
@@ -106,13 +96,7 @@ class _PricingPageState extends State<PricingPage> {
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.red.shade700,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppSnackBar.error(context, e.toString().replaceAll('Exception: ', ''));
     } finally {
       if (mounted) {
         setState(() {

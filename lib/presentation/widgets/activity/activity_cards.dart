@@ -1,6 +1,7 @@
 import 'package:e_team/data/services/activity_service.dart';
 import 'package:e_team/presentation/widgets/activity/activity_badges.dart';
 import 'package:e_team/presentation/widgets/activity/activity_helpers.dart';
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 class ActivityCard extends StatelessWidget {
@@ -117,7 +118,7 @@ class ActivityLoadingMoreIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.all(16.0),
-      child: Center(child: CircularProgressIndicator(color: Colors.purple)),
+      child: AppLoadingState(color: Colors.purple),
     );
   }
 }

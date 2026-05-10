@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_team/presentation/widgets/pricing/pricing_colors.dart';
@@ -16,7 +17,7 @@ class PricingProcessingOverlay extends StatelessWidget {
         child: ColoredBox(
           color: Colors.black.withValues(alpha: 0.35),
           child: const Center(
-            child: CircularProgressIndicator(color: PricingColors.volt),
+            child: AppLoadingIndicator(color: PricingColors.volt),
           ),
         ),
       ),

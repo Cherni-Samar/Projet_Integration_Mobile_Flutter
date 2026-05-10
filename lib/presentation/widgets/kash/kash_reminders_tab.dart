@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'kash_theme.dart';
 
 /// Reminders tab for Kash dashboard showing all payment reminders
@@ -29,7 +30,7 @@ class KashRemindersTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loadingReminders) {
-      return const Center(child: CircularProgressIndicator());
+      return const AppLoadingState();
     }
 
     return Column(

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/models/settings/privacy_policy_section.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:e_team/presentation/widgets/settings/privacy_policy/privacy_policy_content.dart';
 import 'package:e_team/presentation/widgets/settings/privacy_policy/privacy_policy_header.dart';
 
@@ -108,19 +109,6 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
     required AppLocalizations l10n,
     required bool isDark,
   }) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.download, color: Colors.white),
-            const SizedBox(width: 12),
-            Text(l10n.privacyDownloadSnack),
-          ],
-        ),
-        backgroundColor: isDark ? const Color(0xFF2A2A2A) : Colors.black87,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+    AppSnackBar.info(context, l10n.privacyDownloadSnack);
   }
 }

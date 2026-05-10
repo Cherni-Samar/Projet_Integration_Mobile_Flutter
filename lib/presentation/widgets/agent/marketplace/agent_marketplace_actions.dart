@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 class AgentMarketplaceActions extends StatelessWidget {
@@ -79,7 +80,7 @@ class AgentMarketplaceActions extends StatelessWidget {
                       SizedBox(
                         height: 18,
                         width: 18,
-                        child: CircularProgressIndicator(
+                        child: AppLoadingIndicator(
                           strokeWidth: 2.2,
                           color: buttonFg,
                         ),

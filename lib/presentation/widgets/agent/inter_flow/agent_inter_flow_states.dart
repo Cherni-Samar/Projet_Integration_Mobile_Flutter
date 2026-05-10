@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/presentation/widgets/agent/inter_flow/agent_inter_flow_design.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,7 +14,7 @@ class AgentInterFlowLoadingState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(
+          const AppLoadingIndicator(
             color: AgentInterFlowDesignSystem.encrypted,
             strokeWidth: 2,
           ),

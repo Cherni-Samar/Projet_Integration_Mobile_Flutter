@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/presentation/widgets/cart/cart_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -65,7 +66,7 @@ class CartProcessingOverlay extends StatelessWidget {
         child: ColoredBox(
           color: Colors.black.withValues(alpha: 0.35),
           child: const Center(
-            child: CircularProgressIndicator(color: CartTheme.volt),
+            child: AppLoadingIndicator(color: CartTheme.volt),
           ),
         ),
       ),

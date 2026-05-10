@@ -1,3 +1,5 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:e_team/data/services/echo_service.dart';
 import 'package:e_team/domain/models/echo_models.dart';
@@ -102,9 +104,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
           _emails.removeWhere((e) => e.id == email.id);
         });
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Email supprimé')));
+        AppSnackBar.success(context, 'Email supprimé');
       }
     }
   }
@@ -141,9 +141,7 @@ class _EchoInboxScreenState extends State<EchoInboxScreen> {
             Expanded(
               child: _isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF7C3AED),
-                      ),
+                      child: AppLoadingIndicator(color: Color(0xFF7C3AED)),
                     )
                   : _selectedTab == 0
                   ? _buildBody(receivedEmails)

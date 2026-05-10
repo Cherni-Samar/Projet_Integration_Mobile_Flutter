@@ -8,6 +8,7 @@ import 'package:e_team/presentation/widgets/auth/signup/signup_actions.dart';
 import 'package:e_team/presentation/widgets/auth/signup/signup_fields.dart';
 import 'package:e_team/presentation/widgets/auth/signup/signup_header.dart';
 import 'package:e_team/presentation/widgets/auth/signup/signup_terms.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -106,13 +107,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     Color backgroundColor, {
     Duration? duration,
   }) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: backgroundColor,
-        duration: duration ?? const Duration(seconds: 4),
-      ),
+    AppSnackBar.show(
+      context,
+      message,
+      type: _snackBarTypeFor(backgroundColor),
+      duration: duration ?? const Duration(seconds: 4),
     );
+  }
+
+  AppSnackBarType _snackBarTypeFor(Color color) {
+    if (color == Colors.green) return AppSnackBarType.success;
+    if (color == Colors.red) return AppSnackBarType.error;
+    return AppSnackBarType.info;
   }
 
   @override

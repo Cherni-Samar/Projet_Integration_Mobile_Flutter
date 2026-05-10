@@ -1,3 +1,4 @@
+import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:e_team/presentation/widgets/hera/history/hera_history_config.dart';
@@ -10,7 +11,7 @@ class HeraHistoryLoadingMoreIndicator extends StatelessWidget {
     return const Center(
       child: Padding(
         padding: EdgeInsets.all(16),
-        child: CircularProgressIndicator(color: HeraHistoryTheme.lime),
+        child: AppLoadingIndicator(color: HeraHistoryTheme.lime),
       ),
     );
   }
