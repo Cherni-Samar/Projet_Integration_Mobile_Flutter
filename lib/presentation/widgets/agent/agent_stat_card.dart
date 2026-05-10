@@ -8,13 +8,13 @@ class AgentStatCard extends StatelessWidget {
   final bool isDark;
 
   const AgentStatCard({
-    Key? key,
+    super.key,
     required this.icon,
     required this.label,
     required this.value,
     required this.color,
     required this.isDark,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

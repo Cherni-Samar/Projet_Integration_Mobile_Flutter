@@ -1,6 +1,6 @@
 // lib/data/mappers/agent_mapper.dart
-import '../../domain/models/agent_model.dart';
-import '../dtos/agent_dto.dart';
+import 'package:e_team/domain/models/agent_model.dart';
+import 'package:e_team/data/dtos/agent_dto.dart';
 
 class AgentMapper {
   static Agent fromDTO(AgentDTO dto) {

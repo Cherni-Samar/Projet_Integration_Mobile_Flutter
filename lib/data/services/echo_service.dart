@@ -1,8 +1,8 @@
-import 'package:e_team/data/dtos/echo_dto.dart';
-import 'package:e_team/data/services/api_service.dart';
+import 'package:e_team/data/dtos/echo/echo_dto.dart';
+import 'package:e_team/data/repositories/echo_repository.dart';
 
 class EchoService {
-  static const String _baseUrl = 'http://10.0.2.2:3000';
+  static final _repo = EchoRepository.instance;
 
   static Future<EchoResponse> sendTextMessage({
     required String message,
@@ -10,9 +10,8 @@ class EchoService {
     String? token,
   }) async {
     try {
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/echo',
-        body: {'message': message, 'sender': sender},
+      final response = await _repo.sendTextMessage(
+        message: message,
         token: token,
       );
       return EchoResponse.fromJson(response);
@@ -21,23 +20,9 @@ class EchoService {
     }
   }
 
-  static Future<Map<String, dynamic>> getSocialFeed({String? token}) async {
-    try {
-      return await ApiService.get(
-        endpoint: '$_baseUrl/api/echo/social-feed',
-        token: token,
-      );
-    } catch (e) {
-      return {'success': false, 'feed': [], 'error': e.toString()};
-    }
-  }
-
   static Future<EmailsResponse> getEmails({String? token}) async {
     try {
-      final response = await ApiService.get(
-        endpoint: '$_baseUrl/api/emails',
-        token: token,
-      );
+      final response = await _repo.getEmails(token: token);
       return EmailsResponse.fromJson(response);
     } catch (e) {
       return EmailsResponse.error(e.toString());
@@ -46,10 +31,7 @@ class EchoService {
 
   static Future<PendingResponse> getPending({String? token}) async {
     try {
-      final response = await ApiService.get(
-        endpoint: '$_baseUrl/api/emails/pending',
-        token: token,
-      );
+      final response = await _repo.getPending(token: token);
       return PendingResponse.fromJson(response);
     } catch (e) {
       return PendingResponse.error(e.toString());
@@ -58,11 +40,7 @@ class EchoService {
 
   static Future<bool> markAsRead(String emailId, {String? token}) async {
     try {
-      final response = await ApiService.patch(
-        endpoint: '$_baseUrl/api/emails/$emailId/read',
-        body: {},
-        token: token,
-      );
+      final response = await _repo.markAsRead(emailId, token: token);
       return response['success'] == true;
     } catch (_) {
       return false;
@@ -71,29 +49,10 @@ class EchoService {
 
   static Future<bool> deleteEmail(String emailId, {String? token}) async {
     try {
-      final response = await ApiService.delete(
-        endpoint: '$_baseUrl/api/emails/$emailId',
-        token: token,
-      );
+      final response = await _repo.deleteEmail(emailId, token: token);
       return response['success'] == true;
     } catch (_) {
       return false;
-    }
-  }
-
-  static Future<Map<String, dynamic>> replyToEmail({
-    required String emailId,
-    required String replyContent,
-    String? token,
-  }) async {
-    try {
-      return await ApiService.post(
-        endpoint: '$_baseUrl/api/emails/$emailId/reply',
-        body: {'replyContent': replyContent},
-        token: token,
-      );
-    } catch (e) {
-      return {'success': false, 'error': e.toString()};
     }
   }
 
@@ -105,14 +64,11 @@ class EchoService {
     String? token,
   }) async {
     try {
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/response-suggestions',
-        body: {
-          'message': message,
-          'sender': sender,
-          'context': context ?? {},
-          'analysis': analysis,
-        },
+      final response = await _repo.getResponseSuggestions(
+        message: message,
+        sender: sender,
+        context: context,
+        analysis: analysis,
         token: token,
       );
       return ResponseSuggestionsResponse.fromJson(response);
@@ -128,13 +84,10 @@ class EchoService {
     String? token,
   }) async {
     try {
-      return await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/send-to-hera',
-        body: {
-          'subject': subject,
-          'content': content,
-          'from': from ?? 'echo@e-team.com',
-        },
+      return await _repo.sendEmailToHera(
+        subject: subject,
+        content: content,
+        from: from,
         token: token,
       );
     } catch (e) {
@@ -147,11 +100,7 @@ class EchoService {
     String? token,
   }) async {
     try {
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/messages/spam-check',
-        body: {'message': message},
-        token: token,
-      );
+      final response = await _repo.checkSpam(message: message, token: token);
       return SpamCheckResponse.fromJson(response);
     } catch (e) {
       return SpamCheckResponse.error(e.toString());
@@ -160,29 +109,10 @@ class EchoService {
 
   static Future<StatsResponse> getStats({String? token}) async {
     try {
-      final response = await ApiService.get(
-        endpoint: '$_baseUrl/api/messages/stats',
-        token: token,
-      );
+      final response = await _repo.getStats(token: token);
       return StatsResponse.fromJson(response);
     } catch (e) {
       return StatsResponse.error(e.toString());
-    }
-  }
-
-  static Future<DocumentClassificationResponse> classifyDocument({
-    required String content,
-    String? token,
-  }) async {
-    try {
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/classify-document',
-        body: {'content': content},
-        token: token,
-      );
-      return DocumentClassificationResponse.fromJson(response);
-    } catch (e) {
-      return DocumentClassificationResponse.error(e.toString());
     }
   }
 
@@ -192,22 +122,15 @@ class EchoService {
     String? token,
   }) async {
     try {
-      return await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/save-document',
-        body: {
-          'content': content,
-          'classification': classification,
-        },
+      return await _repo.saveClassifiedDocument(
+        content: content,
+        classification: classification,
         token: token,
       );
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
   }
-
-
-
-
 
   static Future<TaskExtractionResponse> extractAndSaveTasks({
     required String message,
@@ -217,14 +140,11 @@ class EchoService {
     String? token,
   }) async {
     try {
-      final response = await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/extract-save-tasks',
-        body: {
-          'message': message,
-          'sender': sender,
-          'emailId': emailId,
-          'subject': subject,
-        },
+      final response = await _repo.extractAndSaveTasks(
+        message: message,
+        sender: sender,
+        emailId: emailId,
+        subject: subject,
         token: token,
       );
       return TaskExtractionResponse.fromJson(response);
@@ -239,20 +159,9 @@ class EchoService {
     String? token,
   }) async {
     try {
-      final queryParams = <String, String>{};
-
-      if (status != null) queryParams['status'] = status;
-      if (category != null) queryParams['category'] = category;
-
-      String endpoint = '$_baseUrl/api/echo/tasks';
-
-      if (queryParams.isNotEmpty) {
-        endpoint +=
-        '?${queryParams.entries.map((e) => '${e.key}=${e.value}').join('&')}';
-      }
-
-      final response = await ApiService.get(
-        endpoint: endpoint,
+      final response = await _repo.getTasks(
+        status: status,
+        category: category,
         token: token,
       );
 
@@ -268,9 +177,9 @@ class EchoService {
     String? token,
   }) async {
     try {
-      return await ApiService.patch(
-        endpoint: '$_baseUrl/api/echo/tasks/$taskId/status',
-        body: {'status': status},
+      return await _repo.updateTaskStatus(
+        taskId: taskId,
+        status: status,
         token: token,
       );
     } catch (e) {
@@ -283,10 +192,7 @@ class EchoService {
     String? token,
   }) async {
     try {
-      return await ApiService.delete(
-        endpoint: '$_baseUrl/api/echo/tasks/$taskId',
-        token: token,
-      );
+      return await _repo.deleteTask(taskId: taskId, token: token);
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
@@ -299,22 +205,10 @@ class EchoService {
     String? token,
   }) async {
     try {
-      final queryParams = <String, String>{
-        'page': page.toString(),
-        'limit': limit.toString(),
-      };
-
-      if (platform != null) {
-        queryParams['platform'] = platform;
-      }
-
-      String endpoint = '$_baseUrl/api/echo/mobile/posts';
-
-      endpoint +=
-      '?${queryParams.entries.map((e) => '${e.key}=${e.value}').join('&')}';
-
-      final response = await ApiService.get(
-        endpoint: endpoint,
+      final response = await _repo.getMobilePosts(
+        page: page,
+        limit: limit,
+        platform: platform,
         token: token,
       );
 
@@ -326,11 +220,7 @@ class EchoService {
 
   static Future<Map<String, dynamic>> forcePost({String? token}) async {
     try {
-      return await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/mobile/force-post',
-        body: {},
-        token: token,
-      );
+      return await _repo.forcePost(token: token);
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
@@ -341,11 +231,7 @@ class EchoService {
     String? token,
   }) async {
     try {
-      return await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/product/scrape',
-        body: {'productUrl': productUrl},
-        token: token,
-      );
+      return await _repo.scrapeProduct(productUrl: productUrl, token: token);
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
@@ -358,13 +244,10 @@ class EchoService {
     String? token,
   }) async {
     try {
-      return await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/product/campaign/start',
-        body: {
-          'productUrl': productUrl,
-          'frequency': frequency,
-          'platforms': platforms,
-        },
+      return await _repo.startProductCampaign(
+        productUrl: productUrl,
+        frequency: frequency,
+        platforms: platforms,
         token: token,
       );
     } catch (e) {
@@ -374,10 +257,7 @@ class EchoService {
 
   static Future<Map<String, dynamic>> getCampaignStatus({String? token}) async {
     try {
-      return await ApiService.get(
-        endpoint: '$_baseUrl/api/echo/product/campaign/status',
-        token: token,
-      );
+      return await _repo.getCampaignStatus(token: token);
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
@@ -387,11 +267,7 @@ class EchoService {
     String? token,
   }) async {
     try {
-      return await ApiService.post(
-        endpoint: '$_baseUrl/api/echo/product/campaign/stop',
-        body: {},
-        token: token,
-      );
+      return await _repo.stopProductCampaign(token: token);
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
@@ -403,29 +279,13 @@ class EchoService {
     String? token,
   }) async {
     try {
-      final queryParams = <String, String>{
-        'limit': limit.toString(),
-      };
-
-      if (status != null) {
-        queryParams['status'] = status;
-      }
-
-      String endpoint = '$_baseUrl/api/echo/product/campaign/history';
-
-      endpoint +=
-      '?${queryParams.entries.map((e) => '${e.key}=${e.value}').join('&')}';
-
-      return await ApiService.get(
-        endpoint: endpoint,
+      return await _repo.getCampaignHistory(
+        limit: limit,
+        status: status,
         token: token,
       );
     } catch (e) {
-      return {
-        'success': false,
-        'error': e.toString(),
-        'campaigns': [],
-      };
+      return {'success': false, 'error': e.toString(), 'campaigns': []};
     }
   }
 }

@@ -1,6 +1,6 @@
 // lib/data/mappers/user_mapper.dart
-import '../../domain/models/user_model.dart';
-import '../dtos/user_dto.dart';
+import 'package:e_team/domain/models/user_model.dart';
+import 'package:e_team/data/dtos/user_dto.dart';
 
 class UserMapper {
   static User fromDTO(UserDTO dto) {
@@ -17,16 +17,24 @@ class UserMapper {
       energyBalance: dto.energyBalance,
 
       // ✅ MAPPING DE LA LISTE DES SETTINGS
-      workforceSettings: dto.workforceSettings.map((s) => WorkforceSetting(
-        department: s.department,
-        targetCount: s.targetCount,
-        currentCount: s.currentCount,
-      )).toList(),
+      workforceSettings: dto.workforceSettings
+          .map(
+            (s) => WorkforceSetting(
+              department: s.department,
+              targetCount: s.targetCount,
+              currentCount: s.currentCount,
+            ),
+          )
+          .toList(),
 
       companyVision: dto.companyVision,
 
-      createdAt: dto.createdAt != null ? DateTime.tryParse(dto.createdAt!) : null,
-      updatedAt: dto.updatedAt != null ? DateTime.tryParse(dto.updatedAt!) : null,
+      createdAt: dto.createdAt != null
+          ? DateTime.tryParse(dto.createdAt!)
+          : null,
+      updatedAt: dto.updatedAt != null
+          ? DateTime.tryParse(dto.updatedAt!)
+          : null,
     );
   }
 
@@ -44,11 +52,15 @@ class UserMapper {
       energyBalance: user.energyBalance,
 
       // ✅ CONVERSION INVERSE
-      workforceSettings: user.workforceSettings.map((s) => WorkforceSettingDTO(
-        department: s.department,
-        targetCount: s.targetCount,
-        currentCount: s.currentCount,
-      )).toList(),
+      workforceSettings: user.workforceSettings
+          .map(
+            (s) => WorkforceSettingDTO(
+              department: s.department,
+              targetCount: s.targetCount,
+              currentCount: s.currentCount,
+            ),
+          )
+          .toList(),
 
       companyVision: user.companyVision,
 

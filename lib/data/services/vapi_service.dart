@@ -1,17 +1,20 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:vapi/vapi.dart';
+import 'package:e_team/core/config/app_secrets.dart';
 
 enum HeraVoiceStatus { idle, connecting, listening, speaking, ended, error }
 
-class VapiService extends ChangeNotifier {
-  static const String publicKey = '6c5ea938-c1c0-4a59-826e-143cbaa8de53';
-  static const String assistantId = '7c6ac6cf-c5b1-45a8-9b7b-9655735e78f4';
+typedef VapiServiceListener = void Function();
 
-  late final VapiClient _client;
+class VapiService {
+  static String get _publicKey => AppSecrets.vapiPublicKey;
+  static String get _assistantId => AppSecrets.vapiAssistantId;
+
+  VapiClient? _client;
   VapiCall? _call;
 
   StreamSubscription<VapiEvent>? _eventSubscription;
+  final List<VapiServiceListener> _listeners = [];
 
   HeraVoiceStatus _status = HeraVoiceStatus.idle;
   HeraVoiceStatus get status => _status;
@@ -32,12 +35,27 @@ class VapiService extends ChangeNotifier {
       _status == HeraVoiceStatus.listening ||
       _status == HeraVoiceStatus.speaking;
 
+  bool get _hasValidConfig =>
+      _publicKey.trim().isNotEmpty && _assistantId.trim().isNotEmpty;
+
+  void _markMissingConfig() {
+    _status = HeraVoiceStatus.error;
+    _errorMessage =
+        'Hera voice is not configured. Set VAPI_PUBLIC_KEY and VAPI_ASSISTANT_ID.';
+    _notifyListeners();
+  }
+
   Future<void> init() async {
     if (_initialized) return;
 
-    _client = VapiClient(publicKey);
+    if (!_hasValidConfig) {
+      _markMissingConfig();
+      return;
+    }
+
+    _client = VapiClient(_publicKey.trim());
     _initialized = true;
-    notifyListeners();
+    _notifyListeners();
   }
 
   Future<void> start() async {
@@ -48,50 +66,53 @@ class VapiService extends ChangeNotifier {
 
       _status = HeraVoiceStatus.connecting;
       _errorMessage = '';
-      notifyListeners();
+      _notifyListeners();
 
-      _call = await _client.start(assistantId: assistantId);
+      final client = _client;
+      if (client == null) {
+        _markMissingConfig();
+        return;
+      }
+
+      _call = await client.start(assistantId: _assistantId.trim());
 
       await _eventSubscription?.cancel();
       _eventSubscription = _call!.onEvent.listen(_handleEvent);
 
-      notifyListeners();
+      _notifyListeners();
     } catch (e) {
       _status = HeraVoiceStatus.error;
       _errorMessage = e.toString();
-      notifyListeners();
+      _notifyListeners();
     }
   }
 
   void _handleEvent(VapiEvent event) {
-    debugPrint('VAPI EVENT => ${event.label}');
-    debugPrint('VAPI VALUE => ${event.value}');
-
     switch (event.label) {
       case 'call-start':
         _status = HeraVoiceStatus.listening;
-        notifyListeners();
+        _notifyListeners();
         return;
 
       case 'call-end':
         _status = HeraVoiceStatus.ended;
-        notifyListeners();
+        _notifyListeners();
         return;
 
       case 'speech-start':
         _status = HeraVoiceStatus.speaking;
-        notifyListeners();
+        _notifyListeners();
         return;
 
       case 'speech-end':
         _status = HeraVoiceStatus.listening;
-        notifyListeners();
+        _notifyListeners();
         return;
 
       case 'error':
         _status = HeraVoiceStatus.error;
         _errorMessage = event.value?.toString() ?? 'Erreur inconnue';
-        notifyListeners();
+        _notifyListeners();
         return;
 
       case 'message':
@@ -118,10 +139,10 @@ class VapiService extends ChangeNotifier {
           _lastAssistantTranscript = transcript;
         }
 
-        notifyListeners();
+        _notifyListeners();
       }
-    } catch (e) {
-      debugPrint('Transcript parse error: $e');
+    } catch (_) {
+      return;
     }
   }
 
@@ -129,11 +150,11 @@ class VapiService extends ChangeNotifier {
     try {
       await _call?.stop();
       _status = HeraVoiceStatus.ended;
-      notifyListeners();
+      _notifyListeners();
     } catch (e) {
       _status = HeraVoiceStatus.error;
       _errorMessage = e.toString();
-      notifyListeners();
+      _notifyListeners();
     }
   }
 
@@ -150,7 +171,7 @@ class VapiService extends ChangeNotifier {
 
     try {
       _lastUserTranscript = text.trim();
-      notifyListeners();
+      _notifyListeners();
 
       await _call!.send({
         'type': 'add-message',
@@ -159,7 +180,7 @@ class VapiService extends ChangeNotifier {
     } catch (e) {
       _status = HeraVoiceStatus.error;
       _errorMessage = e.toString();
-      notifyListeners();
+      _notifyListeners();
     }
   }
 
@@ -168,14 +189,28 @@ class VapiService extends ChangeNotifier {
     _lastUserTranscript = '';
     _lastAssistantTranscript = '';
     _errorMessage = '';
-    notifyListeners();
+    _notifyListeners();
   }
 
-  @override
+  void addListener(VapiServiceListener listener) {
+    if (_listeners.contains(listener)) return;
+    _listeners.add(listener);
+  }
+
+  void removeListener(VapiServiceListener listener) {
+    _listeners.remove(listener);
+  }
+
+  void _notifyListeners() {
+    for (final listener in List<VapiServiceListener>.of(_listeners)) {
+      listener();
+    }
+  }
+
   void dispose() {
     _eventSubscription?.cancel();
     _call?.dispose();
-    _client.dispose();
-    super.dispose();
+    _client?.dispose();
+    _listeners.clear();
   }
 }

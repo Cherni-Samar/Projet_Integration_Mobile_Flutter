@@ -1,13 +1,12 @@
 // lib/data/services/auth_service.dart
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../dtos/user_dto.dart'; // ✅ Import du DTO
-import '../../utils/constants.dart';
+import 'package:e_team/data/dtos/user_dto.dart'; // ✅ Import du DTO
+import 'package:e_team/core/utils/constants.dart';
 import 'api_service.dart';
-import 'package:e_team/data/services/api_service.dart';
-import 'package:e_team/data/services/api_config.dart';
 import 'package:e_team/domain/models/user_model.dart';
 import 'package:e_team/data/mappers/user_mapper.dart';
+
 class AuthService {
   static const String _tokenKey = 'auth_token';
   static const String _userKey = 'user_data';
@@ -18,22 +17,18 @@ class AuthService {
   }) async {
     final response = await ApiService.post(
       endpoint: ApiConstants.signup,
-      body: {
-        'email': email,
-        'password': password,
-        'name': name,
-      },
+      body: {'email': email, 'password': password, 'name': name},
     );
 
     if (response['success'] == true) {
       // ✅ FIX: Save the JWT token (matching login() pattern)
       await _saveToken(response['data']['token']);
-      
+
       // ✅ FIX: Save user data to SharedPreferences (matching login() pattern)
       final dto = UserDTO.fromJson(response['data']['user']);
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_userKey, jsonEncode(dto.toJson()));
-      
+
       return response;
     }
 
@@ -74,10 +69,7 @@ class AuthService {
 
     if (email == null || password == null) return null;
 
-    return {
-      'email': email,
-      'password': password,
-    };
+    return {'email': email, 'password': password};
   }
 
   Future<void> clearSavedCredentials() async {
@@ -85,8 +77,12 @@ class AuthService {
     await prefs.remove('saved_email');
     await prefs.remove('saved_password');
   }
+
   // LOGIN (Exemple)
-  Future<UserDTO?> login({required String email, required String password}) async {
+  Future<UserDTO?> login({
+    required String email,
+    required String password,
+  }) async {
     final response = await ApiService.post(
       endpoint: ApiConstants.login,
       body: {'email': email, 'password': password},
@@ -106,13 +102,15 @@ class AuthService {
   Future<UserDTO?> getMe() async {
     final token = await getToken();
     if (token == null) return null;
-    final response = await ApiService.get(endpoint: ApiConstants.getMe, token: token);
+    final response = await ApiService.get(
+      endpoint: ApiConstants.getMe,
+      token: token,
+    );
     if (response['success'] == true) {
       return UserDTO.fromJson(response['data']['user']);
     }
     return null;
   }
-
 
   // VERIFY EMAIL
   Future<bool> verifyEmail(String email, String code) async {
@@ -131,6 +129,7 @@ class AuthService {
     );
     return response['success'] == true;
   }
+
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_tokenKey);
@@ -190,17 +189,10 @@ class AuthService {
     throw Exception(response['message'] ?? 'Failed to update profile');
   }
 
-
-
-
-
   Future<bool> verifyResetCode(String email, String code) async {
     final response = await ApiService.post(
       endpoint: ApiConstants.verifyResetCode,
-      body: {
-        'email': email,
-        'code': code,
-      },
+      body: {'email': email, 'code': code},
     );
 
     return response['success'] == true;
@@ -213,11 +205,7 @@ class AuthService {
   }) async {
     final response = await ApiService.post(
       endpoint: ApiConstants.resetPassword,
-      body: {
-        'email': email,
-        'code': code,
-        'newPassword': newPassword,
-      },
+      body: {'email': email, 'code': code, 'newPassword': newPassword},
     );
 
     return response['success'] == true;
@@ -226,22 +214,16 @@ class AuthService {
   Future<Map<String, dynamic>> forgotPassword(String email) async {
     final response = await ApiService.post(
       endpoint: ApiConstants.forgotPassword,
-      body: {
-        'email': email,
-      },
+      body: {'email': email},
     );
 
     return response;
   }
+
   Future<User?> getSavedUserModel() async {
     final dto = await getSavedUser();
     if (dto == null) return null;
 
     return UserMapper.fromDTO(dto);
   }
-  Future<User?> getMeModel() async {
-    final dto = await getMe();
-    if (dto == null) return null;
-
-    return UserMapper.fromDTO(dto);
-  }}
+}

@@ -10,14 +10,14 @@ class AppBottomNavBar extends StatelessWidget {
   final VoidCallback onSettingsTap;
 
   const AppBottomNavBar({
-    Key? key,
+    super.key,
     required this.isDark,
     required this.onMarketTap,
     required this.onAgentsTap,
     required this.onActivityTap,
     required this.onStatsTap,
     required this.onSettingsTap,
-  }) : super(key: key);
+  });
 
   Widget _buildNavItem(
     IconData icon,
@@ -33,8 +33,8 @@ class AppBottomNavBar extends StatelessWidget {
           color: isActive
               ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
               : (isDark
-                    ? Colors.white.withOpacity(0.4)
-                    : Colors.black.withOpacity(0.4)),
+                    ? Colors.white.withValues(alpha: 0.4)
+                    : Colors.black.withValues(alpha: 0.4)),
           size: 26,
         ),
         const SizedBox(height: 6),
@@ -44,8 +44,8 @@ class AppBottomNavBar extends StatelessWidget {
             color: isActive
                 ? (isDark ? const Color(0xFFCDFF00) : Colors.black)
                 : (isDark
-                      ? Colors.white.withOpacity(0.4)
-                      : Colors.black.withOpacity(0.4)),
+                      ? Colors.white.withValues(alpha: 0.4)
+                      : Colors.black.withValues(alpha: 0.4)),
             fontSize: 11,
             fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           ),
@@ -57,7 +57,7 @@ class AppBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Container(
       height: 72,
       decoration: BoxDecoration(
@@ -65,8 +65,8 @@ class AppBottomNavBar extends StatelessWidget {
         border: Border(
           top: BorderSide(
             color: isDark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.black.withOpacity(0.1),
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.1),
             width: 1,
           ),
         ),

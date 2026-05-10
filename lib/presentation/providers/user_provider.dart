@@ -37,6 +37,7 @@ class UserProvider extends ChangeNotifier {
 
     await refreshFromApi();
   }
+
   List<String> get activeAgents {
     return _user?.activeAgents ?? [];
   }
@@ -66,14 +67,8 @@ class UserProvider extends ChangeNotifier {
     _user = null;
     notifyListeners();
   }
-  void setUserModel(User newUser) {
-    _user = newUser;
-    notifyListeners();
-  }
+
   bool isAgentActive(String agentId) {
     return _user?.activeAgents.contains(agentId) ?? false;
-  }
-  Future<void> refreshUser() async {
-    await refreshFromApi();
   }
 }

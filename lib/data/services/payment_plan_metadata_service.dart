@@ -67,24 +67,28 @@ class PaymentPlanMetadataService {
 
   /// Get plan by ID with safe fallback
   static PaymentPlan getPlanById(String id) {
-    try {
-      return _plans.firstWhere((plan) => plan.id == id);
-    } catch (e) {
-      // Safe fallback to basic_plan if unknown ID
-      print('⚠️ Unknown plan ID: $id, falling back to basic_plan');
-      return _plans.firstWhere((plan) => plan.id == 'basic_plan');
-    }
+    return _plans.firstWhere(
+      (plan) => plan.id == id,
+      orElse: () => _plans.firstWhere((plan) => plan.id == 'basic_plan'),
+    );
   }
 
   /// Get subscription plans only (excludes energy-only packs)
   static List<PaymentPlan> getSubscriptionPlans() {
-    return _plans.where((plan) => plan.agentsAllowed > 0 && 
-                                  (plan.id == 'basic_plan' || plan.id == 'premium_plan')).toList();
+    return _plans
+        .where(
+          (plan) =>
+              plan.agentsAllowed > 0 &&
+              (plan.id == 'basic_plan' || plan.id == 'premium_plan'),
+        )
+        .toList();
   }
 
   /// Get energy top-up plans only
   static List<PaymentPlan> getEnergyTopupPlans() {
-    return _plans.where((plan) => plan.id == 'energy_eco' || plan.id == 'energy_boost').toList();
+    return _plans
+        .where((plan) => plan.id == 'energy_eco' || plan.id == 'energy_boost')
+        .toList();
   }
 
   /// Get recommended plan for number of agents

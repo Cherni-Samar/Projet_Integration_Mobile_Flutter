@@ -1,30 +1,46 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import '../services/api_service.dart';
-import '../services/auth_service.dart';
-import '/utils/constants.dart';
+import 'package:e_team/core/config/app_secrets.dart';
+import 'package:e_team/data/services/api_service.dart';
+import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/core/utils/constants.dart';
 
 class StripeService {
   static final AuthService _authService = AuthService();
-  static String? _lastPaymentIntentId;
 
-  static String? get lastPaymentIntentId => _lastPaymentIntentId;
+  static Future<void> _ensureStripeConfigured() async {
+    final publishableKey = AppSecrets.stripePublishableKey.trim();
+    if (publishableKey.isEmpty) {
+      throw Exception(
+        'Stripe publishable key is not configured. Pass it with --dart-define=STRIPE_PUBLISHABLE_KEY=your_value.',
+      );
+    }
 
-  /// Creates a PaymentIntent on the backend and presents the Stripe PaymentSheet.
+    Stripe.publishableKey = publishableKey;
+    await Stripe.instance.applySettings();
+  }
+
+  /// Creates a PaymentIntent, presents the Stripe PaymentSheet, and confirms
+  /// the payment with the backend in a single call.
+  ///
+  /// Returns the backend confirmation response map on success.
+  /// Returns null if the user cancelled.
+  /// Throws on any other error.
+  ///
   /// [packId] is a server-defined identifier (e.g. energy_eco, energy_boost, basic_plan).
   /// [suggestedAgents] is an optional list of agent names to auto-hire after payment.
-  /// Returns true on success, false on cancel.
-  /// Throws on error.
-  static Future<bool> makePayment({
+  static Future<Map<String, dynamic>?> makePayment({
     required String packId,
     List<String>? suggestedAgents,
   }) async {
+    await _ensureStripeConfigured();
+
     // 1. Get the auth token
     final token = await _authService.getToken();
     if (token == null) {
       throw Exception('You must be logged in to make a payment');
     }
 
+    // 2. Create PaymentIntent on the backend
     final response = await ApiService.post(
       endpoint: ApiConstants.createPaymentIntent,
       body: {
@@ -45,35 +61,31 @@ class StripeService {
       throw Exception('Missing paymentIntentId from backend response');
     }
 
-    _lastPaymentIntentId = paymentIntentId.toString();
-
     // 3. Initialize the PaymentSheet
     await Stripe.instance.initPaymentSheet(
       paymentSheetParameters: SetupPaymentSheetParameters(
         paymentIntentClientSecret: clientSecret,
         merchantDisplayName: 'E-Team',
-        style: ThemeMode.system,
       ),
     );
 
     // 4. Present the PaymentSheet
     try {
       await Stripe.instance.presentPaymentSheet();
-
-      // 5. ✅ Confirm on backend to actually credit energy/credits
-      final confirmRes = await ApiService.post(
-        endpoint: ApiConstants.confirmPayment,
-        body: {'paymentIntentId': paymentIntentId.toString()},
-        token: token,
-      );
-
-      return confirmRes['success'] == true;
     } on StripeException catch (e) {
       if (e.error.code == FailureCode.Canceled) {
-        _lastPaymentIntentId = null;
-        return false; // User cancelled
+        return null; // User cancelled — caller checks for null
       }
       rethrow;
     }
+
+    // 5. Confirm payment with backend and return the full response
+    final confirmRes = await ApiService.post(
+      endpoint: ApiConstants.confirmPayment,
+      body: {'paymentIntentId': paymentIntentId.toString()},
+      token: token,
+    );
+
+    return confirmRes;
   }
 }

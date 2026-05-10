@@ -1,33 +1,31 @@
 import 'package:flutter/material.dart';
-
-import '/l10n/app_localizations.dart';
-import '/domain/models/user_model.dart';
-import '/data/services/api_service.dart';
-import '/data/services/auth_service.dart';
-import '/data/services/stripe_service.dart';
-import '/utils/constants.dart';
-import 'package:e_team/data/dtos/user_dto.dart';
 import 'package:provider/provider.dart';
-import 'package:e_team/presentation/providers/user_provider.dart';
+
+import 'package:e_team/data/dtos/user_dto.dart';
 import 'package:e_team/data/services/payment_plan_metadata_service.dart';
+import 'package:e_team/data/services/stripe_service.dart';
+import 'package:e_team/l10n/app_localizations.dart';
+import 'package:e_team/presentation/models/pricing/pricing_offer.dart';
+import 'package:e_team/presentation/providers/user_provider.dart';
+import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';
+import 'package:e_team/presentation/widgets/pricing/pricing_dialogs.dart';
+import 'package:e_team/presentation/widgets/pricing/pricing_offers_list.dart';
+import 'package:e_team/presentation/widgets/pricing/pricing_processing_overlay.dart';
+
 class PricingPage extends StatefulWidget {
   const PricingPage({super.key});
 
   @override
   State<PricingPage> createState() => _PricingPageState();
-
-  static const cardBg = Color(0xFF1A1A1A);
-  static const volt = Color(0xFFCDFF00);
 }
 
 class _PricingPageState extends State<PricingPage> {
-  final _authService = AuthService();
   bool _isProcessing = false;
   String? _processingPackId;
 
-  List<_Offer> _offers() {
+  List<PricingOffer> _offers() {
     return PaymentPlanMetadataService.getPricingOffers().map((offerData) {
-      return _Offer(
+      return PricingOffer(
         sectionId: offerData['sectionId'],
         packId: offerData['packId'],
         price: offerData['price'],
@@ -44,16 +42,16 @@ class _PricingPageState extends State<PricingPage> {
 
   String _sectionTitleText(AppLocalizations l10n, String sectionId) {
     switch (sectionId) {
-      case _OfferSectionId.subscriptions:
+      case PricingOfferSectionId.subscriptions:
         return l10n.pricingSectionSubscriptions;
-      case _OfferSectionId.energyTopups:
+      case PricingOfferSectionId.energyTopups:
         return l10n.pricingSectionEnergyTopups;
       default:
         return sectionId;
     }
   }
 
-  Future<void> _handlePurchase(_Offer offer) async {
+  Future<void> _handlePurchase(PricingOffer offer) async {
     if (_isProcessing) return;
 
     final l10n = AppLocalizations.of(context)!;
@@ -61,12 +59,7 @@ class _PricingPageState extends State<PricingPage> {
     // Free Trial is a special case (Stripe typically doesn't support 0€ intents)
     if (offer.packId == 'free_trial') {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.pricingFreeTrialAlreadyAvailableSnack),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppSnackBar.info(context, l10n.pricingFreeTrialAlreadyAvailableSnack);
       return;
     }
 
@@ -76,43 +69,21 @@ class _PricingPageState extends State<PricingPage> {
     });
 
     try {
-      final paid = await StripeService.makePayment(
+      final confirm = await StripeService.makePayment(
         packId: offer.packId,
         suggestedAgents: null, // No suggested agents from this flow
       );
       if (!mounted) return;
 
-      if (!paid) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.paymentCancelledSnack),
-            backgroundColor: Colors.orange,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+      if (confirm == null) {
+        // User cancelled the payment sheet
+        AppSnackBar.warning(context, l10n.paymentCancelledSnack);
         return;
       }
-
-      final paymentIntentId = StripeService.lastPaymentIntentId;
-      if (paymentIntentId == null) {
-        throw Exception(l10n.paymentMissingIntentId);
-      }
-
-      final token = await _authService.getToken();
-      if (token == null) {
-        throw Exception(l10n.authMustBeLoggedIn);
-      }
-
-      final confirm = await ApiService.post(
-        endpoint: ApiConstants.confirmPayment,
-        body: {'paymentIntentId': paymentIntentId},
-        token: token,
-      );
 
       final rawUser = confirm['data']?['user'] ?? confirm['user'];
       if (rawUser is Map<String, dynamic>) {
         final dto = UserDTO.fromJson(rawUser);
-
         await context.read<UserProvider>().setUser(dto);
       } else {
         await context.read<UserProvider>().refreshFromApi();
@@ -125,13 +96,7 @@ class _PricingPageState extends State<PricingPage> {
       Navigator.of(context).pop(true);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString().replaceAll('Exception: ', '')),
-          backgroundColor: Colors.red.shade700,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      AppSnackBar.error(context, e.toString().replaceAll('Exception: ', ''));
     } finally {
       if (mounted) {
         setState(() {
@@ -146,88 +111,8 @@ class _PricingPageState extends State<PricingPage> {
     final l10n = AppLocalizations.of(context)!;
     await showDialog<void>(
       context: context,
-      builder: (ctx) {
-        return Dialog(
-          backgroundColor: PricingPage.cardBg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-            side: BorderSide(
-              color: PricingPage.volt.withValues(alpha: 0.18),
-              width: 0.8,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: PricingPage.volt.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: PricingPage.volt.withValues(alpha: 0.12),
-                        blurRadius: 18,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: PricingPage.volt,
-                    size: 32,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Text(
-                  l10n.paymentConfirmedTitle,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.paymentConfirmedSubtitle(planName),
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.72),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    height: 1.35,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.of(ctx).pop(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: PricingPage.volt,
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      l10n.onboardingChatbotContinue,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (context) =>
+          PricingSuccessDialog(l10n: l10n, planName: planName),
     );
   }
 
@@ -237,223 +122,28 @@ class _PricingPageState extends State<PricingPage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final offers = _offers();
 
-    final sections = <String, List<_Offer>>{};
+    final sections = <String, List<PricingOffer>>{};
     for (final o in offers) {
-      sections.putIfAbsent(o.sectionId, () => <_Offer>[]).add(o);
+      sections.putIfAbsent(o.sectionId, () => <PricingOffer>[]).add(o);
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.pricingOffersTitle),
-      ),
+      appBar: AppBar(title: Text(l10n.pricingOffersTitle)),
       body: Stack(
         children: [
-          ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              for (final entry in sections.entries) ...[
-                _sectionTitle(_sectionTitleText(l10n, entry.key)),
-                const SizedBox(height: 12),
-                for (final offer in entry.value) ...[
-                  _planCard(
-                    context,
-                    title: _offerTitle(l10n, offer.packId),
-                    price: offer.price,
-                    credits: offer.credits,
-                    creditsLabel: l10n.pricingCreditsCount(offer.credits),
-                    agents: offer.agents,
-                    agentsLabel: offer.agents != null
-                        ? l10n.pricingAgentsCount(offer.agents!)
-                        : null,
-                    isBestValue: offer.isBestValue,
-                    isDark: isDark,
-                    isLoading:
-                        _isProcessing && _processingPackId == offer.packId,
-                    onTap:
-                        _isProcessing ? null : () => _handlePurchase(offer),
-                  ),
-                  const SizedBox(height: 12),
-                ],
-                const SizedBox(height: 8),
-              ],
-            ],
+          PricingOffersList(
+            l10n: l10n,
+            isDark: isDark,
+            isProcessing: _isProcessing,
+            processingPackId: _processingPackId,
+            sections: sections,
+            sectionTitleText: (sectionId) => _sectionTitleText(l10n, sectionId),
+            offerTitle: (packId) => _offerTitle(l10n, packId),
+            onPurchase: _handlePurchase,
           ),
-          if (_isProcessing)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: ColoredBox(
-                  color: Colors.black.withValues(alpha: 0.35),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFFCDFF00),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+          PricingProcessingOverlay(isVisible: _isProcessing),
         ],
       ),
     );
   }
-
-  static Widget _sectionTitle(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-
-  static Widget _planCard(
-    BuildContext context, {
-    required String title,
-    required String price,
-    required int credits,
-    required String creditsLabel,
-    int? agents,
-    required String? agentsLabel,
-    bool isBestValue = false,
-    required bool isDark,
-    required bool isLoading,
-    required VoidCallback? onTap,
-  }) {
-    final borderColor = isBestValue
-        ? PricingPage.volt.withValues(alpha: 0.55)
-        : Colors.white.withValues(alpha: 0.12);
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDark ? PricingPage.cardBg : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: borderColor,
-              width: 0.8,
-            ),
-            boxShadow: isBestValue
-                ? [
-                    BoxShadow(
-                      color: PricingPage.volt.withValues(alpha: 0.18),
-                      blurRadius: 22,
-                      spreadRadius: 0.6,
-                    ),
-                  ]
-                : null,
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    _planMetaLine(
-                      creditsLabel: creditsLabel,
-                      agentsLabel: agentsLabel,
-                      isDark: isDark,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              if (isLoading)
-                SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.4,
-                    color: PricingPage.volt,
-                  ),
-                )
-              else
-                Text(
-                  price,
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  static Widget _planMetaLine({
-    required String creditsLabel,
-    required String? agentsLabel,
-    required bool isDark,
-  }) {
-    final textColor = isDark
-        ? Colors.white.withValues(alpha: 0.7)
-        : Colors.black.withValues(alpha: 0.65);
-
-    final separatorColor = isDark
-        ? Colors.white.withValues(alpha: 0.45)
-        : Colors.black.withValues(alpha: 0.35);
-    final baseStyle = TextStyle(
-      color: textColor,
-      fontSize: 13,
-      fontWeight: FontWeight.w500,
-      height: 1.3,
-    );
-
-    return Wrap(
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 6,
-      runSpacing: 6,
-      children: [
-        Icon(
-          Icons.bolt,
-          size: 14,
-          color: PricingPage.volt.withValues(alpha: isDark ? 0.85 : 0.9),
-        ),
-        Text(creditsLabel, style: baseStyle),
-        if (agentsLabel != null) ...[
-          Text('•', style: baseStyle.copyWith(color: separatorColor)),
-          Text(agentsLabel, style: baseStyle),
-        ],
-      ],
-    );
-  }
-}
-
-class _Offer {
-  final String sectionId;
-  final String packId;
-  final String price;
-  final int credits;
-  final int? agents;
-  final bool isBestValue;
-
-  const _Offer({
-    required this.sectionId,
-    required this.packId,
-    required this.price,
-    required this.credits,
-    this.agents,
-    this.isBestValue = false,
-  });
-}
-
-class _OfferSectionId {
-  static const subscriptions = 'subscriptions';
-  static const energyTopups = 'energy_topups';
 }

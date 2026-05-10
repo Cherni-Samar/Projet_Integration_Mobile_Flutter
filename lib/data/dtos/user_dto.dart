@@ -82,7 +82,9 @@ class UserDTO {
       subscriptionPlan: (json['subscriptionPlan'] ?? 'free').toString(),
       subscriptionStatus: json['subscriptionStatus']?.toString(),
       maxAgentsAllowed: (json['maxAgentsAllowed'] as num?)?.toInt() ?? 1,
-      activeAgents: (json['activeAgents'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      activeAgents:
+          (json['activeAgents'] as List?)?.map((e) => e.toString()).toList() ??
+          [],
       energyBalance: (json['energyBalance'] as num?)?.toInt() ?? 0,
 
       // Nouveaux champs

@@ -1,35 +1,28 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:e_team/presentation/screens/agent/agent_inter_flow_page.dart';
 import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/core/config/api_config.dart';
+import 'package:e_team/domain/models/agent_interaction_model.dart';
 
 class AgentInteractionService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api/hera';
+  static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
 
   static Future<Map<String, String>> _headers({String? token}) async {
     final savedToken = token ?? await AuthService().getToken();
 
-    print('🔐 TOKEN ACTIVITY EXISTS => ${savedToken != null && savedToken.isNotEmpty}');
-    print('🔐 TOKEN ACTIVITY VALUE => $savedToken');
-
     if (savedToken == null || savedToken.isEmpty) {
-      return {
-        'Content-Type': 'application/json',
-      };
+      return {'Content-Type': 'application/json'};
     }
 
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $savedToken',
-    };
+    // Fixed: backend authMiddleware expects 'x-auth-token', not 'Authorization: Bearer'.
+    return {'Content-Type': 'application/json', 'x-auth-token': savedToken};
   }
+
   static Future<List<AgentInteraction>> getAgentInteractions({
     String? token,
   }) async {
     try {
       final uri = Uri.parse('$baseUrl/admin/agent-interactions');
-
-      print('📡 Tentative de connexion à : $uri');
 
       final response = await http.get(
         uri,
@@ -40,23 +33,16 @@ class AgentInteractionService {
         final data = json.decode(response.body);
         final List<dynamic> list = data['interactions'] ?? data['logs'] ?? [];
 
-        print('✅ Données reçues : ${list.length} logs trouvés');
-
         return list.map((json) => AgentInteraction.fromJson(json)).toList();
       }
 
-      print('❌ Erreur HTTP : ${response.statusCode}');
-      print('❌ Body : ${response.body}');
       return [];
-    } catch (e) {
-      print('❌ Erreur Service Interaction : $e');
+    } catch (_) {
       return [];
     }
   }
 
-  static Future<Map<String, int>> getInteractionStats({
-    String? token,
-  }) async {
+  static Future<Map<String, int>> getInteractionStats({String? token}) async {
     try {
       final uri = Uri.parse('$baseUrl/admin/agent-interactions/stats');
 
@@ -81,9 +67,6 @@ class AgentInteractionService {
         }
       }
 
-      print('⚠️ Stats API Error: ${response.statusCode}');
-      print('⚠️ Stats Body: ${response.body}');
-
       return {
         'total': 0,
         'successful': 0,
@@ -91,9 +74,7 @@ class AgentInteractionService {
         'pending': 0,
         'failed': 0,
       };
-    } catch (e) {
-      print('❌ AgentInteractionService - Stats Exception: $e');
-
+    } catch (_) {
       return {
         'total': 0,
         'successful': 0,
