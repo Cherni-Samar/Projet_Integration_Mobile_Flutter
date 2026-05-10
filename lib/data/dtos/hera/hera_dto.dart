@@ -1,4 +1,4 @@
-import 'package:e_team/domain/models/hera_models.dart';
+import 'package:e_team/domain/models/hera/hera_models.dart';
 import 'package:e_team/data/mappers/hera_mapper.dart';
 
 class HeraEmployeesResponse {

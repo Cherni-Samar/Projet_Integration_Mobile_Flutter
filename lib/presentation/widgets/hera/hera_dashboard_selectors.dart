@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import 'package:e_team/domain/models/hera_models.dart';
+import 'package:e_team/domain/models/hera/hera_models.dart';
 
 @immutable
 class HeraFluxData {

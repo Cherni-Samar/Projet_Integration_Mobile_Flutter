@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:e_team/domain/models/hera_models.dart';
+import 'package:e_team/domain/models/hera/hera_models.dart';
 import 'package:e_team/presentation/widgets/hera/team/hera_team_widgets.dart';
 
 /// Team tab — active employees, onboarding, and candidates.

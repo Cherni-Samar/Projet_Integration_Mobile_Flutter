@@ -1,4 +1,4 @@
-import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/domain/models/echo/echo_models.dart';
 import 'package:e_team/presentation/widgets/echo/echo_posts/echo_posts_header.dart';
 import 'package:e_team/presentation/widgets/echo/echo_posts/echo_posts_list.dart';
 import 'package:flutter/material.dart';

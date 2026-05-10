@@ -5,7 +5,7 @@ import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/presentation/screens/agent/agent_chat_page.dart';
 import 'package:e_team/presentation/screens/agent/dexo/dexo_dashboard_page.dart';
 import 'package:e_team/presentation/screens/agent/echo/echo_dashboard_page.dart';
-import 'package:e_team/presentation/screens/agent/finance/kash_dashboard_screen.dart';
+import 'package:e_team/presentation/screens/agent/kash/kash_dashboard_screen.dart';
 import 'package:e_team/presentation/screens/agent/timo/timo_dashboard_page.dart';
 import 'package:e_team/presentation/screens/hera/hera_dashboard_page.dart';
 import 'package:e_team/presentation/widgets/common/app_snack_bar.dart';

@@ -10,7 +10,7 @@ class VapiService {
   static String get _publicKey => AppSecrets.vapiPublicKey;
   static String get _assistantId => AppSecrets.vapiAssistantId;
 
-  late final VapiClient _client;
+  VapiClient? _client;
   VapiCall? _call;
 
   StreamSubscription<VapiEvent>? _eventSubscription;
@@ -35,10 +35,25 @@ class VapiService {
       _status == HeraVoiceStatus.listening ||
       _status == HeraVoiceStatus.speaking;
 
+  bool get _hasValidConfig =>
+      _publicKey.trim().isNotEmpty && _assistantId.trim().isNotEmpty;
+
+  void _markMissingConfig() {
+    _status = HeraVoiceStatus.error;
+    _errorMessage =
+        'Hera voice is not configured. Set VAPI_PUBLIC_KEY and VAPI_ASSISTANT_ID.';
+    _notifyListeners();
+  }
+
   Future<void> init() async {
     if (_initialized) return;
 
-    _client = VapiClient(_publicKey);
+    if (!_hasValidConfig) {
+      _markMissingConfig();
+      return;
+    }
+
+    _client = VapiClient(_publicKey.trim());
     _initialized = true;
     _notifyListeners();
   }
@@ -53,7 +68,13 @@ class VapiService {
       _errorMessage = '';
       _notifyListeners();
 
-      _call = await _client.start(assistantId: _assistantId);
+      final client = _client;
+      if (client == null) {
+        _markMissingConfig();
+        return;
+      }
+
+      _call = await client.start(assistantId: _assistantId.trim());
 
       await _eventSubscription?.cancel();
       _eventSubscription = _call!.onEvent.listen(_handleEvent);
@@ -189,7 +210,7 @@ class VapiService {
   void dispose() {
     _eventSubscription?.cancel();
     _call?.dispose();
-    _client.dispose();
+    _client?.dispose();
     _listeners.clear();
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:e_team/data/services/echo_service.dart';
-import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/domain/models/echo/echo_models.dart';
 import 'package:e_team/presentation/widgets/echo/echo_theme.dart';
 import 'package:e_team/presentation/widgets/echo/echo_dashboard_header.dart';
 import 'package:e_team/presentation/widgets/echo/echo_dashboard_navigation.dart';

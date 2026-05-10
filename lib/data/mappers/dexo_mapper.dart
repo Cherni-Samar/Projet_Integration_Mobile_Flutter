@@ -1,5 +1,5 @@
-import 'package:e_team/domain/models/dexo_action_model.dart';
-import 'package:e_team/data/dtos/dexo_action_dto.dart';
+import 'package:e_team/domain/models/dexo/dexo_action_model.dart';
+import 'package:e_team/data/dtos/dexo/dexo_action_dto.dart';
 
 class DexoMapper {
   static DexoAction fromDTO(DexoActionDTO dto) {

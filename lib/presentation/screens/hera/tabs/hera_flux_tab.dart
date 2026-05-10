@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:e_team/domain/models/hera_models.dart';
+import 'package:e_team/domain/models/hera/hera_models.dart';
 import 'package:e_team/presentation/screens/hera/hera_history_page.dart';
 import 'package:e_team/presentation/widgets/hera/flux/hera_flux_widgets.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';

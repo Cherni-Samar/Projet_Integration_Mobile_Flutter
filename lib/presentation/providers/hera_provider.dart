@@ -19,7 +19,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:e_team/core/errors/app_error.dart';
 import 'package:e_team/data/services/hera_service.dart';
-import 'package:e_team/domain/models/hera_models.dart';
+import 'package:e_team/domain/models/hera/hera_models.dart';
 
 class HeraProvider extends ChangeNotifier {
   // ─── Data ─────────────────────────────────────────────────────────────────

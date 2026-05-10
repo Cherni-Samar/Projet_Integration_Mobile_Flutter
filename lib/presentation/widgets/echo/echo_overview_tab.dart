@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/domain/models/echo/echo_models.dart';
 import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'echo_dashboard_helpers.dart';
 import 'echo_theme.dart';

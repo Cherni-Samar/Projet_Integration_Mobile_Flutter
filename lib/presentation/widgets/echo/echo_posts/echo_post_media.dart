@@ -1,6 +1,6 @@
 import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/core/config/api_config.dart';
-import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/domain/models/echo/echo_models.dart';
 import 'package:e_team/presentation/widgets/echo/echo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

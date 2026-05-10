@@ -1,7 +1,7 @@
 import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:flutter/material.dart';
 
-import 'package:e_team/domain/models/hera_models.dart';
+import 'package:e_team/domain/models/hera/hera_models.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 class HeraTeamSubTabs extends StatelessWidget {

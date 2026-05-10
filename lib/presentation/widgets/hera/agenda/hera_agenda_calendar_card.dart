@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import 'package:e_team/domain/models/hera_models.dart';
+import 'package:e_team/domain/models/hera/hera_models.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 class HeraAgendaCalendarCard extends StatelessWidget {

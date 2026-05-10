@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/domain/models/echo/echo_models.dart';
 import 'package:e_team/presentation/widgets/echo/inbox/echo_inbox_helpers.dart';
 
 class EchoEmailDetailsSheet extends StatelessWidget {

@@ -1,6 +1,7 @@
 import 'dart:convert';
+
 import 'package:characters/characters.dart';
-import 'package:e_team/domain/models/echo_analysis_model.dart';
+import 'package:e_team/domain/models/echo/echo_analysis_model.dart';
 
 class EchoFormatters {
   static String humanReadableAutoReplyBody(String raw) {

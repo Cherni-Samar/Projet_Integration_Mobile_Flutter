@@ -1,4 +1,4 @@
-import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/domain/models/echo/echo_models.dart';
 import 'package:e_team/presentation/widgets/common/app_loading.dart';
 import 'package:e_team/presentation/widgets/echo/echo_posts/echo_post_card_view.dart';
 import 'package:e_team/presentation/widgets/echo/echo_theme.dart';

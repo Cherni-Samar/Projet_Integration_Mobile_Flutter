@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:e_team/app/app.dart';
 import 'package:e_team/app/app_providers.dart';
-import 'package:e_team/core/config/app_secrets.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  Stripe.publishableKey = AppSecrets.stripePublishableKey;
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

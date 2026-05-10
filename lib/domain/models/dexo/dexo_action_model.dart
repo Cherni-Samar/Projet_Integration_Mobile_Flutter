@@ -1,4 +1,4 @@
-// lib/domain/models/dexo_action_model.dart
+// lib/domain/models/dexo/dexo_action_model.dart
 class DexoAction {
   final String id;
   final String title;

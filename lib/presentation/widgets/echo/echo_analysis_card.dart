@@ -1,6 +1,6 @@
 // presentation/widgets/echo/echo_analysis_card.dart
 import 'package:flutter/material.dart';
-import 'package:e_team/domain/models/echo_analysis_model.dart';
+import 'package:e_team/domain/models/echo/echo_analysis_model.dart';
 
 class EchoAnalysisCard extends StatelessWidget {
   final EchoAnalysis analysis;

@@ -1,4 +1,4 @@
-import 'package:e_team/domain/models/echo_models.dart';
+import 'package:e_team/domain/models/echo/echo_models.dart';
 
 class EchoMapper {
   static String _str(dynamic value) => value == null ? '' : value.toString();

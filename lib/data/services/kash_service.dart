@@ -1,6 +1,4 @@
-import 'package:e_team/core/config/api_config.dart';
-import 'package:e_team/data/services/api_service.dart';
-import 'package:e_team/data/services/auth_service.dart';
+import 'package:e_team/data/repositories/kash_repository.dart';
 import 'package:e_team/domain/models/kash/kash_expense_model.dart';
 import 'package:e_team/domain/models/kash/kash_budget_model.dart';
 import 'package:e_team/domain/models/kash/kash_reminder_model.dart';
@@ -8,12 +6,10 @@ import 'package:e_team/data/dtos/kash/kash_expense_dto.dart';
 import 'package:e_team/data/dtos/kash/kash_budget_dto.dart';
 import 'package:e_team/data/dtos/kash/kash_reminder_dto.dart';
 
-import 'package:e_team/data/mappers/kash/kash_mapper.dart';
+import 'package:e_team/data/mappers/kash_mapper.dart';
 
 class KashService {
-  static final AuthService _authService = AuthService();
-
-  static String get _baseUrl => '${ApiConfig.baseUrl}/api/kash';
+  static final _repo = KashRepository.instance;
 
   // ===========================================================================
   // EXPENSES
@@ -22,12 +18,7 @@ class KashService {
   /// Fetch all expenses for the current user (last 50, sorted by date desc)
   /// GET /api/kash/expenses
   static Future<List<KashExpense>> getExpenses() async {
-    final token = await _authService.getToken();
-
-    final response = await ApiService.get(
-      endpoint: '$_baseUrl/expenses',
-      token: token,
-    );
+    final response = await _repo.getExpenses();
 
     final list = response['data']['expenses'] as List;
 
@@ -42,14 +33,7 @@ class KashService {
   static Future<Map<String, dynamic>> addExpense(
     Map<String, dynamic> data,
   ) async {
-    final token = await _authService.getToken();
-    if (token == null) throw Exception('No authentication token found');
-
-    final response = await ApiService.post(
-      endpoint: '$_baseUrl/add',
-      body: data,
-      token: token,
-    );
+    final response = await _repo.addExpense(data);
 
     if (response['success'] != true) {
       throw Exception(response['message'] ?? 'Failed to add expense');
@@ -65,12 +49,7 @@ class KashService {
   /// Get budget array for the current user
   /// GET /api/kash/budget
   static Future<List<KashBudget>> getBudget() async {
-    final token = await _authService.getToken();
-
-    final response = await ApiService.get(
-      endpoint: '$_baseUrl/budget',
-      token: token,
-    );
+    final response = await _repo.getBudget();
 
     final list = response['data']['budget'] as List;
 
@@ -87,9 +66,6 @@ class KashService {
     required double limit,
     String currency = 'TND',
   }) async {
-    final token = await _authService.getToken();
-    if (token == null) throw Exception('No authentication token found');
-
     if (category.trim().isEmpty) {
       throw Exception('Category is required');
     }
@@ -98,14 +74,10 @@ class KashService {
       throw Exception('Budget limit must be greater than 0');
     }
 
-    final response = await ApiService.post(
-      endpoint: '$_baseUrl/budget/create',
-      body: {
-        'category': category.trim(),
-        'limit': limit,
-        'currency': currency.toUpperCase(),
-      },
-      token: token,
+    final response = await _repo.createBudget(
+      category: category.trim(),
+      limit: limit,
+      currency: currency.toUpperCase(),
     );
 
     if (response['success'] != true) {
@@ -122,12 +94,7 @@ class KashService {
   /// Fetch all reminders for the current user (sorted by dueDate asc)
   /// GET /api/kash/reminders
   static Future<List<KashReminder>> getReminders() async {
-    final token = await _authService.getToken();
-
-    final response = await ApiService.get(
-      endpoint: '$_baseUrl/reminders',
-      token: token,
-    );
+    final response = await _repo.getReminders();
 
     final list = response['data']['reminders'] as List;
 
@@ -142,9 +109,6 @@ class KashService {
   static Future<Map<String, dynamic>> createReminder(
     Map<String, dynamic> data,
   ) async {
-    final token = await _authService.getToken();
-    if (token == null) throw Exception('No authentication token found');
-
     // Validate required fields
     if (data['title'] == null || data['title'].toString().trim().isEmpty) {
       throw Exception('Reminder title is required');
@@ -173,11 +137,7 @@ class KashService {
       'vendor': data['vendor'] ?? '',
     };
 
-    final response = await ApiService.post(
-      endpoint: '$_baseUrl/reminders',
-      body: body,
-      token: token,
-    );
+    final response = await _repo.createReminder(body);
 
     if (response['success'] != true) {
       throw Exception(response['message'] ?? 'Failed to create reminder');
@@ -189,18 +149,11 @@ class KashService {
   /// Mark a reminder as paid
   /// PATCH /api/kash/reminders/:id/mark-paid
   static Future<Map<String, dynamic>> markReminderPaid(String id) async {
-    final token = await _authService.getToken();
-    if (token == null) throw Exception('No authentication token found');
-
     if (id.trim().isEmpty) {
       throw Exception('Reminder ID is required');
     }
 
-    final response = await ApiService.patch(
-      endpoint: '$_baseUrl/reminders/${id.trim()}/mark-paid',
-      body: {},
-      token: token,
-    );
+    final response = await _repo.markReminderPaid(id.trim());
 
     if (response['success'] != true) {
       throw Exception(response['message'] ?? 'Failed to mark reminder as paid');
@@ -217,18 +170,11 @@ class KashService {
   /// POST /api/kash/analyze
   /// Body: { imageBase64 }
   static Future<Map<String, dynamic>> analyzeReceipt(String base64Image) async {
-    final token = await _authService.getToken();
-    if (token == null) throw Exception('No authentication token found');
-
     if (base64Image.trim().isEmpty) {
       throw Exception('Image data is required');
     }
 
-    final response = await ApiService.post(
-      endpoint: '$_baseUrl/analyze',
-      body: {'imageBase64': base64Image.trim()},
-      token: token,
-    );
+    final response = await _repo.analyzeReceipt(base64Image.trim());
 
     if (response['success'] != true) {
       throw Exception(response['message'] ?? 'Failed to analyze receipt');

@@ -11,7 +11,7 @@
 /// so every existing caller continues to work without modification.
 library;
 
-import 'package:e_team/data/dtos/hera_dto.dart';
+import 'package:e_team/data/dtos/hera/hera_dto.dart';
 import 'package:e_team/data/repositories/hera_repository.dart';
 
 class HeraService {

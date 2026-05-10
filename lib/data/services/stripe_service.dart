@@ -1,10 +1,23 @@
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:e_team/core/config/app_secrets.dart';
 import 'package:e_team/data/services/api_service.dart';
 import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/core/utils/constants.dart';
 
 class StripeService {
   static final AuthService _authService = AuthService();
+
+  static Future<void> _ensureStripeConfigured() async {
+    final publishableKey = AppSecrets.stripePublishableKey.trim();
+    if (publishableKey.isEmpty) {
+      throw Exception(
+        'Stripe publishable key is not configured. Pass it with --dart-define=STRIPE_PUBLISHABLE_KEY=your_value.',
+      );
+    }
+
+    Stripe.publishableKey = publishableKey;
+    await Stripe.instance.applySettings();
+  }
 
   /// Creates a PaymentIntent, presents the Stripe PaymentSheet, and confirms
   /// the payment with the backend in a single call.
@@ -19,6 +32,8 @@ class StripeService {
     required String packId,
     List<String>? suggestedAgents,
   }) async {
+    await _ensureStripeConfigured();
+
     // 1. Get the auth token
     final token = await _authService.getToken();
     if (token == null) {

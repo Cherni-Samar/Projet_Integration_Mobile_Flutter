@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:e_team/domain/models/hera_models.dart';
+import 'package:e_team/domain/models/hera/hera_models.dart';
 import 'package:e_team/presentation/widgets/hera/hera_common_widgets.dart';
 import 'package:e_team/presentation/widgets/hera/hera_palette.dart';
 

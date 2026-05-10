@@ -1,9 +1,7 @@
-import 'package:e_team/core/config/api_config.dart';
-import 'api_service.dart';
-import 'auth_service.dart';
+import 'package:e_team/data/repositories/dexo_repository.dart';
 
 class DexoService {
-  static String get baseUrl => '${ApiConfig.baseUrl}/api/dexo';
+  static final _repo = DexoRepository.instance;
 
   // ═══════════════════════════════════════════════════════════════
   // 📂 DOCUMENT CATEGORY MANAGEMENT
@@ -17,19 +15,12 @@ class DexoService {
     int offset = 0,
   }) async {
     try {
-      final queryParams = <String, String>{
-        'category': category,
-        'limit': limit.toString(),
-        'offset': offset.toString(),
-      };
-      if (userId != null) queryParams['userId'] = userId;
-
-      final token = await AuthService().getToken();
-      final uri = Uri.parse(
-        '$baseUrl/documents-by-category',
-      ).replace(queryParameters: queryParams).toString();
-
-      return await ApiService.get(endpoint: uri, token: token);
+      return await _repo.getDocumentsByCategory(
+        category: category,
+        userId: userId,
+        limit: limit,
+        offset: offset,
+      );
     } catch (e) {
       throw Exception('Erreur récupération documents par catégorie: $e');
     }
@@ -41,15 +32,10 @@ class DexoService {
     String? userId,
   }) async {
     try {
-      final queryParams = <String, String>{};
-      if (userId != null) queryParams['userId'] = userId;
-
-      final token = await AuthService().getToken();
-      final uri = Uri.parse(
-        '$baseUrl/document-content/$documentId',
-      ).replace(queryParameters: queryParams).toString();
-
-      return await ApiService.get(endpoint: uri, token: token);
+      return await _repo.getDocumentContent(
+        documentId: documentId,
+        userId: userId,
+      );
     } catch (e) {
       throw Exception('Erreur récupération contenu document: $e');
     }
@@ -59,32 +45,21 @@ class DexoService {
   static Future<Map<String, dynamic>> updateWorkforceSettings(
     Map<String, dynamic> data,
   ) async {
-    final token = await AuthService().getToken();
-    return ApiService.patch(
-      endpoint: '${ApiConfig.baseUrl}/api/dexo/workforce-settings',
-      body: data,
-      token: token,
-    );
+    return _repo.updateWorkforceSettings(data);
   }
 
   // Obtenir des conseils stratégiques via l'IA Dexo
   static Future<Map<String, dynamic>> getStrategicAdvice(
     Map<String, dynamic> payload,
   ) async {
-    return ApiService.post(
-      endpoint: '${ApiConfig.baseUrl}/api/dexo/strategic-advice',
-      body: payload,
-    );
+    return _repo.getStrategicAdvice(payload);
   }
 
   // Sauvegarder la vision organisationnelle
   static Future<Map<String, dynamic>> saveVision(
     Map<String, dynamic> payload,
   ) async {
-    return ApiService.post(
-      endpoint: '${ApiConfig.baseUrl}/api/dexo/save-vision',
-      body: payload,
-    );
+    return _repo.saveVision(payload);
   }
 
   // ═══════════════════════════════════════════════════════════════

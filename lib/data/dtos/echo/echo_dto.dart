@@ -1,5 +1,5 @@
-import 'package:e_team/domain/models/echo_models.dart';
-import 'package:e_team/domain/models/echo_analysis_model.dart';
+import 'package:e_team/domain/models/echo/echo_models.dart';
+import 'package:e_team/domain/models/echo/echo_analysis_model.dart';
 import 'package:e_team/data/mappers/echo_mapper.dart';
 
 class EchoResponse {

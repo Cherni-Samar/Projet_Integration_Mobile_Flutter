@@ -1,13 +1,12 @@
-import 'package:e_team/core/config/api_config.dart';
-import 'api_service.dart';
+import 'package:e_team/data/repositories/timo_repository.dart';
 
 class TimoService {
-  static String get baseUrl => '${ApiConfig.baseUrl}/api/hera';
+  static final _repo = TimoRepository.instance;
 
   /// Fetch Timo's inbox of pending scheduling items.
   static Future<Map<String, dynamic>> getTimoInbox() async {
     try {
-      return await ApiService.get(endpoint: '$baseUrl/admin/timo-inbox');
+      return await _repo.getTimoInbox();
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
@@ -20,9 +19,10 @@ class TimoService {
     required String name,
   }) async {
     try {
-      return await ApiService.post(
-        endpoint: '$baseUrl/admin/timo-confirm',
-        body: {'emailId': emailId, 'selectedDate': date, 'employeeName': name},
+      return await _repo.confirmPlanning(
+        emailId: emailId,
+        date: date,
+        name: name,
       );
     } catch (e) {
       return {'success': false, 'error': e.toString()};
@@ -32,7 +32,7 @@ class TimoService {
   /// Fetch Timo's task list.
   static Future<Map<String, dynamic>> getTimoTasks() async {
     try {
-      return await ApiService.get(endpoint: '$baseUrl/admin/timo-tasks');
+      return await _repo.getTimoTasks();
     } catch (e) {
       return {'success': false, 'error': e.toString()};
     }
