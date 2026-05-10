@@ -6,7 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:e_team/data/services/dexo_service.dart';
 import 'package:e_team/presentation/models/dexo/department_pulse_view_model.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
-import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_organization_pulse_widgets.dart';
+import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_organization_pulse_chrome.dart';
+import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_organization_pulse_list.dart';
+import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_organization_pulse_theme.dart';
 
 class DexoOrganizationPulseScreen extends StatefulWidget {
   const DexoOrganizationPulseScreen({super.key});

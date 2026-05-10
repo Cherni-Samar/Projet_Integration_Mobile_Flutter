@@ -7,7 +7,8 @@ import 'package:e_team/presentation/providers/owned_agents_provider.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/presentation/screens/agent/my_agents_page.dart';
-import 'package:e_team/presentation/widgets/cart/cart_widgets.dart';
+import 'package:e_team/presentation/widgets/cart/cart_content.dart';
+import 'package:e_team/presentation/widgets/cart/cart_states.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

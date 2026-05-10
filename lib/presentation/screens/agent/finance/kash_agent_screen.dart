@@ -11,8 +11,13 @@ import 'package:e_team/data/services/api_service.dart';
 import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/core/utils/constants.dart';
 import 'package:e_team/presentation/models/kash/kash_agent_models.dart';
-import 'package:e_team/presentation/widgets/kash/agent/kash_agent_chat_widgets.dart';
-import 'package:e_team/presentation/widgets/kash/agent/kash_agent_shell_widgets.dart';
+import 'package:e_team/presentation/widgets/kash/agent/kash_agent_composer.dart';
+import 'package:e_team/presentation/widgets/kash/agent/kash_agent_extraction_card.dart';
+import 'package:e_team/presentation/widgets/kash/agent/kash_agent_message_bubble.dart';
+import 'package:e_team/presentation/widgets/kash/agent/kash_agent_shimmer_bubble.dart';
+import 'package:e_team/presentation/widgets/kash/agent/kash_agent_header.dart';
+import 'package:e_team/presentation/widgets/kash/agent/kash_agent_navigation.dart';
+import 'package:e_team/presentation/widgets/kash/agent/kash_agent_statistics.dart';
 
 class KashAgentScreen extends StatefulWidget {
   const KashAgentScreen({super.key});

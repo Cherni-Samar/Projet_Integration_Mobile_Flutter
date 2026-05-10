@@ -9,7 +9,8 @@ import 'package:e_team/presentation/providers/user_provider.dart';
 import 'package:e_team/presentation/screens/hera/hera_dashboard_page.dart';
 import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 import 'package:e_team/presentation/widgets/agent/agent_energy_pack_sheet.dart';
-import 'package:e_team/presentation/widgets/agent/details/agent_details_widgets.dart';
+import 'package:e_team/presentation/widgets/agent/details/agent_details_dialogs.dart';
+import 'package:e_team/presentation/widgets/agent/details/agent_details_scaffold.dart';
 
 class AgentDetailsPage extends StatefulWidget {
   // ✅ Legacy single agent (optionnel)

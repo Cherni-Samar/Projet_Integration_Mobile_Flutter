@@ -6,7 +6,11 @@ import 'package:e_team/data/services/dexo_service.dart';
 import 'package:e_team/domain/models/dexo/dexo_onboarding_models.dart';
 import 'package:e_team/presentation/providers/cart_provider.dart';
 import 'package:e_team/presentation/utils/onboarding_cart_builder.dart';
-import 'package:e_team/presentation/widgets/agent/onboarding/onboarding_chatbot_widgets.dart';
+import 'package:e_team/presentation/widgets/agent/onboarding/onboarding_chatbot_header.dart';
+import 'package:e_team/presentation/widgets/agent/onboarding/onboarding_chatbot_input.dart';
+import 'package:e_team/presentation/widgets/agent/onboarding/onboarding_chatbot_message.dart';
+import 'package:e_team/presentation/widgets/agent/onboarding/onboarding_chatbot_theme.dart';
+import 'package:e_team/presentation/widgets/agent/onboarding/onboarding_chatbot_typing.dart';
 
 class OnboardingChatbotScreen extends StatefulWidget {
   final String email;

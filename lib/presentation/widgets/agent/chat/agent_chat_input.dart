@@ -1,5 +1,6 @@
 import 'package:e_team/presentation/widgets/agent/chat/agent_chat_models.dart';
-import 'package:e_team/presentation/widgets/agent/chat/agent_chat_shared.dart';
+import 'package:e_team/presentation/widgets/agent/chat/agent_chat_buttons.dart';
+import 'package:e_team/presentation/widgets/agent/chat/agent_chat_pills.dart';
 import 'package:e_team/presentation/widgets/agent/chat/agent_chat_theme.dart';
 import 'package:flutter/material.dart';
 

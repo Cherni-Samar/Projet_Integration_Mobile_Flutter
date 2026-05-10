@@ -4,7 +4,10 @@ import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/screens/settings/privacy_policy_screen.dart';
 import 'package:e_team/presentation/screens/settings/terms_and_conditions_screen.dart';
-import 'package:e_team/presentation/widgets/auth/signup_widgets.dart';
+import 'package:e_team/presentation/widgets/auth/signup/signup_actions.dart';
+import 'package:e_team/presentation/widgets/auth/signup/signup_fields.dart';
+import 'package:e_team/presentation/widgets/auth/signup/signup_header.dart';
+import 'package:e_team/presentation/widgets/auth/signup/signup_terms.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});

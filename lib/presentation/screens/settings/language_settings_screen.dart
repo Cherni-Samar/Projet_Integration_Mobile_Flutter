@@ -5,7 +5,10 @@ import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/models/settings/language_option.dart';
 import 'package:e_team/presentation/providers/locale_provider.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
-import 'package:e_team/presentation/widgets/settings/language_settings_widgets.dart';
+import 'package:e_team/presentation/widgets/settings/language_settings/language_actions.dart';
+import 'package:e_team/presentation/widgets/settings/language_settings/language_header.dart';
+import 'package:e_team/presentation/widgets/settings/language_settings/language_info_banner.dart';
+import 'package:e_team/presentation/widgets/settings/language_settings/language_options.dart';
 
 class LanguageSettingsScreen extends StatefulWidget {
   const LanguageSettingsScreen({super.key});

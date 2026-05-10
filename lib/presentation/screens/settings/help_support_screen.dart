@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
-import 'package:e_team/presentation/widgets/settings/help_support_widgets.dart';
+import 'package:e_team/presentation/widgets/settings/help_support/help_support_content.dart';
+import 'package:e_team/presentation/widgets/settings/help_support/help_support_header.dart';
 
 class HelpSupportScreen extends StatelessWidget {
   const HelpSupportScreen({super.key});

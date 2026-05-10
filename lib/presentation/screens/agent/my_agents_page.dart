@@ -8,7 +8,8 @@ import 'package:e_team/presentation/screens/agent/echo/echo_dashboard_page.dart'
 import 'package:e_team/presentation/screens/agent/finance/kash_dashboard_screen.dart';
 import 'package:e_team/presentation/screens/agent/timo/timo_dashboard_page.dart';
 import 'package:e_team/presentation/screens/hera/hera_dashboard_page.dart';
-import 'package:e_team/presentation/widgets/agent/my_agents/my_agents_widgets.dart';
+import 'package:e_team/presentation/widgets/agent/my_agents/my_agents_list.dart';
+import 'package:e_team/presentation/widgets/agent/my_agents/my_agents_sheets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

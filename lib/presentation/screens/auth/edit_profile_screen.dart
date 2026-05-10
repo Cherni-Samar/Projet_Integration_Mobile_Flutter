@@ -4,7 +4,9 @@ import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/domain/models/user_model.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
-import 'package:e_team/presentation/widgets/auth/edit_profile_widgets.dart';
+import 'package:e_team/presentation/widgets/auth/edit_profile/edit_profile_app_bar.dart';
+import 'package:e_team/presentation/widgets/auth/edit_profile/edit_profile_avatar.dart';
+import 'package:e_team/presentation/widgets/auth/edit_profile/edit_profile_fields.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final User user;

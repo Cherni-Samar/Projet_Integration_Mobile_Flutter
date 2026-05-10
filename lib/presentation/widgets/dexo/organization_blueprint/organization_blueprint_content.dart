@@ -3,7 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:e_team/domain/models/dexo/dexo_onboarding_models.dart';
 import 'package:e_team/presentation/widgets/dexo/organization_blueprint/organization_blueprint_helpers.dart';
-import 'package:e_team/presentation/widgets/dexo/organization_blueprint/organization_blueprint_sections.dart';
+import 'package:e_team/presentation/widgets/dexo/organization_blueprint/organization_blueprint_actions.dart';
+import 'package:e_team/presentation/widgets/dexo/organization_blueprint/organization_blueprint_agents.dart';
+import 'package:e_team/presentation/widgets/dexo/organization_blueprint/organization_blueprint_header.dart';
+import 'package:e_team/presentation/widgets/dexo/organization_blueprint/organization_blueprint_rows.dart';
 import 'package:e_team/presentation/widgets/dexo/organization_blueprint/organization_blueprint_theme.dart';
 
 class OrganizationBlueprintContent extends StatelessWidget {

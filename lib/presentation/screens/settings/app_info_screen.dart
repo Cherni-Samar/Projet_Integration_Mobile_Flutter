@@ -1,6 +1,9 @@
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
-import 'package:e_team/presentation/widgets/settings/app_info_widgets.dart';
+import 'package:e_team/presentation/widgets/settings/app_info/app_info_cards.dart';
+import 'package:e_team/presentation/widgets/settings/app_info/app_info_header.dart';
+import 'package:e_team/presentation/widgets/settings/app_info/app_info_hero.dart';
+import 'package:e_team/presentation/widgets/settings/app_info/app_info_links.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

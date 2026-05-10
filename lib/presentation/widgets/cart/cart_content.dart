@@ -1,6 +1,8 @@
 import 'package:e_team/presentation/providers/cart_provider.dart';
 import 'package:e_team/presentation/widgets/cart/cart_footer.dart';
-import 'package:e_team/presentation/widgets/cart/cart_item_cards.dart';
+import 'package:e_team/presentation/widgets/cart/cart_agent_item_card.dart';
+import 'package:e_team/presentation/widgets/cart/cart_plan_item_card.dart';
+import 'package:e_team/presentation/widgets/cart/cart_section_title.dart';
 import 'package:flutter/material.dart';
 
 class CartContent extends StatelessWidget {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:e_team/presentation/models/dexo/department_pulse_view_model.dart';
-import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_organization_pulse_cards.dart';
+import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_department_pulse_card.dart';
+import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_organization_empty_state.dart';
+import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_organization_pulse_hero.dart';
 import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_organization_pulse_chrome.dart';
 import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_organization_pulse_helpers.dart';
 import 'package:e_team/presentation/widgets/dexo/organization_pulse/dexo_organization_pulse_theme.dart';

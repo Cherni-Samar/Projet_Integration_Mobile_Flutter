@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:e_team/presentation/widgets/splash/splash_widgets.dart';
+import 'package:e_team/presentation/widgets/splash/splash_background.dart';
+import 'package:e_team/presentation/widgets/splash/splash_brand.dart';
+import 'package:e_team/presentation/widgets/splash/splash_core.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

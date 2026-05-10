@@ -1,5 +1,9 @@
 import 'package:e_team/data/services/dexo_service.dart';
-import 'package:e_team/presentation/widgets/documents/document_category_widgets.dart';
+import 'package:e_team/presentation/widgets/documents/document_category_app_bar.dart';
+import 'package:e_team/presentation/widgets/documents/document_category_card.dart';
+import 'package:e_team/presentation/widgets/documents/document_category_dialogs.dart';
+import 'package:e_team/presentation/widgets/documents/document_category_states.dart';
+import 'package:e_team/presentation/widgets/documents/document_category_theme.dart';
 import 'package:flutter/material.dart';
 
 class DocumentCategoryPage extends StatefulWidget {

@@ -3,7 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:e_team/presentation/models/timo/timo_task_view_model.dart';
 import 'package:e_team/presentation/widgets/timo/timo_design_system.dart';
-import 'package:e_team/presentation/widgets/timo/timo_shared_widgets.dart';
+import 'package:e_team/presentation/widgets/timo/timo_common_widgets.dart';
+import 'package:e_team/presentation/widgets/timo/timo_stats_widgets.dart';
+import 'package:e_team/presentation/widgets/timo/timo_task_widgets.dart';
 
 class TimoJournalTab extends StatelessWidget {
   const TimoJournalTab({

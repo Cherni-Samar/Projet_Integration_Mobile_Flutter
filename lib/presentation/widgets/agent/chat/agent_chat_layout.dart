@@ -1,7 +1,10 @@
 import 'package:e_team/presentation/providers/owned_agents_provider.dart';
 import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 import 'package:e_team/presentation/widgets/agent/chat/agent_chat_models.dart';
-import 'package:e_team/presentation/widgets/agent/chat/agent_chat_shared.dart';
+import 'package:e_team/presentation/widgets/agent/chat/agent_chat_avatars.dart';
+import 'package:e_team/presentation/widgets/agent/chat/agent_chat_buttons.dart';
+import 'package:e_team/presentation/widgets/agent/chat/agent_chat_cards.dart';
+import 'package:e_team/presentation/widgets/agent/chat/agent_chat_pills.dart';
 import 'package:flutter/material.dart';
 
 class AgentChatScaffoldBackground extends StatelessWidget {

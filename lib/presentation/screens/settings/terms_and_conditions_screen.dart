@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/models/settings/terms_conditions_section.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
-import 'package:e_team/presentation/widgets/settings/terms_conditions_widgets.dart';
+import 'package:e_team/presentation/widgets/settings/terms_conditions/terms_conditions_content.dart';
+import 'package:e_team/presentation/widgets/settings/terms_conditions/terms_conditions_header.dart';
 
 class TermsAndConditionsScreen extends StatefulWidget {
   const TermsAndConditionsScreen({super.key});

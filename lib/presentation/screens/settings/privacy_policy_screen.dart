@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/models/settings/privacy_policy_section.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
-import 'package:e_team/presentation/widgets/settings/privacy_policy_widgets.dart';
+import 'package:e_team/presentation/widgets/settings/privacy_policy/privacy_policy_content.dart';
+import 'package:e_team/presentation/widgets/settings/privacy_policy/privacy_policy_header.dart';
 
 class PrivacyPolicyScreen extends StatefulWidget {
   const PrivacyPolicyScreen({super.key});

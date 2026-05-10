@@ -2,7 +2,9 @@ import 'package:e_team/presentation/providers/owned_agents_provider.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
 import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 import 'package:e_team/presentation/widgets/agent/chat/agent_chat_models.dart';
-import 'package:e_team/presentation/widgets/agent/chat/agent_chat_widgets.dart';
+import 'package:e_team/presentation/widgets/agent/chat/agent_chat_input.dart';
+import 'package:e_team/presentation/widgets/agent/chat/agent_chat_layout.dart';
+import 'package:e_team/presentation/widgets/agent/chat/agent_chat_messages.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

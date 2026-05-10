@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/l10n/app_localizations.dart';
-import 'package:e_team/presentation/widgets/auth/email_verification_widgets.dart';
+import 'package:e_team/presentation/widgets/auth/email_verification/email_verification_content.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key});

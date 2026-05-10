@@ -7,7 +7,7 @@ import 'package:e_team/presentation/widgets/echo/echo_dashboard_header.dart';
 import 'package:e_team/presentation/widgets/echo/echo_dashboard_navigation.dart';
 import 'package:e_team/presentation/widgets/echo/echo_overview_tab.dart';
 import 'package:e_team/presentation/widgets/echo/echo_messages_tab.dart';
-import 'package:e_team/presentation/widgets/echo/echo_posts_tab.dart';
+import 'package:e_team/presentation/widgets/echo/echo_posts/echo_posts_view.dart';
 
 class EchoDashboardPage extends StatefulWidget {
   final String? token;

@@ -1,5 +1,9 @@
 import 'package:e_team/data/services/hera_service.dart';
-import 'package:e_team/presentation/widgets/hera/history/hera_history_widgets.dart';
+import 'package:e_team/presentation/widgets/hera/history/hera_history_config.dart';
+import 'package:e_team/presentation/widgets/hera/history/hera_history_empty_state.dart';
+import 'package:e_team/presentation/widgets/hera/history/hera_history_header.dart';
+import 'package:e_team/presentation/widgets/hera/history/hera_history_item.dart';
+import 'package:e_team/presentation/widgets/hera/history/hera_history_loading.dart';
 import 'package:flutter/material.dart';
 
 class HeraHistoryPage extends StatefulWidget {

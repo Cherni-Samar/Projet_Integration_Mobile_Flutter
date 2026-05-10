@@ -1,5 +1,5 @@
 import 'package:e_team/domain/models/echo_models.dart';
-import 'package:e_team/presentation/widgets/echo/echo_posts/echo_post_card.dart';
+import 'package:e_team/presentation/widgets/echo/echo_posts/echo_post_card_view.dart';
 import 'package:e_team/presentation/widgets/echo/echo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';

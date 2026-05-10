@@ -4,8 +4,9 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:e_team/data/services/timo_service.dart';
 import 'package:e_team/presentation/models/timo/timo_task_view_model.dart';
 import 'package:e_team/presentation/widgets/timo/timo_design_system.dart';
-import 'package:e_team/presentation/widgets/timo/timo_dashboard_tabs.dart';
-import 'package:e_team/presentation/widgets/timo/timo_shared_widgets.dart';
+import 'package:e_team/presentation/widgets/timo/timo_agenda_tab.dart';
+import 'package:e_team/presentation/widgets/timo/timo_journal_tab.dart';
+import 'package:e_team/presentation/widgets/timo/timo_chrome_widgets.dart';
 
 // ─────────────────────────────────────────────────────────────
 //  PAGE PRINCIPALE

@@ -7,7 +7,9 @@ import 'package:e_team/data/services/stripe_service.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/models/pricing/pricing_offer.dart';
 import 'package:e_team/presentation/providers/user_provider.dart';
-import 'package:e_team/presentation/widgets/pricing/pricing_widgets.dart';
+import 'package:e_team/presentation/widgets/pricing/pricing_dialogs.dart';
+import 'package:e_team/presentation/widgets/pricing/pricing_offers_list.dart';
+import 'package:e_team/presentation/widgets/pricing/pricing_processing_overlay.dart';
 
 class PricingPage extends StatefulWidget {
   const PricingPage({super.key});

@@ -1,5 +1,10 @@
 import 'package:e_team/data/services/vapi_service.dart';
-import 'package:e_team/presentation/widgets/hera/voice/hera_voice_widgets.dart';
+import 'package:e_team/presentation/widgets/hera/voice/hera_voice_background.dart';
+import 'package:e_team/presentation/widgets/hera/voice/hera_voice_controls.dart';
+import 'package:e_team/presentation/widgets/hera/voice/hera_voice_models.dart';
+import 'package:e_team/presentation/widgets/hera/voice/hera_voice_orb.dart';
+import 'package:e_team/presentation/widgets/hera/voice/hera_voice_theme.dart';
+import 'package:e_team/presentation/widgets/hera/voice/hera_voice_transcript.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 

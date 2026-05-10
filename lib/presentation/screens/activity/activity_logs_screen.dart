@@ -1,6 +1,8 @@
 import 'package:e_team/data/services/activity_service.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
-import 'package:e_team/presentation/widgets/activity/activity_logs_widgets.dart';
+import 'package:e_team/presentation/widgets/activity/activity_cards.dart';
+import 'package:e_team/presentation/widgets/activity/activity_filters.dart';
+import 'package:e_team/presentation/widgets/activity/activity_overview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

@@ -1,5 +1,10 @@
 import 'package:e_team/data/services/hera_service.dart';
-import 'package:e_team/presentation/widgets/dexo/production/dexo_production_widgets.dart';
+import 'package:e_team/presentation/widgets/dexo/production/dexo_production_chrome.dart';
+import 'package:e_team/presentation/widgets/dexo/production/dexo_production_details.dart';
+import 'package:e_team/presentation/widgets/dexo/production/dexo_production_filters.dart';
+import 'package:e_team/presentation/widgets/dexo/production/dexo_production_states.dart';
+import 'package:e_team/presentation/widgets/dexo/production/dexo_production_theme.dart';
+import 'package:e_team/presentation/widgets/dexo/production/dexo_production_tiles.dart';
 import 'package:flutter/material.dart';
 
 class DexoProductionScreen extends StatefulWidget {

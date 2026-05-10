@@ -1,6 +1,8 @@
 import 'package:e_team/data/services/echo_service.dart';
 import 'package:e_team/presentation/widgets/echo/product_marketing/echo_product_marketing_theme.dart';
-import 'package:e_team/presentation/widgets/echo/product_marketing/echo_product_marketing_widgets.dart';
+import 'package:e_team/presentation/widgets/echo/product_marketing/echo_campaign_history_tab.dart';
+import 'package:e_team/presentation/widgets/echo/product_marketing/echo_product_marketing_form.dart';
+import 'package:e_team/presentation/widgets/echo/product_marketing/echo_product_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

@@ -9,7 +9,10 @@ import 'package:e_team/presentation/screens/auth/edit_profile_screen.dart';
 import 'package:e_team/presentation/screens/settings/language_settings_screen.dart';
 import 'package:e_team/presentation/screens/settings/privacy_policy_screen.dart';
 import 'package:e_team/presentation/screens/settings/terms_and_conditions_screen.dart';
-import 'package:e_team/presentation/widgets/auth/user_profile_widgets.dart';
+import 'package:e_team/presentation/widgets/auth/user_profile/user_profile_dialogs.dart';
+import 'package:e_team/presentation/widgets/auth/user_profile/user_profile_header.dart';
+import 'package:e_team/presentation/widgets/auth/user_profile/user_profile_identity.dart';
+import 'package:e_team/presentation/widgets/auth/user_profile/user_profile_options.dart';
 
 class UserProfilePage extends StatefulWidget {
   final User? user;

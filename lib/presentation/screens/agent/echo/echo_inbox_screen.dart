@@ -3,7 +3,10 @@ import 'package:e_team/data/services/echo_service.dart';
 import 'package:e_team/domain/models/echo_models.dart';
 import 'package:e_team/presentation/screens/agent/agent_communication_screen.dart';
 import 'echo_email_detail_screen.dart';
-import 'package:e_team/presentation/widgets/echo/inbox/echo_inbox_widgets.dart';
+import 'package:e_team/presentation/widgets/echo/inbox/echo_email_card.dart';
+import 'package:e_team/presentation/widgets/echo/inbox/echo_inbox_header.dart';
+import 'package:e_team/presentation/widgets/echo/inbox/echo_inbox_states.dart';
+import 'package:e_team/presentation/widgets/echo/inbox/echo_inbox_tabs.dart';
 import 'package:e_team/presentation/widgets/echo/inbox/echo_email_details_sheet.dart';
 
 class EchoInboxScreen extends StatefulWidget {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:e_team/data/services/hera_service.dart';
-import 'package:e_team/presentation/widgets/dexo/dashboard/dexo_dashboard_widgets.dart';
+import 'package:e_team/presentation/widgets/dexo/dashboard/dexo_dashboard_chrome.dart';
+import 'package:e_team/presentation/widgets/dexo/dashboard/dexo_dashboard_list.dart';
+import 'package:e_team/presentation/widgets/dexo/dashboard/dexo_dashboard_theme.dart';
 import 'dexo_production_screen.dart';
 import 'dexo_organization_pulse_screen.dart';
 

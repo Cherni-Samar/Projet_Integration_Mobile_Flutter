@@ -3,7 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'package:e_team/domain/models/hera_models.dart';
-import 'package:e_team/presentation/widgets/hera/agenda/hera_agenda_widgets.dart';
+import 'package:e_team/presentation/widgets/hera/agenda/hera_agenda_calendar_card.dart';
+import 'package:e_team/presentation/widgets/hera/agenda/hera_agenda_legend.dart';
+import 'package:e_team/presentation/widgets/hera/agenda/hera_leave_detail_card.dart';
 import 'package:e_team/presentation/widgets/hera/hera_shared_widgets.dart';
 
 /// Agenda tab — calendar view of approved leaves.

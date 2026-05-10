@@ -2,7 +2,10 @@ import 'dart:math';
 
 import 'package:e_team/data/services/agent_interaction_service.dart';
 import 'package:e_team/domain/models/agent_interaction_model.dart';
-import 'package:e_team/presentation/widgets/agent/inter_flow/agent_inter_flow_widgets.dart';
+import 'package:e_team/presentation/widgets/agent/inter_flow/agent_inter_flow_design.dart';
+import 'package:e_team/presentation/widgets/agent/inter_flow/agent_inter_flow_header_stats.dart';
+import 'package:e_team/presentation/widgets/agent/inter_flow/agent_inter_flow_states.dart';
+import 'package:e_team/presentation/widgets/agent/inter_flow/agent_interaction_flow_widgets.dart';
 import 'package:flutter/material.dart';
 
 class AgentInterFlowPage extends StatefulWidget {

@@ -2,7 +2,9 @@ import 'package:e_team/data/dtos/user_dto.dart';
 import 'package:e_team/data/services/auth_service.dart';
 import 'package:e_team/l10n/app_localizations.dart';
 import 'package:e_team/presentation/providers/theme_provider.dart';
-import 'package:e_team/presentation/widgets/auth/login_widgets.dart';
+import 'package:e_team/presentation/widgets/auth/login/login_actions.dart';
+import 'package:e_team/presentation/widgets/auth/login/login_background.dart';
+import 'package:e_team/presentation/widgets/auth/login/login_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
