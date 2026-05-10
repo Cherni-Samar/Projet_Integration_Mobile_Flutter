@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:e_team/presentation/widgets/agent/agent_marketplace_card_stats.dart';
 import 'package:e_team/presentation/utils/domain_model_color_extensions.dart';
 
 class AgentMarketplaceCard extends StatelessWidget {
@@ -19,48 +20,6 @@ class AgentMarketplaceCard extends StatelessWidget {
     required this.isDark,
     required this.onTap,
   });
-
-  /// Get agent-specific stats based on agent name
-  List<Map<String, dynamic>> _getAgentStats(String agentName) {
-    switch (agentName.toLowerCase()) {
-      case 'hera':
-        return [
-          {'label': 'HR Requests', 'value': '12', 'icon': Icons.person_add},
-          {'label': 'Interviews', 'value': '4', 'icon': Icons.event},
-          {'label': 'Pending', 'value': '3', 'icon': Icons.pending_actions},
-        ];
-      case 'kash':
-        return [
-          {'label': 'Budgets', 'value': '8', 'icon': Icons.account_balance},
-          {'label': 'Approved', 'value': '15', 'icon': Icons.check_circle},
-          {'label': 'Rejected', 'value': '2', 'icon': Icons.cancel},
-        ];
-      case 'echo':
-        return [
-          {'label': 'Posts', 'value': '6', 'icon': Icons.campaign},
-          {'label': 'Campaigns', 'value': '3', 'icon': Icons.trending_up},
-          {'label': 'Reach', 'value': '2.4k', 'icon': Icons.visibility},
-        ];
-      case 'dexo':
-        return [
-          {'label': 'Reports', 'value': '5', 'icon': Icons.description},
-          {'label': 'Documents', 'value': '28', 'icon': Icons.folder},
-          {'label': 'Briefings', 'value': '1', 'icon': Icons.summarize},
-        ];
-      case 'timo':
-        return [
-          {'label': 'Meetings', 'value': '9', 'icon': Icons.event_note},
-          {'label': 'Reminders', 'value': '14', 'icon': Icons.notifications},
-          {'label': 'Tasks', 'value': '22', 'icon': Icons.task_alt},
-        ];
-      default:
-        return [
-          {'label': 'Tasks', 'value': '0', 'icon': Icons.task},
-          {'label': 'Active', 'value': '0', 'icon': Icons.check},
-          {'label': 'Pending', 'value': '0', 'icon': Icons.pending},
-        ];
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -266,19 +225,10 @@ class AgentMarketplaceCard extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 8), // Reduced from 10
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children:
-                                        _getAgentStats(agent['name'] as String)
-                                            .map(
-                                              (stat) => _buildStatItem(
-                                                stat['label'] as String,
-                                                stat['value'] as String,
-                                                stat['icon'] as IconData,
-                                              ),
-                                            )
-                                            .toList(),
+                                  AgentMarketplaceStatsRow(
+                                    agentName: agent['name'] as String,
+                                    agentColor: agentColor,
+                                    isDark: isDark,
                                   ),
                                 ],
                               ),
@@ -353,46 +303,6 @@ class AgentMarketplaceCard extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Flexible(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: colorFromValue(agent['color']).withValues(alpha: 0.7),
-            size: 16, // Reduced from 18
-          ),
-          const SizedBox(height: 3), // Reduced from 4
-          Text(
-            value,
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.black,
-              fontSize: 14, // Reduced from 16
-              fontWeight: FontWeight.w800,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 1), // Reduced from 2
-          Text(
-            label,
-            style: TextStyle(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.5)
-                  : Colors.black.withValues(alpha: 0.5),
-              fontSize: 8, // Reduced from 9
-              fontWeight: FontWeight.w600,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
     );
   }
 }
